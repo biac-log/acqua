@@ -1,5 +1,5 @@
 <template>
-	<v-app id="inspire" @keypress.enter="login">
+	<v-app id="inspire">
 		<v-content>
 			<v-container class="fill-height" fluid>
 				<v-row align="center" justify="center">
@@ -12,10 +12,12 @@
 								<v-form>
 									<v-text-field
 										label="Utilisateur"
+										ref="loginElement"
 										name="login"
 										prepend-icon="mdi-account"
 										type="text"
 										v-model="username"
+										@keypress.enter="login"
 									></v-text-field>
 
 									<v-text-field
@@ -25,6 +27,7 @@
 										prepend-icon="mdi-lock"
 										type="password"
 										v-model="password"
+										@keypress.enter="login"
 									></v-text-field>
 								</v-form>
 							</v-card-text>
@@ -58,9 +61,9 @@ export default class extends Vue {
   public loading: Boolean = false;
   public errorMessage: string = "";
 
-  // mounted() {
-  //   (this.$refs.username as HTMLFormElement).focus();
-  // }
+  mounted() {
+    this.$nextTick(() => (this.$refs.loginElement as HTMLInputElement).focus());
+  }
 
   public login() {
     this.loading = true;
