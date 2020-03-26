@@ -1,37 +1,120 @@
 <template>
-	<v-container>
-    <v-radio-group v-model="periode" row @change="LoadPeriode">
-      <v-radio label="Période courante" value="Courante"></v-radio>
-      <v-radio label="Période précédente" value="Precedente"></v-radio>
-    </v-radio-group>
-    {{debutPeriode}}
-    {{finPeriode}}
-    {{Title}}
+  <v-container>
+    <v-card class="align-start">
+      <v-row class="pl-5" align="center" justify="center">
+        <v-col cols=3>
+          <v-row>
+          <v-radio-group v-model="periode" row @change="LoadPeriode" :messages="libellePeriode"> 
+            <v-radio label="Période courante" value="Courante"></v-radio>
+            <v-radio label="Période précédente" value="Precedente"></v-radio>
+          </v-radio-group>
+          </v-row>
+        </v-col>
+        <v-col cols="2">
+          <v-text-field label="Journal" placeholder="Numéro" outlined v-model="NumeroJournal" type="number" @keydown.enter="LoadJournal" :loading="journalIsLoading" hide-details="true"></v-text-field>
+        </v-col>
+        <v-col cols="1" class="pl-0">
+          <v-btn @click="searchJournalDialog = true" outlined fab small color="blue" >
+            <v-icon>mdi-magnify</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col>
+          <p>{{LibelleJournal}}</p>
+        </v-col>
+      </v-row>
+    </v-card>
+        <v-snackbar
+          v-model="errorPopup"
+          :timeout="timeout"
+          color="error"
+          top
+        >
+      {{ errorMessage }}
+      <v-btn
+        color="black"
+        text
+        @click="errorPopup = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
+     <v-row justify="center">
+      <v-dialog v-model="searchJournalDialog" scrollable max-width="300px">
+        <v-card>
+          <v-card-title>Sélection d'un journal</v-card-title>
+          <v-divider></v-divider>
+          <v-card-text style="height: 300px;">
+
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="searchJournalDialog = false">Fermer</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from 'axios';
-import { PeriodeComptable } from '@/models/PeriodeComptable'
+import axios from "axios";
+import { PeriodeComptable } from "@/models/PeriodeComptable";
+import moment from "moment";
+import { JournalAV } from "@/models/JournalAV"
 
 @Component({
   name: "AchatVente"
 })
 export default class extends Vue {
-  public Title: string="";
-  public periode: string = "";
-  public debutPeriode : Date = new Date();
-  public finPeriode : Date = new Date();
+  public Title: string = "";
+  public periode: string = "Courante";
+  public NumeroJournal: number = 0;
+  public LibelleJournal : string = "";
+  public errorMessage: string = "";
+  public errorPopup: boolean = false;
+  public timeout: number = 5000;
+  public journalIsLoading: boolean = false;
+  public searchJournalDialog: boolean = false;
+  public libellePeriode: string="";
+  mounted() {
+    this.LoadPeriode();
+  }
 
-  public LoadPeriode(){
-      this.Title = this.periode
+  public LoadPeriode() {
+    axios
+      .get<PeriodeComptable>(
+        process.env.VUE_APP_ApiAcQuaCore +
+          "/AchatVente/GetPeriode" +
+          this.periode
+      )
+      .then(resp => {
 
-     axios.get<PeriodeComptable>(process.env.VUE_APP_ApiAcQuaCore + "/AchatVente/GetPeriode" + this.periode)
-          .then((resp) => {
-              this.debutPeriode = resp.data.debut;
-              this.finPeriode = resp.data.fin;
-          });
+        this.libellePeriode = "Début " + moment(resp.data.debut).format("DD/MM/YYYY") + " - Fin " + moment(resp.data.fin).format("DD/MM/YYYY");
+
+      }).catch(error => {
+        this.errorPopup = true;
+        this.errorMessage = error.response.data;
+      });
+  }
+
+  public LoadJournal()
+  {
+    this.journalIsLoading = true;
+    axios
+      .get<JournalAV>(
+        process.env.VUE_APP_ApiAcQuaCore +
+          "/AchatVente/GetJournal?numero=" + this.NumeroJournal, 
+      )
+      .then(resp => {
+        this.LibelleJournal = resp.data.libelle;
+      }).catch(error => {
+        this.errorPopup = true;
+        this.errorMessage = error.response.data;
+      }).finally(() => {
+        this.journalIsLoading = false;
+      });
   }
 }
 </script>
