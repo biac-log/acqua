@@ -59,7 +59,7 @@ export default class extends Vue {
   private drawer: Boolean = true;
   private mini: Boolean = false;
   private source: String = "";
-  private currentRoute: string | null | undefined = "";
+  private currentRoute: any = "";
 
   mounted() {
     this.currentRoute = this.$route.name;
