@@ -32,7 +32,7 @@
 		</v-app-bar>
 
 		<v-content>
-			<v-container class="fill-height" fluid>
+			<v-container fluid>
 				<app-main />
 			</v-container>
 		</v-content>
