@@ -5,11 +5,11 @@ import store from '@/store/index';
 import { Utilisateur } from '@/models/Utilisateur';
 
 export interface IUserState {
-  token: string
-  username: string
-  expire: string
-  status: string
-  hasLoadedOnce: boolean
+  token: string,
+  username: string,
+  expire: string,
+  status: string,
+  utilisateur: Utilisateur
 }
 
 @Module({ dynamic: true, store, name: 'user' })
@@ -18,8 +18,8 @@ class User extends VuexModule implements IUserState {
   public token: string = localStorage.getItem("user-token") || "";
   public expire: string = localStorage.getItem("token-expire") || "";
   public status: string = '';
+  public utilisateur: Utilisateur = new Utilisateur();
   public username: string = '';
-  public hasLoadedOnce: boolean = false;
 
   @Mutation
   private SET_TOKEN(resp: Token): void {
@@ -29,18 +29,17 @@ class User extends VuexModule implements IUserState {
     this.token = resp.value;
     this.expire = dateExpire;
     this.status = "success";
-    this.hasLoadedOnce = true;
   };
 
   @Mutation
-  private SET_USER(resp: Utilisateur): void {
-    this.username = resp.NomPrenom;
+  private SET_USER(user: Utilisateur): void {
+    this.utilisateur = user;
+    this.username = user.NomPrenom;
   };
 
   @Mutation
   private LOGIN_FAIL(): void {
     this.status = "error";
-    this.hasLoadedOnce = true;
   };
 
   @Mutation
@@ -76,7 +75,7 @@ class User extends VuexModule implements IUserState {
       const header = `Bearer ${this.token}`;
       axios.get<Utilisateur>(`${process.env.VUE_APP_ApiGestionUser}/User/GetUserLog/ACQUA`, { withCredentials: false, headers: { Authorization: header } })
         .then((resp) => {
-          this.SET_USER(resp.data)
+          this.SET_USER(resp.data);
           resolve(resp);
         })
         .catch((err) => {

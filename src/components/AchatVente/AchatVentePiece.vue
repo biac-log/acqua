@@ -1,24 +1,42 @@
 <template>
-  <v-dialog v-model="dialog" scrollable>
-    <v-card>
-        <v-card-title>
-        <v-row>
-          <v-col cols="auto"> 
-            <v-text-field label="Période" :value="periodeDisplay" outlined dense readonly filled hide-details></v-text-field>
-          </v-col>
-          <v-col cols="auto">
-            <v-text-field label="Journal" :value="journalDisplay" outlined dense filled readonly hide-details></v-text-field>
-          </v-col>
-          <v-col cols="auto">
-            <v-text-field label="Numéro pièce" :value="numeroPiece" outlined dense filled readonly hide-details></v-text-field>
-          </v-col>
-        </v-row>
-        </v-card-title>
-        
-      <v-divider></v-divider>
-      <v-card-text></v-card-text>
-    </v-card>
-  </v-dialog>
+	<v-dialog v-model="dialog" scrollable width="unset">
+		<v-card>
+			<v-card-title class="d-flex justify-start">
+				<v-text-field
+					label="Période"
+					:value="periodeDisplay"
+					outlined
+					dense
+					readonly
+					filled
+					hide-details
+					class="ma-2"
+				></v-text-field>
+				<v-text-field
+					label="Journal"
+					:value="journalDisplay"
+					outlined
+					dense
+					filled
+					readonly
+					hide-details
+					class="ma-2"
+				></v-text-field>
+				<v-text-field
+					label="Numéro pièce"
+					:value="numeroPiece"
+					outlined
+					dense
+					filled
+					readonly
+					hide-details
+					class="ma-2"
+				></v-text-field>
+			</v-card-title>
+			<v-divider></v-divider>
+			<v-card-text></v-card-text>
+		</v-card>
+	</v-dialog>
 </template>
 
 <script lang="ts">
@@ -37,7 +55,7 @@ import moment from "moment";
 export default class extends Vue {
   public periodeDisplay: string = "";
   public journalDisplay: string = "";
-  public numeroPiece:number=0;
+  public numeroPiece: number = 0;
 
   @PropSync("dialogPiece")
   public dialog!: boolean;
