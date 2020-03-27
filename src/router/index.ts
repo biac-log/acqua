@@ -111,9 +111,9 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
       // // Dynamically add accessible routes
       // router.addRoutes(PermissionModule.dynamicRoutes)
       if (to.path.toUpperCase() == '/LOGIN') {
-        next({ path: '/achatvente', replace: true });
+        next({ path: '/achatvente' });
       } else {
-        next({ ...to, replace: true })
+        next({})
       }
     }).catch(reason => {
       next({ path: '/login' });

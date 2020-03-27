@@ -1,5 +1,5 @@
 <template>
-	<v-dialog v-model="dialog" scrollable width="unset">
+	<v-dialog v-model="dialog" scrollable width="1000">
 		<v-card>
 			<v-card-title class="d-flex justify-start">
 				<v-text-field
