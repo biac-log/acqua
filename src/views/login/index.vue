@@ -18,6 +18,7 @@
 										type="text"
 										v-model="username"
 										@keypress.enter="login"
+										autofocus
 									></v-text-field>
 
 									<v-text-field
@@ -60,10 +61,6 @@ export default class extends Vue {
   public password: string = "";
   public loading: Boolean = false;
   public errorMessage: string = "";
-
-  mounted() {
-    this.$nextTick(() => (this.$refs.loginElement as HTMLInputElement).focus());
-  }
 
   public login() {
     this.loading = true;

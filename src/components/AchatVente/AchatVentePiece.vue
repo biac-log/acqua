@@ -2,36 +2,44 @@
 	<v-dialog v-model="dialog" scrollable width="1000">
 		<v-card>
 			<v-card-title class="d-flex justify-start">
-				<v-text-field
-					label="Période"
-					:value="periodeDisplay"
-					outlined
-					dense
-					readonly
-					filled
-					hide-details
-					class="ma-2"
-				></v-text-field>
-				<v-text-field
-					label="Journal"
-					:value="journalDisplay"
-					outlined
-					dense
-					filled
-					readonly
-					hide-details
-					class="ma-2"
-				></v-text-field>
-				<v-text-field
-					label="Numéro pièce"
-					:value="numeroPiece"
-					outlined
-					dense
-					filled
-					readonly
-					hide-details
-					class="ma-2"
-				></v-text-field>
+				<v-row>
+					<v-col cols="6">
+						<v-text-field
+							label="Période"
+							:value="periodeDisplay"
+							outlined
+							dense
+							readonly
+							filled
+							hide-details
+							class="ma-2"
+						></v-text-field>
+					</v-col>
+					<v-col cols="3">
+						<v-text-field
+							label="Journal"
+							:value="journalDisplay"
+							outlined
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+					</v-col>
+					<v-col cols="3">
+						<v-text-field
+							label="Numéro pièce"
+							:value="numeroPiece"
+							outlined
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+					</v-col>
+				</v-row>
 			</v-card-title>
 			<v-divider></v-divider>
 			<v-card-text></v-card-text>
@@ -87,16 +95,13 @@ export default class extends Vue {
   private SetPeriodeDisplay(periode: PeriodeComptable) {
     let stPeriode = "Courante";
     if (periode.typePeriodeComptable == "precedente") stPeriode = "Précédente";
-
-    this.periodeDisplay =
-      stPeriode +
-      " " +
-      moment(periode.debut).format("DD/MM/YYYY") +
-      " - " +
-      moment(periode.fin).format("DD/MM/YYYY");
+    this.periodeDisplay = `${stPeriode} ${moment(periode.debut).format(
+      "DD/MM/YYYY"
+    )} ${moment(periode.fin).format("DD/MM/YYYY")}`;
   }
+
   private SetJournalDisplay(journal: Journal) {
-    this.journalDisplay = journal.numero + " - " + journal.libelle;
+    this.journalDisplay = `${journal.numero} -  ${journal.libelle}`;
   }
 
   @Emit("saveAction")
