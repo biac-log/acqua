@@ -25,3 +25,52 @@ export class EntetePieceComptable {
     public fin: Date = new Date();
     public typePeriodeComptable: string = '';
   }
+
+  export class PieceComptable
+  {
+    public numeroJournal:number= 0;
+    public numeroPiece:number=0;
+    public codeDevise:number= 0;
+    public libelleDevise: string="";
+    public libelle: string="";
+    public taux:number=0;
+    public montantDevise:number=0;
+    public montantBase:number=0;
+    public datePiece: Date = new Date();
+    public dateEcheance: Date = new Date();
+    public montantEscompteDevise:number=0;
+    public montantEscompteBase:number=0;
+    public pieceAcquittee: boolean = false;
+    public statut:number=0;
+    public statutLibelle: string="";
+    public compteTiersCodeDevise:number=0;
+    public compteTiersLibelleDevise: string="";
+    public compteTiersNumero:number=0;
+    public compteTiersNom: string="";
+    public compteTiersSoldeComptable:number=0;
+    public delaiPaiementLibelle: string="";
+    public compteTiersEscomptePourcentage: string="";
+    public compteTiersEscompteNombreJours: string="";
+    public compteAssocieNumero: string="";
+    public compteAssocieNom: string="";
+    public compteVenteAchatNumero:number=0;
+    public compteVenteAchatNom: string="";
+    public deviseComptaLibelle: string="";
+    public contreparties:PieceComptableContrepartie[] =[];    
+  }
+
+  export class PieceComptableContrepartie
+  {
+    public numeroLigne:number=0;
+    public typeCompte: string="";
+        public numeroCompte:number=0;
+        public compteLibelle: string="";
+        public libelle: string="";
+        public codeMouvement: string="";
+        public montantDevise:number=0;
+        public montantBase:number=0;
+        public codeDevise:number=0;
+        public libelleDevise: string="";
+        public numeroCase:number=0;
+        public libelleCase: string="";
+  }
