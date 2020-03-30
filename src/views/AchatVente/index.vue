@@ -85,7 +85,7 @@ import {
   EntetePieceComptable
 } from "@/models/AchatVenteModels";
 import moment from "moment";
-import AchatVentePiece from "./AchatVentePiece.vue";
+import AchatVentePiece from "./components/AchatVentePiece.vue";
 
 @Component({
   name: "AchatVente",

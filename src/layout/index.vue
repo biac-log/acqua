@@ -2,20 +2,14 @@
 	<v-app id="inspire">
 		<v-navigation-drawer v-model="drawer" :mini-variant.sync="mini" app>
 			<v-list dense>
-				<v-list-item link :to="{path: '/home'}">
+				<v-list-item v-for="item in routes" 
+										:key="item.title"
+										:to="item">
 					<v-list-item-action>
-						<v-icon>mdi-home</v-icon>
+						<v-icon>{{ getOnlyChildren(item).meta.icon}}</v-icon>
 					</v-list-item-action>
 					<v-list-item-content>
-						<v-list-item-title>Home</v-list-item-title>
-					</v-list-item-content>
-				</v-list-item>
-				<v-list-item link :to="{path: '/achatvente'}">
-					<v-list-item-action>
-						<v-icon>mdi-currency-eur</v-icon>
-					</v-list-item-action>
-					<v-list-item-content>
-						<v-list-item-title>Achat Vente</v-list-item-title>
+						<v-list-item-title>{{ getOnlyChildren(item).name }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
 			</v-list>
@@ -47,7 +41,8 @@ import Vue from "vue";
 import { Component, Watch } from "vue-property-decorator";
 import { AppMain } from "./components";
 import { UserModule } from "@/store/modules/user";
-import { Route } from "vue-router";
+import { Route, RouteConfig } from "vue-router";
+import { PermissionModule } from '@/store/modules/permissions'
 
 @Component({
   name: "Layout",
@@ -64,6 +59,23 @@ export default class extends Vue {
   mounted() {
     this.currentRoute = this.$route.name;
   }
+
+	get routes(){
+		return PermissionModule.routes.filter((r) => !r.meta || !r.meta.hidden);
+	}
+
+	private getOnlyChildren(route:RouteConfig){
+    if (route.children) {
+      for (let child of route.children) {
+        if (!child.meta || !child.meta.hidden) {
+          return child
+        }
+      }
+    }
+    // If there is no children, return itself with path removed,
+    // because this.basePath already conatins item's path information
+    return { ...route, path: '' }
+	}
 
   @Watch("$route")
   private onRouteChange(route: Route) {
