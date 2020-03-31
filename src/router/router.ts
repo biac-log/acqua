@@ -76,7 +76,7 @@ const router = createRouter();
 
 router.beforeEach(async (to: Route, from: Route, next: any) => {
   if (UserModule.token) {
-    if (PermissionModule.routes && PermissionModule.routes.length === 0) {
+    if (!UserModule.utilisateur || (PermissionModule.routes && PermissionModule.routes.length === 0)) {
       UserModule.LoadUser()
         .then(() => {
           PermissionModule.GenerateRoutes(
@@ -87,7 +87,7 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
           if (to.path.toUpperCase() == "/LOGIN") {
             next({ path: "/" });
           } else {
-            next();
+            next({ ...to, replace: true })
           }
         })
         .catch(reason => {
@@ -103,7 +103,7 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
       next()
     } else {
       // Other pages that do not have permission to access are redirected to the login page.
-      next(`/login?redirect=${to.path}`)
+      next(`/login`)
     }
   }
 });

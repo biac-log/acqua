@@ -82,12 +82,13 @@ export default class extends Vue {
         process.env.VUE_APP_ApiAcQuaCore +
           "/AchatVente/GetPieceComptable?journal=" +
           entete.codeJournal +
-          "&stPeriode=" +
-          entete.codePiece +
-          "&stPeriode=" +
-          periode.typePeriodeComptable
+          "&piece=" +
+          entete.codePiece
       )
-      .then(resp => {})
+      .then(resp => {
+				let test = resp.data;
+				console.log(test);
+			})
       .catch(error => {})
       .finally(() => {});
   }
