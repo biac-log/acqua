@@ -1,156 +1,227 @@
 <template>
   <v-dialog v-model="dialog" scrollable width="2000">
     <v-card>
-      <v-card-title class="d-flex justify-start">
-        <v-row>
-          <v-col cols="3">
-            <v-text-field
-              label="Période"
-              v-model="periodeDisplay"
-              outlined
-              dense
-              readonly
-              filled
-              hide-details
-            ></v-text-field>
-          </v-col>
-          <v-col cols="2">
-            <v-text-field
-              label="Journal"
-              :value="journalDisplay"
-              outlined
-              dense
-              filled
-              readonly
-              hide-details
-            ></v-text-field>
-          </v-col>
-          <v-col cols="1">
-            <v-text-field
-              label="Numéro pièce"
-              :value="numeroPiece"
-              outlined
-              dense
-              filled
-              readonly
-              hide-details
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-card-title>
-      <v-divider />
+      <v-toolbar color="primary" dark flat>
+        <v-card-title class="d-flex justify-start">
+          <p class="mb-0">Pièce {{numeroJournal}}.{{numeroPiece}}</p>
+          <p class="ml-10 mb-0 textMini">Période {{periodeDisplay}}</p>
+          <p class="ml-5 mb-0 textMini">Journal {{journalDisplay}}</p>
+        </v-card-title>
+      </v-toolbar>
       <v-card-text>
-        <v-row>
-          <v-text-field
-            label="Numéro compte tiers"
-            :value="pieceComptableData.compteTiersNumero"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-          <v-text-field
-            label="Nom compte tiers"
-            :value="pieceComptableData.compteTiersNom"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-          <v-text-field
-            label="Libelle"
-            :value="pieceComptableData.libelle"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-        </v-row>
-        <v-row>
-          <v-text-field
-            label="Montant"
-            :value="pieceComptableData.montantDevise"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-          <v-text-field
-            label="Devise pièce"
-            :value="pieceComptableData.libelleDevise"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-          <v-text-field
-            label="Taux"
-            :value="pieceComptableData.taux"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-        </v-row>
-        <v-row>
-          <v-text-field
-            label="Date pièce"
-            v-model="pieceComptableData.datePiece"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-          <v-text-field
-            label="Date échéance"
-            :value="pieceComptableData.dateEcheance"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-          <v-text-field
-            label="Montant Escompte"
-            :value="pieceComptableData.montantEscompteDevise"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-          <v-checkbox label="Pièce acquitée" :value="pieceComptableData.pieceAcquittee"></v-checkbox>
-          <v-text-field
-            label="Statut"
-            :value="pieceComptableData.dateEcheance"
-            dense
-            filled
-            readonly
-            hide-details
-            class="ma-2"
-          ></v-text-field>
-        </v-row>
-        <v-row>
-          <v-data-table
-            :headers="headersContreparties"
-            :items="contreparties"
-            :items-per-page="10"
-            class="elevation-1"
-          >
-		  <template v-slot:item.montantDevise="{ item }">
-          <span>{{ item.montantDevise.toFixed(2) }}</span>
-        </template>
-		<template v-slot:item.numeroCase="{ item }">
-          <span>{{ item.numeroCase }} - {{item.libelleCase}}</span>
-        </template>
-		  </v-data-table>
+        <v-row fill-height>
+          <v-col cols="6">
+            <v-row dense>
+              <v-col cols="4">
+                <v-text-field
+                  label="Numéro compte tiers"
+                  :value="pieceComptableData.compteTiersNumero"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+              <v-col cols="8">
+                <v-text-field
+                  label="Nom compte tiers"
+                  :value="pieceComptableData.compteTiersNom"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col cols="12">
+                <v-text-field
+                  label="Libelle"
+                  :value="pieceComptableData.libelle"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col cols="2">
+                <v-text-field
+                  label="Devise pièce"
+                  :value="pieceComptableData.libelleDevise"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="Montant"
+                  :value="pieceComptableData.montantDevise"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="Montant Escompte"
+                  :value="pieceComptableData.montantEscompteDevise"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+
+              <v-col cols="2">
+                <v-text-field
+                  label="Taux"
+                  :value="pieceComptableData.taux"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col cols="4">
+                <v-text-field
+                  label="Date pièce"
+                  v-model="datePiece"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="Date échéance"
+                  :value="dateEcheance"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+			  <v-col cols="4">
+                <v-text-field
+                  label="Statut"
+                  :value="statut"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row dense>
+              
+              <v-col cols="4">
+                <v-checkbox label="Pièce acquitée" :value="pieceComptableData.pieceAcquittee"></v-checkbox>
+              </v-col>
+			  <v-col cols="4">
+                <v-text-field
+                  label="Montant en devise comtpable"
+                  :value="montantCompta"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-divider></v-divider>
+			<v-card-title>Informations compte tiers</v-card-title>
+			<v-row dense>
+              <v-col cols="3">
+                <v-text-field
+                  label="Solde du compte"
+                  :value="soldeCompteTiers"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+			  <v-col cols="3">
+                <v-text-field
+                  label="Délai de paiement"
+                  :value="pieceComptableData.delaiPaiementLibelle"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+			  <v-col cols="3">
+                <v-text-field
+                  label="% Escompte"
+                  :value="pieceComptableData.compteTiersEscomptePourcentage"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+			  <v-col cols="3">
+                <v-text-field
+                  label="Nombre jours escompte"
+                  :value="pieceComptableData.compteTiersEscompteNombreJours"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col cols="6">
+                <v-text-field
+                  label="Compte associé"
+                  :value="compteAssocie"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+			  <v-col cols="6">
+                <v-text-field
+                  label="Compte achat/vente"
+                  :value="compteVenteAchat"
+                  dense
+                  filled
+                  readonly
+                  hide-details
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="6">
+            <v-card>
+              <v-card-title>Contreparties</v-card-title>
+              <v-data-table
+                :headers="headersContreparties"
+                :items="contreparties"
+                :items-per-page="10"
+                class="elevation-1"
+                dense
+              >
+                <template v-slot:item.montantDevise="{ item }">
+                  <span>{{ item.montantDevise.toFixed(2) }}</span>
+                </template>
+                <template v-slot:item.numeroCase="{ item }">
+                  <span>{{ item.numeroCase }} - {{item.libelleCase}}</span>
+                </template>
+              </v-data-table>
+            </v-card>
+          </v-col>
         </v-row>
       </v-card-text>
     </v-card>
@@ -173,20 +244,33 @@ import moment from "moment";
   name: "AchatVentePiece"
 })
 export default class extends Vue {
+  public pieceComptableData: PieceComptable = new PieceComptable();
+  private contreparties: PieceComptableContrepartie[] = [];
   public periodeDisplay: string = "";
   public journalDisplay: string = "";
-  public numeroPiece: number = 0;
-  public pieceComptableData: PieceComptable = new PieceComptable();
-  private contreparties: PieceComptableContrepartie[]=[];
+  public numeroPiece: string = "";
+  public numeroJournal: string = "";
+  private datePiece: string = moment(this.pieceComptableData.datePiece).format(
+    "DD/MM/YYYY"
+  );
+  private dateEcheance: string = moment(
+    this.pieceComptableData.dateEcheance
+  ).format("DD/MM/YYYY");
+  private statut: string = "";
+  private montantCompta:string="";
+
+  private compteAssocie:string="";
+  private compteVenteAchat:string="";
+  private soldeCompteTiers:string="";
 
   private headersContreparties = [
-    { text: "Type", value: "typeCompte" },
-    { text: "N° Compte", value: "numeroCompte" },
-	{ text: "Nom compte", value: "compteLibelle" },
-	{ text: "Libelle", value: "libelle" },
-    { text: "Montant", value: "montantDevise", align: "end"},
-	{ text: "Devise", value: "libelleDevise" },
-	{ text: "Case TVA", value: "numeroCase" }
+    { text: "N° Compte", value: "compteDisplay" },
+    { text: "Nom compte", value: "compteLibelle" },
+    { text: "Libelle", value: "libelle" },
+    { text: "Débit", value: "montantDebit", align: "end" },
+    { text: "Crédit", value: "montantCredit", align: "end" },
+    { text: "Devise", value: "libelleDevise" },
+    { text: "Case TVA", value: "numeroCase" }
   ];
 
   @PropSync("dialogPiece")
@@ -199,7 +283,8 @@ export default class extends Vue {
   ) {
     this.SetPeriodeDisplay(periode);
     this.SetJournalDisplay(journal);
-    this.numeroPiece = entete.codePiece;
+    this.numeroPiece = entete.codePiece.toString();
+    this.numeroJournal = entete.codeJournal.toString();
 
     axios
       .get<PieceComptable>(
@@ -210,8 +295,9 @@ export default class extends Vue {
           entete.codePiece
       )
       .then(resp => {
-		this.pieceComptableData = resp.data;
-		this.contreparties = resp.data.contreparties;
+        this.pieceComptableData = resp.data;
+
+        this.SetDisplayData();
       })
       .catch(error => {})
       .finally(() => {});
@@ -229,7 +315,33 @@ export default class extends Vue {
     this.journalDisplay = `${journal.numero} -  ${journal.libelle}`;
   }
 
+  private SetDisplayData() {
+    this.datePiece = moment(this.pieceComptableData.datePiece).format(
+      "DD/MM/YYYY"
+    );
+	this.contreparties = this.pieceComptableData.contreparties;
+	this.compteAssocie = this.pieceComptableData.compteAssocieNumero + " " + this.pieceComptableData.compteAssocieNom;
+	this.compteVenteAchat = this.pieceComptableData.compteVenteAchatNumero + " " + this.pieceComptableData.compteVenteAchatNom;
+	this.soldeCompteTiers = this.pieceComptableData.compteTiersSoldeComptable.toFixed(2) + " " + this.pieceComptableData.compteTiersLibelleDevise;
+	this.statut = this.pieceComptableData.statut + " - " + this.pieceComptableData.statutLibelle;
+	this.montantCompta = this.pieceComptableData.montantBase.toFixed(2) + " " + this.pieceComptableData.deviseComptaLibelle;
+
+    this.contreparties.forEach(element => {
+      if (element.codeMouvement == "DB")
+        element.montantDebit = element.montantDevise;
+      else element.montantCredit = element.montantDevise;
+
+      element.compteDisplay = element.typeCompte + element.numeroCompte;
+    });
+  }
+
   @Emit("saveAction")
   private save() {}
 }
 </script>
+
+<style>
+.textMini {
+  font-size: 12px;
+}
+</style>

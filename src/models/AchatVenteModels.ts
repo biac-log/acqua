@@ -73,4 +73,9 @@ export class EntetePieceComptable {
         public libelleDevise: string="";
         public numeroCase:number=0;
         public libelleCase: string="";
+
+        public compteDisplay:string="";
+        public montantDebit:number=0;
+        public montantCredit:number=0;
   }
+
