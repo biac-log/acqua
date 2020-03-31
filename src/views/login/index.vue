@@ -1,52 +1,54 @@
 <template>
-	<v-app id="inspire">
-		<v-content>
-			<v-container class="fill-height" fluid>
-				<v-row align="center" justify="center">
-					<v-col cols="12" sm="8" md="4">
-						<v-card>
-							<v-toolbar color="primary" dark flat>
-								<v-toolbar-title>Connexion</v-toolbar-title>
-							</v-toolbar>
-							<v-card-text>
-								<v-form>
-									<v-text-field
-										label="Utilisateur"
-										ref="loginElement"
-										name="login"
-										prepend-icon="mdi-account"
-										type="text"
-										v-model="username"
-										@keypress.enter="login"
-										autofocus
-									></v-text-field>
+  <v-app id="inspire">
+    <v-content>
+      <v-container class="fill-height" fluid>
+        <v-row align="center" justify="center">
+          <v-col cols="12" sm="8" md="4">
+            <v-card>
+              <v-toolbar color="primary" dark flat>
+                <v-toolbar-title>Connexion</v-toolbar-title>
+              </v-toolbar>
+              <v-card-text>
+                <v-form>
+                  <v-text-field
+                    label="Utilisateur"
+                    ref="loginElement"
+                    name="login"
+                    prepend-icon="mdi-account"
+                    type="text"
+                    v-model="username"
+                    @keypress.enter="login"
+                    autofocus
+                  ></v-text-field>
 
-									<v-text-field
-										id="password"
-										label="Mot de passe"
-										name="password"
-										prepend-icon="mdi-lock"
-										type="password"
-										v-model="password"
-										@keypress.enter="login"
-									></v-text-field>
-								</v-form>
-							</v-card-text>
+                  <v-text-field
+                    id="password"
+                    label="Mot de passe"
+                    name="password"
+                    prepend-icon="mdi-lock"
+                    type="password"
+                    v-model="password"
+                    @keypress.enter="login"
+                  ></v-text-field>
+                </v-form>
+              </v-card-text>
 
-							<v-card-actions>
-								<v-spacer></v-spacer>
-								<v-btn color="primary" :loading="loading" @click="login">Se connecter</v-btn>
-							</v-card-actions>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" :loading="loading" @click="login"
+                  >Se connecter</v-btn
+                >
+              </v-card-actions>
 
-							<v-card-text v-if="errorMessage != ''">
-								<v-alert type="warning">{{ errorMessage }}</v-alert>
-							</v-card-text>
-						</v-card>
-					</v-col>
-				</v-row>
-			</v-container>
-		</v-content>
-	</v-app>
+              <v-card-text v-if="errorMessage != ''">
+                <v-alert type="warning">{{ errorMessage }}</v-alert>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-content>
+  </v-app>
 </template>
 
 <script lang="ts">
