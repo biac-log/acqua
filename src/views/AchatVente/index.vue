@@ -48,7 +48,7 @@
             </v-btn> -->
             <v-btn
               color="primary"
-              class="btn-acqua"
+              id="btn-acqua"
               x-large
               :disabled="!searchIsValid"
               @click="LoadPiecesComptables"
@@ -83,13 +83,13 @@
         @click:row="OpenPieceComptable"
       >
         <template v-slot:item.datePiece="{ item }">
-          <span>{{ getDate(item.datePiece) }}</span>
+          <span>{{ item.datePiece | dateToString }}</span>
         </template>
         <template v-slot:item.dateEcheance="{ item }">
-          <span>{{ getDate(item.dateEcheance) }}</span>
+          <span>{{ item.dateEcheance | dateToString }}</span>
         </template>
         <template v-slot:item.montant="{ item }">
-          <span>{{ item.montant.toFixed(2) }}</span>
+          <span>{{ item.montant | numberToString }}</span>
         </template>
       </v-data-table>
     </v-card>
@@ -231,10 +231,6 @@ export default class extends Vue {
       });
   }
 
-  public getDate(date: Date): string {
-    return moment(date).format("DD/MM/YYYY");
-  }
-
   public OpenPieceComptable(entete: EntetePieceComptable) {
     this.dialogPieceMaster = true;
 
@@ -250,7 +246,7 @@ export default class extends Vue {
 </script>
 
 <style>
-.btn-acqua {
-  width: 150px;
+#btn-acqua {
+  height: 56px;
 }
 </style>
