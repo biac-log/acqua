@@ -10,7 +10,7 @@
       </v-toolbar>
       <v-card-text>
         <v-row fill-height>
-          <v-col cols="6">
+          <v-col cols="5">
             <v-row dense>
               <v-col cols="4">
                 <v-text-field
@@ -121,13 +121,12 @@
               </v-col>
             </v-row>
             <v-row dense>
-              
               <v-col cols="4">
-                <v-checkbox label="Pièce acquitée" :value="pieceComptableData.pieceAcquittee"></v-checkbox>
+                <v-checkbox label="Pièce acquitée" :value="pieceComptableData.pieceAcquittee" readonly></v-checkbox>
               </v-col>
 			  <v-col cols="4">
                 <v-text-field
-                  label="Montant en devise comtpable"
+                  label="Montant en devise comptable"
                   :value="montantCompta"
                   dense
                   filled
@@ -203,7 +202,7 @@
               </v-col>
             </v-row>
           </v-col>
-          <v-col cols="6">
+          <v-col cols="7">
             <v-card>
               <v-card-title>Contreparties</v-card-title>
               <v-data-table
@@ -213,9 +212,6 @@
                 class="elevation-1"
                 dense
               >
-                <template v-slot:item.montantDevise="{ item }">
-                  <span>{{ item.montantDevise.toFixed(2) }}</span>
-                </template>
                 <template v-slot:item.numeroCase="{ item }">
                   <span>{{ item.numeroCase }} - {{item.libelleCase}}</span>
                 </template>
@@ -318,6 +314,9 @@ export default class extends Vue {
   private SetDisplayData() {
     this.datePiece = moment(this.pieceComptableData.datePiece).format(
       "DD/MM/YYYY"
+	);
+	this.dateEcheance = moment(this.pieceComptableData.dateEcheance).format(
+      "DD/MM/YYYY"
     );
 	this.contreparties = this.pieceComptableData.contreparties;
 	this.compteAssocie = this.pieceComptableData.compteAssocieNumero + " " + this.pieceComptableData.compteAssocieNom;
@@ -328,8 +327,8 @@ export default class extends Vue {
 
     this.contreparties.forEach(element => {
       if (element.codeMouvement == "DB")
-        element.montantDebit = element.montantDevise;
-      else element.montantCredit = element.montantDevise;
+        element.montantDebit = element.montantDevise.toFixed(2);
+      else element.montantCredit = element.montantDevise.toFixed(2);
 
       element.compteDisplay = element.typeCompte + element.numeroCompte;
     });
