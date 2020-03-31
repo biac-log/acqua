@@ -31,6 +31,7 @@
               return-object
               persistent-hint
               @click="LoadJournaux"
+              @focus="LoadJournaux"
               :rules="journalRules"
               required
             >
@@ -81,6 +82,8 @@
         :search="search"
         :loading="isLoadingPieces"
         @click:row="OpenPieceComptable"
+        sort-by="codePieceDisplay"
+        sort-desc="true"
       >
         <template v-slot:item.datePiece="{ item }">
           <span>{{ item.datePiece | dateToString }}</span>
@@ -142,7 +145,7 @@ export default class extends Vue {
   private journalSearched: Journal = new Journal();
 
   private headers = [
-    { text: "Numéro pièce", value: "codePiece" },
+    { text: "Numéro pièce", value: "codePieceDisplay" },
     { text: "Date pièce", value: "datePiece" },
     { text: "Date échéance", value: "dateEcheance" },
     { text: "Numéro compte", value: "numeroCompte" },
@@ -151,7 +154,7 @@ export default class extends Vue {
     { text: "Montant", value: "montant", align: "end" },
     { text: "Escompte", value: "escompte", align: "end" },
     { text: "Devise", value: "devise" },
-    { text: "Status", value: "status" }
+    { text: "Status", value: "statutDisplay" }
   ];
   private search: string = "";
   private piecesComptables: EntetePieceComptable[] = [];
@@ -224,6 +227,10 @@ export default class extends Vue {
       )
       .then(resp => {
         this.piecesComptables = resp.data;
+        this.piecesComptables.forEach(element => {
+          element.codePieceDisplay = element.codeJournal + "." + element.codePiece;
+          element.statutDisplay = element.status + " - " + element.statusLibelle;
+        });
       })
       .catch(error => {})
       .finally(() => {

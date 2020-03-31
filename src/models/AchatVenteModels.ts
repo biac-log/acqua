@@ -6,10 +6,14 @@ export class EntetePieceComptable {
     public datePiece: Date = new Date();
     public dateEcheance: Date = new Date();
     public status: number = 0;
+    public statusLibelle:string="";
     public montant: number = 0;
     public numeroCompte: number = 0;
     public nomCompte: string = "";
     public devise: string = "";
+
+    public codePieceDisplay:string="";
+    public statutDisplay:string="";
   }
   export class Journal {
     public numero: number = 0;
@@ -56,6 +60,7 @@ export class EntetePieceComptable {
     public compteVenteAchatNumero:number=0;
     public compteVenteAchatNom: string="";
     public deviseComptaLibelle: string="";
+    public hash:string="";
     public contreparties:PieceComptableContrepartie[] =[];    
   }
 
