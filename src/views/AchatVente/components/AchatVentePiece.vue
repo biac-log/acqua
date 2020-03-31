@@ -1,21 +1,20 @@
 <template>
-	<v-dialog v-model="dialog" scrollable width="1000">
+	<v-dialog v-model="dialog" scrollable width="2000">
 		<v-card>
 			<v-card-title class="d-flex justify-start">
 				<v-row>
-					<v-col cols="6">
+					<v-col cols="3">
 						<v-text-field
 							label="Période"
-							:value="periodeDisplay"
+							v-model="periodeDisplay"
 							outlined
 							dense
 							readonly
 							filled
 							hide-details
-							class="ma-2"
 						></v-text-field>
 					</v-col>
-					<v-col cols="3">
+					<v-col cols="2">
 						<v-text-field
 							label="Journal"
 							:value="journalDisplay"
@@ -24,10 +23,9 @@
 							filled
 							readonly
 							hide-details
-							class="ma-2"
 						></v-text-field>
 					</v-col>
-					<v-col cols="3">
+					<v-col cols="1">
 						<v-text-field
 							label="Numéro pièce"
 							:value="numeroPiece"
@@ -36,13 +34,91 @@
 							filled
 							readonly
 							hide-details
-							class="ma-2"
 						></v-text-field>
 					</v-col>
 				</v-row>
 			</v-card-title>
-			<v-divider></v-divider>
-			<v-card-text></v-card-text>
+			<v-divider />
+			<v-card-text>
+				<v-row>
+						<v-text-field
+							label="Numéro compte tiers"
+							:value="pieceComptableData.compteTiersNumero"
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+						<v-text-field
+							label="Nom compte tiers"
+							:value="pieceComptableData.compteTiersNom"
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+						<v-text-field
+							label="Libelle"
+							:value="pieceComptableData.libelle"
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+						</v-row>
+					<v-row>
+						<v-text-field
+							label="Montant"
+							:value="pieceComptableData.montantDevise"
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+						<v-text-field
+							label="Devise pièce"
+							:value="pieceComptableData.libelleDevise"
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+						<v-text-field
+							label="Taux"
+							:value="pieceComptableData.taux"
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+				</v-row>
+				<v-row>
+					<v-text-field
+							label="Date pièce"
+							:value="pieceComptableData.datePiece"
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+						<v-text-field
+							label="Date échéance"
+							:value="pieceComptableData.dateEcheance"
+							dense
+							filled
+							readonly
+							hide-details
+							class="ma-2"
+						></v-text-field>
+				</v-row>
+			</v-card-text>
 		</v-card>
 	</v-dialog>
 </template>
@@ -52,7 +128,9 @@ import { Component, Vue, PropSync, Emit } from "vue-property-decorator";
 import {
   PeriodeComptable,
   EntetePieceComptable,
-  Journal
+  Journal,
+  PieceComptable,
+  PieceComptableContrepartie
 } from "@/models/AchatVenteModels";
 import axios from "axios";
 import moment from "moment";
@@ -64,6 +142,7 @@ export default class extends Vue {
   public periodeDisplay: string = "";
   public journalDisplay: string = "";
   public numeroPiece: number = 0;
+  public pieceComptableData: PieceComptable = new PieceComptable();
 
   @PropSync("dialogPiece")
   public dialog!: boolean;
@@ -78,18 +157,22 @@ export default class extends Vue {
     this.numeroPiece = entete.codePiece;
 
     axios
-      .get<EntetePieceComptable[]>(
+      .get<PieceComptable>(
         process.env.VUE_APP_ApiAcQuaCore +
           "/AchatVente/GetPieceComptable?journal=" +
           entete.codeJournal +
-          "&stPeriode=" +
-          entete.codePiece +
-          "&stPeriode=" +
-          periode.typePeriodeComptable
+          "&piece=" +
+          entete.codePiece
       )
-      .then(resp => {})
-      .catch(error => {})
-      .finally(() => {});
+      .then(resp => {
+		  	this.pieceComptableData = resp.data;
+	  })
+      .catch(error => {
+		  
+	  })
+      .finally(() => {
+
+	  });
   }
 
   private SetPeriodeDisplay(periode: PeriodeComptable) {
