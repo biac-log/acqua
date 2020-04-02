@@ -32,9 +32,10 @@
                   :filled="piecereadonly"
                   :readonly="piecereadonly"
                   :append-icon="piecereadonly ? '' : 'mdi-magnify'"
-                  @click:append="searchCompteTiersDialog = true"
+                  @click:append="OpenSearchCompte()"
                   hide-details
-                ></v-text-field>
+                >
+                </v-text-field>
               </v-col>
               <v-col cols="8">
                 <v-text-field
@@ -258,6 +259,7 @@
                 </template>
               </v-data-table>
             </v-card>
+            <SearchCompteTier ref="compteDialog" :dialog.sync="searchCompteTiersDialog" @compteSelected="setCompte"></SearchCompteTier>
           </v-col>
         </v-row>
       </v-card-text>
@@ -273,14 +275,17 @@ import {
   Journal,
   PieceComptable,
   PieceComptableContrepartie,
-  Devise,
-  Statut
+	Devise,
+	Statut,
 } from "@/models/AchatVenteModels";
 import axios from "axios";
 import moment from "moment";
+import SearchCompteTier from "./SearchCompteTier.vue"
+import { ICompteSearch } from '../../../models/ICompte';
 
 @Component({
-  name: "AchatVentePiece"
+  name: "AchatVentePiece",
+  components: { SearchCompteTier }
 })
 export default class extends Vue {
   public piecereadonly: boolean = true;
@@ -311,12 +316,23 @@ export default class extends Vue {
   private datePieceFormat: string = "";
 
   private dateEcheanceFormat: string = "";
+  public typeCompte: string = "";
+  // private datePiece: string = moment(this.pieceComptableData.datePiece).format(
+  //   "DD/MM/YYYY"
+  // );
+  // private dateEcheance: string = moment(
+  //   this.pieceComptableData.dateEcheance
+  // ).format("DD/MM/YYYY");
   private statut: string = "";
   private montantCompta: string = "";
 
   private compteAssocie: string = "";
   private compteVenteAchat: string = "";
   private soldeCompteTiers: string = "";
+  private isEdit: boolean = false;
+
+  private numeroCompteTier: string = "";
+  private nomCompteTier: string = "";
 
   private headersContreparties = [
     { text: "N° Compte", value: "compteDisplay" },
@@ -328,10 +344,9 @@ export default class extends Vue {
     { text: "Case TVA", value: "numeroCase" }
   ];
 
-  private searchCompteTiersDialog:boolean = false;
-
   @PropSync("dialogPiece")
   public dialog!: boolean;
+  public searchCompteTiersDialog: boolean = false;
 
   public Init(
     entete: EntetePieceComptable,
@@ -373,6 +388,10 @@ export default class extends Vue {
 
   private SetJournalDisplay(journal: Journal) {
     this.journalDisplay = `${journal.numero} -  ${journal.libelle}`;
+    if(journal.famille == "vente" || journal.famille == "ncvente")
+      this.typeCompte = "C";
+    else if(journal.famille == "achat" || journal.famille == "ncachat")
+      this.typeCompte  = "F";
   }
 
   private SetDisplayData(pieceComptable: PieceComptable) {
@@ -442,6 +461,11 @@ this.statut =
     });
   }
 
+  private setCompte(compte: ICompteSearch){
+    this.pieceComptableData.compteTiersNumero = compte.numero;
+    this.pieceComptableData.compteTiersNom = compte.nom;
+  }
+
   private ModifierPiece() {
     this.piecereadonly = false;
 
@@ -473,8 +497,6 @@ this.statut =
       .finally(() => {});
   }
 
-  private searchCompteTiers() {}
-
 private parseDate (date:string) {
         if (!date) return null
 
@@ -495,6 +517,12 @@ private parseDate (date:string) {
       "DD/MM/YYYY"
     );
   }
+  private OpenSearchCompte() : void{
+      this.searchCompteTiersDialog = true;
+      (this.$refs.compteDialog as SearchCompteTier).loadComptes(this.typeCompte);
+  }
+
+  private searchCompteTiers(){}
 
   @Emit("saveAction")
   private save() {}

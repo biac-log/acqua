@@ -50,7 +50,7 @@ export const asyncRoutes: RouteConfig[] = [
         path: "index",
         component: () =>
           import(
-            /* webpackChunkName: "dashboard" */ "@/views/AchatVente/index.vue"
+            /* webpackChunkName: "achatvente" */ "@/views/AchatVente/index.vue"
           ),
         name: "Achat Vente",
         meta: {
@@ -65,7 +65,7 @@ export const asyncRoutes: RouteConfig[] = [
 
 const createRouter = () =>
   new Router({
-    mode: "history",
+    //mode: "history",
     scrollBehavior: (to, from, savedPosition) => {
       if (savedPosition) {
         return savedPosition;

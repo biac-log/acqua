@@ -83,7 +83,7 @@
         :loading="isLoadingPieces"
         @click:row="OpenPieceComptable"
         sort-by="codePieceDisplay"
-        sort-desc="true"
+        sort-desc
       >
         <template v-slot:item.datePiece="{ item }">
           <span>{{ item.datePiece | dateToString }}</span>
