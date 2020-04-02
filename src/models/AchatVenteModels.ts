@@ -84,3 +84,12 @@ export class EntetePieceComptable {
         public montantCredit:string="";
   }
 
+  export class Devise{
+    public id:number=0;
+    public libelle:string="";
+  }
+  export class Statut{
+    public id:number=0;
+    public libelle:string="";
+  }
+
