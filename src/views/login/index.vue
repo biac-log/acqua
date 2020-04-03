@@ -18,7 +18,6 @@
                     type="text"
                     v-model="username"
                     @keypress.enter="login"
-                    autofocus
                   ></v-text-field>
 
                   <v-text-field

@@ -15,6 +15,7 @@
               persistent-hint
               :rules="periodesRules"
               required
+              autofocus
             ></v-select>
           </v-col>
           <v-col cols="12" xs="12" md="6" lg="3">
@@ -24,29 +25,26 @@
               label="Sélection du journal"
               outlined
               :loading="journauxIsLoading"
+              item-text="fullLibelle"
               item-value="numero"
               :hint="
                 `Nature ${journalSelected.famille} - Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`
               "
               return-object
               persistent-hint
-              @click="LoadJournaux"
-              @focus="LoadJournaux"
+               @focus="LoadJournaux"
               :rules="journalRules"
               required
             >
-              <template v-slot:selection="{ item }"
+              <!-- <template v-slot:selection="{ item }"
                 >{{ item.numero }} - {{ item.libelle }}</template
               >
               <template v-slot:item="{ item }"
                 >{{ item.numero }} - {{ item.libelle }}</template
-              >
+              > -->
             </v-select>
           </v-col>
           <v-col cols="12" xs="12" md="3" lg="3">
-            <!-- <v-btn color="warning" fab large dark class="mr-5">
-              <v-icon>mdi-plus</v-icon>
-            </v-btn> -->
             <v-btn
               color="primary"
               id="btn-acqua"
@@ -109,9 +107,10 @@ import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
 import {
   PeriodeComptable,
-  Journal,
   EntetePieceComptable
 } from "@/models/AchatVenteModels";
+import Journal from "@/models/Journal"
+import  {JournalApi} from "@/api/JournalApi"
 import moment from "moment";
 import AchatVentePiece from "./components/AchatVentePiece.vue";
 
@@ -196,12 +195,9 @@ export default class extends Vue {
 
   public LoadJournaux() {
     this.journauxIsLoading = true;
-    axios
-      .get<Journal[]>(
-        process.env.VUE_APP_ApiAcQuaCore + "/AchatVente/GetJournaux"
-      )
+    JournalApi.getAll()
       .then(resp => {
-        this.journaux = resp.data;
+        this.journaux = resp;
       })
       .catch(error => {})
       .finally(() => {

@@ -23,7 +23,6 @@
         :loading="isLoading"
         :search="filtreCompte"
         @click:row="sendCompte"
-        cursor="pointer"
       >
       </v-data-table>
     </v-card>
@@ -32,7 +31,7 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit } from "vue-property-decorator";
-import { ICompteSearch } from "@/models/ICompte";
+import { ICompteSearch } from "@/models/Compte";
 import axios from "axios";
 
 @Component({

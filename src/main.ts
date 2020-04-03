@@ -8,6 +8,7 @@ import moment from 'moment'
 import * as filters from '@/utils/FiltersMethods'
 
 Vue.config.productionTip = false;
+Vue.config.keyCodes.f2 = 113;
 
 // Register global filter functions
 Object.keys(filters).forEach(key => {

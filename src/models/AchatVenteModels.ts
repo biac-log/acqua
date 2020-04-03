@@ -15,14 +15,18 @@ export class EntetePieceComptable {
     public codePieceDisplay:string="";
     public statutDisplay:string="";
   }
-  export class Journal {
-    public numero: number = 0;
-    public libelle: string = '';
-    public isAutomatique: boolean = false;
-    public famille: string = '';
-    public devise: string = '';
-    public numeroDernierePiece: number = 0;
-  }
+  // export class Journal {
+  //   public numero: number = 0;
+  //   public libelle: string = '';
+  //   public isAutomatique: boolean = false;
+  //   public famille: string = '';
+  //   public devise: string = '';
+  //   public numeroDernierePiece: number = 0;
+
+  //   get fullLibelle(): string{
+  //     return `${this.numero} - ${this.libelle}`;
+  //   }
+  // }
 
   export class PeriodeComptable {
     public debut: Date = new Date();

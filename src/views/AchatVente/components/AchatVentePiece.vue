@@ -1,23 +1,46 @@
 <template>
-  <v-dialog v-model="dialog" scrollable width="2000" :persistent="!piecereadonly">
+  <v-dialog
+    v-model="dialog"
+    scrollable
+    width="2000"
+    :persistent="!piecereadonly"
+    @keydown.f2="ModifierPiece"
+    @keydown.delete="DeletePiece"
+  >
     <v-card>
       <v-toolbar color="primary" dark flat>
         <v-card-title class="d-flex justify-start">
-          <p class="mb-0">Pièce {{numeroJournal}}.{{numeroPiece}}</p>
-          <p class="ml-10 mb-0 textMini">Période {{periodeDisplay}}</p>
-          <p class="ml-5 mb-0 textMini">Journal {{journalDisplay}}</p>
+          <p class="mb-0">Pièce {{ numeroJournal }}.{{ numeroPiece }}</p>
+          <p class="ml-10 mb-0 textMini">Période {{ periodeDisplay }}</p>
+          <p class="ml-5 mb-0 textMini">Journal {{ journalDisplay }}</p>
         </v-card-title>
         <v-spacer></v-spacer>
-        <v-btn class="mr-5" color="success" @click="ModifierPiece" v-if="piecereadonly">
+        <v-btn
+          class="mr-5"
+          color="success"
+          @click="ModifierPiece"
+          v-if="piecereadonly"
+        >
           <v-icon left>mdi-pencil</v-icon>Modifier
         </v-btn>
-        <v-btn class="mr-10" color="error" v-if="piecereadonly">
+        <v-btn class="mr-10" color="error" v-if="piecereadonly" @click="DeletePiece">
           <v-icon left>mdi-delete</v-icon>Supprimer
         </v-btn>
-        <v-btn class="mr-10" color="warning" @click="ModifierPiece" v-if="!piecereadonly">
+        <v-btn
+          class="mr-10"
+          color="warning"
+          @click="ModifierPiece"
+          v-if="!piecereadonly"
+        >
           <v-icon left>mdi-content-save</v-icon>Sauvegarder
         </v-btn>
-        <v-btn class="ml-10" icon color="white" @click="dialog = false">
+        <v-btn
+          ref="buttonClose"
+          class="ml-10"
+          icon
+          color="white"
+          @click="dialog = false"
+        >
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-toolbar>
@@ -32,8 +55,10 @@
                   :filled="piecereadonly"
                   :readonly="piecereadonly"
                   :append-icon="piecereadonly ? '' : 'mdi-magnify'"
-                  @click:append="OpenSearchCompte()"
                   hide-details
+                  ref="firstElement"
+                  @click:append="OpenSearchCompte()"
+                  @focus="$event.target.select()"
                 >
                 </v-text-field>
               </v-col>
@@ -112,19 +137,23 @@
                   max-width="290px"
                   min-width="290px"
                 >
-                  <template v-slot:activator="{  }">
+                  <template v-slot:activator="{}">
                     <v-text-field
                       v-model="datePieceFormat"
                       label="Date pièce"
-                      :prepend-icon="piecereadonly ? '' :'mdi-calendar'"
-                      @click:prepend="menuDatePiece=true"
+                      :prepend-icon="piecereadonly ? '' : 'mdi-calendar'"
+                      @click:prepend="menuDatePiece = true"
                       :filled="piecereadonly"
                       :readonly="piecereadonly"
                       @blur="datePiece = parseDate(datePieceFormat)"
                       hide-details
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="datePiece" no-title @input="menuDatePiece = false"></v-date-picker>
+                  <v-date-picker
+                    v-model="datePiece"
+                    no-title
+                    @input="menuDatePiece = false"
+                  ></v-date-picker>
                 </v-menu>
               </v-col>
               <v-col cols="4">
@@ -137,19 +166,23 @@
                   max-width="290px"
                   min-width="290px"
                 >
-                  <template v-slot:activator="{  }">
+                  <template v-slot:activator="{}">
                     <v-text-field
                       v-model="dateEcheanceFormat"
                       label="Date échéance"
-                      :prepend-icon="piecereadonly ? '' :'mdi-calendar'"
-                      @click:prepend="menuDateEcheance=true"
+                      :prepend-icon="piecereadonly ? '' : 'mdi-calendar'"
+                      @click:prepend="menuDateEcheance = true"
                       :filled="piecereadonly"
                       :readonly="piecereadonly"
                       @blur="dateEcheance = parseDate(dateEcheanceFormat)"
                       hide-details
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="dateEcheance" no-title @input="menuDateEcheance = false"></v-date-picker>
+                  <v-date-picker
+                    v-model="dateEcheance"
+                    no-title
+                    @input="menuDateEcheance = false"
+                  ></v-date-picker>
                 </v-menu>
               </v-col>
               <v-col cols="4">
@@ -255,14 +288,19 @@
                 dense
               >
                 <template v-slot:item.numeroCase="{ item }">
-                  <span>{{ item.numeroCase }} - {{item.libelleCase}}</span>
+                  <span>{{ item.numeroCase }} - {{ item.libelleCase }}</span>
                 </template>
               </v-data-table>
             </v-card>
-            <SearchCompteTier ref="compteDialog" :dialog.sync="searchCompteTiersDialog" @compteSelected="setCompte"></SearchCompteTier>
+            <SearchCompteTier
+              ref="compteDialog"
+              :dialog.sync="searchCompteTiersDialog"
+              @compteSelected="setCompte"
+            ></SearchCompteTier>
           </v-col>
         </v-row>
       </v-card-text>
+      <Confirm ref="confirmDialog"></Confirm>
     </v-card>
   </v-dialog>
 </template>
@@ -272,20 +310,21 @@ import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
 import {
   PeriodeComptable,
   EntetePieceComptable,
-  Journal,
   PieceComptable,
   PieceComptableContrepartie,
-	Devise,
-	Statut,
+  Devise,
+  Statut
 } from "@/models/AchatVenteModels";
+import Journal from "@/models/Journal";
 import axios from "axios";
 import moment from "moment";
-import SearchCompteTier from "./SearchCompteTier.vue"
-import { ICompteSearch } from '../../../models/ICompte';
+import SearchCompteTier from "./SearchCompteTier.vue";
+import { ICompteSearch } from "../../../models/Compte";
+import Confirm from "@/components/Confirm.vue";
 
 @Component({
   name: "AchatVentePiece",
-  components: { SearchCompteTier }
+  components: { SearchCompteTier, Confirm }
 })
 export default class extends Vue {
   public piecereadonly: boolean = true;
@@ -307,22 +346,16 @@ export default class extends Vue {
   private deviseSelected: Devise = new Devise();
   private statuts: Statut[] = [];
   private statutSelected: Statut = new Statut();
-  private datePiece:Date= new Date();
-  private dateEcheance:Date= new Date();
+  private datePiece: Date = new Date();
+  private dateEcheance: Date = new Date();
 
   //Display
-  private menuDatePiece:boolean=false;
-  private menuDateEcheance:boolean=false;
+  private menuDatePiece: boolean = false;
+  private menuDateEcheance: boolean = false;
   private datePieceFormat: string = "";
 
   private dateEcheanceFormat: string = "";
   public typeCompte: string = "";
-  // private datePiece: string = moment(this.pieceComptableData.datePiece).format(
-  //   "DD/MM/YYYY"
-  // );
-  // private dateEcheance: string = moment(
-  //   this.pieceComptableData.dateEcheance
-  // ).format("DD/MM/YYYY");
   private statut: string = "";
   private montantCompta: string = "";
 
@@ -388,10 +421,10 @@ export default class extends Vue {
 
   private SetJournalDisplay(journal: Journal) {
     this.journalDisplay = `${journal.numero} -  ${journal.libelle}`;
-    if(journal.famille == "vente" || journal.famille == "ncvente")
+    if (journal.famille == "vente" || journal.famille == "ncvente")
       this.typeCompte = "C";
-    else if(journal.famille == "achat" || journal.famille == "ncachat")
-      this.typeCompte  = "F";
+    else if (journal.famille == "achat" || journal.famille == "ncachat")
+      this.typeCompte = "F";
   }
 
   private SetDisplayData(pieceComptable: PieceComptable) {
@@ -423,7 +456,7 @@ export default class extends Vue {
     };
     this.statuts.push(this.statutSelected);
 
-this.statut =
+    this.statut =
       this.pieceComptableData.statut +
       " - " +
       this.pieceComptableData.statutLibelle;
@@ -461,16 +494,35 @@ this.statut =
     });
   }
 
-  private setCompte(compte: ICompteSearch){
+  private loadCompte() {
+    axios.get<ICompteSearch>(
+      `${process.env.VUE_APP_ApiAcQuaCore}/Compte/GetCompteById?typeCompte=${this.typeCompte}&numeroCompte=${this.numeroCompteTier}`
+    );
+  }
+
+  private setCompte(compte: ICompteSearch) {
     this.pieceComptableData.compteTiersNumero = compte.numero;
     this.pieceComptableData.compteTiersNom = compte.nom;
   }
 
   private ModifierPiece() {
     this.piecereadonly = false;
-
+    this.$nextTick(() => (this.$refs.firstElement as any).focus());
     this.LoadStatuts();
     this.LoadDevises();
+  }
+
+  private DeletePiece() {
+    (this.$refs.confirmDialog as Confirm)
+      .open(
+        "Suppression",
+        `Êtes-vous sur de vouloir supprimer la piece ${this.numeroJournal}.${this.numeroPiece} ?`,
+        "error",
+        "Supprimer"
+      )
+      .then(resp => {
+        if (resp) console.log("DELETE");
+      });
   }
 
   private LoadStatuts() {
@@ -497,32 +549,28 @@ this.statut =
       .finally(() => {});
   }
 
-private parseDate (date:string) {
-        if (!date) return null
+  private parseDate(date: string) {
+    if (!date) return null;
 
-        const [day,month, year] = date.split('/')
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-      }
-
-  @Watch('datePiece')
-  private datePieceChanged(val: Date, oldVal: Date){
-    this.datePieceFormat = moment(val).format(
-      "DD/MM/YYYY"
-    );
+    const [day, month, year] = date.split("/");
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   }
 
-  @Watch('dateEcheance')
-  private dateEcheanceChanged(val: Date, oldVal: Date){
-    this.dateEcheanceFormat = moment(val).format(
-      "DD/MM/YYYY"
-    );
-  }
-  private OpenSearchCompte() : void{
-      this.searchCompteTiersDialog = true;
-      (this.$refs.compteDialog as SearchCompteTier).loadComptes(this.typeCompte);
+  @Watch("datePiece")
+  private datePieceChanged(val: Date, oldVal: Date) {
+    this.datePieceFormat = moment(val).format("DD/MM/YYYY");
   }
 
-  private searchCompteTiers(){}
+  @Watch("dateEcheance")
+  private dateEcheanceChanged(val: Date, oldVal: Date) {
+    this.dateEcheanceFormat = moment(val).format("DD/MM/YYYY");
+  }
+  private OpenSearchCompte(): void {
+    this.searchCompteTiersDialog = true;
+    (this.$refs.compteDialog as SearchCompteTier).loadComptes(this.typeCompte);
+  }
+
+  private searchCompteTiers() {}
 
   @Emit("saveAction")
   private save() {}
