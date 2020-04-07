@@ -1,6 +1,6 @@
 import Axios from "axios";
 
-import PieceComptable, { PieceComptableDTO } from '@/models/AchatVente/PieceComptable';
+import { PieceComptableDTO, PieceComptable } from '@/models/AchatVente/PieceComptable';
 
 export abstract class AchatVenteApi {
   private static achatVenteAxios = Axios.create();

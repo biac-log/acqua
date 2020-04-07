@@ -32,7 +32,7 @@
               "
               return-object
               persistent-hint
-               @focus="LoadJournaux"
+              @focus="LoadJournaux"
               :rules="journalRules"
               required
             >
@@ -88,11 +88,11 @@
         </template>
       </v-data-table>
     </v-card>
-    <AchatVentePiece
+    <AchatVentePieceVue
       ref="refPiece"
       :dialogPiece.sync="dialogPieceMaster"
       @saveAction="updateRow()"
-    ></AchatVentePiece>
+    ></AchatVentePieceVue>
   </v-container>
 </template>
 
@@ -101,16 +101,16 @@ import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
 import {
   PeriodeComptable,
-  EntetePieceComptable
-} from "@/models/AchatVenteModels";
-import Journal from "@/models/Journal"
-import  {JournalApi} from "@/api/JournalApi"
+  EntetePieceComptable,
+  Journal
+} from "@/models/AchatVente";
+import { JournalApi } from "@/api/JournalApi";
 import moment from "moment";
-import AchatVentePiece from "./components/AchatVentePiece.vue";
+import AchatVentePieceVue from "./components/AchatVentePiece.vue";
 
 @Component({
   name: "AchatVente",
-  components: { AchatVentePiece }
+  components: { AchatVentePieceVue }
 })
 export default class extends Vue {
   private searchIsValid: boolean = true;
@@ -218,8 +218,10 @@ export default class extends Vue {
       .then(resp => {
         this.piecesComptables = resp.data;
         this.piecesComptables.forEach(element => {
-          element.codePieceDisplay = element.codeJournal + "." + element.codePiece;
-          element.statutDisplay = element.status + " - " + element.statusLibelle;
+          element.codePieceDisplay =
+            element.codeJournal + "." + element.codePiece;
+          element.statutDisplay =
+            element.status + " - " + element.statusLibelle;
         });
       })
       .catch(error => {})
@@ -231,7 +233,7 @@ export default class extends Vue {
   public OpenPieceComptable(entete: EntetePieceComptable) {
     this.dialogPieceMaster = true;
 
-    (this.$refs.refPiece as AchatVentePiece).Init(
+    (this.$refs.refPiece as AchatVentePieceVue).Init(
       entete,
       this.periodeSearched,
       this.journalSearched

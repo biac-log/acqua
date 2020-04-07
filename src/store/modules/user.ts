@@ -1,8 +1,8 @@
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators'
 import axios from 'axios'
-import { Token } from '@/models/Token';
+import { Token } from '@/models/Login/Token';
 import store from '@/store/index';
-import { Utilisateur } from '@/models/Utilisateur';
+import { Utilisateur } from '@/models/Login/Utilisateur';
 
 export interface IUserState {
   token: string,

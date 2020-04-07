@@ -17,7 +17,7 @@
     numeroDernierePiece: number = 0;
   }
   
-  export default class Journal extends JournalDTO {
+  export class Journal extends JournalDTO {
     constructor(dto?: JournalDTO){
       super();
       Object.assign(this, dto || new JournalDTO());

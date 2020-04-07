@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit, Prop } from "vue-property-decorator";
-import PieceComptableContrepartie from "@/models/AchatVente/PieceComptableContrepartie";
+import { PieceComptableContrepartie } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import axios from "axios";
 import EditContrepartieVue from "./EditContrepartie.vue";

@@ -32,7 +32,7 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit } from "vue-property-decorator";
-import CompteSearch from "@/models/CompteSearch";
+import CompteSearch from "@/models/Compte/CompteSearch";
 import { CompteApi } from "@/api/CompteApi";
 import axios from "axios";
 

@@ -24,14 +24,18 @@
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
+                :filled="readonly"
                 :readonly="readonly"
+                :rules="typesComptesRules"
               ></v-select>
             </v-col>
             <v-col>
               <v-text-field
                 :value="numeroCompte"
                 label="N° compte"
+                :filled="readonly"
                 :readonly="readonly"
+                :rules="numeroCompteRules"
               ></v-text-field>
             </v-col>
             <v-col>
@@ -39,7 +43,9 @@
                 ref="firstElement"
                 :value="nomCompte"
                 label="Nom compte"
+                :filled="readonly"
                 :readonly="readonly"
+                :rules="nomCompteRules"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -48,7 +54,9 @@
               <v-text-field
                 :value="libelle"
                 label="Libelle"
+                :filled="readonly"
                 :readonly="readonly"
+                :rules="libelleRules"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -58,7 +66,9 @@
                 :items="devises"
                 v-model="devisesSelected"
                 label="Devise"
+                :filled="readonly"
                 :readonly="readonly"
+                :rules="devisesRules"
               ></v-select>
             </v-col>
             <v-col>
@@ -66,14 +76,18 @@
                 :items="typesMouvements"
                 v-model="typesMouvementsSelected"
                 label="Type de mouvement"
+                :filled="readonly"
                 :readonly="readonly"
+                :rules="typesMouvementsRules"
               ></v-select>
             </v-col>
             <v-col>
               <v-text-field
                 :value="montant"
                 label="Montant"
+                :filled="readonly"
                 :readonly="readonly"
+                :rules="montantRules"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -82,14 +96,18 @@
               <v-text-field
                 :value="caseTva"
                 label="Case TVA"
+                :filled="readonly"
                 :readonly="readonly"
+                :rules="caseTvaRules"
               ></v-text-field>
             </v-col>
             <v-col>
               <v-text-field
                 :value="reference"
                 label="Référence"
+                :filled="readonly"
                 :readonly="readonly"
+                :rules="referenceRules"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -110,7 +128,7 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit, Prop } from "vue-property-decorator";
-import PieceComptableContrepartie from "@/models/AchatVente/PieceComptableContrepartie";
+import { PieceComptableContrepartie, TypeCompte } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import axios from "axios";
 
@@ -125,9 +143,7 @@ export default class extends Vue {
   private resolve!: any;
   private reject!: any;
 
-  public overlay: boolean = false;
-
-  public typesComptes: string[] = ["General", "Bonjour"];
+  public typesComptes: string[] = ["Général", "Extra Comptable"];
   public typesComptesSelected: string = "";
   private typesComptesRules: any = [(v: string) => !!v || "Type obligatoire"];
   public numeroCompte: string = "";
@@ -136,7 +152,7 @@ export default class extends Vue {
   private nomCompteRules: any = [(v: string) => !!v || "Nom obligatoire"];
   public devises: string[] = ["EUR", "DLRS"];
   public devisesSelected: string = "";
-  private deviseRules: any = [(v: string) => !!v || "Devise obligatoire"];
+  private devisesRules: any = [(v: string) => !!v || "Devise obligatoire"];
   public libelle: string = "";
   private libelleRules: any = [(v: string) => !!v || "Libelle obligatoire"];
   public typesMouvements: string[] = ["Débit", "Crédit"];

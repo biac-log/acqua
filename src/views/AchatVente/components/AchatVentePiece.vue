@@ -259,20 +259,20 @@
 </template>
 
 <script lang="ts">
+import axios from "axios";
+import moment from "moment";
 import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
 import {
   PeriodeComptable,
   EntetePieceComptable,
+  PieceComptable,
+  PieceComptableContrepartie,
   Devise,
-  Statut
-} from "@/models/AchatVenteModels";
-import PieceComptable from "@/models/AchatVente/PieceComptable"
-import PieceComptableContrepartie from "@/models/AchatVente/PieceComptableContrepartie"
-import Journal from "@/models/Journal";
-import axios from "axios";
-import moment from "moment";
+  Statut,
+  Journal
+} from "@/models/AchatVente";
+import CompteSearch from "@/models/Compte/CompteSearch";
 import SearchCompteTier from "./SearchCompteTier.vue";
-import CompteSearch from "../../../models/CompteSearch";
 import Confirm from "@/components/Confirm.vue";
 import DatePicker from "@/components/DatePicker.vue";
 import { CompteApi } from "@/api/CompteApi";

@@ -1,4 +1,4 @@
-  import PieceComptableContrepartie, { IPieceComptableContrepartie } from "./PieceComptableContrepartie"
+  import { IPieceComptableContrepartie, PieceComptableContrepartie } from "./PieceComptableContrepartie"
   
   export interface IPieceComptable {
     numeroJournal:number;
@@ -66,7 +66,7 @@
     public contreparties: PieceComptableContrepartie[] = [];    
   }
   
-  export default class PieceComptable extends PieceComptableDTO {
+  export class PieceComptable extends PieceComptableDTO {
     constructor(dto?: PieceComptableDTO){
       super();
       Object.assign(this, dto || new PieceComptableDTO());

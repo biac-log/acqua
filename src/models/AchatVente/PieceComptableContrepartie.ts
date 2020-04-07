@@ -28,7 +28,7 @@ export class PieceComptableContrepartieDTO implements IPieceComptableContreparti
   public libelleCase: string="";
 }
 
-export default class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
+export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
   constructor(dto?: PieceComptableContrepartieDTO){
     super();
     Object.assign(this, dto || new PieceComptableContrepartieDTO());

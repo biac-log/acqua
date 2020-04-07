@@ -1,5 +1,5 @@
 import Axios from "axios";
-import CompteSearch, {CompteSearchDTO} from "@/models/CompteSearch";
+import CompteSearch, {CompteSearchDTO} from "@/models/Compte/CompteSearch";
 
 export abstract class CompteApi {
   private static CompteAxios = Axios.create();
