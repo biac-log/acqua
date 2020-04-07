@@ -9,6 +9,7 @@ import * as filters from '@/utils/FiltersMethods'
 
 Vue.config.productionTip = false;
 Vue.config.keyCodes.f2 = 113;
+Vue.config.keyCodes.suppr = 46;
 
 // Register global filter functions
 Object.keys(filters).forEach(key => {

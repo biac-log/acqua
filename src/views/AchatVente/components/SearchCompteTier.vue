@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="1200" v-model="showDialog">
+  <v-dialog width="1200" v-model="dialog" @click:outside="close">
     <v-card class="mt-5">
       <v-card-title>
         Comptes
@@ -13,11 +13,12 @@
           label="Filtrer"
           single-line
           hide-details
+          autofocus
         ></v-text-field>
       </v-card-title>
       <v-data-table
         id="dataTable"
-        height=530
+        height="530"
         :headers="headersComptes"
         :items="comptes"
         :loading="isLoading"
@@ -31,15 +32,15 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit } from "vue-property-decorator";
-import { ICompteSearch } from "@/models/Compte";
+import CompteSearch from "@/models/CompteSearch";
+import { CompteApi } from "@/api/CompteApi";
 import axios from "axios";
 
 @Component({
   name: "SearchCompteTier"
 })
 export default class extends Vue {
-  @PropSync("dialog")
-  private showDialog!: boolean;
+  private dialog: boolean = false;
   private numero: string = "";
   private matchCode: string = "";
   private texte: string = "";
@@ -47,7 +48,7 @@ export default class extends Vue {
   private typeLoad!: string;
   private filtreCompte: string = "";
   private isLoading: boolean = false;
-  private comptes: ICompteSearch[] = [];
+  private comptes: CompteSearch[] = [];
   private headersComptes = [
     { text: "Numéro", value: "numero" },
     { text: "Nom", value: "nom" },
@@ -55,33 +56,47 @@ export default class extends Vue {
     { text: "Adresse", value: "adresse" }
   ];
 
-  public loadComptes(typeToLoad: string) {
+  private resolve!: any;
+  private reject!: any;
+
+  public open(typeToLoad: string): Promise<CompteSearch> {
+    this.dialog = true;
+    this.loadComptes(typeToLoad);
+
+    return new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+
+  private loadComptes(typeToLoad: string) {
     if (this.typeLoad != typeToLoad) {
       this.typeLoad = typeToLoad;
       this.refreshComptes();
     }
   }
 
-  @Emit('compteSelected')
-  public sendCompte(compte: ICompteSearch){
-    this.showDialog = false;
-    return compte;
-  }
-
   private refreshComptes() {
     if (this.typeLoad) {
       this.isLoading = true;
-      axios
-        .get<ICompteSearch[]>(
-          `${process.env.VUE_APP_ApiAcQuaCore}/Compte/GetAllComptesByType?typeCompte=${this.typeLoad}`
-        )
+      CompteApi.getByType(this.typeLoad)
         .then(resp => {
-          this.comptes = resp.data;
+          this.comptes = resp;
         })
         .finally(() => {
           this.isLoading = false;
         });
     }
+  }
+
+  private sendCompte(compte: CompteSearch) {
+    this.dialog = false;
+    this.resolve(compte);
+  }
+
+  private close(){
+    this.dialog = false;
+    this.reject();
   }
 }
 </script>

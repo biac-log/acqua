@@ -36,12 +36,6 @@
               :rules="journalRules"
               required
             >
-              <!-- <template v-slot:selection="{ item }"
-                >{{ item.numero }} - {{ item.libelle }}</template
-              >
-              <template v-slot:item="{ item }"
-                >{{ item.numero }} - {{ item.libelle }}</template
-              > -->
             </v-select>
           </v-col>
           <v-col cols="12" xs="12" md="3" lg="3">
