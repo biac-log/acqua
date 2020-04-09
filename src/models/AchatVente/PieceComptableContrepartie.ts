@@ -31,6 +31,10 @@ export class PieceComptableContrepartieDTO implements IPieceComptableContreparti
 export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
   constructor(dto?: PieceComptableContrepartieDTO){
     super();
+    this.Refresh(dto);
+  }
+
+  public Refresh(dto?: PieceComptableContrepartieDTO){
     Object.assign(this, dto || new PieceComptableContrepartieDTO());
   }
 

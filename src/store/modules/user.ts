@@ -50,9 +50,10 @@ class User extends VuexModule implements IUserState {
     this.expire = "";
   };
 
-  @Action
+  @Action({rawError: true})
   public Login(userInfo: { username: string, password: string }): Promise<any> {
     return new Promise((resolve, reject) => {
+      
       axios.post<Token>(process.env.VUE_APP_ApiAuth + "/Authentication/Login", userInfo)
         .then((resp) => {
           this.SET_TOKEN(resp.data);
@@ -63,7 +64,7 @@ class User extends VuexModule implements IUserState {
           let errorMessage: string = "Impossible de se connecter au serveur d'authentification";
           if (err.response && err.response.status === 400) {
             errorMessage = err.response.data.Message;
-          }
+          };
           reject(errorMessage);
         });
     });

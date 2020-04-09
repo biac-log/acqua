@@ -1,8 +1,8 @@
 <template>
-  <v-dialog width="1000" v-model="dialog" @click:outside="close">
+  <v-dialog width="800" v-model="dialog" @click:outside="close">
     <v-card class="mt-5">
       <v-card-title>
-        Comptes
+        Comptes {{ typeLoad ? typeLoad.libelle : "" }}
         <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">
           <v-icon>mdi-refresh</v-icon>
         </v-btn>
@@ -14,22 +14,23 @@
           single-line
           hide-details
           autofocus
+          @keydown.enter="trySend"
         ></v-text-field>
       </v-card-title>
       <v-data-table
         id="dataTable"
-        height="530"
+        ref="dataTable"
+        height="600"
         dense
+        disable-pagination
         fixed-header
-        :footer-props="{
-          'items-per-page-options': [30,50,100]
-        }"
-        :items-per-page="30"
+        hide-default-footer
         :headers="headersComptes"
         :items="comptes"
         :loading="isLoading"
         :search="filtreCompte"
         @click:row="sendCompte"
+        @current-items="setFilteredItems"
       >
       </v-data-table>
     </v-card>
@@ -38,34 +39,34 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit } from "vue-property-decorator";
-import CompteSearch from "@/models/Compte/CompteSearch";
+import {TypeCompte} from "@/models/AchatVente";
+import CompteGeneralSearch from "@/models/Compte/CompteGeneralSearch";
+import { AchatVenteApi } from "@/api/AchatVenteApi";
 import { CompteApi } from "@/api/CompteApi";
 import axios from "axios";
 
 @Component({
-  name: "SearchCompteTier"
+  name: "SearchCompteContrepartie"
 })
 export default class extends Vue {
   private dialog: boolean = false;
-  private numero: string = "";
-  private matchCode: string = "";
-  private texte: string = "";
-
-  private typeLoad!: string;
+  private typeLoad: TypeCompte = new TypeCompte();
   private filtreCompte: string = "";
   private isLoading: boolean = false;
-  private comptes: CompteSearch[] = [];
+  private comptes: CompteGeneralSearch[] = [];
+  private displayComptes: CompteGeneralSearch[] = [];
   private headersComptes = [
-    { text: "Numéro", value: "numero" },
-    { text: "Nom", value: "nom" },
-    { text: "Raison sociale", value: "raisonSocial" },
-    { text: "Adresse", value: "adresse" }
+    { text: "Numéro", value: "numero", width: 100 },
+    { text: "Nom", value: "nom", width: 100 },
+    { text: "Solde", value: "libelleSolde", align: "end", width: 100 },
+    { text: "Nature", value: "libelleNature", width: 100 },
+    { text: "Case TVA", value: "libelleCase", width: 100 }
   ];
 
   private resolve!: any;
   private reject!: any;
 
-  public open(typeToLoad: string): Promise<CompteSearch> {
+  public open(typeToLoad: TypeCompte): Promise<CompteGeneralSearch> {
     this.dialog = true;
     this.loadComptes(typeToLoad);
 
@@ -75,17 +76,21 @@ export default class extends Vue {
     });
   }
 
-  private loadComptes(typeToLoad: string) {
-    if (this.typeLoad != typeToLoad) {
+  private setFilteredItems(e : CompteGeneralSearch[]){
+    this.displayComptes = e;
+  }
+
+  private loadComptes(typeToLoad: TypeCompte) {
+    if (this.typeLoad.id != typeToLoad.id) {
       this.typeLoad = typeToLoad;
       this.refreshComptes();
     }
   }
 
   private refreshComptes() {
-    if (this.typeLoad) {
+    if (this.typeLoad.id) {
       this.isLoading = true;
-      CompteApi.getComptesTiers(this.typeLoad)
+      CompteApi.getComptesGeneraux(this.typeLoad.id)
         .then(resp => {
           this.comptes = resp;
         })
@@ -95,7 +100,12 @@ export default class extends Vue {
     }
   }
 
-  private sendCompte(compte: CompteSearch) {
+  private trySend(){
+    if(this.displayComptes.length == 1)
+      this.sendCompte(this.displayComptes[0]);
+  }
+
+  private sendCompte(compte: CompteGeneralSearch) {
     this.dialog = false;
     this.resolve(compte);
   }

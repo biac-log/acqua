@@ -12,51 +12,67 @@
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </template>
-    <v-form ref="form" v-model="isValid">
+    <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
         <v-card-title>
           Contrepartie
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col>
+            <v-col cols="3">
               <v-select
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
+                item-text="libelle"
+                return-object
                 :filled="readonly"
                 :readonly="readonly"
+                :hide-details="readonly"
                 :rules="typesComptesRules"
+                autofocus
               ></v-select>
             </v-col>
-            <v-col>
+            <v-col cols="3">
               <v-text-field
-                :value="numeroCompte"
                 label="N° compte"
+                v-model="numeroCompte"
                 :filled="readonly"
                 :readonly="readonly"
-                :rules="numeroCompteRules"
-              ></v-text-field>
+                :append-icon="readonly ? '' : 'mdi-magnify'"
+                :hide-details="readonly"
+                ref="firstElement"
+                @keypress.enter="loadCompte"
+                @blur="loadCompte"
+                @click:append="OpenSearchCompte()"
+              >
+              </v-text-field>
+              <SearchCompteContrepartieVue
+                ref="compteDialog"
+              ></SearchCompteContrepartieVue>
             </v-col>
-            <v-col>
+            <v-col cols="6">
               <v-text-field
                 ref="firstElement"
-                :value="nomCompte"
                 label="Nom compte"
+                v-model="nomCompte"
                 :filled="readonly"
-                :readonly="readonly"
+                :hide-details="readonly"
                 :rules="nomCompteRules"
+                tabindex="-1"
+                readonly
               ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
             <v-col>
               <v-text-field
-                :value="libelle"
                 label="Libelle"
+                v-model="libelle"
                 :filled="readonly"
                 :readonly="readonly"
                 :rules="libelleRules"
+                :hide-details="readonly"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -66,9 +82,13 @@
                 :items="devises"
                 v-model="devisesSelected"
                 label="Devise"
+                item-value="id"
+                item-text="libelle"
+                return-object
                 :filled="readonly"
                 :readonly="readonly"
                 :rules="devisesRules"
+                :hide-details="readonly"
               ></v-select>
             </v-col>
             <v-col>
@@ -76,48 +96,62 @@
                 :items="typesMouvements"
                 v-model="typesMouvementsSelected"
                 label="Type de mouvement"
+                item-value="id"
+                item-text="libelle"
+                return-object
                 :filled="readonly"
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
+                :hide-details="readonly"
               ></v-select>
             </v-col>
             <v-col>
               <v-text-field
-                :value="montant"
+                v-model="montant"
                 label="Montant"
                 :filled="readonly"
                 :readonly="readonly"
                 :rules="montantRules"
+                :hide-details="readonly"
               ></v-text-field>
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col cols="3">
               <v-text-field
-                :value="caseTva"
-                label="Case TVA"
+                ref="firstElement"
+                label="Numéro case TVA"
+                v-model="numeroCaseTva"
                 :filled="readonly"
                 :readonly="readonly"
-                :rules="caseTvaRules"
-              ></v-text-field>
+                :append-icon="readonly ? '' : 'mdi-magnify'"
+                :rules="numeroCaseTvaRules"
+                :hide-details="readonly"
+                @keypress.enter="loadCaseTva"
+                @blur="loadCaseTva"
+                @click:append="OpenSearchCaseTva()"
+              >
+              </v-text-field>
             </v-col>
-            <v-col>
+            <v-col cols="3">
               <v-text-field
-                :value="reference"
-                label="Référence"
+                label="Libellé case TVA"
+                v-model="libelleCaseTva"
                 :filled="readonly"
-                :readonly="readonly"
-                :rules="referenceRules"
+                :hide-details="readonly"
+                tabindex="-1"
+                readonly
               ></v-text-field>
+              <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
             </v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false"
+          <v-btn color="blue darken-1" text @click="dialog = false" tabindex="-1"
             >Fermer</v-btn
           >
-          <v-btn color="success" text @click="dialog = false" v-if="!readonly"
+          <v-btn color="success" text :disabled="!isValid" @click="sendContrepartie" v-if="!readonly"
             >Valider</v-btn
           >
         </v-card-actions>
@@ -128,58 +162,85 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit, Prop } from "vue-property-decorator";
-import { PieceComptableContrepartie, TypeCompte } from "@/models/AchatVente";
+import {
+  PieceComptableContrepartie,
+  TypeCompte,
+  Devise,
+  TypeMouvement,
+  getTypesMouvements
+} from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
+import { CompteApi } from "@/api/CompteApi";
+import SearchCompteContrepartieVue from "./SearchCompteContrepartie.vue";
+import SearchCaseTvaVue from "./SearchCaseTva.vue";
 import axios from "axios";
+import CompteGenerealSearch from '../../../models/Compte/CompteGeneralSearch';
 
 @Component({
-  name: "EditContrepartie"
+  name: "EditContrepartie",
+  components: { SearchCompteContrepartieVue, SearchCaseTvaVue }
 })
 export default class extends Vue {
-  public dialog: boolean = false;
+  private dialog: boolean = false;
   @PropSync("isReadOnly")
   public readonly!: boolean;
-  public isValid: boolean = false;
+  private isValid: boolean = true;
   private resolve!: any;
   private reject!: any;
+  private numeroJournal: number = 0;
 
-  public typesComptes: string[] = ["Général", "Extra Comptable"];
-  public typesComptesSelected: string = "";
+  private typesComptes: TypeCompte[] = [];
+  private typesComptesSelected: TypeCompte = new TypeCompte();
   private typesComptesRules: any = [(v: string) => !!v || "Type obligatoire"];
-  public numeroCompte: string = "";
+  private compteLoading: boolean = false;
+  private numeroCompte: string = "";
   private numeroCompteRules: any = [(v: string) => !!v || "Numéro obligatoire"];
-  public nomCompte: string = "";
+  private nomCompte: string = "";
   private nomCompteRules: any = [(v: string) => !!v || "Nom obligatoire"];
-  public devises: string[] = ["EUR", "DLRS"];
-  public devisesSelected: string = "";
+  private devises: Devise[] = [];
+  private devisesSelected: Devise = new Devise();
   private devisesRules: any = [(v: string) => !!v || "Devise obligatoire"];
-  public libelle: string = "";
+  private libelle: string = "";
   private libelleRules: any = [(v: string) => !!v || "Libelle obligatoire"];
-  public typesMouvements: string[] = ["Débit", "Crédit"];
-  public typesMouvementsSelected: string = "";
+  private typesMouvements: TypeMouvement[] = getTypesMouvements();
+  private typesMouvementsSelected: TypeMouvement = new TypeMouvement();
   private typesMouvementsRules: any = [
     (v: string) => !!v || "Type obligatoire"
   ];
-  public montant: string = "";
+  private montant: string = "";
   private montantRules: any = [(v: string) => !!v || "Montant obligatoire"];
-  public caseTva: string = "";
-  private caseTvaRules: any = [(v: string) => !!v || "Case tva obligatoire"];
-  public reference: string = "";
+  private numeroCaseTva: string = "";
+  private numeroCaseTvaRules: any = [
+    (v: string) => !!v || "Case tva obligatoire"
+  ];
+  private libelleCaseTva: string = "";
+  private reference: string = "";
   private referenceRules: any = [(v: string) => !!v || "Référence obligatoire"];
 
+  mounted() {
+    AchatVenteApi.getTypesComptes().then(resp => {
+      this.typesComptes = resp;
+    });
+  }
+
   public open(
-    compte: PieceComptableContrepartie
+    contrepartie: PieceComptableContrepartie,
+    numeroJournal: number,
+    deviseEntete: Devise
   ): Promise<PieceComptableContrepartie> {
     this.dialog = true;
+    this.initDevises(deviseEntete, contrepartie);
+    this.numeroJournal = numeroJournal;
 
-    this.typesComptesSelected = compte.typeCompte;
-    this.devisesSelected = compte.libelleDevise;
-
-    this.numeroCompte = compte.numeroCompte.toString();
-    this.libelle = compte.compteLibelle;
-    this.typesMouvementsSelected = compte.codeMouvement;
-    this.montant = compte.montantBase.toString();
-    this.caseTva = compte.numeroCase.toString();
+    this.typesComptesSelected = this.typesComptes.find(tc => tc.id == contrepartie.typeCompte) || this.typesComptes[0];
+    this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) || this.devises[0];
+    this.numeroCompte = contrepartie.numeroCompte.toString();
+    this.nomCompte = contrepartie.compteLibelle;
+    this.libelle = contrepartie.libelle;
+    this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
+    this.montant = contrepartie.montantBase.toString();
+    this.numeroCaseTva = contrepartie.numeroCase ? contrepartie.numeroCase.toString() : "";
+    this.libelleCaseTva = contrepartie.libelleCase;
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -187,27 +248,116 @@ export default class extends Vue {
     });
   }
 
+    public openNew(numeroJournal: number,
+    deviseEntete: Devise
+  ): Promise<PieceComptableContrepartie> {
+    (this.$refs.form as any).reset();
+    this.dialog = true;
+    this.initDevises(deviseEntete);
+    this.numeroJournal = numeroJournal;
+  
+    this.typesComptesSelected = this.typesComptes[0];
+    this.devisesSelected = this.devises[0];
+    this.typesMouvementsSelected = this.typesMouvements[0];
+
+    return new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+
+  private initDevises(deviseEntete: Devise, contrepartie?: PieceComptableContrepartie){
+    this.devises = [];
+    this.devises.push(new Devise({id:1, libelle: "EUR"}));
+    if(!this.devises.find(d => d.id == deviseEntete.id))
+        this.devises.push(deviseEntete);
+    if(contrepartie){
+      if(!this.devises.find(d => d.id == contrepartie.codeDevise))
+        this.devises.push(new Devise({id:contrepartie.codeDevise, libelle: contrepartie.libelleDevise}));
+    }
+  }
+
+  private loadCompte() {
+    this.compteLoading = true;
+    if(this.typesComptesSelected){
+      CompteApi.getCompteGeneral(this.typesComptesSelected.id, this.numeroCompte.toString())
+        .then(compte => {
+          this.setCompte(compte);
+        })
+        .finally(() => {
+          this.compteLoading = false;
+        });
+    }
+  }
+  private OpenSearchCompte(): void {
+    if(this.typesComptesSelected){
+      (this.$refs.compteDialog as SearchCompteContrepartieVue)
+      .open(this.typesComptesSelected)
+      .then(compte => {
+        this.setCompte(compte);
+      });
+    }
+  }
+  private setCompte(compte: CompteGenerealSearch){
+    this.numeroCompte = compte.numero.toString();
+    this.nomCompte = compte.nom;
+  }
+
+  private loadCaseTva() {
+    this.compteLoading = true;
+    if (+this.numeroCaseTva) {
+      AchatVenteApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
+        .then(caseTva => {
+          this.numeroCaseTva = caseTva ? caseTva.numeroCase.toString() : "";
+          this.libelleCaseTva = caseTva ? caseTva.libelleCase : "";
+        })
+        .catch(err => {
+          this.numeroCaseTva = "";
+          this.libelleCaseTva = "";
+        })
+        .finally(() => {
+          this.compteLoading = false;
+          (this.$refs.form as any).validate()
+        });
+    } else {
+      this.numeroCaseTva = "";
+      this.libelleCaseTva = "";
+    }
+  }
+
+  private OpenSearchCaseTva(): void {
+    (this.$refs.caseTvaDialog as SearchCaseTvaVue)
+      .open(this.numeroJournal)
+      .then(caseTva => {
+        this.numeroCaseTva = caseTva.numeroCase.toString();
+        this.libelleCaseTva = caseTva.libelleCase;
+      });
+  }
+
   private GetModel(): PieceComptableContrepartie {
     let contrepartie = new PieceComptableContrepartie();
 
-    contrepartie.typeCompte = this.typesComptesSelected;
-    //contrepartie.numeroCompte = this.numeroCompte;
+    contrepartie.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : "";
+    contrepartie.numeroCompte = parseInt(this.numeroCompte);
     contrepartie.compteLibelle = this.nomCompte;
     contrepartie.libelle = this.libelle;
-    contrepartie.codeMouvement = this.typesComptesSelected;
-    //contrepartie.montantDevise = this.devisesSelected;
-    //contrepartie.montantBase = this.montant;
-    //contrepartie.codeDevise = this.devisesSelected;
-    contrepartie.libelleDevise = this.devisesSelected;
-    //contrepartie.numeroCase = this.caseTva;
-    contrepartie.libelleCase = this.caseTva;
+    contrepartie.codeMouvement = this.typesMouvementsSelected ? this.typesMouvementsSelected.id : "";
+    contrepartie.montantDevise = parseFloat(this.montant);
+    contrepartie.montantBase = parseFloat(this.montant);
+    contrepartie.codeDevise = this.devisesSelected ? this.devisesSelected.id : 0;
+    contrepartie.libelleDevise = this.devisesSelected ? this.devisesSelected.libelle : "";
+    contrepartie.numeroCase = parseInt(this.numeroCaseTva);
+    contrepartie.libelleCase = this.libelleCaseTva;
 
     return contrepartie;
   }
 
   private sendContrepartie(compte: PieceComptableContrepartie) {
-    this.dialog = false;
-    this.resolve(this.GetModel());
+    (this.$refs.form as any).validate();
+    if(this.isValid){
+      this.dialog = false;
+      this.resolve(this.GetModel());
+    }
   }
 
   private close() {

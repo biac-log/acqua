@@ -5,17 +5,17 @@
         <v-row align="start" justify="start" class="pl-5 pr-5">
           <v-col cols="12" xs="12" md="4" lg="2">
             <v-select
-              v-model="periodeSelected"
-              :items="periodes"
               label="Sélection de la période"
               outlined
-              :loading="periodeIsLoading"
-              @change="LoadPeriode"
-              :hint="libellePeriode"
               persistent-hint
-              :rules="periodesRules"
               required
               autofocus
+              :items="periodes"
+              v-model="periodeSelected"
+              :loading="periodeIsLoading"
+              :hint="periodeData.libellePeriode"
+              :rules="periodesRules"
+              @change="LoadPeriode"
             ></v-select>
           </v-col>
           <v-col cols="12" xs="12" md="6" lg="3">
@@ -88,11 +88,7 @@
         </template>
       </v-data-table>
     </v-card>
-    <AchatVentePieceVue
-      ref="refPiece"
-      :dialogPiece.sync="dialogPieceMaster"
-      @saveAction="updateRow()"
-    ></AchatVentePieceVue>
+    <AchatVentePieceVue ref="refDialogPiece"></AchatVentePieceVue>
   </v-container>
 </template>
 
@@ -107,6 +103,7 @@ import {
 import { JournalApi } from "@/api/JournalApi";
 import moment from "moment";
 import AchatVentePieceVue from "./components/AchatVentePiece.vue";
+import { AchatVenteApi } from "../../api/AchatVenteApi";
 
 @Component({
   name: "AchatVente",
@@ -153,24 +150,13 @@ export default class extends Vue {
   private piecesComptables: EntetePieceComptable[] = [];
   private isLoadingPieces: boolean = false;
 
-  private dialogPieceMaster: boolean = false;
-
   public LoadPeriode() {
     this.periodeIsLoading = true;
-
-    axios
-      .get<PeriodeComptable>(
-        process.env.VUE_APP_ApiAcQuaCore +
-          "/AchatVente/GetPeriode" +
-          this.GetPeriode()
-      )
+    const periodeString: string =
+      this.periodeSelected == "Période précédente" ? "Precedente" : "Courante";
+    AchatVenteApi.getPeriodeComptable(periodeString)
       .then(resp => {
-        this.periodeData = resp.data;
-        this.libellePeriode =
-          "Début " +
-          moment(resp.data.debut).format("DD/MM/YYYY") +
-          " - Fin " +
-          moment(resp.data.fin).format("DD/MM/YYYY");
+        this.periodeData = resp;
       })
       .catch(error => {
         this.isErrorPeriode = true;
@@ -178,13 +164,6 @@ export default class extends Vue {
       .finally(() => {
         this.periodeIsLoading = false;
       });
-  }
-
-  private GetPeriode(): string {
-    let periode: string = "Courante";
-    if (this.periodeSelected == "Période précédente") periode = "Precedente";
-
-    return periode;
   }
 
   public LoadJournaux() {
@@ -207,37 +186,24 @@ export default class extends Vue {
     this.periodeSearched = this.periodeData;
     this.journalSearched = this.journalSelected;
 
-    axios
-      .get<EntetePieceComptable[]>(
-        process.env.VUE_APP_ApiAcQuaCore +
-          "/AchatVente/GetEntetePiecesComptables?journal=" +
-          this.journalSelected.numero +
-          "&stPeriode=" +
-          periode
-      )
-      .then(resp => {
-        this.piecesComptables = resp.data;
-        this.piecesComptables.forEach(element => {
-          element.codePieceDisplay =
-            element.codeJournal + "." + element.codePiece;
-          element.statutDisplay =
-            element.status + " - " + element.statusLibelle;
-        });
-      })
-      .catch(error => {})
-      .finally(() => {
-        this.isLoadingPieces = false;
-      });
+    AchatVenteApi.GetEntetePiecesComptables(
+      this.journalSelected.numero,
+      periode
+    ).then(resp => {
+        this.piecesComptables = resp;
+    })
+    .catch(error => {})
+    .finally(() => {
+      this.isLoadingPieces = false;
+    });
   }
 
   public OpenPieceComptable(entete: EntetePieceComptable) {
-    this.dialogPieceMaster = true;
-
-    (this.$refs.refPiece as AchatVentePieceVue).Init(
-      entete,
-      this.periodeSearched,
-      this.journalSearched
-    );
+    (this.$refs.refDialogPiece as AchatVentePieceVue)
+      .open(entete, this.periodeSearched, this.journalSearched)
+      .then(resp => {
+        Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp);
+      });
   }
 
   public UpdateRow() {}

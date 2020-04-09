@@ -26,14 +26,19 @@ export class EntetePieceComptableDTO implements IEntetePieceComptable{
   numeroCompte: number = 0;
   nomCompte: string = "";
   devise: string = "";
-
-  codePieceDisplay:string="";
-  statutDisplay:string="";
 }
 
 export class EntetePieceComptable extends EntetePieceComptableDTO {
   constructor(dto?: EntetePieceComptableDTO){
     super();
     Object.assign(this, dto || new EntetePieceComptableDTO());
+  }
+
+  get codePieceDisplay(): string{
+    return `${this.codeJournal}.${this.codePiece}`;
+  }
+
+  get statutDisplay(): string{
+    return `${this.status}.${this.statusLibelle}`;
   }
 }

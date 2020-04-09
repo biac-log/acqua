@@ -1,14 +1,14 @@
 <template>
-  <v-dialog width="1000" v-model="dialog" @click:outside="close">
+  <v-dialog width="600" v-model="dialog" @click:outside="close">
     <v-card class="mt-5">
       <v-card-title>
-        Comptes
-        <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">
+        Case Tva
+        <v-btn color="primary" fab class="ml-5" small @click="refreshcasesTva">
           <v-icon>mdi-refresh</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
         <v-text-field
-          v-model="filtreCompte"
+          v-model="filtreCaseTva"
           append-icon="mdi-magnify"
           label="Filtrer"
           single-line
@@ -19,17 +19,12 @@
       <v-data-table
         id="dataTable"
         height="530"
-        dense
-        fixed-header
-        :footer-props="{
-          'items-per-page-options': [30,50,100]
-        }"
-        :items-per-page="30"
-        :headers="headersComptes"
-        :items="comptes"
+        :headers="headersCasesTva"
+        :items="casesTva"
         :loading="isLoading"
-        :search="filtreCompte"
-        @click:row="sendCompte"
+        :search="filtreCaseTva"
+        @click:row="sendCaseTva"
+        disable-pagination
       >
       </v-data-table>
     </v-card>
@@ -38,36 +33,35 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit } from "vue-property-decorator";
-import CompteSearch from "@/models/Compte/CompteSearch";
+import { CaseTva } from "@/models/AchatVente";
 import { CompteApi } from "@/api/CompteApi";
 import axios from "axios";
+import { AchatVenteApi } from '@/api/AchatVenteApi';
 
 @Component({
   name: "SearchCompteTier"
 })
 export default class extends Vue {
   private dialog: boolean = false;
-  private numero: string = "";
-  private matchCode: string = "";
-  private texte: string = "";
 
-  private typeLoad!: string;
-  private filtreCompte: string = "";
+  private numeroJournalLoad!: number;
+  private filtreCaseTva: string = "";
   private isLoading: boolean = false;
-  private comptes: CompteSearch[] = [];
-  private headersComptes = [
-    { text: "Numéro", value: "numero" },
-    { text: "Nom", value: "nom" },
-    { text: "Raison sociale", value: "raisonSocial" },
-    { text: "Adresse", value: "adresse" }
+  private casesTva: CaseTva[] = [];
+  private headersCasesTva = [
+    { text: "Numéro case", value: "numeroCase" , align: "end" },
+    { text: "Libellé", value: "libelleCase" },
+    { text: "Type", value: "libelleTypeCase" },
+    { text: "Nature", value: "natureCase" },
+    { text: "Taux", value: "tauxTvaCase", align: "end" }
   ];
 
   private resolve!: any;
   private reject!: any;
 
-  public open(typeToLoad: string): Promise<CompteSearch> {
+  public open(numeroJournal: number): Promise<CaseTva> {
     this.dialog = true;
-    this.loadComptes(typeToLoad);
+    this.loadcasesTva(numeroJournal);
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -75,19 +69,19 @@ export default class extends Vue {
     });
   }
 
-  private loadComptes(typeToLoad: string) {
-    if (this.typeLoad != typeToLoad) {
-      this.typeLoad = typeToLoad;
-      this.refreshComptes();
+  private loadcasesTva(numeroJournalLoad: number) {
+    if (this.numeroJournalLoad != numeroJournalLoad) {
+      this.numeroJournalLoad = numeroJournalLoad;
+      this.refreshcasesTva();
     }
   }
 
-  private refreshComptes() {
-    if (this.typeLoad) {
+  private refreshcasesTva() {
+    if (this.numeroJournalLoad) {
       this.isLoading = true;
-      CompteApi.getComptesTiers(this.typeLoad)
+      AchatVenteApi.getCasesTVADisponibles(this.numeroJournalLoad)
         .then(resp => {
-          this.comptes = resp;
+          this.casesTva = resp;
         })
         .finally(() => {
           this.isLoading = false;
@@ -95,9 +89,9 @@ export default class extends Vue {
     }
   }
 
-  private sendCompte(compte: CompteSearch) {
+  private sendCaseTva(caseTva: CaseTva) {
     this.dialog = false;
-    this.resolve(compte);
+    this.resolve(caseTva);
   }
 
   private close(){

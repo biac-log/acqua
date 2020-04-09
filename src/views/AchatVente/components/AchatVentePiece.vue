@@ -241,7 +241,12 @@
             </v-row>
           </v-col>
           <v-col cols="7">
-            <GridContreparties :Contreparties.sync="contreparties" :isReadOnly.sync="piecereadonly"></GridContreparties>
+            <GridContreparties
+              :Contreparties.sync="contreparties"
+              :IsReadOnly.sync="piecereadonly"
+              :NumeroJournal.sync="numeroJournal"
+              :DeviseEntete.sync="deviseSelected"
+            ></GridContreparties>
             <SearchCompteTier ref="compteDialog"></SearchCompteTier>
           </v-col>
         </v-row>
@@ -292,7 +297,7 @@ export default class extends Vue {
   private periodeDisplay: string = "";
   private journalDisplay: string = "";
   private numeroPiece: string = "";
-  private numeroJournal: string = "";
+  private numeroJournal: number = 0;
 
   //Encodage
   private numeroCompte: number = 0;
@@ -312,22 +317,42 @@ export default class extends Vue {
   private numeroCompteTier: string = "";
   private nomCompteTier: string = "";
 
-  @PropSync("dialogPiece")
-  public dialog!: boolean;
+  public dialog: boolean = false;
   public searchCompteTiersDialog: boolean = false;
 
-  public Init(
-    entete: EntetePieceComptable,
+  // public Init(
+  //   entete: EntetePieceComptable,
+  //   periode: PeriodeComptable,
+  //   journal: Journal
+  // ) {
+  //   this.piecereadonly = true;
+  //   this.SetPeriodeDisplay(periode);
+  //   this.SetJournalDisplay(journal);
+  //   this.numeroPiece = entete.codePiece.toString();
+  //   this.numeroJournal = entete.codeJournal;
+
+  //   this.GetData();
+  // }
+
+  private resolve!: any;
+  private reject!: any;
+
+  public open(entete: EntetePieceComptable,
     periode: PeriodeComptable,
-    journal: Journal
-  ) {
+    journal: Journal): Promise<EntetePieceComptable> {
+    this.dialog = true;
     this.piecereadonly = true;
     this.SetPeriodeDisplay(periode);
     this.SetJournalDisplay(journal);
     this.numeroPiece = entete.codePiece.toString();
-    this.numeroJournal = entete.codeJournal.toString();
+    this.numeroJournal = entete.codeJournal;
 
     this.GetData();
+
+    return new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
   }
 
   private GetData() {
@@ -385,7 +410,7 @@ export default class extends Vue {
   private compteLoading: boolean = false;
   private loadCompte() {
     this.compteLoading = true;
-    CompteApi.get(this.typeCompte, this.numeroCompte.toString())
+    CompteApi.getCompteTier(this.typeCompte, this.numeroCompte.toString())
       .then(compte => {
         this.setCompte(compte);
       })

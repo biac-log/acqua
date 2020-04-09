@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit, Prop } from "vue-property-decorator";
-import { PieceComptableContrepartie } from "@/models/AchatVente";
+import { PieceComptableContrepartie, Devise } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import axios from "axios";
 import EditContrepartieVue from "./EditContrepartie.vue";
@@ -32,10 +32,14 @@ import EditContrepartieVue from "./EditContrepartie.vue";
   components: { EditContrepartieVue }
 })
 export default class extends Vue {
-  @PropSync("isReadOnly")
+  @PropSync("IsReadOnly")
   public readonly!: boolean;
   @PropSync("Contreparties")
   private contreparties!: PieceComptableContrepartie[];
+  @PropSync("NumeroJournal")
+  private numeroJournal!: number;
+  @PropSync("DeviseEntete")
+  private devise!: Devise;
 
   private headersContreparties = [
     { text: "N° Compte", value: "libelleNumero" },
@@ -49,13 +53,19 @@ export default class extends Vue {
 
   private addContrepartie() {
     (this.$refs.editContrepartie as EditContrepartieVue)
-      .open(new PieceComptableContrepartie())
-      .then((resp: PieceComptableContrepartie) => {});
+      .openNew(this.numeroJournal, this.devise)
+      .then((resp: PieceComptableContrepartie) => {
+        const maxLigne = Math.max(...this.contreparties.map(i => i.numeroLigne))
+        resp.numeroLigne = maxLigne + 1;
+        this.contreparties.push(resp);
+      });
   }
   private editContrepartie(compte: PieceComptableContrepartie) {
     (this.$refs.editContrepartie as EditContrepartieVue)
-      .open(compte)
-      .then((resp: PieceComptableContrepartie) => {});
+      .open(compte, this.numeroJournal, this.devise)
+      .then((resp: PieceComptableContrepartie) => {
+        Vue.set(this.contreparties, this.contreparties.findIndex(d => d == compte), resp);
+      });
   }
 }
 </script>

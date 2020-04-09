@@ -6,3 +6,6 @@ export * from './Statut';
 export * from './Journal';
 export * from './PieceComptableContrepartie';
 export * from './PieceComptable';
+export * from './CompteContrepartieSearch';
+export * from './CaseTva';
+export * from './TypeMouvement';
