@@ -26,4 +26,12 @@
     get fullLibelle(): string {
       return `${this.numero} - ${this.libelle}`;
     }
+
+    get typeCompteChar(): string {
+      if (this.famille == "vente" || this.famille == "ncvente")
+        return "C";
+      else if (this.famille == "achat" || this.famille == "ncachat")
+        return "F";
+      else return "";
+    }
   }

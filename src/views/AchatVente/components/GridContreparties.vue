@@ -2,6 +2,16 @@
   <v-card>
     <v-card-title>
       Contreparties
+      <v-btn
+        color="primary"
+        fab
+        small
+        class="ml-5"
+        :disabled="readonly"
+        @click.stop="addContrepartie"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
       <EditContrepartieVue
         ref="editContrepartie"
         :isReadOnly.sync="readonly"
@@ -51,7 +61,7 @@ export default class extends Vue {
     { text: "Case TVA", value: "libelleCaseTva" }
   ];
 
-  private addContrepartie() {
+  public addContrepartie() {
     (this.$refs.editContrepartie as EditContrepartieVue)
       .openNew(this.numeroJournal, this.devise)
       .then((resp: PieceComptableContrepartie) => {
@@ -60,6 +70,7 @@ export default class extends Vue {
         this.contreparties.push(resp);
       });
   }
+
   private editContrepartie(compte: PieceComptableContrepartie) {
     (this.$refs.editContrepartie as EditContrepartieVue)
       .open(compte, this.numeroJournal, this.devise)

@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid @keydown.plus.prevent="openNewPieceComptable">
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
@@ -56,7 +56,7 @@
     <v-card class="mt-5">
       <v-card-title>
         Pièces comptables
-        <v-btn color="warning" fab dark class="ml-5">
+        <v-btn color="warning" fab class="ml-5" :disabled="!searchIsValid" @click="openNewPieceComptable">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
@@ -77,11 +77,11 @@
         sort-by="codePieceDisplay"
         sort-desc
       >
-        <template v-slot:item.datePiece="{ item }">
-          <span>{{ item.datePiece | dateToString }}</span>
+        <template v-slot:item.datePieceDate="{ item }">
+          <span>{{ item.datePieceDate | dateToString }}</span>
         </template>
-        <template v-slot:item.dateEcheance="{ item }">
-          <span>{{ item.dateEcheance | dateToString }}</span>
+        <template v-slot:item.dateEcheanceDate="{ item }">
+          <span>{{ item.dateEcheanceDate | dateToString }}</span>
         </template>
         <template v-slot:item.montant="{ item }">
           <span>{{ item.montant | numberToString }}</span>
@@ -136,8 +136,8 @@ export default class extends Vue {
 
   private headers = [
     { text: "Numéro pièce", value: "codePieceDisplay" },
-    { text: "Date pièce", value: "datePiece" },
-    { text: "Date échéance", value: "dateEcheance" },
+    { text: "Date pièce", value: "datePieceDate" },
+    { text: "Date échéance", value: "dateEcheanceDate" },
     { text: "Numéro compte", value: "numeroCompte" },
     { text: "Nom compte", value: "nomCompte" },
     { text: "Libelle", value: "libelle" },
@@ -198,7 +198,7 @@ export default class extends Vue {
     });
   }
 
-  public OpenPieceComptable(entete: EntetePieceComptable) {
+  private OpenPieceComptable(entete: EntetePieceComptable) {
     (this.$refs.refDialogPiece as AchatVentePieceVue)
       .open(entete, this.periodeSearched, this.journalSearched)
       .then(resp => {
@@ -206,7 +206,17 @@ export default class extends Vue {
       });
   }
 
-  public UpdateRow() {}
+  private openNewPieceComptable() {
+    (this.$refs.refDialogPiece as AchatVentePieceVue)
+      .openNew(this.periodeSearched, this.journalSelected)
+      .then(resp => {
+        //Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp);
+      });
+  }
+
+  public UpdateRow() {
+    
+  }
 }
 </script>
 

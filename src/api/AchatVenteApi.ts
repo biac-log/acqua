@@ -1,4 +1,5 @@
 import Axios from "axios";
+import moment from "moment"
 
 import {
   PieceComptableDTO,
@@ -30,13 +31,13 @@ export abstract class AchatVenteApi {
 
   static async getDateEcheance(
     typeCompte: string,
-    numeroCompte: number,
+    numeroCompte: number | string,
     date: Date
   ): Promise<Date> {
-    let response = await this.achatVenteAxios.get<Date>(
-      `${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDateEcheance?typeCompte=${typeCompte}F&numeroCompte=${numeroCompte}&datePiece=${date}`
+    let response = await this.achatVenteAxios.get(
+      `${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDateEcheance?typeCompte=${typeCompte}F&numeroCompte=${numeroCompte}&datePiece=${moment(date).format("DD/MM/YYYY")}`
     );
-    return response.data;
+    return moment(response.data).toDate();;
   }
 
   static async getPieceComptable(

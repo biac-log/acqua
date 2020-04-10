@@ -1,10 +1,12 @@
+import moment from 'moment'
+
 export interface IEntetePieceComptable {
   codeJournal: number;
   codePiece: number
   escompte: number;
   libelle: string;
-  datePiece: Date;
-  dateEcheance: Date;
+  datePiece: string;
+  dateEcheance: string;
   status: number;
   statusLibelle:string;
   montant: number;
@@ -18,8 +20,8 @@ export class EntetePieceComptableDTO implements IEntetePieceComptable{
   codePiece: number = 0;
   escompte: number = 0;
   libelle: string = '';
-  datePiece: Date = new Date();
-  dateEcheance: Date = new Date();
+  datePiece: string = "";
+  dateEcheance: string = "";
   status: number = 0;
   statusLibelle:string="";
   montant: number = 0;
@@ -38,7 +40,17 @@ export class EntetePieceComptable extends EntetePieceComptableDTO {
     return `${this.codeJournal}.${this.codePiece}`;
   }
 
-  get statutDisplay(): string{
-    return `${this.status}.${this.statusLibelle}`;
+  get datePieceDate(): Date{
+    return moment(this.datePiece).toDate();
+  }
+  set datePieceDate(date: Date){
+    this.datePiece = date.toISOString();
+  }
+
+  get dateEcheanceDate(): Date{
+    return moment(this.dateEcheance).toDate();
+  }
+  set dateEcheanceDate(date: Date){
+    this.dateEcheance = date.toISOString();
   }
 }

@@ -1,5 +1,5 @@
-  import { IPieceComptableContrepartie, PieceComptableContrepartie } from "./PieceComptableContrepartie"
-  
+  import { IPieceComptableContrepartie, PieceComptableContrepartie } from "./PieceComptableContrepartie";
+  import moment from "moment";
   export interface IPieceComptable {
     numeroJournal:number;
     numeroPiece:number;
@@ -9,8 +9,8 @@
     taux:number;
     montantDevise:number;
     montantBase:number;
-    datePiece: Date;
-    dateEcheance: Date;
+    datePiece: string;
+    dateEcheance: string;
     montantEscompteDevise:number;
     montantEscompteBase:number;
     pieceAcquittee: boolean;
@@ -42,8 +42,8 @@
     public taux:number=0;
     public montantDevise:number=0;
     public montantBase:number=0;
-    public datePiece: Date = new Date();
-    public dateEcheance: Date = new Date();
+    public datePiece: string = "";
+    public dateEcheance: string = "";
     public montantEscompteDevise:number=0;
     public montantEscompteBase:number=0;
     public pieceAcquittee: boolean = false;
@@ -100,5 +100,19 @@
 
     get libelleSoldeCompteTiers(): string{
       return `${this.compteTiersSoldeComptable.toFixed(2)} ${this.compteTiersLibelleDevise}`;
+    }
+
+    get datePieceDate(): Date{
+      return moment(this.datePiece).toDate();
+    }
+    set datePieceDate(date: Date){
+      this.datePiece = date.toISOString();
+    }
+
+    get dateEcheanceDate(): Date{
+      return moment(this.dateEcheance).toDate();
+    }
+    set dateEcheanceDate(date: Date){
+      this.dateEcheance = date.toISOString();
     }
   }

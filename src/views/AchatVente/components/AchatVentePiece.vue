@@ -5,261 +5,268 @@
     width="2000"
     :persistent="!piecereadonly"
     @keydown.f2="ModifierPiece"
-    @keydown.suppr="DeletePiece"
-    eager
+    @keydown.del.prevent="DeletePiece"
+    @keydown.plus.prevent="addContrepartie"
   >
-    <v-card>
-      <v-toolbar color="primary" dark flat>
-        <v-card-title class="d-flex justify-start">
-          <p class="mb-0">Pièce {{ numeroJournal }}.{{ numeroPiece }}</p>
-          <p class="ml-10 mb-0 textMini">Période {{ periodeDisplay }}</p>
-          <p class="ml-5 mb-0 textMini">Journal {{ journalDisplay }}</p>
-        </v-card-title>
-        <v-spacer></v-spacer>
-        <v-btn
-          class="mr-5"
-          color="success"
-          @click="ModifierPiece"
-          v-if="piecereadonly"
-        >
-          <v-icon left>mdi-pencil</v-icon>Modifier
-        </v-btn>
-        <v-btn
-          class="mr-10"
-          color="error"
-          v-if="piecereadonly"
-          @click="DeletePiece"
-        >
-          <v-icon left>mdi-delete</v-icon>Supprimer
-        </v-btn>
-        <v-btn
-          ref="buttonClose"
-          class="ml-10"
-          icon
-          color="white"
-          @click="dialog = false"
-        >
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </v-toolbar>
-      <v-card-text>
-        <v-row fill-height>
-          <v-col cols="5">
-            <v-row dense>
-              <v-col cols="4">
-                <v-text-field
-                  label="Numéro compte tiers"
-                  v-model="numeroCompte"
-                  :filled="piecereadonly"
-                  :readonly="piecereadonly"
-                  :append-icon="piecereadonly ? '' : 'mdi-magnify'"
-                  hide-details
-                  ref="firstElement"
-                  @keypress.enter="loadCompte"
-                  @click:append="OpenSearchCompte()"
-                  @focus="$event.target.select()"
-                >
-                </v-text-field>
-              </v-col>
-              <v-col cols="8">
-                <v-text-field
-                  label="Nom compte tiers"
-                  :value="pieceComptableData.compteTiersNom"
-                  :filled="piecereadonly"
-                  readonly
-                  hide-details
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row dense>
-              <v-col cols="12">
-                <v-text-field
-                  label="Libelle"
-                  :value="pieceComptableData.libelle"
-                  :filled="piecereadonly"
-                  :readonly="piecereadonly"
-                  hide-details
-                  v-model="libelle"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row dense>
-              <v-col cols="2">
-                <v-select
-                  :items="devises"
-                  v-model="deviseSelected"
-                  :filled="piecereadonly"
-                  :readonly="piecereadonly"
-                  item-value="id"
-                  item-text="libelle"
-                  label="Devise pièce"
-                  hide-details
-                ></v-select>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  label="Montant"
-                  v-model="montant"
-                  :filled="piecereadonly"
-                  :readonly="piecereadonly"
-                  hide-details
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  label="Montant Escompte"
-                  v-model="montantEscompte"
-                  :filled="piecereadonly"
-                  :readonly="piecereadonly"
-                  hide-details
-                ></v-text-field>
-              </v-col>
+    <v-form ref="form" v-model="isValid" lazy-validation>
+      <v-card>
+        <v-toolbar color="primary" dark flat>
+          <v-card-title class="d-flex justify-start">
+            <p class="mb-0" v-if="numeroPiece">Pièce {{ numeroJournal }}.{{ numeroPiece }}</p>
+            <p class="mb-0" v-if="!numeroPiece">Nouvelle pièce</p>
+            <p class="ml-10 mb-0 textMini">Période {{ periodeDisplay }}</p>
+            <p class="ml-5 mb-0 textMini">Journal {{ journalDisplay }}</p>
+          </v-card-title>
+          <v-spacer></v-spacer>
+          <v-btn
+            class="mr-5"
+            color="success"
+            @click="ModifierPiece"
+            v-if="piecereadonly"
+          >
+            <v-icon left>mdi-pencil</v-icon>Modifier
+          </v-btn>
+          <v-btn
+            class="mr-10"
+            color="error"
+            v-if="piecereadonly"
+            @click="DeletePiece"
+          >
+            <v-icon left>mdi-delete</v-icon>Supprimer
+          </v-btn>
+          <v-btn
+            ref="buttonClose"
+            class="ml-10"
+            icon
+            color="white"
+            @click="dialog = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-row fill-height>
+            <v-col cols="5">
+              <v-row dense>
+                <v-col cols="4">
+                  <v-text-field
+                    label="Numéro compte tiers"
+                    v-model="numeroCompte"
+                    :filled="piecereadonly"
+                    :readonly="piecereadonly"
+                    :append-icon="piecereadonly ? '' : 'mdi-magnify'"
+                    :rules="numeroCompteTierRules"
+                    @keypress.enter="loadCompte"
+                    @click:append="OpenSearchCompte()"
+                    @focus="$event.target.select()"
+                    @blur="loadCompte"
+                    :hide-details="piecereadonly"
+                    ref="firstElement"
+                    autofocus
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="8">
+                  <v-text-field
+                    label="Nom compte tiers"
+                    :value="compteTiersNom"
+                    :filled="piecereadonly"
+                    readonly
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="12">
+                  <v-text-field
+                    label="Libelle"
+                    :value="libellePiece"
+                    :filled="piecereadonly"
+                    :readonly="piecereadonly"
+                    hide-details
+                    v-model="libelle"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="2">
+                  <v-select
+                    :items="devises"
+                    v-model="deviseSelected"
+                    :filled="piecereadonly"
+                    :readonly="piecereadonly"
+                    item-value="id"
+                    item-text="libelle"
+                    label="Devise pièce"
+                    hide-details
+                  ></v-select>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    label="Montant"
+                    v-model="montant"
+                    :filled="piecereadonly"
+                    :readonly="piecereadonly"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    label="Montant Escompte"
+                    v-model="montantEscompte"
+                    :filled="piecereadonly"
+                    :readonly="piecereadonly"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
 
-              <v-col cols="2">
-                <v-text-field
-                  label="Taux"
-                  :value="pieceComptableData.taux"
-                  :filled="piecereadonly"
-                  readonly
-                  hide-details
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row dense>
-              <v-col cols="4">
-                <DatePicker
-                  label="Date pièce"
-                  :dateSelected.sync="datePiece"
-                  :readonly.sync="piecereadonly"
-                ></DatePicker>
-              </v-col>
-              <v-col cols="4">
-                <DatePicker
-                  label="Date échéance"
-                  :dateSelected.sync="dateEcheance"
-                  :readonly.sync="piecereadonly"
-                ></DatePicker>
-              </v-col>
-              <v-col cols="4">
-                <v-select
-                  :items="statuts"
-                  v-model="statutSelected"
-                  :filled="piecereadonly"
-                  :readonly="piecereadonly"
-                  item-value="id"
-                  item-text="libelle"
-                  label="Statut"
-                  hide-details
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row dense>
-              <v-col cols="4">
-                <v-checkbox
-                  label="Pièce acquitée"
-                  :value="pieceComptableData.pieceAcquittee"
-                  readonly
-                  tabindex="-1"
-                ></v-checkbox>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  label="Montant en devise comptable"
-                  :value="pieceComptableData.libelleMontantCompta"
-                  filled
-                  readonly
-                  tabindex="-1"
-                  hide-details
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-divider></v-divider>
-            <v-card-title>Informations compte tiers</v-card-title>
-            <v-row dense>
-              <v-col cols="3">
-                <v-text-field
-                  label="Solde du compte"
-                  :value="pieceComptableData.libelleSoldeCompteTiers"
-                  filled
-                  readonly
-                  tabindex="-1"
-                  hide-details
-                ></v-text-field>
-              </v-col>
-              <v-col cols="3">
-                <v-text-field
-                  label="Délai de paiement"
-                  :value="pieceComptableData.delaiPaiementLibelle"
-                  filled
-                  readonly
-                  tabindex="-1"
-                  hide-details
-                ></v-text-field>
-              </v-col>
-              <v-col cols="3">
-                <v-text-field
-                  label="% Escompte"
-                  :value="pieceComptableData.compteTiersEscomptePourcentage"
-                  filled
-                  readonly
-                  tabindex="-1"
-                  hide-details
-                ></v-text-field>
-              </v-col>
-              <v-col cols="3">
-                <v-text-field
-                  label="Nombre jours escompte"
-                  :value="pieceComptableData.compteTiersEscompteNombreJours"
-                  filled
-                  readonly
-                  tabindex="-1"
-                  hide-details
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row dense>
-              <v-col cols="6">
-                <v-text-field
-                  label="Compte associé"
-                  :value="pieceComptableData.libelleCompteAssocie"
-                  filled
-                  readonly
-                  tabindex="-1"
-                  hide-details
-                ></v-text-field>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  label="Compte achat/vente"
-                  :value="pieceComptableData.libelleCompteVenteAchat"
-                  filled
-                  readonly
-                  tabindex="-1"
-                  hide-details
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="7">
-            <GridContreparties
-              :Contreparties.sync="contreparties"
-              :IsReadOnly.sync="piecereadonly"
-              :NumeroJournal.sync="numeroJournal"
-              :DeviseEntete.sync="deviseSelected"
-            ></GridContreparties>
-            <SearchCompteTier ref="compteDialog"></SearchCompteTier>
-          </v-col>
-        </v-row>
-      </v-card-text>
-      <v-divider v-if="!piecereadonly"></v-divider>
-      <v-card-actions v-if="!piecereadonly">
-        <v-spacer></v-spacer>
-        <v-btn class="mr-10" color="warning" @click="ModifierPiece">
-          <v-icon left>mdi-content-save</v-icon>Sauvegarder
-        </v-btn>
-      </v-card-actions>
-      <Confirm ref="confirmDialog"></Confirm>
-    </v-card>
+                <v-col cols="2">
+                  <v-text-field
+                    label="Taux"
+                    v-model="taux"
+                    :filled="piecereadonly"
+                    readonly
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="4">
+                  <DatePicker
+                    label="Date pièce"
+                    :date.sync="datePiece"
+                    :readonly.sync="piecereadonly"
+                  ></DatePicker>
+                </v-col>
+                <v-col cols="4">
+                  <DatePicker
+                    label="Date échéance"
+                    :date.sync="dateEcheance"
+                    :readonly.sync="piecereadonly"
+                  ></DatePicker>
+                </v-col>
+                <v-col cols="4">
+                  <v-select
+                    :items="statuts"
+                    v-model="statutSelected"
+                    :filled="piecereadonly"
+                    :readonly="piecereadonly"
+                    item-value="id"
+                    item-text="libelle"
+                    label="Statut"
+                    hide-details
+                  ></v-select>
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="4">
+                  <v-checkbox
+                    label="Pièce acquitée"
+                    v-model="pieceAcquittee"
+                    readonly
+                    tabindex="-1"
+                  ></v-checkbox>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    label="Montant en devise comptable"
+                    v-model="libelleMontantCompta"
+                    filled
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-divider></v-divider>
+              <v-card-title>Informations compte tiers</v-card-title>
+              <v-row dense>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Solde du compte"
+                    v-model="libelleSoldeCompteTiers"
+                    filled
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Délai de paiement"
+                    v-model="delaiPaiementLibelle"
+                    filled
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="3">
+                  <v-text-field
+                    label="% Escompte"
+                    v-model="compteTiersEscomptePourcentage"
+                    filled
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Nombre jours escompte"
+                    v-model="compteTiersEscompteNombreJours"
+                    filled
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-text-field
+                    label="Compte associé"
+                    v-model="libelleCompteAssocie"
+                    filled
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    label="Compte achat/vente"
+                    v-model="libelleCompteVenteAchat"
+                    filled
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="7">
+              <GridContreparties
+                ref="gridContreparties"
+                :Contreparties.sync="contreparties"
+                :IsReadOnly.sync="piecereadonly"
+                :NumeroJournal.sync="numeroJournal"
+                :DeviseEntete.sync="deviseSelected"
+              ></GridContreparties>
+              <SearchCompteTier ref="compteDialog"></SearchCompteTier>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-divider v-if="!piecereadonly"></v-divider>
+        <v-card-actions v-if="!piecereadonly">
+          <v-spacer></v-spacer>
+          <v-btn class="mr-10" color="warning" @click="ModifierPiece">
+            <v-icon left>mdi-content-save</v-icon>Sauvegarder
+          </v-btn>
+        </v-card-actions>
+        <Confirm ref="confirmDialog"></Confirm>
+      </v-card>
+    </v-form>
   </v-dialog>
 </template>
 
@@ -283,6 +290,8 @@ import DatePicker from "@/components/DatePicker.vue";
 import { CompteApi } from "@/api/CompteApi";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import GridContreparties from "./GridContreparties.vue";
+import GridContrepartiesVue from './GridContreparties.vue';
+import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
 
 @Component({
   name: "AchatVentePiece",
@@ -290,20 +299,19 @@ import GridContreparties from "./GridContreparties.vue";
 })
 export default class extends Vue {
   public piecereadonly: boolean = true;
-  private pieceComptableData: PieceComptable = new PieceComptable();
   private contreparties: PieceComptableContrepartie[] = [];
-
+  private isValid: boolean = true;
   //Titre
   private periodeDisplay: string = "";
   private journalDisplay: string = "";
   private numeroPiece: string = "";
-  private numeroJournal: number = 0;
+  private numeroJournal: string = "";
 
   //Encodage
-  private numeroCompte: number = 0;
+  private numeroCompte: string = "";
   private libelle: string = "";
-  private montant: number = 0;
-  private montantEscompte: number = 0;
+  private montant: string = "";
+  private montantEscompte: string = "0";
   private devises: Devise[] = [];
   private deviseSelected: Devise = new Devise();
   private statuts: Statut[] = [];
@@ -315,44 +323,81 @@ export default class extends Vue {
   private isEdit: boolean = false;
 
   private numeroCompteTier: string = "";
+  private numeroCompteTierRules: any = [(v: string) => !!v || "Numéro obligatoire",(v: string) => !!+v || "Numéro invalide"];
   private nomCompteTier: string = "";
 
   public dialog: boolean = false;
   public searchCompteTiersDialog: boolean = false;
 
-  // public Init(
-  //   entete: EntetePieceComptable,
-  //   periode: PeriodeComptable,
-  //   journal: Journal
-  // ) {
-  //   this.piecereadonly = true;
-  //   this.SetPeriodeDisplay(periode);
-  //   this.SetJournalDisplay(journal);
-  //   this.numeroPiece = entete.codePiece.toString();
-  //   this.numeroJournal = entete.codeJournal;
-
-  //   this.GetData();
-  // }
+  private compteTiersNom: string = "";
+  private libellePiece: string = "";
+  private taux: string = "";
+  private pieceAcquittee: string = "";
+  private libelleMontantCompta: string = "";
+  private libelleSoldeCompteTiers: string = "";
+  private delaiPaiementLibelle: string = "";
+  private compteTiersEscomptePourcentage: string = "";
+  private compteTiersEscompteNombreJours: string = "";
+  private libelleCompteAssocie: string = "";
+  private numeroCompteAchatVente: string ="";
+  private nomCompteAchatVente: string ="";
+  private libelleCompteVenteAchat: string = "";
 
   private resolve!: any;
   private reject!: any;
 
+  public openNew(periode: PeriodeComptable, journal: Journal): Promise<EntetePieceComptable> {
+    this.dialog= true;
+    this.init(periode, journal);
+    this.ModifierPiece();
+    return new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+
   public open(entete: EntetePieceComptable,
     periode: PeriodeComptable,
     journal: Journal): Promise<EntetePieceComptable> {
-    this.dialog = true;
-    this.piecereadonly = true;
-    this.SetPeriodeDisplay(periode);
-    this.SetJournalDisplay(journal);
-    this.numeroPiece = entete.codePiece.toString();
-    this.numeroJournal = entete.codeJournal;
-
-    this.GetData();
+    this.dialog=true;
+    this.$nextTick(() => (this.$refs.firstElement as any).focus());
+    this.piecereadonly=true;
+    this.init(periode,journal,entete);
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
     });
+  }
+
+	private init(periode: PeriodeComptable, journal: Journal, entete?: EntetePieceComptable) {
+    this.resetForm();
+    this.periodeDisplay = periode.libellePeriodeFull;
+    this.journalDisplay = journal.fullLibelle;
+    this.typeCompte = journal.typeCompteChar;
+    this.numeroJournal = journal.numero.toString();
+    if(entete){
+      this.numeroPiece = entete.codePiece ? entete.codePiece.toString() : "";
+      this.GetData();
+    }
+  }
+  
+   private resetForm(){
+    this.periodeDisplay = "";
+    this.journalDisplay= "";
+    this.numeroPiece= "";
+    this.numeroJournal= "";
+    this.numeroCompte= "";
+    this.libelle= "";
+    this.montant= "";
+    this.montantEscompte= "";
+    this.deviseSelected = this.devises[0];
+    this.statutSelected = this.statuts[0];
+    this.datePiece = new Date();
+    this.dateEcheance = new Date();
+    this.typeCompte= "";
+    this.numeroCompteTier= "";
+    this.nomCompteTier= "";
   }
 
   private GetData() {
@@ -364,45 +409,38 @@ export default class extends Vue {
       .finally(() => {});
   }
 
-  private SetPeriodeDisplay(periode: PeriodeComptable) {
-    let stPeriode = "Courante";
-    if (periode.typePeriodeComptable == "precedente") stPeriode = "Précédente";
-    this.periodeDisplay = `${stPeriode} du ${moment(periode.debut).format(
-      "DD/MM/YYYY"
-    )} au ${moment(periode.fin).format("DD/MM/YYYY")}`;
-  }
-
-  private SetJournalDisplay(journal: Journal) {
-    this.journalDisplay = `${journal.numero} -  ${journal.libelle}`;
-    if (journal.famille == "vente" || journal.famille == "ncvente")
-      this.typeCompte = "C";
-    else if (journal.famille == "achat" || journal.famille == "ncachat")
-      this.typeCompte = "F";
-  }
-
   private SetDisplayData(pieceComptable: PieceComptable) {
-    this.pieceComptableData = pieceComptable;
-    this.contreparties = this.pieceComptableData.contreparties;
-    this.DisplayEnteteData();
-  }
+    this.contreparties = pieceComptable.contreparties;
 
-  private DisplayEnteteData() {
-    this.numeroCompte = this.pieceComptableData.compteTiersNumero;
-    this.libelle = this.pieceComptableData.libelle;
-    this.datePiece = this.pieceComptableData.datePiece;
-    this.dateEcheance = this.pieceComptableData.dateEcheance;
+    this.numeroCompte = pieceComptable.compteTiersNumero.toString();
+    this.libelle = pieceComptable.libelle;
+    this.datePiece = pieceComptable.datePieceDate;
+    this.dateEcheance = pieceComptable.dateEcheanceDate;
 
-    this.montant = this.pieceComptableData.montantDevise;
-    this.montantEscompte = this.pieceComptableData.montantEscompteDevise;
+    this.montant = pieceComptable.montantDevise.toString();
+    this.montantEscompte = pieceComptable.montantEscompteDevise.toString();
+    this.compteTiersNom = pieceComptable.compteTiersNom;
+    this.libellePiece = pieceComptable.libelle;
+    this.taux = pieceComptable.taux.toString();
+    this.pieceAcquittee = pieceComptable.pieceAcquittee.toString();
+    this.libelleMontantCompta = pieceComptable.libelleMontantCompta;
+    this.libelleSoldeCompteTiers = pieceComptable.libelleSoldeCompteTiers;
+    this.delaiPaiementLibelle = pieceComptable.delaiPaiementLibelle;
+    this.compteTiersEscomptePourcentage = pieceComptable.compteTiersEscomptePourcentage;
+    this.compteTiersEscompteNombreJours = pieceComptable.compteTiersEscompteNombreJours;
+    this.libelleCompteAssocie = pieceComptable.libelleCompteAssocie;
+    this.numeroCompteAchatVente = pieceComptable.compteVenteAchatNumero.toString();
+    this.libelleCompteVenteAchat = pieceComptable.libelleCompteVenteAchat;
+    
     this.deviseSelected = {
-      id: this.pieceComptableData.codeDevise,
-      libelle: this.pieceComptableData.deviseComptaLibelle
+      id: pieceComptable.codeDevise,
+      libelle: pieceComptable.deviseComptaLibelle
     };
     this.devises.push(this.deviseSelected);
 
     this.statutSelected = {
-      id: this.pieceComptableData.statut,
-      libelle: this.pieceComptableData.statutLibelle
+      id: pieceComptable.statut,
+      libelle: pieceComptable.statutLibelle
     };
     this.statuts.push(this.statutSelected);
   }
@@ -410,25 +448,38 @@ export default class extends Vue {
   private compteLoading: boolean = false;
   private loadCompte() {
     this.compteLoading = true;
-    CompteApi.getCompteTier(this.typeCompte, this.numeroCompte.toString())
+    if(+this.numeroCompte){
+      CompteApi.getCompteDeTier(this.typeCompte, this.numeroCompte.toString())
       .then(compte => {
-        this.setCompte(compte);
+        this.setCompteDeTier(compte);
+      }).catch((err) => {
+        this.setCompteDeTier()
       })
       .finally(() => {
         this.compteLoading = false;
       });
+    }
   }
+
   private OpenSearchCompte(): void {
     (this.$refs.compteDialog as SearchCompteTier)
       .open(this.typeCompte)
       .then(compte => {
-        this.setCompte(compte);
+        this.numeroCompte = compte.numero.toString();
+        this.loadCompte();
       });
   }
-  private setCompte(compte: CompteSearch) {
-    this.numeroCompte = compte.numero;
-    this.pieceComptableData.compteTiersNumero = compte.numero;
-    this.pieceComptableData.compteTiersNom = compte.nom;
+  private setCompteDeTier(compte?: CompteDeTier) {
+    this.numeroCompte = compte ? compte.numero.toString() : "";
+    this.compteTiersNom = compte ?  compte.nom : "";
+    this.deviseSelected = compte ? this.devises.find(d => d.id == compte.codeDevise) || this.devises[0] : this.devises[0] ;
+    this.libelleSoldeCompteTiers = compte ? compte.libelleSoldeCompteTiers: "";
+    this.compteTiersEscomptePourcentage = compte ? compte.escomptePourcentage.toString(): "";
+    this.compteTiersEscompteNombreJours = compte ? compte.escompteNombreJours.toString(): "";
+    this.libelleCompteAssocie = compte ? compte.libelleCompteAssocie: "";
+    this.numeroCompteAchatVente = compte ? compte.compteVenteAchatNumero.toString(): "";
+    this.libelleCompteVenteAchat = compte ? compte.libelleCompteVenteAchat : "";
+    this.delaiPaiementLibelle = compte ? compte.delaiPaiementLibelle : "";
   }
 
   private ModifierPiece() {
@@ -477,7 +528,7 @@ export default class extends Vue {
 
   @Watch("datePiece")
   private datePieceChanged(val: Date, oldVal: Date) {
-    if (!this.piecereadonly && val != oldVal) {
+    if (!this.piecereadonly && this.numeroCompte && this.typeCompte && val != oldVal) {
       AchatVenteApi.getDateEcheance(
         this.typeCompte,
         this.numeroCompte,
@@ -486,6 +537,10 @@ export default class extends Vue {
         this.dateEcheance = dateEcheance;
       });
     }
+  }
+
+  private addContrepartie(){
+    (this.$refs.gridContreparties as GridContrepartiesVue).addContrepartie();
   }
 
   @Emit("saveAction")
