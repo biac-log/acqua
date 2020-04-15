@@ -25,7 +25,7 @@
       id="dataTable"
       class="elevation-1"
       dense
-      @click:row.stop="editContrepartie"
+      @click:row="editContrepartie"
     >
     </v-data-table>
   </v-card>
@@ -80,7 +80,7 @@ export default class extends Vue {
         if(contrepartie)
           Vue.set(this.contreparties, this.contreparties.findIndex(d => d == piece), resp);
         else this.contreparties.push(resp);
-        this.$nextTick(() => (this.$refs.btnAdd.$el as any).focus());
+        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
       });
   }
 }

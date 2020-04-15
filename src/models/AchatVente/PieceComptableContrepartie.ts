@@ -12,8 +12,6 @@ export interface IPieceComptableContrepartie {
   codeDevise:number;
   libelleDevise: string;
   caseTva: CaseTva;
-  numeroCase:number
-  libelleCase: string;
 }
 
 export class PieceComptableContrepartieDTO implements IPieceComptableContrepartie{
@@ -28,15 +26,13 @@ export class PieceComptableContrepartieDTO implements IPieceComptableContreparti
   public codeDevise:number=0;
   public libelleDevise: string="";
   public caseTva: CaseTva = new CaseTva();
-  public numeroCase:number=0;
-  public libelleCase: string="";
 }
 
 export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
   constructor(dto?: PieceComptableContrepartieDTO){
     super();
     this.Refresh(dto);
-    //this.caseTva = new CaseTva(dto.caseTva);
+    this.caseTva = new CaseTva(dto?.caseTva);
   }
 
   public Refresh(dto?: PieceComptableContrepartieDTO){
@@ -56,6 +52,6 @@ export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
   }
 
   get libelleCaseTva():string{
-    return `${this.numeroCase} - ${ this.libelleCase }`;
+    return this.caseTva.getLibelleCase;
   }
 }

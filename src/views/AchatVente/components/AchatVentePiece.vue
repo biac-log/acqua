@@ -608,8 +608,8 @@ export default class extends Vue {
       contrepartie.codeMouvement = this.typeCompte == "F" ? "DB" : "CR";
       contrepartie.montantDevise = +this.montant * (1- (tva.tauxTvaCase / 100));
       contrepartie.montantBase = +this.montantCompta * (1- (tva.tauxTvaCase / 100));
-      contrepartie.numeroCase = compteAchatVente.numeroCase;
-      contrepartie.libelleCase = compteAchatVente.libelleCase;
+      contrepartie.caseTva = tva;
+
       (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
     }
     else if(this.contreparties.find(c => c.numeroCompte == +this.numeroCompteAchatVente))

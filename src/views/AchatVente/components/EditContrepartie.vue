@@ -290,10 +290,10 @@ export default class extends Vue {
     this.montant = contrepartie.montantBase
       ? contrepartie.montantBase.toString()
       : "";
-    this.numeroCaseTva = contrepartie.numeroCase
-      ? contrepartie.numeroCase.toString()
+    this.numeroCaseTva = contrepartie.caseTva.numeroCase
+      ? contrepartie.caseTva.numeroCase.toString()
       : "";
-    this.libelleCaseTva = contrepartie.libelleCase;
+    this.libelleCaseTva = contrepartie.caseTva.libelleCase;
   }
 
   private initDevises(
@@ -402,8 +402,8 @@ export default class extends Vue {
     contrepartie.libelleDevise = this.devisesSelected
       ? this.devisesSelected.libelle
       : "";
-    contrepartie.numeroCase = parseInt(this.numeroCaseTva);
-    contrepartie.libelleCase = this.libelleCaseTva;
+    contrepartie.caseTva.numeroCase = parseInt(this.numeroCaseTva);
+    contrepartie.caseTva.libelleCase = this.libelleCaseTva;
 
     return contrepartie;
   }
