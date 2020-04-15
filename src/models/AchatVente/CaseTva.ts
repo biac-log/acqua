@@ -5,6 +5,7 @@
     tauxTvaCase: number;
     typeCase: number;
     libelleTypeCase: string;
+    codePays: string;
   }
   
   export class CaseTvaDTO implements ICaseTva{
@@ -14,6 +15,7 @@
     tauxTvaCase: number = 0;
     typeCase: number = 0;
     libelleTypeCase: string = "";
+    codePays: string = "";
   }
   
   export class CaseTva extends CaseTvaDTO {

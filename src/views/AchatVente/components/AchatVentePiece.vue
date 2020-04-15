@@ -80,6 +80,7 @@
                 <v-col cols="12">
                   <v-text-field
                     label="Libelle"
+                    ref="libellePiece"
                     :value="libellePiece"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
@@ -95,7 +96,7 @@
                     v-model="deviseSelected"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
-                    item-value="id"
+                    return-object
                     item-text="libelle"
                     label="Devise pièce"
                     hide-details
@@ -292,6 +293,7 @@ import { AchatVenteApi } from "@/api/AchatVenteApi";
 import GridContreparties from "./GridContreparties.vue";
 import GridContrepartiesVue from './GridContreparties.vue';
 import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
+import CompteGenerealSearch from '../../../models/Compte/CompteGeneralSearch';
 
 @Component({
   name: "AchatVentePiece",
@@ -324,7 +326,6 @@ export default class extends Vue {
 
   private numeroCompteTier: string = "";
   private numeroCompteTierRules: any = [(v: string) => !!v || "Numéro obligatoire",(v: string) => !!+v || "Numéro invalide"];
-  private nomCompteTier: string = "";
 
   public dialog: boolean = false;
   public searchCompteTiersDialog: boolean = false;
@@ -332,7 +333,8 @@ export default class extends Vue {
   private compteTiersNom: string = "";
   private libellePiece: string = "";
   private taux: string = "";
-  private pieceAcquittee: string = "";
+  private pieceAcquittee: boolean = false;
+  private montantCompta: string = "";
   private libelleMontantCompta: string = "";
   private libelleSoldeCompteTiers: string = "";
   private delaiPaiementLibelle: string = "";
@@ -346,10 +348,11 @@ export default class extends Vue {
   private resolve!: any;
   private reject!: any;
 
-  public openNew(periode: PeriodeComptable, journal: Journal): Promise<EntetePieceComptable> {
+  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<EntetePieceComptable> {
     this.dialog= true;
+    this.piecereadonly = false;
+    await this.loadDataForEdit();
     this.init(periode, journal);
-    this.ModifierPiece();
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -382,6 +385,11 @@ export default class extends Vue {
     }
   }
   
+  private async loadDataForEdit(){
+    await this.loadDevises();
+    await this.loadStatuts();
+  }
+
    private resetForm(){
     this.periodeDisplay = "";
     this.journalDisplay= "";
@@ -397,7 +405,22 @@ export default class extends Vue {
     this.dateEcheance = new Date();
     this.typeCompte= "";
     this.numeroCompteTier= "";
-    this.nomCompteTier= "";
+      
+    this.compteTiersNom = "";
+    this.libellePiece = "";
+    this.taux = ""
+    this.pieceAcquittee = false;
+    this.montantCompta = "";
+    this.libelleMontantCompta = "";
+    this.libelleSoldeCompteTiers = "";
+    this.delaiPaiementLibelle = "";
+    this.compteTiersEscomptePourcentage = "";
+    this.compteTiersEscompteNombreJours = "";
+    this.libelleCompteAssocie = "";
+    this.numeroCompteAchatVente = "";
+    this.nomCompteAchatVente = "";
+    this.libelleCompteVenteAchat = "";
+    this.contreparties = [];
   }
 
   private GetData() {
@@ -422,7 +445,7 @@ export default class extends Vue {
     this.compteTiersNom = pieceComptable.compteTiersNom;
     this.libellePiece = pieceComptable.libelle;
     this.taux = pieceComptable.taux.toString();
-    this.pieceAcquittee = pieceComptable.pieceAcquittee.toString();
+    this.pieceAcquittee = pieceComptable.pieceAcquittee;
     this.libelleMontantCompta = pieceComptable.libelleMontantCompta;
     this.libelleSoldeCompteTiers = pieceComptable.libelleSoldeCompteTiers;
     this.delaiPaiementLibelle = pieceComptable.delaiPaiementLibelle;
@@ -432,17 +455,8 @@ export default class extends Vue {
     this.numeroCompteAchatVente = pieceComptable.compteVenteAchatNumero.toString();
     this.libelleCompteVenteAchat = pieceComptable.libelleCompteVenteAchat;
     
-    this.deviseSelected = {
-      id: pieceComptable.codeDevise,
-      libelle: pieceComptable.deviseComptaLibelle
-    };
-    this.devises.push(this.deviseSelected);
-
-    this.statutSelected = {
-      id: pieceComptable.statut,
-      libelle: pieceComptable.statutLibelle
-    };
-    this.statuts.push(this.statutSelected);
+    this.deviseSelected = pieceComptable ? this.getDeviseToSelect(new Devise({id: pieceComptable.codeDevise, libelle: pieceComptable.libelleDevise})) : this.devises[0];
+    this.statutSelected = pieceComptable ? this.getStatutToSelect(new Statut({id: pieceComptable.statut, libelle: pieceComptable.statutLibelle})) : this.statuts[0];
   }
 
   private compteLoading: boolean = false;
@@ -452,6 +466,7 @@ export default class extends Vue {
       CompteApi.getCompteDeTier(this.typeCompte, this.numeroCompte.toString())
       .then(compte => {
         this.setCompteDeTier(compte);
+        this.$nextTick(() => (this.$refs.libellePiece as any).focus());
       }).catch((err) => {
         this.setCompteDeTier()
       })
@@ -469,10 +484,10 @@ export default class extends Vue {
         this.loadCompte();
       });
   }
-  private setCompteDeTier(compte?: CompteDeTier) {
+  private async setCompteDeTier(compte?: CompteDeTier) {
     this.numeroCompte = compte ? compte.numero.toString() : "";
     this.compteTiersNom = compte ?  compte.nom : "";
-    this.deviseSelected = compte ? this.devises.find(d => d.id == compte.codeDevise) || this.devises[0] : this.devises[0] ;
+    this.deviseSelected = compte ? this.getDeviseToSelect(new Devise({id: compte.codeDevise, libelle: compte.libelleDevise})) : this.devises[0];
     this.libelleSoldeCompteTiers = compte ? compte.libelleSoldeCompteTiers: "";
     this.compteTiersEscomptePourcentage = compte ? compte.escomptePourcentage.toString(): "";
     this.compteTiersEscompteNombreJours = compte ? compte.escompteNombreJours.toString(): "";
@@ -482,11 +497,39 @@ export default class extends Vue {
     this.delaiPaiementLibelle = compte ? compte.delaiPaiementLibelle : "";
   }
 
-  private ModifierPiece() {
+  private async ModifierPiece() {
+    await this.loadDataForEdit();
     this.piecereadonly = false;
     this.$nextTick(() => (this.$refs.firstElement as any).focus());
-    this.LoadStatuts();
-    this.LoadDevises();
+  }
+
+  private async loadDevises() {
+    if(this.devises.length <= 1){
+      this.devises = await AchatVenteApi.getAllDevises();
+    }
+  }
+  private getDeviseToSelect(deviseSelected: Devise): Devise{
+    let deviseToSelect = this.devises.find(d => d.id == deviseSelected.id);
+    if(!deviseToSelect){
+      this.devises.push(deviseSelected);
+      return deviseSelected;
+    }
+    else return deviseToSelect;
+  }
+
+  private async loadStatuts(){
+    if(this.statuts.length <= 1){
+      this.statuts = await AchatVenteApi.getAllStatut();
+    }
+  }
+  private getStatutToSelect(statutSelected: Statut): Statut {
+    let statutToSelect = this.statuts.find(d => d.id == statutSelected.id);
+    if(!statutToSelect)
+    {
+      this.statuts.push(statutSelected);
+      return statutSelected;
+    }
+    else return statutSelected;
   }
 
   private DeletePiece() {
@@ -502,49 +545,84 @@ export default class extends Vue {
       });
   }
 
-  private LoadStatuts() {
-    axios
-      .get<Statut[]>(
-        process.env.VUE_APP_ApiAcQuaCore + "/AchatVente/GetStatuts"
-      )
-      .then(resp => {
-        this.statuts = resp.data;
-      })
-      .catch(error => {})
-      .finally(() => {});
-  }
-
-  private LoadDevises() {
-    axios
-      .get<Devise[]>(
-        process.env.VUE_APP_ApiAcQuaCore + "/AchatVente/GetDevises"
-      )
-      .then(resp => {
-        this.devises = resp.data;
-      })
-      .catch(error => {})
-      .finally(() => {});
-  }
-
   @Watch("datePiece")
   private datePieceChanged(val: Date, oldVal: Date) {
-    if (!this.piecereadonly && this.numeroCompte && this.typeCompte && val != oldVal) {
-      AchatVenteApi.getDateEcheance(
-        this.typeCompte,
-        this.numeroCompte,
-        val
-      ).then(dateEcheance => {
-        this.dateEcheance = dateEcheance;
+    if (!this.piecereadonly && val.getTime() != oldVal.getTime()) {
+      if(this.numeroCompte && this.typeCompte){
+        AchatVenteApi.getDateEcheance(
+          this.typeCompte,
+          this.numeroCompte,
+          val
+        ).then(dateEcheance => {
+          this.dateEcheance = dateEcheance;
+        });
+      }
+
+      if(!this.deviseSelected || this.deviseSelected.id == 1)
+        this.taux = "1";
+      else {
+        AchatVenteApi.getTaux(this.deviseSelected.id, this.datePiece)
+        .then((resp) => {
+          this.taux = resp.toFixed(2);
+        });
+      }
+    }
+  }
+
+  @Watch("montant")
+  private montantChanged(val: string, oldVal: string){
+    if(!this.piecereadonly)
+      this.recalculMontantCompta();
+  }
+
+  @Watch("deviseSelected")
+  private deviseSelectedChanged(val: Devise, oldVal: Devise){
+    if(!this.piecereadonly && val){
+      AchatVenteApi.getTaux(this.deviseSelected.id, this.datePiece)
+      .then((resp) => {
+        this.taux = resp.toFixed(2);
       });
     }
   }
 
-  private addContrepartie(){
-    (this.$refs.gridContreparties as GridContrepartiesVue).addContrepartie();
+  private recalculMontantCompta(){
+    if(+this.taux && +this.montant){
+      this.montantCompta = (Number.parseFloat(this.montant) * Number.parseFloat(this.taux)).toFixed(2);
+      this.libelleMontantCompta = `${this.montantCompta} ${this.deviseSelected.libelle}`;
+    }
+    else{
+      this.montantCompta = "";
+      this.libelleMontantCompta = "";
+    }
+  }
+
+  private async addContrepartie(){
+    if(this.contreparties.length == 0)
+    {
+      let contrepartie = new PieceComptableContrepartie();
+      let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
+      let tva = await AchatVenteApi.getCaseTVA(compteAchatVente.numeroCase, this.numeroJournal);
+      contrepartie.numeroCompte = compteAchatVente.numero;
+      contrepartie.compteLibelle = compteAchatVente.nom;
+      contrepartie.libelle = this.compteTiersNom;
+      contrepartie.codeMouvement = this.typeCompte == "F" ? "DB" : "CR";
+      contrepartie.montantDevise = +this.montant * (1- (tva.tauxTvaCase / 100));
+      contrepartie.montantBase = +this.montantCompta * (1- (tva.tauxTvaCase / 100));
+      contrepartie.numeroCase = compteAchatVente.numeroCase;
+      contrepartie.libelleCase = compteAchatVente.libelleCase;
+      (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
+    }
+    else if(this.contreparties.find(c => c.numeroCompte == +this.numeroCompteAchatVente))
+    {
+      
+      (this.$refs.gridContreparties as GridContrepartiesVue).addContrepartie();
+    }
   }
 
   @Emit("saveAction")
-  private save() {}
+  private save() {
+    
+  }
 }
 </script>
 

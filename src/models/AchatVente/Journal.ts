@@ -16,13 +16,13 @@
     devise: string = "";
     numeroDernierePiece: number = 0;
   }
-  
+
   export class Journal extends JournalDTO {
     constructor(dto?: JournalDTO){
       super();
       Object.assign(this, dto || new JournalDTO());
     }
-  
+ 
     get fullLibelle(): string {
       return `${this.numero} - ${this.libelle}`;
     }

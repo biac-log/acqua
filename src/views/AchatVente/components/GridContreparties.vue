@@ -7,6 +7,7 @@
         fab
         small
         class="ml-5"
+        ref="btnAdd"
         :disabled="readonly"
         @click.stop="addContrepartie"
       >
@@ -24,7 +25,7 @@
       id="dataTable"
       class="elevation-1"
       dense
-      @click:row="editContrepartie"
+      @click:row.stop="editContrepartie"
     >
     </v-data-table>
   </v-card>
@@ -61,7 +62,7 @@ export default class extends Vue {
     { text: "Case TVA", value: "libelleCaseTva" }
   ];
 
-  public addContrepartie() {
+  public addContrepartie(piece?: PieceComptableContrepartie) {
     (this.$refs.editContrepartie as EditContrepartieVue)
       .openNew(this.numeroJournal, this.devise)
       .then((resp: PieceComptableContrepartie) => {
@@ -71,11 +72,15 @@ export default class extends Vue {
       });
   }
 
-  private editContrepartie(compte: PieceComptableContrepartie) {
+  public editContrepartie(piece: PieceComptableContrepartie) {
     (this.$refs.editContrepartie as EditContrepartieVue)
-      .open(compte, this.numeroJournal, this.devise)
+      .open(piece, this.numeroJournal, this.devise)
       .then((resp: PieceComptableContrepartie) => {
-        Vue.set(this.contreparties, this.contreparties.findIndex(d => d == compte), resp);
+        let contrepartie = this.contreparties.find(d => d == piece);
+        if(contrepartie)
+          Vue.set(this.contreparties, this.contreparties.findIndex(d => d == piece), resp);
+        else this.contreparties.push(resp);
+        this.$nextTick(() => (this.$refs.btnAdd.$el as any).focus());
       });
   }
 }

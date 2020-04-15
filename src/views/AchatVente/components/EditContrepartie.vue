@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="800">
+  <v-dialog v-model="dialog" width="800" @keydown.enter.stop="sendContrepartie">
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
         <v-card-title>
@@ -37,7 +37,7 @@
                 :append-icon="readonly ? '' : 'mdi-magnify'"
                 :hide-details="readonly"
                 ref="firstElement"
-                @keypress.enter="loadCompte"
+                @keypress.enter.stop="loadCompte"
                 @blur="loadCompte"
                 @click:append="OpenSearchCompte()"
               >
@@ -345,6 +345,8 @@ export default class extends Vue {
   private setCompte(compte: CompteGenerealSearch) {
     this.numeroCompte = compte.numero.toString();
     this.nomCompte = compte.nom;
+    this.numeroCaseTva = compte.numeroCase.toString();
+    this.libelleCaseTva = compte.libelleCase;
   }
 
   private loadCaseTva() {
@@ -406,12 +408,14 @@ export default class extends Vue {
     return contrepartie;
   }
 
-  private sendContrepartie(compte: PieceComptableContrepartie) {
+  private sendContrepartie() {
     (this.$refs.form as any).validate();
-    if (this.isValid) {
-      this.dialog = false;
-      this.resolve(this.GetModel());
-    }
+    this.$nextTick(() => {
+      if (this.isValid) {
+        this.dialog = false;
+        this.resolve(this.GetModel());
+      }
+    })
   }
 
   private close() {

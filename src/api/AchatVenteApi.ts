@@ -13,7 +13,9 @@ import {
   PeriodeComptableDTO,
   PeriodeComptable,
   EntetePieceComptableDTO,
-  EntetePieceComptable
+  EntetePieceComptable,
+  Statut,
+  Devise
 } from "@/models/AchatVente";
 
 export abstract class AchatVenteApi {
@@ -87,5 +89,25 @@ export abstract class AchatVenteApi {
   static async getDevises(): Promise<CaseTva> {
     let response = await this.achatVenteAxios.get<CaseTvaDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDevises`);
     return new CaseTva(response.data);
+  }
+
+  static async getTaux(devise: number, datePiece: Date): Promise<number> {
+    let response = await this.achatVenteAxios.get<number>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetTaux?devise=${devise}&datePiece=${datePiece.toUTCString()}`);
+    return response.data;
+  }
+
+  static async getAllStatut(): Promise<Statut[]> {
+    let response = await this.achatVenteAxios.get<Statut[]>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetStatuts`);
+    return response.data;
+  }
+
+  static async getAllDevises(): Promise<Devise[]> {
+    let response = await this.achatVenteAxios.get<Devise[]>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDevises`);
+    return response.data;
+  }
+
+  static async getCompteTva(numerJournal: number | string, codePays: string, codeTaxe: string): Promise<number> {
+    let response = await this.achatVenteAxios.get<number>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetCompteTVA`);
+    return response.data;
   }
 }

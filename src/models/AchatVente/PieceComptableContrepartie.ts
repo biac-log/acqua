@@ -1,3 +1,5 @@
+import { CaseTva } from './CaseTva';
+
 export interface IPieceComptableContrepartie {
   numeroLigne:number;
   typeCompte: string;
@@ -9,6 +11,7 @@ export interface IPieceComptableContrepartie {
   montantBase:number;
   codeDevise:number;
   libelleDevise: string;
+  caseTva: CaseTva;
   numeroCase:number
   libelleCase: string;
 }
@@ -24,6 +27,7 @@ export class PieceComptableContrepartieDTO implements IPieceComptableContreparti
   public montantBase:number=0;
   public codeDevise:number=0;
   public libelleDevise: string="";
+  public caseTva: CaseTva = new CaseTva();
   public numeroCase:number=0;
   public libelleCase: string="";
 }
@@ -32,6 +36,7 @@ export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
   constructor(dto?: PieceComptableContrepartieDTO){
     super();
     this.Refresh(dto);
+    //this.caseTva = new CaseTva(dto.caseTva);
   }
 
   public Refresh(dto?: PieceComptableContrepartieDTO){

@@ -13,6 +13,7 @@ export interface ICompteDeTier {
   compteAssocieNom: string;
   compteVenteAchatNumero: number;
   compteVenteAchatNom: string;
+  codeTaxe: number;
 }
   
 export class CompteDeTierDTO implements ICompteDeTier{
@@ -30,6 +31,7 @@ export class CompteDeTierDTO implements ICompteDeTier{
   compteAssocieNom: string = "";
   compteVenteAchatNumero: number = 0;
   compteVenteAchatNom: string= "";
+  codeTaxe: number = 0;
 }
   
 export class CompteDeTier extends CompteDeTierDTO {
