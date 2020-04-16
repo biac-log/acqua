@@ -69,6 +69,8 @@ export default class extends Vue {
         const maxLigne = Math.max(...this.contreparties.map(i => i.numeroLigne))
         resp.numeroLigne = maxLigne + 1;
         this.contreparties.push(resp);
+      }).finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
       });
   }
 
@@ -80,6 +82,7 @@ export default class extends Vue {
         if(contrepartie)
           Vue.set(this.contreparties, this.contreparties.findIndex(d => d == piece), resp);
         else this.contreparties.push(resp);
+      }).finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
       });
   }

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="1000" v-model="dialog" @click:outside="close">
+  <v-dialog width="1000" v-model="dialog" @click:outside="close()" @keydown.esc="close()">
     <v-card class="mt-5">
       <v-card-title>
         Comptes
@@ -47,9 +47,6 @@ import axios from "axios";
 })
 export default class extends Vue {
   private dialog: boolean = false;
-  private numero: string = "";
-  private matchCode: string = "";
-  private texte: string = "";
 
   private typeLoad!: string;
   private filtreCompte: string = "";
@@ -96,11 +93,13 @@ export default class extends Vue {
   }
 
   private sendCompte(compte: CompteSearch) {
+    this.filtreCompte = "";
     this.dialog = false;
     this.resolve(compte);
   }
 
   private close(){
+    this.filtreCompte = "";
     this.dialog = false;
     this.reject();
   }

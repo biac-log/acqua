@@ -39,7 +39,7 @@
             class="ml-10"
             icon
             color="white"
-            @click="dialog = false"
+            @click="closeDialog()"
           >
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -51,6 +51,7 @@
                 <v-col cols="4">
                   <v-text-field
                     label="Numéro compte tiers"
+                    ref="numeroCompte"
                     v-model="numeroCompte"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
@@ -61,7 +62,6 @@
                     @focus="$event.target.select()"
                     @blur="loadCompte"
                     :hide-details="piecereadonly"
-                    ref="firstElement"
                     autofocus
                   >
                   </v-text-field>
@@ -308,6 +308,7 @@ export default class extends Vue {
   private journalDisplay: string = "";
   private numeroPiece: string = "";
   private numeroJournal: string = "";
+  private familleJournal: string = "";
 
   //Encodage
   private numeroCompte: string = "";
@@ -364,7 +365,7 @@ export default class extends Vue {
     periode: PeriodeComptable,
     journal: Journal): Promise<EntetePieceComptable> {
     this.dialog=true;
-    this.$nextTick(() => (this.$refs.firstElement as any).focus());
+    this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
     this.piecereadonly=true;
     this.init(periode,journal,entete);
 
@@ -380,6 +381,7 @@ export default class extends Vue {
     this.journalDisplay = journal.fullLibelle;
     this.typeCompte = journal.typeCompteChar;
     this.numeroJournal = journal.numero.toString();
+    this.familleJournal = journal.famille;
     if(entete){
       this.numeroPiece = entete.codePiece ? entete.codePiece.toString() : "";
       this.GetData();
@@ -457,7 +459,7 @@ export default class extends Vue {
     this.numeroCompteAchatVente = pieceComptable.compteVenteAchatNumero.toString();
     this.libelleCompteVenteAchat = pieceComptable.libelleCompteVenteAchat;
     
-    this.deviseSelected = pieceComptable ? this.getDeviseToSelect(new Devise({id: pieceComptable.codeDevise, libelle: pieceComptable.libelleDevise})) : this.devises[0];
+    this.deviseSelected = pieceComptable ? this.getDeviseToSelect(new Devise({id: pieceComptable.codeDevise, libelle: pieceComptable.libelleDevise, typeDevise: "D"})) : this.devises[0];
     this.statutSelected = pieceComptable ? this.getStatutToSelect(new Statut({id: pieceComptable.statut, libelle: pieceComptable.statutLibelle})) : this.statuts[0];
   }
 
@@ -470,6 +472,7 @@ export default class extends Vue {
         this.setCompteDeTier(compte);
         this.$nextTick(() => (this.$refs.libellePiece as any).focus());
       }).catch((err) => {
+        this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
         this.setCompteDeTier()
       })
       .finally(() => {
@@ -484,12 +487,14 @@ export default class extends Vue {
       .then(compte => {
         this.numeroCompte = compte.numero.toString();
         this.loadCompte();
+      }).catch(() => {
+        this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
       });
   }
   private async setCompteDeTier(compte?: CompteDeTier) {
     this.numeroCompte = compte ? compte.numero.toString() : "";
     this.compteTiersNom = compte ?  compte.nom : "";
-    this.deviseSelected = compte ? this.getDeviseToSelect(new Devise({id: compte.codeDevise, libelle: compte.libelleDevise})) : this.devises[0];
+    this.deviseSelected = compte ? this.getDeviseToSelect(new Devise({id: compte.codeDevise, libelle: compte.libelleDevise, typeDevise: "D"})) : this.devises[0];
     this.libelleSoldeCompteTiers = compte ? compte.libelleSoldeCompteTiers: "";
     this.compteTiersEscomptePourcentage = compte ? compte.escomptePourcentage.toString(): "";
     this.compteTiersEscompteNombreJours = compte ? compte.escompteNombreJours.toString(): "";
@@ -503,7 +508,7 @@ export default class extends Vue {
   private async ModifierPiece() {
     await this.loadDataForEdit();
     this.piecereadonly = false;
-    this.$nextTick(() => (this.$refs.firstElement as any).focus());
+    this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
   }
 
   private async loadDevises() {
@@ -608,43 +613,95 @@ export default class extends Vue {
       contrepartie.numeroCompte = compteAchatVente.numero;
       contrepartie.compteLibelle = compteAchatVente.nom;
       contrepartie.libelle = this.compteTiersNom;
-      contrepartie.codeMouvement = this.typeCompte == "F" ? "DB" : "CR";
-      contrepartie.montantDevise = +this.montant * (1- (tva.tauxTvaCase / 100));
-      contrepartie.montantBase = +this.montantCompta * (1- (tva.tauxTvaCase / 100));
+      contrepartie.codeMouvement = this.getCodeMouvementEntete() == "DB" ? "CR" : "DB";
+      contrepartie.montantDevise = (+this.montant / (1+(tva.tauxTvaCase/100)));
+      contrepartie.montantBase = +this.montant / (1+(tva.tauxTvaCase/100));
       contrepartie.caseTva = tva;
       (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
     }
     else
     {
-      let sommeCredit = this.contreparties.map(c => +c.montantCredit).reduce((a,b) => a + b);
-      let sommeDebit = this.contreparties.map(c => +c.montantDebit).reduce((a,b) => a + b);
-      if(+this.montant != (sommeCredit + sommeDebit)){
-        let contrepartieAV = this.contreparties.find(c => c.numeroCompte == +this.numeroCompteAchatVente);
-        if(contrepartieAV)
-        {
-          let casesTva = this.contreparties.map(c => c.caseTva);
-          let needCodePays = casesTva.some(tva => ['BX', 'VX', 'FX', 'IX'].indexOf(tva.natureCase) >= 0);
-          let codepays = needCodePays ? contrepartieAV.caseTva.codePays : "";
-          let compteTva = await AchatVenteApi.getCompteTva(this.numeroJournal, "", this.codeTaxe);
-          let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.numeroJournal);
-          let contrepartie = new PieceComptableContrepartie();
-          contrepartie.numeroCompte = compteTva.numero;
-          contrepartie.compteLibelle = compteTva.nom;
-          contrepartie.libelle = this.compteTiersNom;
-          contrepartie.codeMouvement = this.typeCompte == "F" ? "DB" : "CR";
-          contrepartie.montantDevise = +this.montant * (contrepartieAV.caseTva.tauxTvaCase / 100);
-          contrepartie.montantBase = +this.montantCompta * (contrepartieAV.caseTva.tauxTvaCase / 100);
-          contrepartie.caseTva = tva;
-          (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
-        }
+      let ventileDevise = this.getVentileDevise();
+      let tvaCalcule = this.getTvaCalcule();
+      if(ventileDevise == tvaCalcule){
+        let codepays = this.contreparties.find(ctr => ['BX', 'VX', 'FX', 'IX'].indexOf(ctr.caseTva.natureCase))?.caseTva.codePays;
+        let compteTva = await AchatVenteApi.getCompteTva(this.numeroJournal, this.codeTaxe, codepays);
+        let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.numeroJournal);
+        let contrepartie = new PieceComptableContrepartie();
+        contrepartie.numeroCompte = compteTva.numero;
+        contrepartie.compteLibelle = compteTva.nom;
+        contrepartie.libelle = this.compteTiersNom;
+        contrepartie.codeMouvement = this.getCodeMouvementEntete() == "DB" ? "CR" : "DB";
+        contrepartie.montantDevise = Math.abs(tvaCalcule);
+        contrepartie.montantBase = Math.abs(tvaCalcule * +this.taux);
+        contrepartie.caseTva = tva;
+        (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
+      }else
+      {
+
       }
-      else (this.$refs.gridContreparties as GridContrepartiesVue).addContrepartie();
+      //else (this.$refs.gridContreparties as GridContrepartiesVue).addContrepartie();
     }
+  }
+
+  private getCodeMouvementEntete() : string{
+    if(this.familleJournal == "vente" || this.familleJournal == "ncachat")
+      return "DB";
+    else return "CR";
+  }
+
+  private getVentileBase(): number{
+    let ventileCompta : number = +this.montantCompta;
+    if(this.getCodeMouvementEntete() == "CR")
+      ventileCompta = ventileCompta * -1;
+
+    let credit = this.contreparties.filter(c => c.typeCompte != "Z").map(c => +c.montantCreditBase).reduce((a,b) => a + b);
+    let debit = this.contreparties.filter(c => c.typeCompte != "Z").map(c => +c.montantDebitBase).reduce((a,b) => a + b);
+    ventileCompta = ventileCompta + debit - credit;
+    return ventileCompta;
+  }
+
+  private getVentileDevise(): number{
+    let ventileDevise : number = +this.montant;
+    if(this.getCodeMouvementEntete() == "CR")
+      ventileDevise = ventileDevise*-1;
+
+    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.deviseSelected.id).map(c => +c.montantCredit).reduce((a,b) => a + b);
+    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.deviseSelected.id).map(c => +c.montantDebit).reduce((a,b) => a + b);
+    ventileDevise = ventileDevise + debit - credit;
+    return +ventileDevise.toFixed(this.deviseSelected.typeDevise == "E" ? 0 : 2);
+  }
+
+  private getTvaCalcule(): number {
+    let montantsCaseTva : {case: number, caseTaux:number, montant: number}[] = [];
+    this.contreparties.forEach(element => {
+      let montantCase =  montantsCaseTva.find(c => c.case == element.caseTva.numeroCase);
+      if(montantCase)
+        montantCase.montant += +element.montantCredit - +element.montantDebit;
+      else if(element.caseTva.typeCase > 0 && element.caseTva.typeCase < 4 ){
+        montantsCaseTva.push({case: element.caseTva.numeroCase, 
+        caseTaux: element.caseTva.tauxTvaCase,
+        montant: +element.montantCredit - +element.montantDebit});
+      }
+    });
+    
+    return +montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b).toFixed(this.deviseSelected.typeDevise == "E" ? 0 : 2);
+  }
+
+  private getTvaImpute(): number {
+    return this.contreparties.filter(c => c.caseTva.typeCase == 50 || c.caseTva.typeCase == 51)
+      .map(c => +c.montantCredit - +c.montantDebit)
+      .reduce((a,b) => a + b);
   }
 
   @Emit("saveAction")
   private save() {
     
+  }
+
+  private closeDialog(){
+    this.dialog = false;
+    this.reject();
   }
 }
 </script>

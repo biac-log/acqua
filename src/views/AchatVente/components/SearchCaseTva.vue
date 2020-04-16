@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="600" v-model="dialog" @click:outside="close">
+  <v-dialog width="600" v-model="dialog" @click:outside="close" @keydown.esc="close()">
     <v-card class="mt-5">
       <v-card-title>
         Case Tva
@@ -90,11 +90,13 @@ export default class extends Vue {
   }
 
   private sendCaseTva(caseTva: CaseTva) {
+    this.filtreCaseTva = "";
     this.dialog = false;
     this.resolve(caseTva);
   }
 
   private close(){
+    this.filtreCaseTva = "";
     this.dialog = false;
     this.reject();
   }

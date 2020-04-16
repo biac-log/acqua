@@ -25,7 +25,6 @@
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
-                autofocus
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -34,13 +33,17 @@
                 v-model="numeroCompte"
                 :filled="readonly"
                 :readonly="readonly"
-                :append-icon="readonly ? '' : 'mdi-magnify'"
                 :hide-details="readonly"
-                ref="firstElement"
-                @keypress.enter.stop="loadCompte"
+                ref="numeroCompte"
+                @keypress.enter.prevent.stop="loadCompte"
                 @blur="loadCompte"
-                @click:append="OpenSearchCompte()"
+                autofocus
               >
+              <template v-slot:append>
+                <v-btn v-if="!readonly" icon small @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
+                  <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+              </template>
               </v-text-field>
               <SearchCompteContrepartieVue
                 ref="compteDialog"
@@ -48,7 +51,6 @@
             </v-col>
             <v-col cols="6">
               <v-text-field
-                ref="firstElement"
                 label="Nom compte"
                 v-model="nomCompte"
                 :filled="readonly"
@@ -115,19 +117,22 @@
           <v-row>
             <v-col cols="3">
               <v-text-field
-                ref="firstElement"
                 label="Numéro case TVA"
+                ref="numeroCaseTva"
                 v-model="numeroCaseTva"
                 :filled="readonly"
                 :readonly="readonly"
-                :append-icon="readonly ? '' : 'mdi-magnify'"
                 :rules="numeroCaseTvaRules"
                 :hide-details="readonly"
                 :loading="tvaLoading"
                 @keypress.enter="loadCaseTva"
                 @blur="loadCaseTva"
-                @click:append="OpenSearchCaseTva()"
               >
+              <template v-slot:append>
+                <v-btn v-if="!readonly" icon small @click="OpenSearchCaseTva()" @keydown.enter.prevent.stop="OpenSearchCaseTva()">
+                  <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+              </template>
               </v-text-field>
             </v-col>
             <v-col cols="3">
@@ -283,7 +288,7 @@ export default class extends Vue {
     this.nomCompte = contrepartie.compteLibelle;
     this.libelle = contrepartie.libelle;
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
-    this.montant = contrepartie.montantBase ? contrepartie.montantBase.toString() : "";
+    this.montant = contrepartie.montantBase && this.devisesSelected ? contrepartie.montantBase.toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
     this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : "";
     this.caseTva.Refresh(contrepartie.caseTva);
     this.libelleCaseTva = contrepartie.caseTva.libelleCase;
@@ -294,7 +299,7 @@ export default class extends Vue {
     contrepartie?: PieceComptableContrepartie
   ) {
     this.devises = [];
-    this.devises.push(new Devise({ id: 1, libelle: "EUR" }));
+    this.devises.push(new Devise({ id: 1, libelle: "EUR", typeDevise: "D" }));
     if (deviseEntete && !this.devises.find(d => d.id == deviseEntete.id))
       this.devises.push(deviseEntete);
     if (contrepartie && contrepartie.codeDevise != 0) {
@@ -302,7 +307,9 @@ export default class extends Vue {
         this.devises.push(
           new Devise({
             id: contrepartie.codeDevise,
-            libelle: contrepartie.libelleDevise
+            libelle: contrepartie.libelleDevise,
+            //TODO : METTRE CONTREPARTIE TYPE DEVISE
+            typeDevise: "D"
           })
         );
         this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) || this.devises[0];
@@ -316,13 +323,12 @@ export default class extends Vue {
       CompteApi.getCompteGeneral(
         this.typesComptesSelected.id,
         this.numeroCompte.toString()
-      )
-        .then(compte => {
-          this.setCompte(compte);
-        })
-        .finally(() => {
-          this.compteLoading = false;
-        });
+      ).then(compte => {
+        this.setCompte(compte);
+      })
+      .finally(() => {
+        this.compteLoading = false;
+      });
     }
   }
   private OpenSearchCompte(): void {
@@ -331,7 +337,9 @@ export default class extends Vue {
         .open(this.typesComptesSelected)
         .then(compte => {
           this.setCompte(compte);
-          (this.$refs.libelle as any).focus();
+          this.$nextTick(() => (this.$refs.libelle as any).focus());
+        }).catch(() => {
+          this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
         });
     }
   }
@@ -371,7 +379,9 @@ export default class extends Vue {
       .then(caseTva => {
         this.numeroCaseTva = caseTva.numeroCase.toString();
         this.caseTva = caseTva;
-        (this.$refs.btnValidate as any).focus();
+        this.$nextTick(() => (this.$refs.btnValidate as any).focus());
+      }).catch(() => {
+        this.$nextTick(() => (this.$refs.numeroCaseTva as any).focus())
       });
   }
 

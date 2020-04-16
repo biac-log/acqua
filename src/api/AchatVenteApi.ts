@@ -18,6 +18,7 @@ import {
   Devise
 } from "@/models/AchatVente";
 import CompteGenerealSearch from '@/models/Compte/CompteGeneralSearch';
+import { PieceComptableSave } from '@/models/AchatVente/PieceComptableSave';
 
 export abstract class AchatVenteApi {
   private static achatVenteAxios = Axios.create();
@@ -107,8 +108,18 @@ export abstract class AchatVenteApi {
     return response.data;
   }
 
-  static async getCompteTva(numeroJournal: number | string, codePays: string, codeTaxe: string | number): Promise<CompteGenerealSearch> {
+  static async getCompteTva(numeroJournal: number | string, codeTaxe: string | number, codePays?: string): Promise<CompteGenerealSearch> {
     let response = await this.achatVenteAxios.get<CompteGenerealSearch>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetCompteTVA?numeroJournal=${numeroJournal}&codePays=${codePays}&codeTaxeCompteTiers=${codeTaxe}`);
+    return response.data;
+  }
+
+  static async AddPiece(pieceComptable: PieceComptableSave): Promise<PieceComptableSave> {
+    let response = await this.achatVenteAxios.post<PieceComptableSave>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/AddPieceComptable`, pieceComptable);
+    return response.data;
+  }
+
+  static async UpdatePiece(pieceComptable: PieceComptableSave): Promise<PieceComptableSave> {
+    let response = await this.achatVenteAxios.put<PieceComptableSave>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/UpdatePieceComptable`, pieceComptable);
     return response.data;
   }
 }

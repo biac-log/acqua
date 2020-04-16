@@ -5,11 +5,11 @@
         <v-row align="start" justify="start" class="pl-5 pr-5">
           <v-col cols="12" xs="12" md="4" lg="2">
             <v-select
+              autofocus
               label="Sélection de la période"
               outlined
               persistent-hint
               required
-              autofocus
               :items="periodes"
               v-model="periodeSelected"
               :loading="periodeIsLoading"
@@ -56,7 +56,7 @@
     <v-card class="mt-5">
       <v-card-title>
         Pièces comptables
-        <v-btn color="warning" fab class="ml-5" :disabled="!searchIsValid" @click="openNewPieceComptable">
+        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" :disabled="!searchIsValid" @click="openNewPieceComptable">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
@@ -203,6 +203,9 @@ export default class extends Vue {
       .open(entete, this.periodeSearched, this.journalSearched)
       .then(resp => {
         Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp);
+      })
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus())
       });
   }
 
@@ -211,6 +214,9 @@ export default class extends Vue {
       .openNew(this.periodeSearched, this.journalSelected)
       .then(resp => {
         //Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp);
+      })
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus())
       });
   }
 

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="800" v-model="dialog" @click:outside="close">
+  <v-dialog width="800" v-model="dialog" @click:outside="close()" @keydown.esc="close()">
     <v-card class="mt-5">
       <v-card-title>
         Comptes {{ typeLoad ? typeLoad.libelle : "" }}
@@ -106,11 +106,13 @@ export default class extends Vue {
   }
 
   private sendCompte(compte: CompteGeneralSearch) {
+    this.filtreCompte = "";
     this.dialog = false;
     this.resolve(compte);
   }
 
   private close(){
+    this.filtreCompte = "";
     this.dialog = false;
     this.reject();
   }
