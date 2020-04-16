@@ -5,8 +5,8 @@
     width="2000"
     :persistent="!piecereadonly"
     @keydown.f2="ModifierPiece"
-    @keydown.del.prevent="DeletePiece"
-    @keydown.plus.prevent="addContrepartie"
+    @keydown.del.prevent.stop="DeletePiece"
+    @keydown.plus.prevent.stop="addContrepartie"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
@@ -344,6 +344,7 @@ export default class extends Vue {
   private numeroCompteAchatVente: string ="";
   private nomCompteAchatVente: string ="";
   private libelleCompteVenteAchat: string = "";
+  private codeTaxe: number = 0;
 
   private resolve!: any;
   private reject!: any;
@@ -420,6 +421,7 @@ export default class extends Vue {
     this.numeroCompteAchatVente = "";
     this.nomCompteAchatVente = "";
     this.libelleCompteVenteAchat = "";
+    this.codeTaxe = 0;
     this.contreparties = [];
   }
 
@@ -495,6 +497,7 @@ export default class extends Vue {
     this.numeroCompteAchatVente = compte ? compte.compteVenteAchatNumero.toString(): "";
     this.libelleCompteVenteAchat = compte ? compte.libelleCompteVenteAchat : "";
     this.delaiPaiementLibelle = compte ? compte.delaiPaiementLibelle : "";
+    this.codeTaxe = compte ? compte.codeTaxe : 0;
   }
 
   private async ModifierPiece() {
@@ -599,9 +602,9 @@ export default class extends Vue {
   private async addContrepartie(){
     if(this.contreparties.length == 0)
     {
-      let contrepartie = new PieceComptableContrepartie();
       let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
       let tva = await AchatVenteApi.getCaseTVA(compteAchatVente.numeroCase, this.numeroJournal);
+      let contrepartie = new PieceComptableContrepartie();
       contrepartie.numeroCompte = compteAchatVente.numero;
       contrepartie.compteLibelle = compteAchatVente.nom;
       contrepartie.libelle = this.compteTiersNom;
@@ -612,10 +615,26 @@ export default class extends Vue {
 
       (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
     }
-    else if(this.contreparties.find(c => c.numeroCompte == +this.numeroCompteAchatVente))
+    else
     {
-      
-      (this.$refs.gridContreparties as GridContrepartiesVue).addContrepartie();
+      let contrepartieAV = this.contreparties.find(c => c.numeroCompte == +this.numeroCompteAchatVente);
+      if(contrepartieAV)
+      {
+        let casesTva = this.contreparties.map(c => c.caseTva);
+        let needCodePays = casesTva.some(tva => ['BX', 'VX', 'FX', 'IX'].indexOf(tva.natureCase) >= 0);
+        let codepays = needCodePays ? contrepartieAV.caseTva.codePays : "";
+        let compteTva = await AchatVenteApi.getCompteTva(this.numeroJournal, "", this.codeTaxe);
+        let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.numeroJournal);
+        let contrepartie = new PieceComptableContrepartie();
+        contrepartie.numeroCompte = compteTva.numero;
+        contrepartie.compteLibelle = compteTva.nom;
+        contrepartie.libelle = this.compteTiersNom;
+        contrepartie.codeMouvement = this.typeCompte == "F" ? "DB" : "CR";
+        contrepartie.montantDevise = +this.montant * (contrepartieAV.caseTva.tauxTvaCase / 100);
+        contrepartie.montantBase = +this.montantCompta * (contrepartieAV.caseTva.tauxTvaCase / 100);
+        contrepartie.caseTva = tva;
+        (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
+      }
     }
   }
 

@@ -17,6 +17,7 @@ import {
   Statut,
   Devise
 } from "@/models/AchatVente";
+import CompteGenerealSearch from '@/models/Compte/CompteGeneralSearch';
 
 export abstract class AchatVenteApi {
   private static achatVenteAxios = Axios.create();
@@ -106,8 +107,8 @@ export abstract class AchatVenteApi {
     return response.data;
   }
 
-  static async getCompteTva(numerJournal: number | string, codePays: string, codeTaxe: string): Promise<number> {
-    let response = await this.achatVenteAxios.get<number>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetCompteTVA`);
+  static async getCompteTva(numeroJournal: number | string, codePays: string, codeTaxe: string | number): Promise<CompteGenerealSearch> {
+    let response = await this.achatVenteAxios.get<CompteGenerealSearch>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetCompteTVA?numeroJournal=${numeroJournal}&codePays=${codePays}&codeTaxeCompteTiers=${codeTaxe}`);
     return response.data;
   }
 }

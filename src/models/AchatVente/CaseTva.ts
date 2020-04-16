@@ -24,6 +24,10 @@
       Object.assign(this, dto || new CaseTvaDTO());
     }
 
+    public Refresh(dto?: CaseTvaDTO){
+      Object.assign(this, dto || new CaseTvaDTO());
+    }
+
     get getLibelleCase() : string{
       return `${this.numeroCase} - ${ this.libelleCase }`;
     }

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="800" @keydown.enter.stop="sendContrepartie">
+  <v-dialog v-model="dialog" width="800" @keydown.enter.prevent.stop="sendContrepartie">
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
         <v-card-title>
@@ -133,7 +133,7 @@
             <v-col cols="3">
               <v-text-field
                 label="Libellé case TVA"
-                v-model="libelleCaseTva"
+                v-model="caseTva.libelleCase"
                 :filled="readonly"
                 :hide-details="readonly"
                 tabindex="-1"
@@ -174,7 +174,8 @@ import {
   TypeCompte,
   Devise,
   TypeMouvement,
-  getTypesMouvements
+  getTypesMouvements,
+	CaseTva
 } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import { CompteApi } from "@/api/CompteApi";
@@ -221,7 +222,10 @@ export default class extends Vue {
   private numeroCaseTvaRules: any = [
     (v: string) => !!v || "Case tva obligatoire"
   ];
+  private caseTva: CaseTva = new CaseTva();
+
   private libelleCaseTva: string = "";
+  private tauxCase: number= 0;
   private tvaLoading = false;
   private reference: string = "";
   private referenceRules: any = [(v: string) => !!v || "Référence obligatoire"];
@@ -273,26 +277,15 @@ export default class extends Vue {
     this.initDevises(deviseEntete, contrepartie);
     this.numeroJournal = numeroJournal;
 
-    this.typesComptesSelected =
-      this.typesComptes.find(tc => tc.id == contrepartie.typeCompte) ||
-      this.typesComptes[0];
-    this.devisesSelected =
-      this.devises.find(d => d.id == contrepartie.codeDevise) ||
-      this.devises[0];
-    this.numeroCompte = contrepartie.numeroCompte
-      ? contrepartie.numeroCompte.toString()
-      : "";
+    this.typesComptesSelected =this.typesComptes.find(tc => tc.id == contrepartie.typeCompte) || this.typesComptes[0];
+    this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) ||this.devises[0];
+    this.numeroCompte = contrepartie.numeroCompte ? contrepartie.numeroCompte.toString() : "";
     this.nomCompte = contrepartie.compteLibelle;
     this.libelle = contrepartie.libelle;
-    this.typesMouvementsSelected =
-      this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) ||
-      this.typesMouvements[0];
-    this.montant = contrepartie.montantBase
-      ? contrepartie.montantBase.toString()
-      : "";
-    this.numeroCaseTva = contrepartie.caseTva.numeroCase
-      ? contrepartie.caseTva.numeroCase.toString()
-      : "";
+    this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
+    this.montant = contrepartie.montantBase ? contrepartie.montantBase.toString() : "";
+    this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : "";
+    this.caseTva.Refresh(contrepartie.caseTva);
     this.libelleCaseTva = contrepartie.caseTva.libelleCase;
   }
 
@@ -354,13 +347,13 @@ export default class extends Vue {
       this.tvaLoading = true;
       AchatVenteApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
         .then(caseTva => {
-          this.numeroCaseTva = caseTva ? caseTva.numeroCase.toString() : "";
-          this.libelleCaseTva = caseTva ? caseTva.libelleCase : "";
+          this.numeroCaseTva = caseTva.numeroCase.toString();
+          this.caseTva.Refresh(caseTva);
           this.errorMessage = "";
         })
         .catch((err: AxiosError) => {
           this.numeroCaseTva = "";
-          this.libelleCaseTva = "";
+          this.caseTva.Refresh();
           if (err.request.status != 505)
             this.errorMessage = err.request.response;
         })
@@ -368,8 +361,8 @@ export default class extends Vue {
           this.tvaLoading = false;
         });
     } else {
-      this.numeroCaseTva = "";
-      this.libelleCaseTva = "";
+      this.caseTva.Refresh();
+      this.caseTva = new CaseTva();
     }
   }
   private OpenSearchCaseTva(): void {
@@ -377,34 +370,23 @@ export default class extends Vue {
       .open(this.numeroJournal)
       .then(caseTva => {
         this.numeroCaseTva = caseTva.numeroCase.toString();
-        this.libelleCaseTva = caseTva.libelleCase;
+        this.caseTva = caseTva;
         (this.$refs.btnValidate as any).focus();
       });
   }
 
   private GetModel(): PieceComptableContrepartie {
     let contrepartie = new PieceComptableContrepartie();
-
-    contrepartie.typeCompte = this.typesComptesSelected
-      ? this.typesComptesSelected.id
-      : "";
+    contrepartie.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : "";
     contrepartie.numeroCompte = parseInt(this.numeroCompte);
     contrepartie.compteLibelle = this.nomCompte;
     contrepartie.libelle = this.libelle;
-    contrepartie.codeMouvement = this.typesMouvementsSelected
-      ? this.typesMouvementsSelected.id
-      : "";
+    contrepartie.codeMouvement = this.typesMouvementsSelected ? this.typesMouvementsSelected.id : "";
     contrepartie.montantDevise = parseFloat(this.montant);
     contrepartie.montantBase = parseFloat(this.montant);
-    contrepartie.codeDevise = this.devisesSelected
-      ? this.devisesSelected.id
-      : 0;
-    contrepartie.libelleDevise = this.devisesSelected
-      ? this.devisesSelected.libelle
-      : "";
-    contrepartie.caseTva.numeroCase = parseInt(this.numeroCaseTva);
-    contrepartie.caseTva.libelleCase = this.libelleCaseTva;
-
+    contrepartie.codeDevise = this.devisesSelected ? this.devisesSelected.id : 0;
+    contrepartie.libelleDevise = this.devisesSelected ? this.devisesSelected.libelle : "";
+    contrepartie.caseTva = new CaseTva(this.caseTva);
     return contrepartie;
   }
 
