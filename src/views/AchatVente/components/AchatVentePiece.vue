@@ -612,29 +612,33 @@ export default class extends Vue {
       contrepartie.montantDevise = +this.montant * (1- (tva.tauxTvaCase / 100));
       contrepartie.montantBase = +this.montantCompta * (1- (tva.tauxTvaCase / 100));
       contrepartie.caseTva = tva;
-
       (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
     }
     else
     {
-      let contrepartieAV = this.contreparties.find(c => c.numeroCompte == +this.numeroCompteAchatVente);
-      if(contrepartieAV)
-      {
-        let casesTva = this.contreparties.map(c => c.caseTva);
-        let needCodePays = casesTva.some(tva => ['BX', 'VX', 'FX', 'IX'].indexOf(tva.natureCase) >= 0);
-        let codepays = needCodePays ? contrepartieAV.caseTva.codePays : "";
-        let compteTva = await AchatVenteApi.getCompteTva(this.numeroJournal, "", this.codeTaxe);
-        let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.numeroJournal);
-        let contrepartie = new PieceComptableContrepartie();
-        contrepartie.numeroCompte = compteTva.numero;
-        contrepartie.compteLibelle = compteTva.nom;
-        contrepartie.libelle = this.compteTiersNom;
-        contrepartie.codeMouvement = this.typeCompte == "F" ? "DB" : "CR";
-        contrepartie.montantDevise = +this.montant * (contrepartieAV.caseTva.tauxTvaCase / 100);
-        contrepartie.montantBase = +this.montantCompta * (contrepartieAV.caseTva.tauxTvaCase / 100);
-        contrepartie.caseTva = tva;
-        (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
+      let sommeCredit = this.contreparties.map(c => +c.montantCredit).reduce((a,b) => a + b);
+      let sommeDebit = this.contreparties.map(c => +c.montantDebit).reduce((a,b) => a + b);
+      if(+this.montant != (sommeCredit + sommeDebit)){
+        let contrepartieAV = this.contreparties.find(c => c.numeroCompte == +this.numeroCompteAchatVente);
+        if(contrepartieAV)
+        {
+          let casesTva = this.contreparties.map(c => c.caseTva);
+          let needCodePays = casesTva.some(tva => ['BX', 'VX', 'FX', 'IX'].indexOf(tva.natureCase) >= 0);
+          let codepays = needCodePays ? contrepartieAV.caseTva.codePays : "";
+          let compteTva = await AchatVenteApi.getCompteTva(this.numeroJournal, "", this.codeTaxe);
+          let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.numeroJournal);
+          let contrepartie = new PieceComptableContrepartie();
+          contrepartie.numeroCompte = compteTva.numero;
+          contrepartie.compteLibelle = compteTva.nom;
+          contrepartie.libelle = this.compteTiersNom;
+          contrepartie.codeMouvement = this.typeCompte == "F" ? "DB" : "CR";
+          contrepartie.montantDevise = +this.montant * (contrepartieAV.caseTva.tauxTvaCase / 100);
+          contrepartie.montantBase = +this.montantCompta * (contrepartieAV.caseTva.tauxTvaCase / 100);
+          contrepartie.caseTva = tva;
+          (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
+        }
       }
+      else (this.$refs.gridContreparties as GridContrepartiesVue).addContrepartie();
     }
   }
 
