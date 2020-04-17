@@ -6,16 +6,16 @@
     :persistent="!piecereadonly"
     @keydown.f2="ModifierPiece"
     @keydown.del.prevent.stop="DeletePiece"
-    @keydown.plus.prevent.stop="addContrepartie"
+    @keydown.plus.prevent.stop="createContrepartie"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
-            <p class="mb-0" v-if="numeroPiece">Pièce {{ numeroJournal }}.{{ numeroPiece }}</p>
+            <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
             <p class="mb-0" v-if="!numeroPiece">Nouvelle pièce</p>
             <p class="ml-10 mb-0 textMini">Période {{ periodeDisplay }}</p>
-            <p class="ml-5 mb-0 textMini">Journal {{ journalDisplay }}</p>
+            <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
           <v-spacer></v-spacer>
           <v-btn
@@ -58,6 +58,7 @@
                     :append-icon="piecereadonly ? '' : 'mdi-magnify'"
                     :rules="numeroCompteTierRules"
                     @keypress.enter="loadCompte"
+                    @keyup.enter="$event.target.select()"
                     @click:append="OpenSearchCompte()"
                     @focus="$event.target.select()"
                     @blur="loadCompte"
@@ -171,7 +172,7 @@
                 <v-col cols="4">
                   <v-text-field
                     label="Montant en devise comptable"
-                    v-model="libelleMontantCompta"
+                    v-model="libelleMontantBase"
                     filled
                     readonly
                     tabindex="-1"
@@ -251,8 +252,14 @@
                 ref="gridContreparties"
                 :Contreparties.sync="contreparties"
                 :IsReadOnly.sync="piecereadonly"
-                :NumeroJournal.sync="numeroJournal"
+                :Journal.sync="journal"
                 :DeviseEntete.sync="deviseSelected"
+                :CompteAchatVente.sync="numeroCompteAchatVente"
+                :MontantDevise.sync="montant"
+                :MontantBase.sync="montantBase"
+                :TauxDevise.sync="taux"
+                :CodeTaxe.sync="codeTaxe"
+                :NomCompteDeTier.sync="compteTiersNom"
               ></GridContreparties>
               <SearchCompteTier ref="compteDialog"></SearchCompteTier>
             </v-col>
@@ -305,10 +312,8 @@ export default class extends Vue {
   private isValid: boolean = true;
   //Titre
   private periodeDisplay: string = "";
-  private journalDisplay: string = "";
+  private journal: Journal = new Journal();
   private numeroPiece: string = "";
-  private numeroJournal: string = "";
-  private familleJournal: string = "";
 
   //Encodage
   private numeroCompte: string = "";
@@ -335,8 +340,8 @@ export default class extends Vue {
   private libellePiece: string = "";
   private taux: string = "";
   private pieceAcquittee: boolean = false;
-  private montantCompta: string = "";
-  private libelleMontantCompta: string = "";
+  private montantBase: string = "";
+  private libelleMontantBase: string = "";
   private libelleSoldeCompteTiers: string = "";
   private delaiPaiementLibelle: string = "";
   private compteTiersEscomptePourcentage: string = "";
@@ -377,11 +382,9 @@ export default class extends Vue {
 
 	private init(periode: PeriodeComptable, journal: Journal, entete?: EntetePieceComptable) {
     this.resetForm();
+    this.journal = journal;
     this.periodeDisplay = periode.libellePeriodeFull;
-    this.journalDisplay = journal.fullLibelle;
     this.typeCompte = journal.typeCompteChar;
-    this.numeroJournal = journal.numero.toString();
-    this.familleJournal = journal.famille;
     if(entete){
       this.numeroPiece = entete.codePiece ? entete.codePiece.toString() : "";
       this.GetData();
@@ -395,9 +398,8 @@ export default class extends Vue {
 
    private resetForm(){
     this.periodeDisplay = "";
-    this.journalDisplay= "";
+    this.journal = new Journal();
     this.numeroPiece= "";
-    this.numeroJournal= "";
     this.numeroCompte= "";
     this.libelle= "";
     this.montant= "";
@@ -413,8 +415,8 @@ export default class extends Vue {
     this.libellePiece = "";
     this.taux = ""
     this.pieceAcquittee = false;
-    this.montantCompta = "";
-    this.libelleMontantCompta = "";
+    this.montantBase = "";
+    this.libelleMontantBase = "";
     this.libelleSoldeCompteTiers = "";
     this.delaiPaiementLibelle = "";
     this.compteTiersEscomptePourcentage = "";
@@ -428,7 +430,7 @@ export default class extends Vue {
   }
 
   private GetData() {
-    AchatVenteApi.getPieceComptable(this.numeroJournal, this.numeroPiece)
+    AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece)
       .then(pieceComptable => {
         this.SetDisplayData(pieceComptable);
       })
@@ -450,7 +452,7 @@ export default class extends Vue {
     this.libellePiece = pieceComptable.libelle;
     this.taux = pieceComptable.taux.toString();
     this.pieceAcquittee = pieceComptable.pieceAcquittee;
-    this.libelleMontantCompta = pieceComptable.libelleMontantCompta;
+    this.libelleMontantBase = pieceComptable.libelleMontantBase;
     this.libelleSoldeCompteTiers = pieceComptable.libelleSoldeCompteTiers;
     this.delaiPaiementLibelle = pieceComptable.delaiPaiementLibelle;
     this.compteTiersEscomptePourcentage = pieceComptable.compteTiersEscomptePourcentage;
@@ -470,10 +472,9 @@ export default class extends Vue {
       CompteApi.getCompteDeTier(this.typeCompte, this.numeroCompte.toString())
       .then(compte => {
         this.setCompteDeTier(compte);
-        this.$nextTick(() => (this.$refs.libellePiece as any).focus());
       }).catch((err) => {
-        this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
         this.setCompteDeTier()
+        this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
       })
       .finally(() => {
         this.compteLoading = false;
@@ -487,6 +488,7 @@ export default class extends Vue {
       .then(compte => {
         this.numeroCompte = compte.numero.toString();
         this.loadCompte();
+        this.$nextTick(() => (this.$refs.libellePiece as any).focus());
       }).catch(() => {
         this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
       });
@@ -544,7 +546,7 @@ export default class extends Vue {
     (this.$refs.confirmDialog as Confirm)
       .open(
         "Suppression",
-        `Êtes-vous sur de vouloir supprimer la piece ${this.numeroJournal}.${this.numeroPiece} ?`,
+        `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
         "error",
         "Supprimer"
       )
@@ -580,7 +582,7 @@ export default class extends Vue {
   @Watch("montant")
   private montantChanged(val: string, oldVal: string){
     if(!this.piecereadonly)
-      this.recalculMontantCompta();
+      this.recalculmontantBase();
   }
 
   @Watch("deviseSelected")
@@ -593,105 +595,19 @@ export default class extends Vue {
     }
   }
 
-  private recalculMontantCompta(){
+  private recalculmontantBase(){
     if(+this.taux && +this.montant){
-      this.montantCompta = (Number.parseFloat(this.montant) * Number.parseFloat(this.taux)).toFixed(2);
-      this.libelleMontantCompta = `${this.montantCompta} ${this.deviseSelected.libelle}`;
+      this.montantBase = (Number.parseFloat(this.montant) * Number.parseFloat(this.taux)).toFixed(2);
+      this.libelleMontantBase = `${this.montantBase} ${this.deviseSelected.libelle}`;
     }
     else{
-      this.montantCompta = "";
-      this.libelleMontantCompta = "";
+      this.montantBase = "";
+      this.libelleMontantBase = "";
     }
   }
 
-  private async addContrepartie(){
-    if(this.contreparties.length == 0)
-    {
-      let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
-      let tva = await AchatVenteApi.getCaseTVA(compteAchatVente.numeroCase, this.numeroJournal);
-      let contrepartie = new PieceComptableContrepartie();
-      contrepartie.numeroCompte = compteAchatVente.numero;
-      contrepartie.compteLibelle = compteAchatVente.nom;
-      contrepartie.libelle = this.compteTiersNom;
-      contrepartie.codeMouvement = this.getCodeMouvementEntete() == "DB" ? "CR" : "DB";
-      contrepartie.montantDevise = (+this.montant / (1+(tva.tauxTvaCase/100)));
-      contrepartie.montantBase = +this.montant / (1+(tva.tauxTvaCase/100));
-      contrepartie.caseTva = tva;
-      (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
-    }
-    else
-    {
-      let ventileDevise = this.getVentileDevise();
-      let tvaCalcule = this.getTvaCalcule();
-      if(ventileDevise == tvaCalcule){
-        let codepays = this.contreparties.find(ctr => ['BX', 'VX', 'FX', 'IX'].indexOf(ctr.caseTva.natureCase))?.caseTva.codePays;
-        let compteTva = await AchatVenteApi.getCompteTva(this.numeroJournal, this.codeTaxe, codepays);
-        let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.numeroJournal);
-        let contrepartie = new PieceComptableContrepartie();
-        contrepartie.numeroCompte = compteTva.numero;
-        contrepartie.compteLibelle = compteTva.nom;
-        contrepartie.libelle = this.compteTiersNom;
-        contrepartie.codeMouvement = this.getCodeMouvementEntete() == "DB" ? "CR" : "DB";
-        contrepartie.montantDevise = Math.abs(tvaCalcule);
-        contrepartie.montantBase = Math.abs(tvaCalcule * +this.taux);
-        contrepartie.caseTva = tva;
-        (this.$refs.gridContreparties as GridContrepartiesVue).editContrepartie(contrepartie);
-      }else
-      {
-
-      }
-      //else (this.$refs.gridContreparties as GridContrepartiesVue).addContrepartie();
-    }
-  }
-
-  private getCodeMouvementEntete() : string{
-    if(this.familleJournal == "vente" || this.familleJournal == "ncachat")
-      return "DB";
-    else return "CR";
-  }
-
-  private getVentileBase(): number{
-    let ventileCompta : number = +this.montantCompta;
-    if(this.getCodeMouvementEntete() == "CR")
-      ventileCompta = ventileCompta * -1;
-
-    let credit = this.contreparties.filter(c => c.typeCompte != "Z").map(c => +c.montantCreditBase).reduce((a,b) => a + b);
-    let debit = this.contreparties.filter(c => c.typeCompte != "Z").map(c => +c.montantDebitBase).reduce((a,b) => a + b);
-    ventileCompta = ventileCompta + debit - credit;
-    return ventileCompta;
-  }
-
-  private getVentileDevise(): number{
-    let ventileDevise : number = +this.montant;
-    if(this.getCodeMouvementEntete() == "CR")
-      ventileDevise = ventileDevise*-1;
-
-    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.deviseSelected.id).map(c => +c.montantCredit).reduce((a,b) => a + b);
-    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.deviseSelected.id).map(c => +c.montantDebit).reduce((a,b) => a + b);
-    ventileDevise = ventileDevise + debit - credit;
-    return +ventileDevise.toFixed(this.deviseSelected.typeDevise == "E" ? 0 : 2);
-  }
-
-  private getTvaCalcule(): number {
-    let montantsCaseTva : {case: number, caseTaux:number, montant: number}[] = [];
-    this.contreparties.forEach(element => {
-      let montantCase =  montantsCaseTva.find(c => c.case == element.caseTva.numeroCase);
-      if(montantCase)
-        montantCase.montant += +element.montantCredit - +element.montantDebit;
-      else if(element.caseTva.typeCase > 0 && element.caseTva.typeCase < 4 ){
-        montantsCaseTva.push({case: element.caseTva.numeroCase, 
-        caseTaux: element.caseTva.tauxTvaCase,
-        montant: +element.montantCredit - +element.montantDebit});
-      }
-    });
-    
-    return +montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b).toFixed(this.deviseSelected.typeDevise == "E" ? 0 : 2);
-  }
-
-  private getTvaImpute(): number {
-    return this.contreparties.filter(c => c.caseTva.typeCase == 50 || c.caseTva.typeCase == 51)
-      .map(c => +c.montantCredit - +c.montantDebit)
-      .reduce((a,b) => a + b);
+  private createContrepartie(){
+    (this.$refs.gridContreparties as GridContrepartiesVue).createContrepartie();
   }
 
   @Emit("saveAction")

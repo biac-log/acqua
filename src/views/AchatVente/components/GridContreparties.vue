@@ -9,7 +9,7 @@
         class="ml-5"
         ref="btnAdd"
         :disabled="readonly"
-        @click.stop="addContrepartie"
+        @click.stop="createContrepartie"
       >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
@@ -33,10 +33,12 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit, Prop } from "vue-property-decorator";
-import { PieceComptableContrepartie, Devise } from "@/models/AchatVente";
+import { PieceComptableContrepartie, Devise, Journal } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import axios from "axios";
 import EditContrepartieVue from "./EditContrepartie.vue";
+import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
+import { CompteApi } from '@/api/CompteApi';
 
 @Component({
   name: "GridContreparties",
@@ -47,10 +49,22 @@ export default class extends Vue {
   public readonly!: boolean;
   @PropSync("Contreparties")
   private contreparties!: PieceComptableContrepartie[];
-  @PropSync("NumeroJournal")
-  private numeroJournal!: number;
+  @PropSync("Journal")
+  private journal!: Journal;
   @PropSync("DeviseEntete")
   private devise!: Devise;
+  @PropSync("CompteAchatVente")
+  private numeroCompteAchatVente!: string;
+  @PropSync("MontantDevise")
+  private montantDevise!: string;
+  @PropSync("MontantBase")
+  private montantBase!: string;
+  @PropSync("NomCompteDeTier")
+  private nomCompteDeTier!: string;
+  @PropSync("CodeTaxe")
+  private codeTaxe!: number;
+  @PropSync("TauxDevise")
+  private tauxDevise!: string;
 
   private headersContreparties = [
     { text: "N° Compte", value: "libelleNumero" },
@@ -62,9 +76,9 @@ export default class extends Vue {
     { text: "Case TVA", value: "libelleCaseTva" }
   ];
 
-  public addContrepartie(piece?: PieceComptableContrepartie) {
+  private addContrepartie(contrepartie?: PieceComptableContrepartie) {
     (this.$refs.editContrepartie as EditContrepartieVue)
-      .openNew(this.numeroJournal, this.devise)
+      .openNew(this.journal.numero, this.devise, this.getVentileDevise(), this.getTvaCalcule(), this.getTvaImpute(), contrepartie)
       .then((resp: PieceComptableContrepartie) => {
         const maxLigne = Math.max(...this.contreparties.map(i => i.numeroLigne))
         resp.numeroLigne = maxLigne + 1;
@@ -74,17 +88,103 @@ export default class extends Vue {
       });
   }
 
-  public editContrepartie(piece: PieceComptableContrepartie) {
+  //TODO ne pas prendre en compte la ligne sélectionné pour les calculs
+  private editContrepartie(piece: PieceComptableContrepartie) {
     (this.$refs.editContrepartie as EditContrepartieVue)
-      .open(piece, this.numeroJournal, this.devise)
+      .open(piece, this.journal.numero, this.devise, this.getVentileDevise(piece), this.getTvaCalcule(piece), this.getTvaImpute(piece))
       .then((resp: PieceComptableContrepartie) => {
-        let contrepartie = this.contreparties.find(d => d == piece);
-        if(contrepartie)
-          Vue.set(this.contreparties, this.contreparties.findIndex(d => d == piece), resp);
-        else this.contreparties.push(resp);
+        if(resp){
+          let contrepartie = this.contreparties.find(d => d == piece);
+          if(contrepartie)
+            Vue.set(this.contreparties, this.contreparties.findIndex(d => d == piece), resp);
+          else this.contreparties.push(resp);
+        }
+        else this.contreparties.splice(this.contreparties.indexOf(piece), 1);
       }).finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
       });
+  }
+
+  public async createContrepartie(){
+    if(this.contreparties.length == 0)
+    {
+      let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
+      let tva = await AchatVenteApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
+      let contrepartie = new PieceComptableContrepartie();
+      contrepartie.numeroCompte = compteAchatVente.numero;
+      contrepartie.compteLibelle = compteAchatVente.nom;
+      contrepartie.libelle = this.nomCompteDeTier;
+      contrepartie.codeMouvement = this.journal.codeMouvement == "DB" ? "CR" : "DB";
+      contrepartie.montantDevise = (+this.montantDevise / (1+(tva.tauxTvaCase/100)));
+      contrepartie.montantBase = +this.montantDevise / (1+(tva.tauxTvaCase/100));
+      contrepartie.caseTva = tva;
+      this.addContrepartie(contrepartie);
+    }
+    else
+    {
+      let ventileDevise = this.getVentileDevise();
+      let tvaCalcule = this.getTvaCalcule();
+      let tvaImpute = this.getTvaImpute();
+      if(ventileDevise == (tvaCalcule - tvaImpute)){
+        let codepays = this.contreparties.find(ctr => ['BX', 'VX', 'FX', 'IX'].indexOf(ctr.caseTva.natureCase))?.caseTva.codePays;
+        let compteTva = await AchatVenteApi.getCompteTva(this.journal.numero, this.codeTaxe, codepays);
+        let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.journal.numero);
+        let contrepartie = new PieceComptableContrepartie();
+        contrepartie.numeroCompte = compteTva.numero;
+        contrepartie.compteLibelle = compteTva.nom;
+        contrepartie.libelle = this.nomCompteDeTier;
+        contrepartie.codeMouvement = this.journal.codeMouvement == "DB" ? "CR" : "DB";
+        contrepartie.montantDevise = Math.abs(tvaCalcule- tvaImpute);
+        contrepartie.montantBase = Math.abs((tvaCalcule - tvaImpute) * + this.tauxDevise);
+        contrepartie.caseTva = tva;
+        this.addContrepartie(contrepartie);
+      }
+      else this.addContrepartie();
+    }
+  }
+
+  private getVentileBase(contrepartieToIgnore?: PieceComptableContrepartie): number{
+    let ventileCompta : number = +this.montantBase;
+    if(this.journal.codeMouvement == "CR")
+      ventileCompta = ventileCompta * -1;
+
+    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c !== contrepartieToIgnore).map(c => +c.montantCreditBase).reduce((a,b) => a + b, 0);
+    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c !== contrepartieToIgnore).map(c => +c.montantDebitBase).reduce((a,b) => a + b, 0);
+    ventileCompta = ventileCompta + debit - credit;
+    return ventileCompta;
+  }
+
+  private getVentileDevise(contrepartieToIgnore?: PieceComptableContrepartie): number{
+      let ventileDevise : number = +this.montantBase;
+      if(this.journal.codeMouvement == "CR")
+        ventileDevise = ventileDevise * -1;
+
+      let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => +c.montantCredit).reduce((a,b) => a + b, 0);
+      let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => +c.montantDebit).reduce((a,b) => a + b, 0);
+      ventileDevise = ventileDevise + debit - credit;
+      return +ventileDevise.toFixed(this.devise.typeDevise == "E" ? 0 : 2);
+  }
+
+  private getTvaCalcule(contrepartieToIgnore?: PieceComptableContrepartie): number {
+      let montantsCaseTva : {case: number, caseTaux:number, montant: number}[] = [];
+      this.contreparties.filter(c => c !== contrepartieToIgnore).forEach(element => {
+        let montantCase =  montantsCaseTva.find(c => c.case == element.caseTva.numeroCase);
+        if(montantCase)
+          montantCase.montant += +element.montantCredit - +element.montantDebit;
+        else if(element.caseTva.typeCase > 0 && element.caseTva.typeCase < 4 ){
+          montantsCaseTva.push({case: element.caseTva.numeroCase, 
+          caseTaux: element.caseTva.tauxTvaCase,
+          montant: +element.montantCredit - +element.montantDebit});
+        }
+      });
+      
+      return +montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b, 0).toFixed(this.devise.typeDevise == "E" ? 0 : 2);
+  }
+
+  private getTvaImpute(contrepartieToIgnore?: PieceComptableContrepartie): number {
+    return this.contreparties.filter(c => (c.caseTva.typeCase == 50 || c.caseTva.typeCase == 51) && c.codeDevise == this.devise.id && c !== contrepartieToIgnore)
+      .map(c => +c.montantCredit - +c.montantDebit)
+      .reduce((a,b) => a + b, 0);
   }
 }
 </script>

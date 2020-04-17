@@ -85,11 +85,11 @@ export class PieceComptable extends PieceComptableDTO {
     return `${this.statut} ${this.statutLibelle}`;
   }
 
-  get libelleMontantCompta(): string {
+  get libelleMontantBase(): string {
     return `${this.montantBase.toFixed(2)} ${this.deviseComptaLibelle}`;
   }
 
-  get stringMontantCompta(): string {
+  get stringMontantBase(): string {
     return `${this.montantBase.toFixed(2)} ${this.deviseComptaLibelle}`;
   }
 

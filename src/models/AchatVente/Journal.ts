@@ -2,7 +2,6 @@
   export interface IJournal {
     numero: number;
     libelle: string;
-    isAutomatique: boolean;
     famille: string;
     devise: string;
     numeroDernierePiece: number;
@@ -33,5 +32,9 @@
       else if (this.famille == "achat" || this.famille == "ncachat")
         return "F";
       else return "";
+    }
+
+    get codeMouvement(): string{
+      return this.famille == "vente" || this.famille == "ncachat" ? "DB" : "CR";
     }
   }

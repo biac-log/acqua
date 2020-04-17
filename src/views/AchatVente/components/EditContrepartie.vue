@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="800" @keydown.enter.prevent.stop="sendContrepartie">
+  <v-dialog v-model="dialog" width="800" @keydown.enter.prevent.stop="sendContrepartie" @click:outside="close()" @keydown.esc="close()">
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
         <v-card-title>
@@ -39,16 +39,16 @@
                 @blur="loadCompte"
                 autofocus
               >
-              <template v-slot:append>
-                <v-btn v-if="!readonly" icon small @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
-                  <v-icon>mdi-magnify</v-icon>
-                </v-btn>
-              </template>
+                <template v-slot:append>
+                  <v-btn icon small :disabled="readonly" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
+                    <v-icon>mdi-magnify</v-icon>
+                  </v-btn>
+                </template>
               </v-text-field>
               <SearchCompteContrepartieVue
                 ref="compteDialog"
               ></SearchCompteContrepartieVue>
-            </v-col>
+            </v-col>  
             <v-col cols="6">
               <v-text-field
                 label="Nom compte"
@@ -75,7 +75,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col cols="3">
               <v-select
                 :items="devises"
                 v-model="devisesSelected"
@@ -89,32 +89,6 @@
                 :hide-details="readonly"
               ></v-select>
             </v-col>
-            <v-col>
-              <v-select
-                :items="typesMouvements"
-                v-model="typesMouvementsSelected"
-                label="Type de mouvement"
-                item-value="id"
-                item-text="libelle"
-                return-object
-                :filled="readonly"
-                :readonly="readonly"
-                :rules="typesMouvementsRules"
-                :hide-details="readonly"
-              ></v-select>
-            </v-col>
-            <v-col>
-              <v-text-field
-                v-model="montant"
-                label="Montant"
-                :filled="readonly"
-                :readonly="readonly"
-                :rules="montantRules"
-                :hide-details="readonly"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
             <v-col cols="3">
               <v-text-field
                 label="Numéro case TVA"
@@ -129,13 +103,13 @@
                 @blur="loadCaseTva"
               >
               <template v-slot:append>
-                <v-btn v-if="!readonly" icon small @click="OpenSearchCaseTva()" @keydown.enter.prevent.stop="OpenSearchCaseTva()">
+                <v-btn icon small :disabled="readonly" @click="OpenSearchCaseTva()" @keydown.enter.prevent.stop="OpenSearchCaseTva()">
                   <v-icon>mdi-magnify</v-icon>
                 </v-btn>
               </template>
               </v-text-field>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="6">
               <v-text-field
                 label="Libellé case TVA"
                 v-model="caseTva.libelleCase"
@@ -147,25 +121,63 @@
               <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
             </v-col>
           </v-row>
+          <v-row>
+            <v-col cols="3">
+              <v-select
+                :items="typesMouvements"
+                v-model="typesMouvementsSelected"
+                label="Type de mouvement"
+                item-value="id"
+                item-text="libelle"
+                return-object
+                :filled="readonly"
+                :readonly="readonly"
+                :rules="typesMouvementsRules"
+                :hide-details="readonly"
+              ></v-select>
+            </v-col>
+            <v-col cols="3">
+              <v-text-field
+                v-model="montant"
+                label="Montant"
+                :filled="readonly"
+                :readonly="readonly"
+                :rules="montantRules"
+                :hide-details="readonly"
+              >
+                <template v-slot:append>
+                  <v-btn icon small :disabled="readonly" @click="calculMontant()" @keydown.enter.prevent.stop="calculMontant()">
+                    <v-icon>mdi-calculator</v-icon>
+                  </v-btn>
+                </template>
+              </v-text-field>
+            </v-col>
+          </v-row>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="text-center">
+          <v-btn
+            color="error"
+            class="ma-2 pr-4"
+            text
+            tabindex="-1"
+            v-if="!isNew && !readonly"
+            @click="deleteContrepartie()"
+            >
+            Suprrimer</v-btn
+          >
           <v-spacer></v-spacer>
           <v-btn
             color="blue darken-1"
-            text
+            class="ma-2 pr-4"
+            tile outlined
             @click="dialog = false"
             tabindex="-1"
-            >Fermer</v-btn
+            >
+            <v-icon left>mdi-close</v-icon> Fermer</v-btn
           >
-          <v-btn
-            ref="btnValidate"
-            color="success"
-            text
-            :disabled="!isValid"
-            @click="sendContrepartie"
-            v-if="!readonly"
-            >Valider</v-btn
-          >
+          <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" v-if="!readonly" :disabled="!isValid" @click="sendContrepartie">
+            <v-icon left>mdi-check</v-icon> Valider
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -173,7 +185,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Emit, Prop } from "vue-property-decorator";
+import { Component, Vue, PropSync, Emit, Prop, Watch } from "vue-property-decorator";
 import {
   PieceComptableContrepartie,
   TypeCompte,
@@ -197,6 +209,7 @@ export default class extends Vue {
   private dialog: boolean = false;
   @PropSync("isReadOnly")
   public readonly!: boolean;
+  private isNew: boolean = true;
   private errorMessage: string = "";
   private isValid: boolean = true;
   private resolve!: any;
@@ -225,7 +238,8 @@ export default class extends Vue {
   private montantRules: any = [(v: string) => !!v || "Montant obligatoire"];
   private numeroCaseTva: string = "";
   private numeroCaseTvaRules: any = [
-    (v: string) => !!v || "Case tva obligatoire"
+    (v: string) => !!v || "Case tva obligatoire",
+    (v: string) => (Number.isInteger(+v) && +v != 0) || "Numero invalide"
   ];
   private caseTva: CaseTva = new CaseTva();
 
@@ -234,6 +248,10 @@ export default class extends Vue {
   private tvaLoading = false;
   private reference: string = "";
   private referenceRules: any = [(v: string) => !!v || "Référence obligatoire"];
+
+  private tvaCalcule : number = 0;
+  private tvaImpute : number = 0;
+  private ventileDevise: number = 0;
 
   mounted() {
     AchatVenteApi.getTypesComptes().then(resp => {
@@ -244,13 +262,16 @@ export default class extends Vue {
   public open(
     contrepartie: PieceComptableContrepartie,
     numeroJournal: number,
-    deviseEntete: Devise
+    deviseEntete: Devise,
+    ventileDevise: number,
+    tvaCalcule : number,
+    tvaImpute: number
   ): Promise<PieceComptableContrepartie> {
     this.dialog = true;
-
+    this.isNew = false;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.init(contrepartie, numeroJournal, deviseEntete);
+      this.init(contrepartie, numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
     });
 
     return new Promise((resolve, reject) => {
@@ -260,12 +281,17 @@ export default class extends Vue {
   }
   public openNew(
     numeroJournal: number,
-    deviseEntete: Devise
+    deviseEntete: Devise,
+    ventileDevise: number,
+    tvaCalcule : number,
+    tvaImpute: number,
+    contrepartie?: PieceComptableContrepartie,
   ): Promise<PieceComptableContrepartie> {
     this.dialog = true;
+    this.isNew = true;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.init(new PieceComptableContrepartie(), numeroJournal, deviseEntete);
+      this.init(contrepartie || new PieceComptableContrepartie(), numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
     });
 
     return new Promise((resolve, reject) => {
@@ -277,11 +303,13 @@ export default class extends Vue {
   private init(
     contrepartie: PieceComptableContrepartie,
     numeroJournal: number,
-    deviseEntete: Devise
+    deviseEntete: Devise,    
+    ventileDevise: number,
+    tvaCalcule : number,
+    tvaImpute: number
   ) {
     this.initDevises(deviseEntete, contrepartie);
     this.numeroJournal = numeroJournal;
-
     this.typesComptesSelected =this.typesComptes.find(tc => tc.id == contrepartie.typeCompte) || this.typesComptes[0];
     this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) ||this.devises[0];
     this.numeroCompte = contrepartie.numeroCompte ? contrepartie.numeroCompte.toString() : "";
@@ -292,6 +320,10 @@ export default class extends Vue {
     this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : "";
     this.caseTva.Refresh(contrepartie.caseTva);
     this.libelleCaseTva = contrepartie.caseTva.libelleCase;
+
+    this.ventileDevise = ventileDevise;
+    this.tvaCalcule = tvaCalcule;
+    this.tvaImpute = tvaImpute;
   }
 
   private initDevises(
@@ -313,7 +345,7 @@ export default class extends Vue {
           })
         );
         this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) || this.devises[0];
-      }else this.devisesSelected = this.devises[0];
+      } else this.devisesSelected = this.devises[0];
     }
   }
 
@@ -343,11 +375,48 @@ export default class extends Vue {
         });
     }
   }
+
   private setCompte(compte: CompteGenerealSearch) {
     this.numeroCompte = compte.numero.toString();
     this.nomCompte = compte.nom;
-    this.numeroCaseTva = compte.numeroCase.toString();
-    this.libelleCaseTva = compte.libelleCase;
+    if(compte.numeroCase){
+      AchatVenteApi.getCaseTVA(compte.numeroCase, this.numeroJournal).then((resp) => {
+        if(resp)
+        {
+          this.caseTva = resp;
+          this.numeroCaseTva = compte.numeroCase.toString();
+        }
+        else this.caseTva = new CaseTva();
+        this.calculMontant();
+      });
+    }
+  }
+
+  private calculMontant(){
+    if(this.caseTva.typeCase == 50)
+      this.montant = this.calculMontantTva().toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+    else if(this.caseTva.typeCase == 1)
+      this.montant = this.calculMontantTaxable().toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+  }
+  private calculMontantTva() : number{
+    let montantTva = this.tvaCalcule - this.tvaImpute;
+    if(this.typesMouvementsSelected.id == "DB") montantTva = this.tvaImpute -  this.tvaCalcule;
+    if(montantTva < 0)montantTva = 0;
+    return montantTva;
+  }
+
+  private calculMontantTaxable() : number {
+    let montantTaxable = this.tvaCalcule - this.tvaImpute;
+    if(this.typesMouvementsSelected.id == "CR")
+      montantTaxable = this.ventileDevise - montantTaxable;
+    else montantTaxable = montantTaxable - this.ventileDevise;
+
+    if(montantTaxable < 0) montantTaxable =0;
+    else if(this.caseTva.tauxTvaCase)
+    {
+      montantTaxable = (montantTaxable / (1+ (this.caseTva.tauxTvaCase / 100)));
+    }
+    return montantTaxable;
   }
 
   private loadCaseTva() {
@@ -356,12 +425,12 @@ export default class extends Vue {
       AchatVenteApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
         .then(caseTva => {
           this.numeroCaseTva = caseTva.numeroCase.toString();
-          this.caseTva.Refresh(caseTva);
+          this.caseTva = caseTva;
           this.errorMessage = "";
         })
         .catch((err: AxiosError) => {
           this.numeroCaseTva = "";
-          this.caseTva.Refresh();
+          this.caseTva = new CaseTva();
           if (err.request.status != 505)
             this.errorMessage = err.request.response;
         })
@@ -373,13 +442,12 @@ export default class extends Vue {
       this.caseTva = new CaseTva();
     }
   }
-  private OpenSearchCaseTva(): void {
-    (this.$refs.caseTvaDialog as SearchCaseTvaVue)
+  private OpenSearchCaseTva(): void { (this.$refs.caseTvaDialog as SearchCaseTvaVue)
       .open(this.numeroJournal)
       .then(caseTva => {
         this.numeroCaseTva = caseTva.numeroCase.toString();
         this.caseTva = caseTva;
-        this.$nextTick(() => (this.$refs.btnValidate as any).focus());
+        this.$nextTick(() => (this.$refs.btnValidate as any).$el.focus());
       }).catch(() => {
         this.$nextTick(() => (this.$refs.numeroCaseTva as any).focus())
       });
@@ -410,6 +478,21 @@ export default class extends Vue {
     })
   }
 
+  @Watch("caseTva")
+  private caseTvaChanged(val: string, oldVal: string){
+    if(!this.readonly && !this.montant) this.calculMontant();
+  }
+
+  @Watch("devisesSelected")
+  private deviseChanged(val: string, oldVal: string){
+    if(!this.readonly && !this.montant) this.calculMontant();
+  }
+
+  private deleteContrepartie() {
+    this.dialog = false;
+    this.resolve();
+  }
+
   private close() {
     this.dialog = false;
     this.reject();
@@ -418,3 +501,4 @@ export default class extends Vue {
 </script>
 
 <style></style>
+
