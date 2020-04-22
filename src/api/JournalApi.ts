@@ -1,5 +1,5 @@
 import Axios from "axios";
-import {JournalDTO, Journal} from "@/models/AchatVente/Journal";
+import {JournalDTO, Journal} from "@/models/AchatVente/Get/Journal";
 
 export abstract class JournalApi {
   private static journalAxios = Axios.create();

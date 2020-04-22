@@ -67,6 +67,8 @@
                 ref="libelle"
                 label="Libelle"
                 v-model="libelle"
+                counter
+                maxlength="23"
                 :filled="readonly"
                 :readonly="readonly"
                 :rules="libelleRules"

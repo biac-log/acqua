@@ -18,7 +18,7 @@ import {
   Devise
 } from "@/models/AchatVente";
 import CompteGenerealSearch from '@/models/Compte/CompteGeneralSearch';
-import { PieceComptableSave } from '@/models/AchatVente/PieceComptableSave';
+import { PieceComptableSaveDTO } from '@/models/AchatVente';
 
 export abstract class AchatVenteApi {
   private static achatVenteAxios = Axios.create();
@@ -39,7 +39,7 @@ export abstract class AchatVenteApi {
     date: Date
   ): Promise<Date> {
     let response = await this.achatVenteAxios.get(
-      `${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDateEcheance?typeCompte=${typeCompte}F&numeroCompte=${numeroCompte}&datePiece=${moment(date).format("DD/MM/YYYY")}`
+      `${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDateEcheance?typeCompte=${typeCompte}&numeroCompte=${numeroCompte}&datePiece=${date.toUTCString()}`
     );
     return moment(response.data).toDate();;
   }
@@ -113,13 +113,18 @@ export abstract class AchatVenteApi {
     return response.data;
   }
 
-  static async AddPiece(pieceComptable: PieceComptableSave): Promise<PieceComptableSave> {
-    let response = await this.achatVenteAxios.post<PieceComptableSave>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/AddPieceComptable`, pieceComptable);
+  static async AddPiece(pieceComptable: PieceComptableSaveDTO): Promise<number> {
+    let response = await this.achatVenteAxios.post<number>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/AddPieceComptable`, pieceComptable);
     return response.data;
   }
 
-  static async UpdatePiece(pieceComptable: PieceComptableSave): Promise<PieceComptableSave> {
-    let response = await this.achatVenteAxios.put<PieceComptableSave>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/UpdatePieceComptable`, pieceComptable);
+  static async UpdatePiece(pieceComptable: PieceComptableSaveDTO): Promise<PieceComptableSaveDTO> {
+    let response = await this.achatVenteAxios.put<PieceComptableSaveDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/UpdatePieceComptable`, pieceComptable);
+    return response.data;
+  }
+
+  static async DeletePiece(periode: string, journal: number, piece: number): Promise<any> {
+    let response = await this.achatVenteAxios.delete<any>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/DeletePieceComptable?periode=${periode}&journal=${journal}&piece=${piece}`);
     return response.data;
   }
 }

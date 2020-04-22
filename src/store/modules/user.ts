@@ -53,7 +53,6 @@ class User extends VuexModule implements IUserState {
   @Action({rawError: true})
   public Login(userInfo: { username: string, password: string }): Promise<any> {
     return new Promise((resolve, reject) => {
-      
       axios.post<Token>(process.env.VUE_APP_ApiAuth + "/Authentication/Login", userInfo)
         .then((resp) => {
           this.SET_TOKEN(resp.data);

@@ -88,7 +88,6 @@ export default class extends Vue {
       });
   }
 
-  //TODO ne pas prendre en compte la ligne sélectionné pour les calculs
   private editContrepartie(piece: PieceComptableContrepartie) {
     (this.$refs.editContrepartie as EditContrepartieVue)
       .open(piece, this.journal.numero, this.devise, this.getVentileDevise(piece), this.getTvaCalcule(piece), this.getTvaImpute(piece))

@@ -31,6 +31,7 @@
             color="error"
             v-if="piecereadonly"
             @click="DeletePiece"
+            :loading="deleteIsLoading"
           >
             <v-icon left>mdi-delete</v-icon>Supprimer
           </v-btn>
@@ -82,10 +83,12 @@
                   <v-text-field
                     label="Libelle"
                     ref="libellePiece"
+                    counter
+                    maxlength="23"
                     :value="libellePiece"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
-                    hide-details
+                    :hide-details="piecereadonly"
                     v-model="libelle"
                   ></v-text-field>
                 </v-col>
@@ -165,7 +168,7 @@
                   <v-checkbox
                     label="Pièce acquitée"
                     v-model="pieceAcquittee"
-                    readonly
+                    :readonly="piecereadonly"
                     tabindex="-1"
                   ></v-checkbox>
                 </v-col>
@@ -267,11 +270,33 @@
         </v-card-text>
         <v-divider v-if="!piecereadonly"></v-divider>
         <v-card-actions v-if="!piecereadonly">
+          <v-btn
+            color="error"
+            class="ma-2 pr-4"
+            text
+            tabindex="-1"
+            @click="DeletePiece()"
+            :loading="deleteIsLoading"
+            >
+            Suprrimer</v-btn
+          >
           <v-spacer></v-spacer>
-          <v-btn class="mr-10" color="warning" @click="ModifierPiece">
+          <v-btn
+            color="blue darken-1"
+            class="ma-2 pr-4"
+            tile outlined
+            @click="cancelEdit()"
+            tabindex="-1"
+            >
+            <v-icon left>mdi-close</v-icon> Annuler</v-btn
+          >
+          <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" :loading="saveLoading"  @click="savePiece()">
             <v-icon left>mdi-content-save</v-icon>Sauvegarder
           </v-btn>
         </v-card-actions>
+        <v-alert type="error" border="left" v-if="errorMessage"  class="ml-4 mr-4">
+            {{errorMessage}}
+        </v-alert>
         <Confirm ref="confirmDialog"></Confirm>
       </v-card>
     </v-form>
@@ -289,7 +314,10 @@ import {
   PieceComptableContrepartie,
   Devise,
   Statut,
-  Journal
+  Journal,
+	PieceComptableContrepartieSaveDTO,
+  PieceComptableContrepartieDTO,
+  PieceComptableSaveDTO
 } from "@/models/AchatVente";
 import CompteSearch from "@/models/Compte/CompteSearch";
 import SearchCompteTier from "./SearchCompteTier.vue";
@@ -301,6 +329,8 @@ import GridContreparties from "./GridContreparties.vue";
 import GridContrepartiesVue from './GridContreparties.vue';
 import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
 import CompteGenerealSearch from '../../../models/Compte/CompteGeneralSearch';
+import { displayAxiosError } from '@/utils/ErrorMethods';
+
 
 @Component({
   name: "AchatVentePiece",
@@ -308,9 +338,11 @@ import CompteGenerealSearch from '../../../models/Compte/CompteGeneralSearch';
 })
 export default class extends Vue {
   public piecereadonly: boolean = true;
+  private errorMessage: string = "";
   private contreparties: PieceComptableContrepartie[] = [];
   private isValid: boolean = true;
   //Titre
+  private periode: PeriodeComptable = new PeriodeComptable();
   private periodeDisplay: string = "";
   private journal: Journal = new Journal();
   private numeroPiece: string = "";
@@ -351,11 +383,12 @@ export default class extends Vue {
   private nomCompteAchatVente: string ="";
   private libelleCompteVenteAchat: string = "";
   private codeTaxe: number = 0;
+  private hash: string = "";
 
   private resolve!: any;
   private reject!: any;
 
-  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<EntetePieceComptable> {
+  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
     this.dialog= true;
     this.piecereadonly = false;
     await this.loadDataForEdit();
@@ -368,11 +401,11 @@ export default class extends Vue {
 
   public open(entete: EntetePieceComptable,
     periode: PeriodeComptable,
-    journal: Journal): Promise<EntetePieceComptable> {
+    journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
     this.dialog=true;
     this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
     this.piecereadonly=true;
-    this.init(periode,journal,entete);
+    this.init(periode, journal, entete);
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -383,6 +416,7 @@ export default class extends Vue {
 	private init(periode: PeriodeComptable, journal: Journal, entete?: EntetePieceComptable) {
     this.resetForm();
     this.journal = journal;
+    this.periode = periode;
     this.periodeDisplay = periode.libellePeriodeFull;
     this.typeCompte = journal.typeCompteChar;
     if(entete){
@@ -397,6 +431,8 @@ export default class extends Vue {
   }
 
    private resetForm(){
+    this.errorMessage = "";
+
     this.periodeDisplay = "";
     this.journal = new Journal();
     this.numeroPiece= "";
@@ -427,15 +463,18 @@ export default class extends Vue {
     this.libelleCompteVenteAchat = "";
     this.codeTaxe = 0;
     this.contreparties = [];
+    this.hash = "";
   }
 
   private GetData() {
+    this.errorMessage = "";
     AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece)
       .then(pieceComptable => {
         this.SetDisplayData(pieceComptable);
       })
-      .catch(error => {})
-      .finally(() => {});
+      .catch(err => {
+        this.errorMessage = displayAxiosError(err);
+      });
   }
 
   private SetDisplayData(pieceComptable: PieceComptable) {
@@ -447,6 +486,7 @@ export default class extends Vue {
     this.dateEcheance = pieceComptable.dateEcheanceDate;
 
     this.montant = pieceComptable.montantDevise.toString();
+    this.montantBase = pieceComptable.montantBase.toString();
     this.montantEscompte = pieceComptable.montantEscompteDevise.toString();
     this.compteTiersNom = pieceComptable.compteTiersNom;
     this.libellePiece = pieceComptable.libelle;
@@ -463,6 +503,7 @@ export default class extends Vue {
     
     this.deviseSelected = pieceComptable ? this.getDeviseToSelect(new Devise({id: pieceComptable.codeDevise, libelle: pieceComptable.libelleDevise, typeDevise: "D"})) : this.devises[0];
     this.statutSelected = pieceComptable ? this.getStatutToSelect(new Statut({id: pieceComptable.statut, libelle: pieceComptable.statutLibelle})) : this.statuts[0];
+    this.hash = pieceComptable.hash;
   }
 
   private compteLoading: boolean = false;
@@ -542,19 +583,6 @@ export default class extends Vue {
     else return statutSelected;
   }
 
-  private DeletePiece() {
-    (this.$refs.confirmDialog as Confirm)
-      .open(
-        "Suppression",
-        `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
-        "error",
-        "Supprimer"
-      )
-      .then(resp => {
-        if (resp) console.log("DELETE");
-      });
-  }
-
   @Watch("datePiece")
   private datePieceChanged(val: Date, oldVal: Date) {
     if (!this.piecereadonly && val.getTime() != oldVal.getTime()) {
@@ -565,6 +593,11 @@ export default class extends Vue {
           val
         ).then(dateEcheance => {
           this.dateEcheance = dateEcheance;
+        }).catch((err) => {
+          if(err.response.data.Message)
+            this.errorMessage = err.response.data.Message;
+          else
+            this.errorMessage = `Une erreur s'est produite lors de la récupération de la date échéance, veuillez contacter un administrateur, ${err.response.status} ${err.response.statusText}"`;
         });
       }
 
@@ -591,6 +624,11 @@ export default class extends Vue {
       AchatVenteApi.getTaux(this.deviseSelected.id, this.datePiece)
       .then((resp) => {
         this.taux = resp.toFixed(2);
+      }).catch((err) => {
+        if(err.response.data.Message)
+          this.errorMessage = err.response.data.Message;
+        else
+          this.errorMessage = `Une erreur s'est produite lors de la récupération du taux, veuillez contacter un administrateur, ${err.response.status} ${err.response.statusText}"`;
       });
     }
   }
@@ -610,9 +648,134 @@ export default class extends Vue {
     (this.$refs.gridContreparties as GridContrepartiesVue).createContrepartie();
   }
 
+  private saveLoading: boolean = false;
   @Emit("saveAction")
-  private save() {
+  private savePiece() {
+    let pieceToSave = this.GetModelToSave();
+    if(pieceToSave.numeroPiece == 0)
+      this.addPiece(pieceToSave);
+    else 
+      this.updatePiece(pieceToSave);
+  }
     
+
+  private addPiece(piece: PieceComptableSaveDTO) {
+    this.saveLoading = true;
+    this.errorMessage = "";
+    AchatVenteApi.AddPiece(piece).then((numeroPiece) => {
+      this.numeroPiece = numeroPiece.toString();
+      this.resolve({ action: "ADD", data: this.GetModelForGrid()});
+      this.dialog = false;
+    }).catch((err) => {
+      if(err.response.data.Message)
+        this.errorMessage = err.response.data.Message;
+      else
+        this.errorMessage = `Une erreur s'est produite lors de la sauvegarde, veuillez contacter un administrateur, ${err.response.status} ${err.response.statusText}"`;
+    }).finally(()=> {
+      this.saveLoading = false;
+    });
+  }
+
+  private updatePiece(piece: PieceComptableSaveDTO) {
+    this.saveLoading = true;
+    this.errorMessage = "";
+    let pieceComptaToSave = this.GetModelToSave();
+    AchatVenteApi.UpdatePiece(pieceComptaToSave).then(() => {
+      this.resolve({ action: "UPDATE", data: this.GetModelForGrid()});
+      this.piecereadonly = true;
+      this.dialog = false;
+    }).catch((err) => {
+      if(err.response.data.Message)
+        this.errorMessage = err.response.data.Message;
+      else
+        this.errorMessage = `Une erreur s'est produite lors de la sauvegarde, veuillez contacter un administrateur, ${err.response.status} ${err.response.statusText}"`;
+    }).finally(()=> {
+      this.saveLoading = false;
+    });
+  }
+
+  private deleteIsLoading : boolean = false;
+  private DeletePiece() {
+    (this.$refs.confirmDialog as Confirm)
+      .open(
+        "Suppression",
+        `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
+        "error",
+        "Supprimer"
+      )
+      .then((resp) => {
+        if (resp) {
+          this.deleteIsLoading = true;
+          AchatVenteApi.DeletePiece(this.periode.typePeriodeComptable, this.journal.numero, +this.numeroPiece)
+          .then(() => {
+            this.dialog = false;
+            this.resolve({ action: "DELETE", data: this.GetModelForGrid()});
+          }).catch((err) => {
+            this.errorMessage = displayAxiosError(err);
+          }).finally(() => {
+            this.deleteIsLoading = false;
+          });
+        }
+      });
+  }
+
+  private GetModelToSave(): PieceComptableSaveDTO {
+    let pieceComptaSave: PieceComptableSaveDTO = new PieceComptableSaveDTO();
+    pieceComptaSave.periode = this.periode.typePeriodeComptable;
+    pieceComptaSave.numeroJournal = this.journal.numero;
+    pieceComptaSave.numeroPiece = +this.numeroPiece;
+    pieceComptaSave.dateEcheance = this.dateEcheance;
+    pieceComptaSave.datePiece = this.datePiece;
+    pieceComptaSave.montantBase = +this.montantBase;
+    pieceComptaSave.montantDevise = +this.montant;
+    pieceComptaSave.codeDevise = this.deviseSelected.id;
+    pieceComptaSave.libelle = this.libelle;
+    pieceComptaSave.typeCompte = this.typeCompte;
+    pieceComptaSave.numeroCompte = +this.numeroCompte;
+    pieceComptaSave.montantEscompteBase = +this.montantEscompte * +this.taux
+    pieceComptaSave.montantEscompteDevise = +this.montantEscompte;
+    pieceComptaSave.codeBlocage = this.statutSelected.id;
+    pieceComptaSave.pieceAcquittee = this.pieceAcquittee;
+    pieceComptaSave.codeMouvement = this.journal.codeMouvement;
+    pieceComptaSave.contreparties = [];
+    let i = 1;
+    this.contreparties.forEach(c => {
+      let contr : PieceComptableContrepartieSaveDTO = new PieceComptableContrepartieSaveDTO();
+      contr.typeCompte = c.typeCompte;
+      contr.numeroCompte = c.numeroCompte;
+      contr.libelle = c.libelle;
+      contr.codeMouvement = c.codeMouvement;
+      contr.montantDevise = c.montantDevise;
+      contr.montantBase = c.montantBase;
+      contr.codeDevise = c.codeDevise;
+      contr.numeroCaseTVA = c.caseTva.numeroCase;
+      contr.numeroLigne = i++;
+      pieceComptaSave.contreparties.push(contr);
+    });
+    pieceComptaSave.hash = this.hash;
+    return pieceComptaSave;
+  }
+  private GetModelForGrid(): EntetePieceComptable {
+    let entete = new EntetePieceComptable();
+    entete.codeJournal = this.journal.numero;
+    entete.codePiece = +this.numeroPiece;
+    entete.escompte = +this.montantEscompte;
+    entete.libelle = this.libelle;
+    entete.datePieceDate = this.datePiece;
+    entete.dateEcheanceDate = this.dateEcheance;
+    entete.status = this.statutSelected.id;
+    entete.statusLibelle = this.statutSelected.libelle;
+    entete.montant = +this.montant;
+    entete.numeroCompte = +this.numeroCompte;
+    entete.nomCompte = this.compteTiersNom;
+    entete.devise = this.deviseSelected.libelle;
+    return entete;
+  }
+  private cancelEdit(){
+    this.piecereadonly = true;
+    if(+this.numeroPiece != 0){
+      this.closeDialog
+    }else this.closeDialog();
   }
 
   private closeDialog(){

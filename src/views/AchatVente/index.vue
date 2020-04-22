@@ -37,6 +37,7 @@
               required
             >
             </v-select>
+
           </v-col>
           <v-col cols="12" xs="12" md="3" lg="3">
             <v-btn
@@ -89,6 +90,12 @@
       </v-data-table>
     </v-card>
     <AchatVentePieceVue ref="refDialogPiece"></AchatVentePieceVue>
+    <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue>
+    <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
+      <v-icon dark class="mr-3">{{ snackbarColor == "error" ? "mdi-delete" : "mdi-check" }}</v-icon>
+      <span v-html="snackbarMessage"></span>
+      <v-btn icon dark @click="snackbar = false"><v-icon>mdi-close</v-icon></v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -103,11 +110,12 @@ import {
 import { JournalApi } from "@/api/JournalApi";
 import moment from "moment";
 import AchatVentePieceVue from "./components/AchatVentePiece.vue";
+import PieceAddResultVue from "./components/PieceAddResult.vue";
 import { AchatVenteApi } from "../../api/AchatVenteApi";
 
 @Component({
   name: "AchatVente",
-  components: { AchatVentePieceVue }
+  components: { AchatVentePieceVue, PieceAddResultVue }
 })
 export default class extends Vue {
   private searchIsValid: boolean = true;
@@ -133,6 +141,7 @@ export default class extends Vue {
   private periodeData: PeriodeComptable = new PeriodeComptable();
   private periodeSearched: PeriodeComptable = new PeriodeComptable();
   private journalSearched: Journal = new Journal();
+  private selectedPiece!: EntetePieceComptable;
 
   private headers = [
     { text: "Numéro pièce", value: "codePieceDisplay" },
@@ -150,7 +159,7 @@ export default class extends Vue {
   private piecesComptables: EntetePieceComptable[] = [];
   private isLoadingPieces: boolean = false;
 
-  public LoadPeriode() {
+  private LoadPeriode() {
     this.periodeIsLoading = true;
     const periodeString: string =
       this.periodeSelected == "Période précédente" ? "Precedente" : "Courante";
@@ -165,8 +174,7 @@ export default class extends Vue {
         this.periodeIsLoading = false;
       });
   }
-
-  public LoadJournaux() {
+  private LoadJournaux() {
     this.journauxIsLoading = true;
     JournalApi.getAll()
       .then(resp => {
@@ -178,7 +186,7 @@ export default class extends Vue {
       });
   }
 
-  public LoadPiecesComptables() {
+  private LoadPiecesComptables() {
     this.isLoadingPieces = true;
     let periode: string = "courante";
     if (this.periodeSelected == "Période précédente") periode = "precedente";
@@ -202,26 +210,46 @@ export default class extends Vue {
     (this.$refs.refDialogPiece as AchatVentePieceVue)
       .open(entete, this.periodeSearched, this.journalSearched)
       .then(resp => {
-        Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp);
+        if(resp.action == "UPDATE"){
+          Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp.data);
+          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, "success");
+        }else if(resp.action == "DELETE"){
+          this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
+          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, "error");
+        }
       })
       .finally(() => {
-        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus())
+        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
       });
   }
 
   private openNewPieceComptable() {
     (this.$refs.refDialogPiece as AchatVentePieceVue)
       .openNew(this.periodeSearched, this.journalSelected)
-      .then(resp => {
-        //Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp);
+      .then((resp) => {
+        this.displayAddResult(resp.data.codePieceDisplay);
+        this.piecesComptables.unshift(resp.data);
       })
       .finally(() => {
-        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus())
+        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
       });
   }
 
-  public UpdateRow() {
-    
+  private displayAddResult(numeroPiece : string | number){
+    (this.$refs.PieceAddResultVue as PieceAddResultVue).open("",`Ajout réussi, le numéro de pièce créé est le <b class='bold'>${numeroPiece}</b>`, "success", "Ok").finally(() => {
+      this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
+    });
+  }
+
+  private snackbar: boolean = false;
+  private snackbarTimeout: number = 5000;
+  private snackbarMessage: string = "";
+  private snackbarColor: string = "";
+
+  private notifier(message: string, color:string){
+    this.snackbarColor = color;
+    this.snackbarMessage = message;
+    this.snackbar = true;
   }
 }
 </script>

@@ -1,4 +1,4 @@
-import { PieceComptableContrepartie } from '.';
+import { PieceComptableContrepartie, PieceComptableContrepartieSaveDTO } from '..';
 
 export interface IPieceComptableSave {
   periode: string;
@@ -10,9 +10,15 @@ export interface IPieceComptableSave {
   montantBase: number;
   codeDevise: number;
   libelle: string;
+  typeCompte: string;
+  montantEscompteBase: number;
+  montantEscompteDevise: number;
   numeroCompte: number;
+  numeroCompteAssocie: number;
+  codeBlocage: number;
+  pieceAcquittee: boolean;
   codeMouvement: string;
-  contreparties: PieceComptableContrepartie[];
+  contreparties: PieceComptableContrepartieSaveDTO[];
   hash: string;
 }
 
@@ -26,21 +32,14 @@ export class PieceComptableSaveDTO implements IPieceComptableSave {
   public montantBase: number = 0;
   public codeDevise: number = 0;
   public libelle: string = "";
+  public typeCompte: string = "";
   public numeroCompte: number = 0;
+  public montantEscompteBase: number = 0;
+  public montantEscompteDevise: number = 0
   public codeMouvement: string = "";
-  public contreparties: PieceComptableContrepartie[] = [];
+  public numeroCompteAssocie: number = 0;
+  public codeBlocage: number = 0;
+  public pieceAcquittee: boolean= false;
+  public contreparties: PieceComptableContrepartieSaveDTO[] = [];
   public hash: string = "";
-}
-
-export class PieceComptableSave extends PieceComptableSaveDTO {
-  constructor(dto?: PieceComptableSaveDTO) {
-    super();
-    Object.assign(this, dto || new PieceComptableSaveDTO());
-    if (dto) {
-      this.contreparties = [];
-      dto.contreparties.forEach(element => {
-        this.contreparties.push(new PieceComptableContrepartie(element));
-      });
-    }
-  }
 }
