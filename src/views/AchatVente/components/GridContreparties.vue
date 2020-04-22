@@ -1,38 +1,44 @@
 <template>
-  <v-card>
-    <v-card-title>
-      Contreparties
-      <v-btn
-        color="primary"
-        fab
-        small
-        class="ml-5"
-        ref="btnAdd"
-        :disabled="readonly"
-        @click.stop="createContrepartie"
+  <v-container class="ma-0 pa-0">
+    <v-card class="mb-3">
+      <v-card-title>
+        Contreparties
+        <v-btn
+          color="primary"
+          fab
+          small
+          class="ml-5"
+          ref="btnAdd"
+          :disabled="readonly"
+          @click.stop="createContrepartie"
+        >
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+        <EditContrepartieVue
+          ref="editContrepartie"
+          :isReadOnly.sync="readonly"
+        ></EditContrepartieVue>
+      </v-card-title>
+      <v-data-table
+        :headers="headersContreparties"
+        :items="contreparties"
+        :items-per-page="10"
+        id="dataTable"
+        class="elevation-1"
+        dense
+        @click:row="editContrepartie"
       >
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-      <EditContrepartieVue
-        ref="editContrepartie"
-        :isReadOnly.sync="readonly"
-      ></EditContrepartieVue>
-    </v-card-title>
-    <v-data-table
-      :headers="headersContreparties"
-      :items="contreparties"
-      :items-per-page="10"
-      id="dataTable"
-      class="elevation-1"
-      dense
-      @click:row="editContrepartie"
-    >
-    </v-data-table>
-  </v-card>
+      </v-data-table>
+    </v-card>
+    <span :class="ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
+      <span >Montant à ventille : <b>{{ ventilleDevise }} {{ devise.libelle }}</b></span>
+      <span v-if="devise.id != 1">/ <b>{{ ventilleBase }} EUR</b></span>
+    </span>
+  </v-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Emit, Prop } from "vue-property-decorator";
+import { Component, Vue, PropSync, Emit, Prop, Watch } from "vue-property-decorator";
 import { PieceComptableContrepartie, Devise, Journal } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import axios from "axios";
@@ -65,6 +71,9 @@ export default class extends Vue {
   private codeTaxe!: number;
   @PropSync("TauxDevise")
   private tauxDevise!: string;
+
+  private ventilleDevise: number = 0;
+  private ventilleBase: number = 0;
 
   private headersContreparties = [
     { text: "N° Compte", value: "libelleNumero" },
@@ -100,6 +109,7 @@ export default class extends Vue {
         }
         else this.contreparties.splice(this.contreparties.indexOf(piece), 1);
       }).finally(() => {
+        this.refreshMontantAVentille();
         this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
       });
   }
@@ -185,6 +195,13 @@ export default class extends Vue {
       .map(c => +c.montantCredit - +c.montantDebit)
       .reduce((a,b) => a + b, 0);
   }
+
+  @Watch('contreparties')
+  @Watch("montantDevise")
+  private refreshMontantAVentille(){
+    this.ventilleBase = Math.abs(this.getVentileBase());
+    this.ventilleDevise = Math.abs(this.getVentileDevise());
+  }
 }
 </script>
 
@@ -195,5 +212,15 @@ export default class extends Vue {
 
 #dataTable tbody tr {
   cursor: pointer;
+}
+
+.notEquilibre{
+  color: red;
+  margin-left: 10px;
+}
+
+.equilibre{
+  color: green;
+  margin-left: 10px;
 }
 </style>
