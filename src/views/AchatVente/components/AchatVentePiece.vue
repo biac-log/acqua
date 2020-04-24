@@ -754,6 +754,7 @@ export default class extends Vue {
 
   private addPiece(piece: PieceComptableSaveDTO) {
     this.saveLoading = true;
+    this.piecereadonly = true;
     this.errorMessage = "";
     AchatVenteApi.AddPiece(piece).then((numeroPiece) => {
       this.numeroPiece = numeroPiece.toString();
@@ -761,6 +762,7 @@ export default class extends Vue {
       this.dialog = false;
     }).catch((err) => {
       this.errorMessage = displayAxiosError(err);
+      this.piecereadonly = false;
     }).finally(()=> {
       this.saveLoading = false;
     });
@@ -770,12 +772,13 @@ export default class extends Vue {
     this.saveLoading = true;
     this.errorMessage = "";
     let pieceComptaToSave = this.GetModelToSave();
+    this.piecereadonly = true;
     AchatVenteApi.UpdatePiece(pieceComptaToSave).then(() => {
       this.resolve({ action: "UPDATE", data: this.GetModelForGrid()});
-      this.piecereadonly = true;
       this.dialog = false;
     }).catch((err) => {
         this.errorMessage = displayAxiosError(err);
+        this.piecereadonly = false;
     }).finally(()=> {
       this.saveLoading = false;
     });

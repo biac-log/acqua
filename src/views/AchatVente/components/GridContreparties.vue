@@ -22,10 +22,11 @@
       <v-data-table
         :headers="headersContreparties"
         :items="contreparties"
-        :items-per-page="10"
         id="dataTable"
         class="elevation-1"
-        dense
+        :dense="contreparties.length > 8"
+        disable-pagination
+        hide-default-footer
         @click:row="editContrepartie"
       >
       </v-data-table>

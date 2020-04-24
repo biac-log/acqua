@@ -70,6 +70,7 @@
         ></v-text-field>
       </v-card-title>
       <v-data-table
+        id="dataTable"
         :headers="headers"
         :items="piecesComptables"
         :search="search"
@@ -258,5 +259,9 @@ export default class extends Vue {
 <style>
 #btn-acqua {
   height: 56px;
+}
+
+#dataTable tbody tr {
+  cursor: pointer;
 }
 </style>
