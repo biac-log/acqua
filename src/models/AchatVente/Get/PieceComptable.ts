@@ -98,7 +98,7 @@ export class PieceComptable extends PieceComptableDTO {
   }
 
   get libelleCompteVenteAchat(): string {
-    return `${this.compteVenteAchatNumero} ${this.compteVenteAchatNom}`;
+    return  `${this.compteVenteAchatNumero} ${this.compteVenteAchatNom}`;
   }
 
   get libelleSoldeCompteTiers(): string {
