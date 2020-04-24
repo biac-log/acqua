@@ -115,6 +115,9 @@ export default class extends Vue {
   }
 
   public async createContrepartie(){
+    if(!this.numeroCompteAchatVente || this.numeroCompteAchatVente == "0")
+      this.addContrepartie();
+
     if(this.contreparties.length == 0)
     {
       let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);

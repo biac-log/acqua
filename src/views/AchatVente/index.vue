@@ -154,7 +154,7 @@ export default class extends Vue {
     { text: "Montant", value: "montant", align: "end" },
     { text: "Escompte", value: "escompte", align: "end" },
     { text: "Devise", value: "devise" },
-    { text: "Status", value: "statutDisplay" }
+    { text: "Status", value: "statusLibelle" }
   ];
   private search: string = "";
   private piecesComptables: EntetePieceComptable[] = [];
@@ -212,7 +212,7 @@ export default class extends Vue {
       .open(entete, this.periodeData, this.journalSearched)
       .then(resp => {
         if(resp.action == "UPDATE"){
-          Vue.set(this.periodeSearched, this.piecesComptables.findIndex(e => e == entete), resp.data);
+          Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp.data);
           this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, "success");
         }else if(resp.action == "DELETE"){
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);

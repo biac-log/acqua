@@ -185,7 +185,6 @@
                     label="Pièce acquitée"
                     v-model="pieceAcquittee"
                     :readonly="piecereadonly"
-                    tabindex="-1"
                   ></v-checkbox>
                 </v-col>
                 <v-col cols="4">
