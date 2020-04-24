@@ -15,9 +15,11 @@
         :prepend-icon="isReadonly ? '' : 'mdi-calendar'"
         :filled="isReadonly"
         :readonly="isReadonly"
+        :rules="dateRules"
         @click:prepend="menuDate = true"
         @blur="dateSelected = parseDate(dateFormatted)"
-        hide-details
+        :hide-details="isReadonly"
+        validate-on-blur
       ></v-text-field>
     </template>
     <v-date-picker
@@ -31,6 +33,7 @@
 <script lang="ts">
 import { Component, Vue, PropSync, Prop, Watch } from "vue-property-decorator";
 import moment from "moment";
+import { DateTime } from "../models/DateTime";
 
 @Component({
   name: "DatePicker"
@@ -44,28 +47,40 @@ export default class extends Vue {
   readonly label: string | undefined;
   @PropSync("readonly")
   private isReadonly!: boolean;
-  @PropSync("date", { type: Date })
-  public syncedDate!: Date;
+  @PropSync("date")
+  public syncedDate!: DateTime;
+  @PropSync("rules")
+  public dateRules!: any;
 
-  private parseDate(date: string) {
-    if (!date) return null;
-    const [day, month, year] = date.replace(/\-/g, "/").split("/");
-    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  private parseDate(date: string): string {
+    if (!date) return "";
+    else {
+      let dateClean = date.replace(/\-/g, "/");
+      if (moment(dateClean, "DD/MM/YYYY").isValid())
+        return moment(date, "DD/MM/YYYY").format("YYYY-MM-DD");
+      else if (moment(dateClean, "DDMMYYYY").isValid())
+        return moment(date, "DDMMYYYY").format("YYYY-MM-DD");
+      else return "";
+    }
   }
 
   @Watch("dateSelected")
   private dateSelectedChanged(val: string, oldVal: string) {
-    const [year, month, day] = val.split("-");
-    this.dateFormatted = `${day}/${month}/${year}`;
-    const dateToSync = val ? new Date(val) : new Date();
-    if(dateToSync.getTime() != this.syncedDate.getTime())
-      this.syncedDate = val ? new Date(val) : new Date();
+    if (val) {
+      this.dateFormatted = moment(val, "YYYY-MM-DD").format("DD/MM/YYYY");
+      this.syncedDate = new DateTime(this.dateFormatted);
+    } else {
+      this.dateFormatted = "";
+      this.syncedDate = new DateTime();
+    }
   }
 
   @Watch("syncedDate")
-  private syncedDateChanged(val: Date, oldVal: Date) {
-    if (moment(val).format("YYYY-MM-DD") != this.dateSelected)
-      this.dateSelected = moment(val).format("YYYY-MM-DD");
+  private syncedDateChanged(val: DateTime, oldVal: DateTime) {
+    let currentDate = new DateTime(this.dateFormatted);
+    if (!val.isValid()) 
+      this.dateSelected = ""
+    else if (!val.isSame(currentDate)) this.dateSelected = val.toUtc();
   }
 }
 </script>

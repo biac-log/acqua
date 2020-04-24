@@ -4,8 +4,10 @@ import router from "./router/router";
 import store from "./store/index";
 import "./registerServiceWorker";
 import vuetify from "./plugins/vuetify";
-import moment from 'moment'
 import * as filters from '@/utils/FiltersMethods'
+import * as moment from 'moment';
+import 'moment/locale/fr';
+moment.locale('fr')
 
 Vue.config.productionTip = false;
 Vue.config.keyCodes.f2 = 113;

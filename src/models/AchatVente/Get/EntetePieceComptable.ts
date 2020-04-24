@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { DateTime } from '@/models/DateTime';
 
 export interface IEntetePieceComptable {
   codeJournal: number;
@@ -40,17 +41,23 @@ export class EntetePieceComptable extends EntetePieceComptableDTO {
     return `${this.codeJournal}.${this.codePiece}`;
   }
 
-  get datePieceDate(): Date{
-    return moment(this.datePiece).toDate();
+  private _datePieceDate?: DateTime;
+  get datePieceDate(): DateTime{
+    if(!this._datePieceDate) this._datePieceDate = new DateTime(this.datePiece);
+    return this._datePieceDate;
   }
-  set datePieceDate(date: Date){
-    this.datePiece = date.toISOString();
+  set datePieceDate(date: DateTime){
+    this._datePieceDate = date;
+    this.datePiece = date.toUtc();
   }
 
-  get dateEcheanceDate(): Date{
-    return moment(this.dateEcheance).toDate();
+  private _dateEcheanceDate?: DateTime;
+  get dateEcheanceDate(): DateTime{
+    if(!this._dateEcheanceDate) this._dateEcheanceDate = new DateTime(this.dateEcheance);
+    return this._dateEcheanceDate;
   }
-  set dateEcheanceDate(date: Date){
-    this.dateEcheance = date.toISOString();
+  set dateEcheanceDate(date: DateTime){
+    this._datePieceDate = date;
+    this.dateEcheance = date.toUtc();
   }
 }

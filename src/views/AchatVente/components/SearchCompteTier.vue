@@ -21,7 +21,6 @@
         height="530"
         dense
         fixed-header
-        show-select
         :footer-props="{
           'items-per-page-options': [30,50,100]
         }"

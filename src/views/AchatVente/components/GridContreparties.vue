@@ -31,7 +31,7 @@
       </v-data-table>
     </v-card>
     <span :class="ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
-      <span >Montant à ventille : <b>{{ ventilleDevise }} {{ devise.libelle }}</b></span>
+      <span >Montant à ventille : <b>{{ ventilleDevise }} {{ devise ? devise.libelle : "EUR" }}</b></span>
       <span v-if="devise.id != 1">/ <b>{{ ventilleBase }} EUR</b></span>
     </span>
   </v-container>
@@ -93,7 +93,7 @@ export default class extends Vue {
         resp.numeroLigne = maxLigne + 1;
         this.contreparties.push(resp);
       }).finally(() => {
-        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
       });
   }
 
@@ -110,7 +110,7 @@ export default class extends Vue {
         else this.contreparties.splice(this.contreparties.indexOf(piece), 1);
       }).finally(() => {
         this.refreshMontantAVentille();
-        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
       });
   }
 
@@ -153,6 +153,9 @@ export default class extends Vue {
   }
 
   private getVentileBase(contrepartieToIgnore?: PieceComptableContrepartie): number{
+    if(!this.contreparties || ! this.journal)
+      return 0;
+
     let ventileCompta : number = +this.montantBase;
     if(this.journal.codeMouvement == "CR")
       ventileCompta = ventileCompta * -1;
@@ -164,33 +167,41 @@ export default class extends Vue {
   }
 
   private getVentileDevise(contrepartieToIgnore?: PieceComptableContrepartie): number{
-      let ventileDevise : number = +this.montantBase;
-      if(this.journal.codeMouvement == "CR")
-        ventileDevise = ventileDevise * -1;
+    if(!this.devise || !this.journal || !this.contreparties)
+      return 0;
 
-      let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => +c.montantCredit).reduce((a,b) => a + b, 0);
-      let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => +c.montantDebit).reduce((a,b) => a + b, 0);
-      ventileDevise = ventileDevise + debit - credit;
-      return +ventileDevise.toFixed(this.devise.typeDevise == "E" ? 0 : 2);
+    let ventileDevise : number = +this.montantBase;
+    if(this.journal.codeMouvement == "CR")
+      ventileDevise = ventileDevise * -1;
+    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => +c.montantCredit).reduce((a,b) => a + b, 0);
+    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => +c.montantDebit).reduce((a,b) => a + b, 0);
+    ventileDevise = ventileDevise + debit - credit;
+    return +ventileDevise.toFixed(this.devise.typeDevise == "E" ? 0 : 2);
   }
 
   private getTvaCalcule(contrepartieToIgnore?: PieceComptableContrepartie): number {
-      let montantsCaseTva : {case: number, caseTaux:number, montant: number}[] = [];
-      this.contreparties.filter(c => c !== contrepartieToIgnore).forEach(element => {
-        let montantCase =  montantsCaseTva.find(c => c.case == element.caseTva.numeroCase);
-        if(montantCase)
-          montantCase.montant += +element.montantCredit - +element.montantDebit;
-        else if(element.caseTva.typeCase > 0 && element.caseTva.typeCase < 4 ){
-          montantsCaseTva.push({case: element.caseTva.numeroCase, 
-          caseTaux: element.caseTva.tauxTvaCase,
-          montant: +element.montantCredit - +element.montantDebit});
-        }
-      });
-      
-      return +montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b, 0).toFixed(this.devise.typeDevise == "E" ? 0 : 2);
+    if(!this.contreparties)
+      return 0;
+
+    let montantsCaseTva : {case: number, caseTaux:number, montant: number}[] = [];
+    this.contreparties.filter(c => c !== contrepartieToIgnore).forEach(element => {
+      let montantCase =  montantsCaseTva.find(c => c.case == element.caseTva.numeroCase);
+      if(montantCase)
+        montantCase.montant += +element.montantCredit - +element.montantDebit;
+      else if(element.caseTva.typeCase > 0 && element.caseTva.typeCase < 4 ){
+        montantsCaseTva.push({case: element.caseTva.numeroCase, 
+        caseTaux: element.caseTva.tauxTvaCase,
+        montant: +element.montantCredit - +element.montantDebit});
+      }
+    });
+    
+    return +montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b, 0).toFixed(this.devise.typeDevise == "E" ? 0 : 2);
   }
 
   private getTvaImpute(contrepartieToIgnore?: PieceComptableContrepartie): number {
+    if(!this.contreparties)
+      return 0;
+
     return this.contreparties.filter(c => (c.caseTva.typeCase == 50 || c.caseTva.typeCase == 51) && c.codeDevise == this.devise.id && c !== contrepartieToIgnore)
       .map(c => +c.montantCredit - +c.montantDebit)
       .reduce((a,b) => a + b, 0);

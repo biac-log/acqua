@@ -19,6 +19,8 @@ import {
 } from "@/models/AchatVente";
 import CompteGenerealSearch from '@/models/Compte/CompteGeneralSearch';
 import { PieceComptableSaveDTO } from '@/models/AchatVente';
+import * as DateMethods from '@/utils/DateMethods'
+import { DateTime } from '@/models/DateTime';
 
 export abstract class AchatVenteApi {
   private static achatVenteAxios = Axios.create();
@@ -36,12 +38,12 @@ export abstract class AchatVenteApi {
   static async getDateEcheance(
     typeCompte: string,
     numeroCompte: number | string,
-    date: Date
-  ): Promise<Date> {
-    let response = await this.achatVenteAxios.get(
-      `${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDateEcheance?typeCompte=${typeCompte}&numeroCompte=${numeroCompte}&datePiece=${date.toUTCString()}`
+    date: DateTime
+  ): Promise<DateTime> {
+    let response = await this.achatVenteAxios.get<string>(
+      `${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDateEcheance?typeCompte=${typeCompte}&numeroCompte=${numeroCompte}&datePiece=${date.toUtc()}`
     );
-    return moment(response.data).toDate();;
+    return new DateTime(response.data);
   }
 
   static async getPieceComptable(
@@ -93,8 +95,8 @@ export abstract class AchatVenteApi {
     return new CaseTva(response.data);
   }
 
-  static async getTaux(devise: number, datePiece: Date): Promise<number> {
-    let response = await this.achatVenteAxios.get<number>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetTaux?devise=${devise}&datePiece=${datePiece.toUTCString()}`);
+  static async getTaux(devise: number, datePiece: DateTime): Promise<number> {
+    let response = await this.achatVenteAxios.get<number>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetTaux?devise=${devise}&datePiece=${datePiece.toUtc()}`);
     return response.data;
   }
 
@@ -125,6 +127,11 @@ export abstract class AchatVenteApi {
 
   static async DeletePiece(periode: string, journal: number, piece: number): Promise<any> {
     let response = await this.achatVenteAxios.delete<any>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/DeletePieceComptable?periode=${periode}&journal=${journal}&piece=${piece}`);
+    return response.data;
+  }
+
+  static async ValidateLibelle(libelle: string, typeComte: string, numeroCompte: string | number): Promise<boolean>{
+    let response = await this.achatVenteAxios.get<boolean>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/IsReferenceExiste?typeCompte=${typeComte}&numeroCompte=${numeroCompte}&reference=${libelle}`);
     return response.data;
   }
 }

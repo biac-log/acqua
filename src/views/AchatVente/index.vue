@@ -79,10 +79,10 @@
         sort-desc
       >
         <template v-slot:item.datePieceDate="{ item }">
-          <span>{{ item.datePieceDate | dateToString }}</span>
+          <span>{{ item.datePieceDate.toString() }}</span>
         </template>
         <template v-slot:item.dateEcheanceDate="{ item }">
-          <span>{{ item.dateEcheanceDate | dateToString }}</span>
+          <span>{{ item.dateEcheanceDate.toString() }}</span>
         </template>
         <template v-slot:item.montant="{ item }">
           <span>{{ item.montant | numberToString }}</span>
@@ -122,6 +122,7 @@ export default class extends Vue {
   private isErrorPeriode: boolean = false;
   private periodeIsLoading: boolean = false;
   private libellePeriode: string = "";
+  
   private periodes: string[] = ["Période courante", "Période précédente"];
   private periodeSelected: string = "";
   private periodesRules: any = [
@@ -208,10 +209,10 @@ export default class extends Vue {
 
   private OpenPieceComptable(entete: EntetePieceComptable) {
     (this.$refs.refDialogPiece as AchatVentePieceVue)
-      .open(entete, this.periodeSearched, this.journalSearched)
+      .open(entete, this.periodeData, this.journalSearched)
       .then(resp => {
         if(resp.action == "UPDATE"){
-          Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp.data);
+          Vue.set(this.periodeSearched, this.piecesComptables.findIndex(e => e == entete), resp.data);
           this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, "success");
         }else if(resp.action == "DELETE"){
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
@@ -225,7 +226,7 @@ export default class extends Vue {
 
   private openNewPieceComptable() {
     (this.$refs.refDialogPiece as AchatVentePieceVue)
-      .openNew(this.periodeSearched, this.journalSelected)
+      .openNew(this.periodeData, this.journalSelected)
       .then((resp) => {
         this.displayAddResult(resp.data.codePieceDisplay);
         this.piecesComptables.unshift(resp.data);

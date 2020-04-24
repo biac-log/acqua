@@ -4,8 +4,8 @@ export interface IPieceComptableSave {
   periode: string;
   numeroJournal: number;
   numeroPiece: number;
-  datePiece: Date;
-  dateEcheance: Date;
+  datePiece: string;
+  dateEcheance: string;
   montantDevise: number;
   montantBase: number;
   codeDevise: number;
@@ -26,8 +26,8 @@ export class PieceComptableSaveDTO implements IPieceComptableSave {
   public periode: string = "";
   public numeroJournal: number = 0;
   public numeroPiece: number = 0;
-  public datePiece: Date = new Date();
-  public dateEcheance: Date = new Date();
+  public datePiece: string = "";
+  public dateEcheance: string = "";
   public montantDevise: number = 0;
   public montantBase: number = 0;
   public codeDevise: number = 0;

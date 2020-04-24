@@ -52,8 +52,8 @@
                 <v-col cols="4">
                   <v-text-field
                     label="Numéro compte tiers"
-                    ref="numeroCompte"
-                    v-model="numeroCompte"
+                    ref="numeroCompteTier"
+                    v-model="numeroCompteTier"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
                     :append-icon="piecereadonly ? '' : 'mdi-magnify'"
@@ -62,6 +62,7 @@
                     @keyup.enter="$event.target.select()"
                     @click:append="OpenSearchCompte()"
                     @focus="$event.target.select()"
+                    validate-on-blur
                     @blur="loadCompte"
                     :hide-details="piecereadonly"
                     autofocus
@@ -73,8 +74,9 @@
                     label="Nom compte tiers"
                     :value="compteTiersNom"
                     :filled="piecereadonly"
+                    :hide-details="piecereadonly"
+                    tabindex="-1"
                     readonly
-                    hide-details
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -85,12 +87,21 @@
                     ref="libellePiece"
                     counter
                     maxlength="23"
+                    v-model="libelle"
                     :value="libellePiece"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
                     :hide-details="piecereadonly"
-                    v-model="libelle"
-                  ></v-text-field>
+                    :color="libelleWarningMessage ? 'orange' : 'primary'"
+                    :messages="libelleWarningMessage"
+                    :rules="libelleRules"
+                    validate-on-blur
+                    @blur="validateLibelle"
+                  >
+                    <template slot="message">
+                      <span class="warningMessage"> {{ libelleWarningMessage }}</span>
+                    </template>
+                  </v-text-field>
                 </v-col>
               </v-row>
               <v-row dense>
@@ -100,38 +111,40 @@
                     v-model="deviseSelected"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
+                    :hide-details="piecereadonly"
                     return-object
                     item-text="libelle"
                     label="Devise pièce"
-                    hide-details
                   ></v-select>
                 </v-col>
                 <v-col cols="4">
                   <v-text-field
                     label="Montant"
-                    v-model="montant"
+                    v-model="montantDevise"
+                    :rules="numberRules"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
-                    hide-details
+                    :hide-details="piecereadonly"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="4">
                   <v-text-field
                     label="Montant Escompte"
                     v-model="montantEscompte"
+                    :rules="numberRules"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
-                    hide-details
+                    :hide-details="piecereadonly"
                   ></v-text-field>
                 </v-col>
-
                 <v-col cols="2">
                   <v-text-field
                     label="Taux"
+                    readonly
                     v-model="taux"
                     :filled="piecereadonly"
-                    readonly
-                    hide-details
+                    :hide-details="piecereadonly"
+                    tabindex="-1"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -141,6 +154,7 @@
                     label="Date pièce"
                     :date.sync="datePiece"
                     :readonly.sync="piecereadonly"
+                    :rules.sync="datePieceRules"
                   ></DatePicker>
                 </v-col>
                 <v-col cols="4">
@@ -148,18 +162,20 @@
                     label="Date échéance"
                     :date.sync="dateEcheance"
                     :readonly.sync="piecereadonly"
+                    :rules.sync="dateEcheanceRules"
                   ></DatePicker>
                 </v-col>
                 <v-col cols="4">
                   <v-select
-                    :items="statuts"
                     v-model="statutSelected"
+                    :items="statuts"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
+                    return-object
                     item-value="id"
                     item-text="libelle"
                     label="Statut"
-                    hide-details
+                    hide-details="auto"
                   ></v-select>
                 </v-col>
               </v-row>
@@ -258,7 +274,7 @@
                 :Journal.sync="journal"
                 :DeviseEntete.sync="deviseSelected"
                 :CompteAchatVente.sync="numeroCompteAchatVente"
-                :MontantDevise.sync="montant"
+                :MontantDevise.sync="montantDevise"
                 :MontantBase.sync="montantBase"
                 :TauxDevise.sync="taux"
                 :CodeTaxe.sync="codeTaxe"
@@ -269,12 +285,13 @@
           </v-row>
         </v-card-text>
         <v-divider v-if="!piecereadonly"></v-divider>
-        <v-card-actions v-if="!piecereadonly">
+        <v-card-actions v-if="!piecereadonly" class="d-flex">
           <v-btn
             color="error"
-            class="ma-2 pr-4"
+            class="ma-2 pr-4 align-self-start"
             text
             tabindex="-1"
+            v-if="numeroPiece"
             @click="DeletePiece()"
             :loading="deleteIsLoading"
             >
@@ -282,15 +299,38 @@
           >
           <v-spacer></v-spacer>
           <v-btn
+            color="warning"
+            class="ma-2 mt-0 pr-4 align-self-start"
+            text
+            tabindex="-1"
+            v-if="!numeroPiece && !forcerNumero"
+            @click="forcerNumero = true"
+            >
+            Forcer le numéro de pièce</v-btn
+          >
+          <v-text-field 
+            label="Numéro pièce"
+            v-model="numeroToForce"
+            v-if="forcerNumero"
+            append-icon="mdi-close"
+            @click:append="forcerNumero = false"
+            :rules="numeroToForceRules"
+            hide-details="auto"
+            autofocus
+            dense
+            outlined
+            class="shrink align-self-start"
+          ></v-text-field>
+          <v-btn
             color="blue darken-1"
-            class="ma-2 pr-4"
+            class="ma-2 mt-0 pr-4 align-self-start"
             tile outlined
             @click="cancelEdit()"
             tabindex="-1"
             >
             <v-icon left>mdi-close</v-icon> Annuler</v-btn
           >
-          <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" :loading="saveLoading"  @click="savePiece()">
+          <v-btn ref="btnValidate" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()">
             <v-icon left>mdi-content-save</v-icon>Sauvegarder
           </v-btn>
         </v-card-actions>
@@ -330,6 +370,8 @@ import GridContrepartiesVue from './GridContreparties.vue';
 import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
 import CompteGenerealSearch from '../../../models/Compte/CompteGeneralSearch';
 import { displayAxiosError } from '@/utils/ErrorMethods';
+import * as DateMethods from '@/utils/DateMethods'
+import { DateTime } from '../../../models/DateTime';
 
 
 @Component({
@@ -348,22 +390,42 @@ export default class extends Vue {
   private numeroPiece: string = "";
 
   //Encodage
-  private numeroCompte: string = "";
+  private numeroCompteTier: string = "";
+  private numeroCompteTierRules: any = [(v: string) => !!v || "Numéro obligatoire",(v: string) => !!+v || "Numéro invalide"];
   private libelle: string = "";
-  private montant: string = "";
+  private libelleRules: any = [(v: string) => !!v || "Libellé obligatoire"];
+  private libelleWarningMessage: string = "";
+  private montantDevise: string = "";
   private montantEscompte: string = "0";
+  private numberRules: any = [(v: string) => (!v || !!+v || +v == 0)  || "Montant invalide"];
   private devises: Devise[] = [];
   private deviseSelected: Devise = new Devise();
   private statuts: Statut[] = [];
   private statutSelected: Statut = new Statut();
-  private datePiece: Date = new Date();
-  private dateEcheance: Date = new Date();
+  private datePiece: DateTime = new DateTime();
+  private datePieceRules: any = [(v: string) => !!v || "Date obligatoire",
+                                 (v: string) => DateTime.isValid(v) || "Date invalide",
+                                 (v: string) => this.validateDatePiece(v) || "La date est hors période"]
+
+  private dateEcheance: DateTime = new DateTime();
+  private dateEcheanceRules: any =[(v: string) => !!v || "Date obligatoire",
+                                   (v: string) => DateTime.isValid(v) || "Date invalide",
+                                   (v: string) => this.validateDateEcheance(v)]
+
+  private validateDatePiece(date: string) : boolean { 
+    let dateTime = new DateTime(date);
+    return dateTime.isBetween(this.periode.dateDebut, this.periode.dateFin);
+  }
+
+  private validateDateEcheance(date: string) : string | boolean {
+    let dateTime = new DateTime(date);
+    if(dateTime.isBefore(this.datePiece))
+      return "La date doit être supérieur ou égale à la date piece"
+    else return true;
+  }
 
   public typeCompte: string = "";
   private isEdit: boolean = false;
-
-  private numeroCompteTier: string = "";
-  private numeroCompteTierRules: any = [(v: string) => !!v || "Numéro obligatoire",(v: string) => !!+v || "Numéro invalide"];
 
   public dialog: boolean = false;
   public searchCompteTiersDialog: boolean = false;
@@ -388,11 +450,24 @@ export default class extends Vue {
   private resolve!: any;
   private reject!: any;
 
+  private forcerNumero: boolean = true;
+  private numeroToForce: string = "";
+  private numeroToForceRules: any = [(v: string) =>  !!v || "Numéro obligatoire", 
+                                     (v: string) => !!+v || "Numéro invalide"];
+
   public async openNew(periode: PeriodeComptable, journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
     this.dialog= true;
     this.piecereadonly = false;
     await this.loadDataForEdit();
     this.init(periode, journal);
+
+    let today = DateTime.today();
+    if(today.isBefore(this.periode.dateDebut))
+      this.datePiece = this.periode.dateDebut;
+    else if(today.isAfter(this.periode.dateFin)) 
+      this.datePiece = this.periode.dateFin;
+    else this.datePiece = today;
+
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -403,7 +478,7 @@ export default class extends Vue {
     periode: PeriodeComptable,
     journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
     this.dialog=true;
-    this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
+    this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
     this.piecereadonly=true;
     this.init(periode, journal, entete);
 
@@ -421,7 +496,7 @@ export default class extends Vue {
     this.typeCompte = journal.typeCompteChar;
     if(entete){
       this.numeroPiece = entete.codePiece ? entete.codePiece.toString() : "";
-      this.GetData();
+      this.GetPiece();
     }
   }
   
@@ -432,18 +507,21 @@ export default class extends Vue {
 
    private resetForm(){
     this.errorMessage = "";
+    this.libelleWarningMessage = "";
+    this.forcerNumero = false;
+    this.numeroToForce = "";
 
     this.periodeDisplay = "";
     this.journal = new Journal();
     this.numeroPiece= "";
-    this.numeroCompte= "";
+    this.numeroCompteTier= "";
     this.libelle= "";
-    this.montant= "";
+    this.montantDevise= "";
     this.montantEscompte= "";
     this.deviseSelected = this.devises[0];
     this.statutSelected = this.statuts[0];
-    this.datePiece = new Date();
-    this.dateEcheance = new Date();
+    this.datePiece = new DateTime();
+    this.dateEcheance = new DateTime();
     this.typeCompte= "";
     this.numeroCompteTier= "";
       
@@ -466,26 +544,26 @@ export default class extends Vue {
     this.hash = "";
   }
 
-  private GetData() {
+  private async GetPiece() {
     this.errorMessage = "";
-    AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece)
-      .then(pieceComptable => {
-        this.SetDisplayData(pieceComptable);
-      })
-      .catch(err => {
-        this.errorMessage = displayAxiosError(err);
-      });
+    try {
+      let pieceComptable = await AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece);
+      this.SetPiece(pieceComptable);
+    } catch(err) {
+      this.errorMessage = displayAxiosError(err);
+    }
   }
 
-  private SetDisplayData(pieceComptable: PieceComptable) {
+  private SetPiece(pieceComptable: PieceComptable) {
     this.contreparties = pieceComptable.contreparties;
 
-    this.numeroCompte = pieceComptable.compteTiersNumero.toString();
+    this.numeroCompteTier = pieceComptable.compteTiersNumero.toString();
     this.libelle = pieceComptable.libelle;
-    this.datePiece = pieceComptable.datePieceDate;
-    this.dateEcheance = pieceComptable.dateEcheanceDate;
 
-    this.montant = pieceComptable.montantDevise.toString();
+    this.datePiece = new DateTime(pieceComptable.datePiece);
+    this.dateEcheance = new DateTime(pieceComptable.dateEcheance);
+
+    this.montantDevise = pieceComptable.montantDevise.toString();
     this.montantBase = pieceComptable.montantBase.toString();
     this.montantEscompte = pieceComptable.montantEscompteDevise.toString();
     this.compteTiersNom = pieceComptable.compteTiersNom;
@@ -508,14 +586,17 @@ export default class extends Vue {
 
   private compteLoading: boolean = false;
   private loadCompte() {
+    if(this.piecereadonly) return;
+
+
     this.compteLoading = true;
-    if(+this.numeroCompte){
-      CompteApi.getCompteDeTier(this.typeCompte, this.numeroCompte.toString())
+    if(+this.numeroCompteTier){
+      CompteApi.getCompteDeTier(this.typeCompte, this.numeroCompteTier.toString())
       .then(compte => {
         this.setCompteDeTier(compte);
       }).catch((err) => {
         this.setCompteDeTier()
-        this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
+        this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
       })
       .finally(() => {
         this.compteLoading = false;
@@ -524,18 +605,20 @@ export default class extends Vue {
   }
 
   private OpenSearchCompte(): void {
+    if(this.piecereadonly) return;
+
     (this.$refs.compteDialog as SearchCompteTier)
       .open(this.typeCompte)
       .then(compte => {
-        this.numeroCompte = compte.numero.toString();
+        this.numeroCompteTier = compte.numero.toString();
         this.loadCompte();
-        this.$nextTick(() => (this.$refs.libellePiece as any).focus());
+        this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
       }).catch(() => {
-        this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
+        this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
       });
   }
   private async setCompteDeTier(compte?: CompteDeTier) {
-    this.numeroCompte = compte ? compte.numero.toString() : "";
+    this.numeroCompteTier = compte ? compte.numero.toString() : "";
     this.compteTiersNom = compte ?  compte.nom : "";
     this.deviseSelected = compte ? this.getDeviseToSelect(new Devise({id: compte.codeDevise, libelle: compte.libelleDevise, typeDevise: "D"})) : this.devises[0];
     this.libelleSoldeCompteTiers = compte ? compte.libelleSoldeCompteTiers: "";
@@ -546,12 +629,13 @@ export default class extends Vue {
     this.libelleCompteVenteAchat = compte ? compte.libelleCompteVenteAchat : "";
     this.delaiPaiementLibelle = compte ? compte.delaiPaiementLibelle : "";
     this.codeTaxe = compte ? compte.codeTaxe : 0;
+    this.initDateEcheance(this.numeroCompteTier, this.typeCompte, this.datePiece);
   }
 
   private async ModifierPiece() {
     await this.loadDataForEdit();
     this.piecereadonly = false;
-    this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
+    this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
   }
 
   private async loadDevises() {
@@ -584,36 +668,42 @@ export default class extends Vue {
   }
 
   @Watch("datePiece")
-  private datePieceChanged(val: Date, oldVal: Date) {
-    if (!this.piecereadonly && val.getTime() != oldVal.getTime()) {
-      if(this.numeroCompte && this.typeCompte){
-        AchatVenteApi.getDateEcheance(
-          this.typeCompte,
-          this.numeroCompte,
-          val
-        ).then(dateEcheance => {
-          this.dateEcheance = dateEcheance;
-        }).catch((err) => {
-          if(err.response.data.Message)
-            this.errorMessage = err.response.data.Message;
-          else
-            this.errorMessage = `Une erreur s'est produite lors de la récupération de la date échéance, veuillez contacter un administrateur, ${err.response.status} ${err.response.statusText}"`;
-        });
-      }
-
-      if(!this.deviseSelected || this.deviseSelected.id == 1)
-        this.taux = "1";
-      else {
-        AchatVenteApi.getTaux(this.deviseSelected.id, this.datePiece)
-        .then((resp) => {
-          this.taux = resp.toFixed(2);
-        });
-      }
+  private datePieceChanged(val: DateTime, oldVal: DateTime) {
+    if (!this.piecereadonly) {
+      this.initDateEcheance(this.numeroCompteTier, this.typeCompte, val);
+      this.initTauxDevise(this.deviseSelected.id, val);
     }
   }
 
-  @Watch("montant")
-  private montantChanged(val: string, oldVal: string){
+  private initDateEcheance(numeroCompteTier: string, typeComptetier: string, datePiece : DateTime){
+    if(this.numeroCompteTier && this.typeCompte && datePiece.isValid()){
+      AchatVenteApi.getDateEcheance(
+        typeComptetier,
+        numeroCompteTier,
+        datePiece
+      ).then(dateEcheance => {
+        this.dateEcheance = dateEcheance;
+      }).catch((err) => {
+        this.errorMessage = displayAxiosError(err);
+      });
+    }
+  }
+
+  private initTauxDevise(numeroDevise: number, datePiece: DateTime){
+    if(!numeroDevise || numeroDevise == 1)
+      this.taux = "1";
+    else {
+      AchatVenteApi.getTaux(numeroDevise, datePiece)
+      .then((resp) => {
+        this.taux = resp.toFixed(2);
+      }).catch((err) => {
+        this.errorMessage = displayAxiosError(err);
+      });
+    }
+  }
+
+  @Watch("montantDevise")
+  private montantDeviseChanged(val: string, oldVal: string){
     if(!this.piecereadonly)
       this.recalculmontantBase();
   }
@@ -625,18 +715,17 @@ export default class extends Vue {
       .then((resp) => {
         this.taux = resp.toFixed(2);
       }).catch((err) => {
-        if(err.response.data.Message)
-          this.errorMessage = err.response.data.Message;
-        else
-          this.errorMessage = `Une erreur s'est produite lors de la récupération du taux, veuillez contacter un administrateur, ${err.response.status} ${err.response.statusText}"`;
+        this.errorMessage = displayAxiosError(err);
       });
     }
   }
 
   private recalculmontantBase(){
-    if(+this.taux && +this.montant){
-      this.montantBase = (Number.parseFloat(this.montant) * Number.parseFloat(this.taux)).toFixed(2);
-      this.libelleMontantBase = `${this.montantBase} ${this.deviseSelected.libelle}`;
+    if(this.piecereadonly) return;
+
+    if(+this.taux && +this.montantDevise){
+      this.montantBase = (Number.parseFloat(this.montantDevise) * Number.parseFloat(this.taux)).toFixed(2);
+      this.libelleMontantBase = `${this.montantBase} ${this.deviseSelected?.libelle}`;
     }
     else{
       this.montantBase = "";
@@ -649,13 +738,18 @@ export default class extends Vue {
   }
 
   private saveLoading: boolean = false;
-  @Emit("saveAction")
+
   private savePiece() {
-    let pieceToSave = this.GetModelToSave();
-    if(pieceToSave.numeroPiece == 0)
-      this.addPiece(pieceToSave);
-    else 
-      this.updatePiece(pieceToSave);
+    (this.$refs.form as any).validate();
+    this.$nextTick(() => {
+      if (this.isValid) {
+        let pieceToSave = this.GetModelToSave();
+        if(pieceToSave.numeroPiece == 0)
+          this.addPiece(pieceToSave);
+        else 
+          this.updatePiece(pieceToSave);
+      }
+    })
   }
     
 
@@ -667,10 +761,7 @@ export default class extends Vue {
       this.resolve({ action: "ADD", data: this.GetModelForGrid()});
       this.dialog = false;
     }).catch((err) => {
-      if(err.response.data.Message)
-        this.errorMessage = err.response.data.Message;
-      else
-        this.errorMessage = `Une erreur s'est produite lors de la sauvegarde, veuillez contacter un administrateur, ${err.response.status} ${err.response.statusText}"`;
+      this.errorMessage = displayAxiosError(err);
     }).finally(()=> {
       this.saveLoading = false;
     });
@@ -685,10 +776,7 @@ export default class extends Vue {
       this.piecereadonly = true;
       this.dialog = false;
     }).catch((err) => {
-      if(err.response.data.Message)
-        this.errorMessage = err.response.data.Message;
-      else
-        this.errorMessage = `Une erreur s'est produite lors de la sauvegarde, veuillez contacter un administrateur, ${err.response.status} ${err.response.statusText}"`;
+        this.errorMessage = displayAxiosError(err);
     }).finally(()=> {
       this.saveLoading = false;
     });
@@ -721,17 +809,21 @@ export default class extends Vue {
 
   private GetModelToSave(): PieceComptableSaveDTO {
     let pieceComptaSave: PieceComptableSaveDTO = new PieceComptableSaveDTO();
+    if(this.forcerNumero && this.numeroToForce)
+      pieceComptaSave.numeroPiece = +this.numeroPiece;
+
     pieceComptaSave.periode = this.periode.typePeriodeComptable;
     pieceComptaSave.numeroJournal = this.journal.numero;
     pieceComptaSave.numeroPiece = +this.numeroPiece;
-    pieceComptaSave.dateEcheance = this.dateEcheance;
-    pieceComptaSave.datePiece = this.datePiece;
+    pieceComptaSave.datePiece = this.datePiece.toUtc();
+    pieceComptaSave.dateEcheance = this.dateEcheance.toUtc();
     pieceComptaSave.montantBase = +this.montantBase;
-    pieceComptaSave.montantDevise = +this.montant;
+    pieceComptaSave.montantDevise = +this.montantDevise;
     pieceComptaSave.codeDevise = this.deviseSelected.id;
     pieceComptaSave.libelle = this.libelle;
     pieceComptaSave.typeCompte = this.typeCompte;
-    pieceComptaSave.numeroCompte = +this.numeroCompte;
+    pieceComptaSave.numeroCompte = +this.numeroCompteTier;
+    pieceComptaSave.numeroCompteAssocie = +this.numeroCompteAchatVente;
     pieceComptaSave.montantEscompteBase = +this.montantEscompte * +this.taux
     pieceComptaSave.montantEscompteDevise = +this.montantEscompte;
     pieceComptaSave.codeBlocage = this.statutSelected.id;
@@ -765,12 +857,22 @@ export default class extends Vue {
     entete.dateEcheanceDate = this.dateEcheance;
     entete.status = this.statutSelected.id;
     entete.statusLibelle = this.statutSelected.libelle;
-    entete.montant = +this.montant;
-    entete.numeroCompte = +this.numeroCompte;
+    entete.montant = +this.montantDevise;
+    entete.numeroCompte = +this.numeroCompteTier;
     entete.nomCompte = this.compteTiersNom;
     entete.devise = this.deviseSelected.libelle;
     return entete;
   }
+
+  private validateLibelle(){
+    if(!this.piecereadonly && this.libelle){
+      AchatVenteApi.ValidateLibelle(this.libelle,this.typeCompte,this.numeroCompteTier).then((isUsed) => {
+        if(isUsed) this.libelleWarningMessage = "Attention, ce libellé est déjà utilisé par une autre pièce";
+        else this.libelleWarningMessage = "";
+     });
+    } else this.libelleWarningMessage = "";
+  }
+
   private cancelEdit(){
     this.piecereadonly = true;
     if(+this.numeroPiece != 0){
@@ -788,5 +890,10 @@ export default class extends Vue {
 <style>
 .textMini {
   font-size: 12px;
+}
+
+.warningMessage{
+  color: #FB8C00;
+  font-weight: 500;
 }
 </style>

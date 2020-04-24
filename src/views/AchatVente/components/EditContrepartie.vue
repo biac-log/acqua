@@ -342,8 +342,7 @@ export default class extends Vue {
           new Devise({
             id: contrepartie.codeDevise,
             libelle: contrepartie.libelleDevise,
-            //TODO : METTRE CONTREPARTIE TYPE DEVISE
-            typeDevise: "D"
+            typeDevise: this.devisesSelected.typeDevise
           })
         );
         this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) || this.devises[0];
@@ -371,9 +370,9 @@ export default class extends Vue {
         .open(this.typesComptesSelected)
         .then(compte => {
           this.setCompte(compte);
-          this.$nextTick(() => (this.$refs.libelle as any).focus());
+          this.$nextTick(() => (this.$refs.libelle as any)?.focus());
         }).catch(() => {
-          this.$nextTick(() => (this.$refs.numeroCompte as any).focus());
+          this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
         });
     }
   }
@@ -413,11 +412,11 @@ export default class extends Vue {
       montantTaxable = this.ventileDevise - montantTaxable;
     else montantTaxable = montantTaxable - this.ventileDevise;
 
-    if(montantTaxable < 0) montantTaxable =0;
+    if(montantTaxable < 0) 
+      montantTaxable = 0;
     else if(this.caseTva.tauxTvaCase)
-    {
       montantTaxable = (montantTaxable / (1+ (this.caseTva.tauxTvaCase / 100)));
-    }
+      
     return montantTaxable;
   }
 
@@ -449,9 +448,9 @@ export default class extends Vue {
       .then(caseTva => {
         this.numeroCaseTva = caseTva.numeroCase.toString();
         this.caseTva = caseTva;
-        this.$nextTick(() => (this.$refs.btnValidate as any).$el.focus());
+        this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
       }).catch(() => {
-        this.$nextTick(() => (this.$refs.numeroCaseTva as any).focus())
+        this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus())
       });
   }
 

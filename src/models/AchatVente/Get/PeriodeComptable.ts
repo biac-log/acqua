@@ -1,14 +1,15 @@
 import moment from "moment";
+import { DateTime } from '@/models/DateTime';
 
 export interface IPeriodeComptable {
-  debut: Date;
-  fin: Date;
+  debut: string;
+  fin: string;
   typePeriodeComptable: string;
 }
 
 export class PeriodeComptableDTO implements IPeriodeComptable {
-  public debut: Date = new Date();
-  public fin: Date = new Date();
+  public debut: string = "";
+  public fin: string = "";
   public typePeriodeComptable: string = "";
 }
 
@@ -18,17 +19,27 @@ export class PeriodeComptable extends PeriodeComptableDTO {
     Object.assign(this, dto || new PeriodeComptableDTO());
   }
 
+  get dateDebut(): DateTime {
+    return new DateTime(this.debut);
+  }
+  set dateDebut(date: DateTime) {
+    this.debut = date.toUtc();
+  }
+
+  get dateFin(): DateTime {
+    return new DateTime(this.fin);
+  }
+  set dateFin(date: DateTime) {
+    this.fin = date.toUtc();
+  }
+
   get libellePeriode(): string {
-    return `Début ${moment(this.debut).format("DD/MM/YYYY")} - Fin ${moment(
-      this.fin
-    ).format("DD/MM/YYYY")}`;
+    return `Début ${this.dateDebut} - Fin ${this.dateFin}`;
   }
 
   get libellePeriodeFull(): string {
     let stPeriode = "Courante";
     if (this.typePeriodeComptable == "precedente") stPeriode = "Précédente";
-    return `${stPeriode} du ${moment(this.debut).format(
-      "DD/MM/YYYY"
-    )} au ${moment(this.fin).format("DD/MM/YYYY")}`;
+    return `${stPeriode} du ${this.dateDebut} au ${this.dateFin}`;
   }
 }
