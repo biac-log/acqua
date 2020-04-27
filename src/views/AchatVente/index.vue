@@ -229,7 +229,7 @@ export default class extends Vue {
     (this.$refs.refDialogPiece as AchatVentePieceVue)
       .openNew(this.periodeData, this.journalSelected)
       .then((resp) => {
-        this.displayAddResult(resp.data.codePieceDisplay);
+        this.displayAddResult(resp.data);
         this.piecesComptables.unshift(resp.data);
       })
       .finally(() => {
@@ -237,8 +237,8 @@ export default class extends Vue {
       });
   }
 
-  private displayAddResult(numeroPiece : string | number){
-    (this.$refs.PieceAddResultVue as PieceAddResultVue).open("",`Ajout réussi, le numéro de pièce créé est le <b class='bold'>${numeroPiece}</b>`, "success", "Ok").finally(() => {
+  private displayAddResult(piece : EntetePieceComptable){
+    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected).finally(() => {
       this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
     });
   }

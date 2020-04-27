@@ -327,8 +327,7 @@
             @click="cancelEdit()"
             tabindex="-1"
             >
-            <v-icon left>mdi-close</v-icon> Annuler</v-btn
-          >
+            <v-icon left>mdi-close</v-icon> Annuler</v-btn>
           <v-btn ref="btnValidate" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()">
             <v-icon left>mdi-content-save</v-icon>Sauvegarder
           </v-btn>
