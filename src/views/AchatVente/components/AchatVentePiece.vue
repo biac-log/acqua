@@ -466,7 +466,7 @@ export default class extends Vue {
     else if(today.isAfter(this.periode.dateFin)) 
       this.datePiece = this.periode.dateFin;
     else this.datePiece = today;
-
+    this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;

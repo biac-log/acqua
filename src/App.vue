@@ -15,4 +15,11 @@ export default class App extends Vue {}
 #nprogress .bar {
 	background-color: #FFB74D !important;
 }
+
+.v-btn:not(.v-btn--text):not(.v-btn--outlined):focus:before {
+    opacity: 0.30;
+    border: grey;
+    border-style: dotted;
+    border-width: 2px;
+}
 </style>

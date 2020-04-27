@@ -256,7 +256,7 @@ export default class extends Vue {
 }
 </script>
 
-<style>
+<style scopped>
 #btn-acqua {
   height: 56px;
 }
