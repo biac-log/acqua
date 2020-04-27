@@ -238,7 +238,12 @@ export default class extends Vue {
   }
 
   private displayAddResult(piece : EntetePieceComptable){
-    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected).finally(() => {
+    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected).then((numero) => {
+      if(piece.codePiece != numero){
+        piece.codePiece = numero;
+        Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);
+      }
+    }).finally(() => {
       this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
     });
   }

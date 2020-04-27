@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="420" @keypress.enter="sendResponse()">
+  <v-dialog v-model="dialog" width="420" @keypress.enter="sendResponse()"  @click:outside="sendResponse()" @keydown.esc="sendResponse()">
     <v-card class="pa-3 pb-0 ma-0">
       <v-card-title>
         <v-row justify="center">
@@ -20,7 +20,7 @@
             <v-col cols="12">
               <v-row align="center" justify="center">
                 <v-btn outlined tile color="#E65100" class="mr-3" @click="changeNumeroDialog = true">Modifier le numéro</v-btn>
-                <v-btn tile ref="btnClose" @click="sendResponse()" :disabled="numeroLoading" color="primary">
+                <v-btn tile ref="btnClose" @click="sendResponse()" color="primary">
                   <v-icon>mdi-close</v-icon>
                   Fermer
                 </v-btn>
@@ -64,7 +64,7 @@
           <v-card-actions>
             <v-row justify="center">
               <v-btn outlined tile tabindex="-1" color="primary" class="mr-3" @click="changeNumeroDialog = false" :disabled="numeroLoading">
-                <v-icon>mdi-close</v-icon> Fermer
+                <v-icon left>mdi-close</v-icon> Fermer
               </v-btn>
               <v-btn tile ref="btn" @click="saveNewNumero()" color="success" :loading="numeroLoading" :disabled="!isValid">
                 <v-icon left>mdi-content-save</v-icon> Sauvegarder
@@ -107,10 +107,11 @@ export default class extends Vue {
     journal: number,
     numero: number,
     periode: string
-  ): Promise<boolean> {
+  ): Promise<number> {
     setTimeout(() => {
       (this.$refs.btnClose as any).$el.focus();
     });
+    this.errorMessage = "";
     this.journal = journal;
     this.numero = numero;
     this.nouveauNumero = numero.toString();
@@ -122,22 +123,24 @@ export default class extends Vue {
   }
 
   private saveNewNumero(){
-    this.numeroLoading = true;
-    AchatVenteApi.ChangeNumero(this.journal, this.periode, +this.numero, +this.nouveauNumero).then((resp) =>
-    {
-      this.numero = +this.nouveauNumero;
-      this.$nextTick(() => (this.$refs.btnClose as any).focus());
-    }).catch((err) => {
-      this.errorMessage = displayAxiosError(err);
-    }).finally(() => {
-      this.changeNumeroDialog = false;
-      this.numeroLoading = false;
-    });
+    //this.numeroLoading = true;
+    this.numero = +this.nouveauNumero;
+    this.changeNumeroDialog = false;
+    // AchatVenteApi.ChangeNumero(this.journal, this.periode, +this.numero, +this.nouveauNumero).then((resp) =>
+    // {
+    //   this.numero = +this.nouveauNumero;
+    //   this.$nextTick(() => (this.$refs.btnClose as any).focus());
+    // }).catch((err) => {
+    //   this.errorMessage = displayAxiosError(err);
+    // }).finally(() => {
+    //   this.changeNumeroDialog = false;
+    //   this.numeroLoading = false;
+    // });
   }
 
   private sendResponse() {
     this.dialog = false;
-    this.resolve();
+    this.resolve(this.numero);
   }
 }
 </script>
