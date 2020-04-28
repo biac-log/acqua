@@ -65,7 +65,6 @@
                     validate-on-blur
                     @blur="loadCompte"
                     :hide-details="piecereadonly"
-                    autofocus
                   >
                   </v-text-field>
                 </v-col>
@@ -465,7 +464,7 @@ export default class extends Vue {
     else if(today.isAfter(this.periode.dateFin)) 
       this.datePiece = this.periode.dateFin;
     else this.datePiece = today;
-    this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
+    this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -476,10 +475,9 @@ export default class extends Vue {
     periode: PeriodeComptable,
     journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
     this.dialog=true;
-    this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
     this.piecereadonly=true;
     this.init(periode, journal, entete);
-
+     this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;

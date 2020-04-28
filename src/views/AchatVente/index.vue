@@ -233,7 +233,7 @@ export default class extends Vue {
         this.piecesComptables.unshift(resp.data);
       })
       .finally(() => {
-        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
       });
   }
 
@@ -244,7 +244,7 @@ export default class extends Vue {
         Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);
       }
     }).finally(() => {
-      this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
+      this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
     });
   }
 

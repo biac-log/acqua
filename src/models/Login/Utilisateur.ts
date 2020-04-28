@@ -15,10 +15,12 @@ export class Permission {
 
 @JsonObject("Utilisateur")
 export class Utilisateur {
-  @JsonProperty("ID", String)
+  @JsonProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", String)
   public ID: string = '';
-  @JsonProperty("NomPrenom", String)
+  @JsonProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", String)
   public NomPrenom: string = '';
-  @JsonProperty("Permissions", [Permission])
+  @JsonProperty("Permission", [Permission])
   public Permissions: Permission[] = [];
+  @JsonProperty("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", [Permission])
+  public Perms: string[] = [];
 }

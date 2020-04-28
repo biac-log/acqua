@@ -12,6 +12,7 @@
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
     "json2typescript": "^1.2.5",
+    "jwt-decode": "^2.2.0",
     "moment": "^2.24.0",
     "nprogress": "^0.2.0",
     "path-to-regexp": "^6.1.0",
@@ -25,6 +26,7 @@
     "vuex-module-decorators": "^0.16.1"
   },
   "devDependencies": {
+    "@types/jwt-decode": "^2.2.1",
     "@vue/cli-plugin-babel": "^4.3.1",
     "@vue/cli-plugin-pwa": "^4.3.1",
     "@vue/cli-plugin-typescript": "^4.3.1",

@@ -20,6 +20,6 @@ export default class App extends Vue {}
     opacity: 0.30;
     border: grey;
     border-style: dotted;
-    border-width: 2px;
+    border-width: 2.5px;
 }
 </style>

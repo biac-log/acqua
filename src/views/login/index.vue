@@ -53,6 +53,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { UserModule } from "@/store/modules/user";
+import { UserLogin } from '@/models/Login/UserLogin';
 
 @Component({
   name: "Login"
@@ -68,7 +69,10 @@ export default class extends Vue {
     this.errorMessage = "";
 
     const { username, password } = this;
-    UserModule.Login({ username, password })
+    let userLogin = new UserLogin();
+    userLogin.userName = username;
+    userLogin.password = password;
+    UserModule.Login(userLogin)
       .then(() => {
         this.username = "";
         this.password = "";

@@ -33,7 +33,7 @@
     </v-card>
     <span :class="ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
       <span >Montant à ventille : <b>{{ ventilleDevise }} {{ devise ? devise.libelle : "EUR" }}</b></span>
-      <span v-if="devise.id != 1">/ <b>{{ ventilleBase }} EUR</b></span>
+      <span v-if="devise && devise.id != 1">/ <b>{{ ventilleBase }} EUR</b></span>
     </span>
   </v-container>
 </template>

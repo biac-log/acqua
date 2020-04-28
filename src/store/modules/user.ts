@@ -3,6 +3,10 @@ import axios from 'axios'
 import { Token } from '@/models/Login/Token';
 import store from '@/store/index';
 import { Utilisateur } from '@/models/Login/Utilisateur';
+import { UserLogin } from "@/models/Login/UserLogin";
+import { JsonObject, JsonProperty, JsonConvert } from "json2typescript";
+import jwtDecode from "jwt-decode";
+
 
 export interface IUserState {
   token: string,
@@ -51,9 +55,11 @@ class User extends VuexModule implements IUserState {
   };
 
   @Action({rawError: true})
-  public Login(userInfo: { username: string, password: string }): Promise<any> {
+  public Login(userInfo: UserLogin): Promise<any> {
+    userInfo.takePermissions = true;
+    userInfo.application = "ACQUA";
     return new Promise((resolve, reject) => {
-      axios.post<Token>(process.env.VUE_APP_ApiAuth + "/Authentication/Login", userInfo)
+      axios.post<Token>(process.env.VUE_APP_ApiAuth + "/Authentication/LoginApp", userInfo)
         .then((resp) => {
           this.SET_TOKEN(resp.data);
           resolve(resp);
@@ -73,6 +79,12 @@ class User extends VuexModule implements IUserState {
   public LoadUser() {
     return new Promise((resolve, reject) => {
       const header = `Bearer ${this.token}`;
+      let tokenDecode = jwtDecode(this.token);
+      console.log(tokenDecode);
+      let jsonConvert: JsonConvert = new JsonConvert();
+      let user = jsonConvert.deserialize(tokenDecode, Utilisateur);
+      console.log(user);
+
       axios.get<Utilisateur>(`${process.env.VUE_APP_ApiGestionUser}/User/GetUserLog/ACQUA`, { withCredentials: false, headers: { Authorization: header } })
         .then((resp) => {
           this.SET_USER(resp.data);
