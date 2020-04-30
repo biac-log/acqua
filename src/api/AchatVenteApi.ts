@@ -1,5 +1,6 @@
-import Axios from "axios";
-import moment from "moment"
+import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import moment from "moment";
+import { UserModule } from "@/store/modules/user";
 
 import {
   PieceComptableDTO,
@@ -23,7 +24,7 @@ import * as DateMethods from '@/utils/DateMethods'
 import { DateTime } from '@/models/DateTime';
 
 export abstract class AchatVenteApi {
-  private static achatVenteAxios = Axios.create();
+  private static achatVenteAxios = Axios.create({headers: { Authorization: `Bearer ${UserModule.token}` }});
 
   static async getPeriodeComptable(periode: string) : Promise<PeriodeComptable>{
     let response = await this.achatVenteAxios.get<PeriodeComptableDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetPeriode${periode}`);

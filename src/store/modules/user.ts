@@ -62,6 +62,10 @@ class User extends VuexModule implements IUserState {
       axios.post<Token>(process.env.VUE_APP_ApiAuth + "/Authentication/LoginApp", userInfo)
         .then((resp) => {
           this.SET_TOKEN(resp.data);
+          let tokenDecode = jwtDecode(resp.data.value);
+          let jsonConvert: JsonConvert = new JsonConvert();
+          let user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
+          this.SET_USER(user);
           resolve(resp);
         })
         .catch((err) => {
@@ -78,26 +82,11 @@ class User extends VuexModule implements IUserState {
   @Action
   public LoadUser() {
     return new Promise((resolve, reject) => {
-      const header = `Bearer ${this.token}`;
       let tokenDecode = jwtDecode(this.token);
-      console.log(tokenDecode);
       let jsonConvert: JsonConvert = new JsonConvert();
-      let user = jsonConvert.deserialize(tokenDecode, Utilisateur);
-      console.log(user);
-
-      axios.get<Utilisateur>(`${process.env.VUE_APP_ApiGestionUser}/User/GetUserLog/ACQUA`, { withCredentials: false, headers: { Authorization: header } })
-        .then((resp) => {
-          this.SET_USER(resp.data);
-          resolve(resp);
-        })
-        .catch((err) => {
-          this.RESET_TOKEN();
-          let errorMessage: string = "Impossible de se connecter au serveur de gestion des droits";
-          if (err.response && err.response.status === 400) {
-            errorMessage = err.response.data.Message;
-          }
-          reject(errorMessage);
-        });
+      let user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
+      this.SET_USER(user);
+      resolve();
     });
   }
 

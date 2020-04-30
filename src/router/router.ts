@@ -82,26 +82,17 @@ const router = createRouter();
 router.beforeEach(async (to: Route, from: Route, next: any) => {
   NProgress.start();
   if (UserModule.token) {
-    if (
-      !UserModule.utilisateur ||
-      (PermissionModule.routes && PermissionModule.routes.length === 0)
-    ) {
-      UserModule.LoadUser()
-        .then(() => {
-          PermissionModule.GenerateRoutes(
-            UserModule.utilisateur.Permissions.map(p => p.Id)
-          );
-          //Dynamically add accessible routes
-          router.addRoutes(PermissionModule.dynamicRoutes);
-          if (to.path.toUpperCase() == "/LOGIN") {
-            next({ path: "/" });
-          } else {
-            next({ ...to, replace: true });
-          }
-        })
-        .catch(reason => {
-          next({ path: "/login" });
-        });
+    if (!UserModule.utilisateur || (PermissionModule.routes && PermissionModule.routes.length === 0)) {
+      UserModule.LoadUser().then(() => {
+        PermissionModule.GenerateRoutes(UserModule.utilisateur.Permissions);
+        //Dynamically add accessible routes
+        router.addRoutes(PermissionModule.dynamicRoutes);
+        if (to.path.toUpperCase() == "/LOGIN") {
+          next({ path: "/" });
+        } else {
+          next({ ...to, replace: true });
+        }
+      });
     } else {
       next();
     }
