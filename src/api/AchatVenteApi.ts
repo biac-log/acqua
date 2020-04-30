@@ -136,8 +136,8 @@ export abstract class AchatVenteApi {
     return response.data;
   }
 
-  static async ChangeNumero(journal: number, periode: string, oldNumero: number, newNumero: number): Promise<boolean>{
-    let response = await this.achatVenteAxios.get<boolean>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/ChangeNumeroPiece?journal=${journal}&periode=${periode}&numeroCourrant=${oldNumero}&nouveauNumero=${newNumero}`);
-    return response.data;
+  static async ChangeNumero(periode: string, journal: number, oldNumero: number, newNumero: number): Promise<boolean>{
+    await this.achatVenteAxios.put(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/ChangementNumero?periode=${periode}&numeroJournal=${journal}&ancienNumeroPiece=${oldNumero}&nouveauNumeroPiece=${newNumero}`);
+    return true;
   }
 }

@@ -42,4 +42,12 @@ export class PeriodeComptable extends PeriodeComptableDTO {
     if (this.typePeriodeComptable == "precedente") stPeriode = "Précédente";
     return `${stPeriode} du ${this.dateDebut} au ${this.dateFin}`;
   }
+
+  get typePeriodeComptableId(): string{
+    return this.typePeriodeComptable == "C" ? "courante" : "precedente";
+  }
+
+  get typePeriodeComptableLibelle(): string{
+    return this.typePeriodeComptable == "C" ? "Période courante" : "Période précédente";
+  }
 }

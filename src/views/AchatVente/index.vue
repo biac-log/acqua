@@ -238,7 +238,8 @@ export default class extends Vue {
   }
 
   private displayAddResult(piece : EntetePieceComptable){
-    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected).then((numero) => {
+    const periode = this.periodeSelected == "Période précédente" ? "precedente" : "courante";
+    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, periode).then((numero) => {
       if(piece.codePiece != numero){
         piece.codePiece = numero;
         Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);

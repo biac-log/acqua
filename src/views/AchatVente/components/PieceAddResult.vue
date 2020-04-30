@@ -114,6 +114,7 @@ export default class extends Vue {
     this.errorMessage = "";
     this.journal = journal;
     this.numero = numero;
+    this.periode = periode;
     this.nouveauNumero = numero.toString();
     this.dialog = true;
     return new Promise((resolve, reject) => {
@@ -123,19 +124,18 @@ export default class extends Vue {
   }
 
   private saveNewNumero(){
-    //this.numeroLoading = true;
-    this.numero = +this.nouveauNumero;
-    this.changeNumeroDialog = false;
-    // AchatVenteApi.ChangeNumero(this.journal, this.periode, +this.numero, +this.nouveauNumero).then((resp) =>
-    // {
-    //   this.numero = +this.nouveauNumero;
-    //   this.$nextTick(() => (this.$refs.btnClose as any).focus());
-    // }).catch((err) => {
-    //   this.errorMessage = displayAxiosError(err);
-    // }).finally(() => {
-    //   this.changeNumeroDialog = false;
-    //   this.numeroLoading = false;
-    // });
+    this.numeroLoading = true;
+    AchatVenteApi.ChangeNumero(this.periode, this.journal, +this.numero, +this.nouveauNumero)
+      .then((resp) =>
+      {
+        this.numero = +this.nouveauNumero;
+        this.$nextTick(() => (this.$refs.btnClose as any)?.$el?.focus());
+      }).catch((err) => {
+        this.errorMessage = displayAxiosError(err);
+      }).finally(() => {
+        this.changeNumeroDialog = false;
+        this.numeroLoading = false;
+      });
   }
 
   private sendResponse() {
