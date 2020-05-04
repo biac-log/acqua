@@ -60,6 +60,27 @@ export const asyncRoutes: RouteConfig[] = [
         }
       }
     ]
+  },
+  {
+    path: "/financier",
+    component: Layout,
+    redirect: "financier/index",
+    meta: { roles: ["admin", "ACQUAACHATVENTE"] },
+    children: [
+      {
+        path: "index",
+        component: () =>
+          import(
+            /* webpackChunkName: "achatvente" */ "@/views/Financier/index.vue"
+          ),
+        name: "Financier",
+        meta: {
+          title: "Financier",
+          icon: "mdi-bank-transfer",
+          affix: true
+        }
+      }
+    ]
   }
 ];
 
@@ -83,16 +104,19 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
   NProgress.start();
   if (UserModule.token) {
     if (!UserModule.utilisateur || (PermissionModule.routes && PermissionModule.routes.length === 0)) {
-      UserModule.LoadUser().then(() => {
+      try {
+        await UserModule.LoadUser();
         PermissionModule.GenerateRoutes(UserModule.utilisateur.Permissions);
-        //Dynamically add accessible routes
+          //Dynamically add accessible routes
         router.addRoutes(PermissionModule.dynamicRoutes);
         if (to.path.toUpperCase() == "/LOGIN") {
           next({ path: "/" });
         } else {
           next({ ...to, replace: true });
         }
-      });
+      } catch (err) {
+        next(`/login`);
+      }
     } else {
       next();
     }

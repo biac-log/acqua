@@ -112,7 +112,7 @@
                     :readonly="piecereadonly"
                     :hide-details="piecereadonly"
                     return-object
-                    item-text="libelle"
+                    item-text="typePeriodeComptableLibelle"
                     label="Devise pièce"
                   ></v-select>
                 </v-col>
