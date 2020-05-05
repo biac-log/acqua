@@ -1,13 +1,19 @@
 <template>
     <v-app>
         <router-view />
+        <service-worker-update-popup />
     </v-app>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import ServiceWorkerUpdatePopup from '@/components/ServiceWorkerUpdatePopup.vue'
 
-@Component
+
+@Component({
+	name: "App",
+	components: { ServiceWorkerUpdatePopup }
+})
 export default class App extends Vue {}
 </script>
 

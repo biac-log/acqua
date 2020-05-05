@@ -22,6 +22,8 @@ import CompteGenerealSearch from '@/models/Compte/CompteGeneralSearch';
 import { PieceComptableSaveDTO } from '@/models/AchatVente';
 import * as DateMethods from '@/utils/DateMethods'
 import { DateTime } from '@/models/DateTime';
+import { PaginationResult } from '@/models/PaginationResult';
+import { Pagination } from '@/models/Pagination';
 
 export abstract class AchatVenteApi {
   private static achatVenteAxios = Axios.create({headers: { Authorization: `Bearer ${UserModule.token}` }});
@@ -31,9 +33,9 @@ export abstract class AchatVenteApi {
     return new PeriodeComptable(response.data);
   }
 
-  static async GetEntetePiecesComptables(numeroJournal: number, periode: string): Promise<EntetePieceComptable[]>{
-    let response = await this.achatVenteAxios.get<EntetePieceComptableDTO[]>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetEntetePiecesComptables?journal=${numeroJournal}&stPeriode=${periode}`);
-    return response.data.map(entete => new EntetePieceComptable(entete));
+  static async GetEntetePiecesComptables(numeroJournal: number, periode: string, pagination: Pagination): Promise<PaginationResult<EntetePieceComptable>>{
+    let response = await this.achatVenteAxios.get<PaginationResult<EntetePieceComptable>>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetEntetePiecesComptables?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}&SortBy=${pagination.sortBy}&NumeroJournal=${numeroJournal}&Periode=${periode}`);
+    return response.data;
   }
 
   static async getDateEcheance(

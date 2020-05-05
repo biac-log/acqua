@@ -1,6 +1,8 @@
 import Axios from "axios";
 import {JournalDTO, Journal, PeriodeComptable, PeriodeComptableDTO, EntetePieceComptable, EntetePieceComptableDTO} from "@/models/Financier";
 import { UserModule } from "@/store/modules/user";
+import { Pagination } from '@/models/Pagination';
+import { PaginationResult } from '@/models/PaginationResult';
 
 export abstract class FinancierApi {
   private static axios = Axios.create({headers: { Authorization: `Bearer ${UserModule.token}` }});
@@ -19,8 +21,8 @@ export abstract class FinancierApi {
     return response.data.map(journal => new Journal(journal));
   }
 
-  static async getEntetePiecesComptables(numeroJournal: number, periode: string): Promise<EntetePieceComptable[]>{
-    let response = await this.axios.get<EntetePieceComptableDTO[]>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetEntetePiecesComptables?numeroJournal=${numeroJournal}&stPeriode=${periode}`);
-    return response.data.map(entete => new EntetePieceComptable(entete));
+  static async getEntetePiecesComptables(numeroJournal: number, periode: string, pagination: Pagination): Promise<PaginationResult<EntetePieceComptableDTO>>{
+    let response = await this.axios.get<PaginationResult<EntetePieceComptableDTO>>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetEntetePiecesComptables?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}&SortBy=${pagination.sortBy}&NumeroJournal=${numeroJournal}&Periode=${periode}`);
+    return response.data;
   }
 }

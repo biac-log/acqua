@@ -1,0 +1,67 @@
+<template>
+  <v-snackbar v-model="snackbar" color="info" :timeout="timeout">
+      {{ notificationText }}
+      <v-btn
+        color="orange"
+        @click="refreshApp"
+      >
+        <v-icon>mdi-refresh</v-icon>
+        {{ refreshButtonText}}
+      </v-btn>
+    </v-snackbar>
+</template>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
+@Component({
+  name: 'ServiceWorkerUpdatePopup'
+})
+export default class extends Vue {
+  private snackbar = false;
+  private refreshing = false;
+  private notificationText = "L'application à été mise à jour, veuillez recharger";
+  private refreshButtonText = 'Recharger';
+  private registration: ServiceWorkerRegistration | null = null
+  private timeout: number = 10000;
+
+  created() {
+    // Listen for swUpdated event and display refresh notification as required.
+    document.addEventListener('swUpdated', this.showRefreshUI, { once: true })
+    // Refresh all open app tabs when a new service worker is installed.
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (this.refreshing) return
+      this.refreshing = true
+      window.location.reload(true);
+    });
+  }
+
+  render() {
+    // Avoid warning for missing template
+  }
+
+  private showRefreshUI(e: Event) {
+    // Display a notification inviting the user to refresh/reload the app due
+    // to an app update being available.
+    // The new service worker is installed, but not yet active.
+    // Store the ServiceWorkerRegistration instance for later use.
+    const h = this.$createElement;
+    this.registration = (e as CustomEvent).detail;
+    this.snackbar = true;
+  }
+
+  private refreshApp() {
+    window.location.reload(true);
+    // // Protect against missing registration.waiting.
+    // if (!this.registration || !this.registration.waiting) return
+    // this.registration.waiting.postMessage('skipWaiting')
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.sw-update-popup > button {
+  margin-top: 0.5em;
+  padding: 0.25em 1.5em;
+}
+</style>

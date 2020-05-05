@@ -28,7 +28,7 @@
               item-text="fullLibelle"
               item-value="numero"
               :hint="
-                `Nature ${journalSelected.famille} - Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`
+                `Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`
               "
               return-object
               persistent-hint
@@ -76,8 +76,8 @@
         :search="search"
         :loading="isLoadingPieces"
         @click:row="OpenPieceComptable"
-        sort-by="codePieceDisplay"
-        sort-desc
+        :options.sync="options"
+        :server-items-length="totalItems"
       >
         <template v-slot:item.datePieceDate="{ item }">
           <span>{{ item.datePieceDate.toString() }}</span>
@@ -101,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import axios from "axios";
 import {
   PeriodeComptable,
@@ -113,6 +113,7 @@ import moment from "moment";
 import AchatVentePieceVue from "./components/AchatVentePiece.vue";
 import PieceAddResultVue from "./components/PieceAddResult.vue";
 import { AchatVenteApi } from "../../api/AchatVenteApi";
+import { Pagination } from '@/models/Pagination';
 
 @Component({
   name: "AchatVente",
@@ -160,6 +161,8 @@ export default class extends Vue {
   private search: string = "";
   private piecesComptables: EntetePieceComptable[] = [];
   private isLoadingPieces: boolean = false;
+  private options: any = {};
+  private totalItems: number = 0;
 
   private LoadPeriode() {
     this.periodeIsLoading = true;
@@ -188,24 +191,38 @@ export default class extends Vue {
       });
   }
 
-  private LoadPiecesComptables() {
-    this.isLoadingPieces = true;
-    let periode: string = "courante";
-    if (this.periodeSelected == "Période précédente") periode = "precedente";
 
-    this.periodeSearched = this.periodeData;
-    this.journalSearched = this.journalSelected;
+  @Watch("options")
+  onOptionsChanged() {
+    this.LoadPiecesComptables();
+  }
+  private async LoadPiecesComptables() {
+    try {
+      if(this.periodeSelected && this.journalSelected.numero){
+        this.isLoadingPieces = true;
+        let periode: string = "courante";
+        if (this.periodeSelected == "Période précédente") periode = "precedente";
+        const { sortBy, sortDesc, page, itemsPerPage } = this.options;
 
-    AchatVenteApi.GetEntetePiecesComptables(
-      this.journalSelected.numero,
-      periode
-    ).then(resp => {
-        this.piecesComptables = resp;
-    })
-    .catch(error => {})
-    .finally(() => {
+        this.periodeSearched = this.periodeData;
+        this.journalSearched = this.journalSelected;
+
+        let pagination = new Pagination();
+        pagination.terms = this.search;
+        pagination.sortBy = sortBy;
+        pagination.sortDesc = sortDesc;
+        pagination.page = page;
+        pagination.limit = itemsPerPage;
+
+        let paginationResult = await AchatVenteApi.GetEntetePiecesComptables(this.journalSelected.numero, periode, pagination);
+        this.piecesComptables = paginationResult.items.map(i => new EntetePieceComptable(i));
+        this.totalItems = paginationResult.totalCount;
+      }
+    } catch (err) {
+      
+    }finally{
       this.isLoadingPieces = false;
-    });
+    }
   }
 
   private OpenPieceComptable(entete: EntetePieceComptable) {

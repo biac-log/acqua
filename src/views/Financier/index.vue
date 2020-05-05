@@ -17,7 +17,6 @@
               :loading="periodeIsLoading"
               :hint="periodeSelected.libellePeriode"
               :rules="periodesRules"
-              @change="PeriodeChanged"
             ></v-select>
           </v-col>
           <v-col cols="12" xs="12" md="6" lg="3">
@@ -29,9 +28,7 @@
               :loading="journauxIsLoading"
               item-text="fullLibelle"
               item-value="numero"
-              :hint="
-                `Nature ${journalSelected.famille} - Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`
-              "
+              :hint="journalSelected.description"
               return-object
               persistent-hint
               @focus="LoadJournaux"
@@ -58,7 +55,15 @@
     <v-card class="mt-5">
       <v-card-title>
         Pièces comptables
-        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" :disabled="!searchIsValid" @click="openNewPieceComptable">
+        <v-btn
+          ref="btnAdd"
+          color="warning"
+          small
+          fab
+          class="ml-5"
+          :disabled="!searchIsValid"
+          @click="openNewPieceComptable"
+        >
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
@@ -76,9 +81,9 @@
         :items="piecesComptables"
         :search="search"
         :loading="isLoadingPieces"
+        :options.sync="options"
         @click:row="OpenPieceComptable"
-        sort-by="codePieceDisplay"
-        sort-desc
+        :server-items-length="totalItems"
       >
         <template v-slot:item.datePieceDate="{ item }">
           <span>{{ item.datePieceDate.toString() }}</span>
@@ -96,34 +101,46 @@
           <span>{{ item.soldeFinale | numberToString }}</span>
         </template>
         <template v-slot:item.pieceEquilibree="{ item }">
-          <v-simple-checkbox v-model="item.pieceEquilibree" disabled></v-simple-checkbox>
-       </template>
+          <v-simple-checkbox
+            v-model="item.pieceEquilibree"
+            disabled
+          ></v-simple-checkbox>
+        </template>
       </v-data-table>
     </v-card>
-    <AchatVentePieceVue ref="refDialogPiece"></AchatVentePieceVue>
+    <!-- <AchatVentePieceVue ref="refDialogPiece"></AchatVentePieceVue> -->
     <!-- <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue> -->
-    <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
-      <v-icon dark class="mr-3">{{ snackbarColor == "error" ? "mdi-delete" : "mdi-check" }}</v-icon>
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="snackbarTimeout"
+      :color="snackbarColor"
+    >
+      <v-icon dark class="mr-3">{{
+        snackbarColor == "error" ? "mdi-delete" : "mdi-check"
+      }}</v-icon>
       <span v-html="snackbarMessage"></span>
-      <v-btn icon dark @click="snackbar = false"><v-icon>mdi-close</v-icon></v-btn>
+      <v-btn icon dark @click="snackbar = false"
+        ><v-icon>mdi-close</v-icon></v-btn
+      >
     </v-snackbar>
   </v-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import axios from "axios";
 import moment from "moment";
 import { FinancierApi } from "../../api/FinancierApi";
-import { displayAxiosError } from '@/utils/ErrorMethods';
+import { displayAxiosError } from "@/utils/ErrorMethods";
 import {
   PeriodeComptable,
   Journal,
   EntetePieceComptable
 } from "@/models/Financier";
+import { Pagination } from "@/models/Pagination";
 
 @Component({
-  name: "Financier",
+  name: "Financier"
   //components: { AchatVentePieceVue, PieceAddResultVue }
 })
 export default class extends Vue {
@@ -152,55 +169,107 @@ export default class extends Vue {
   private selectedPiece!: EntetePieceComptable;
 
   private headers = [
-    { text: "Numéro pièce", value: "codePieceDisplay" },
+    { text: "Numéro pièce", value: "numeroPiece" },
     { text: "Date pièce", value: "datePieceDate" },
     { text: "Libelle", value: "libelle" },
     { text: "Solde initiale", value: "soldeInitiale", align: "end" },
     { text: "Débit", value: "totalDebit", align: "end" },
     { text: "Crédit", value: "totalCredit", align: "end" },
     { text: "Solde finale", value: "soldeFinale", align: "end" },
-    { text: "Equilibré", value: "pieceEquilibree"},
+    { text: "Equilibré", value: "pieceEquilibree" }
   ];
   private search: string = "";
+  private options: any = {};
   private piecesComptables: EntetePieceComptable[] = [];
+  private totalItems: number = 0;
   private isLoadingPieces: boolean = false;
 
-  mounted(){
+  mounted() {
     this.LoadPeriodes();
     this.LoadJournaux();
   }
 
   private async LoadPeriodes() {
-    try{
+    try {
       this.periodeIsLoading = true;
       let periodes = await FinancierApi.getPeriodes();
       periodes.forEach(p => this.periodes.push(p));
-    }catch(err){
+    } catch (err) {
       this.isErrorPeriode = true;
-    }finally {
+    } finally {
       this.periodeIsLoading = false;
     }
   }
 
   private async LoadJournaux() {
-    try{
+    try {
       this.journauxIsLoading = true;
       let journaux = await FinancierApi.getJournaux();
       journaux.forEach(j => this.journaux.push(j));
-    }catch(err){
+    } catch (err) {
       this.isErrorJournaux = true;
-    }finally {
+    } finally {
       this.journauxIsLoading = false;
     }
   }
 
+  @Watch("options")
+  onOptionsChanged() {
+    this.LoadPiecesComptables();
+  }
+
+  private OpenPieceComptable(entete: EntetePieceComptable) {
+    // (this.$refs.refDialogPiece as AchatVentePieceVue)
+    //   .open(entete, this.periodeData, this.journalSearched)
+    //   .then(resp => {
+    //     if(resp.action == "UPDATE"){
+    //       Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp.data);
+    //       this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, "success");
+    //     }else if(resp.action == "DELETE"){
+    //       this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
+    //       this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, "error");
+    //     }
+    //   })
+    //   .finally(() => {
+    //     this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
+    //   });
+  }
+
+  private openNewPieceComptable() {
+    // (this.$refs.refDialogPiece as AchatVentePieceVue)
+    //   .openNew(this.periodeData, this.journalSelected)
+    //   .then((resp) => {
+    //     this.displayAddResult(resp.data);
+    //     this.piecesComptables.unshift(resp.data);
+    //   })
+    //   .finally(() => {
+    //     this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+    //   });
+  }
+
   private async LoadPiecesComptables() {
     try {
-      this.isLoadingPieces = true;
-      this.piecesComptables = await FinancierApi.getEntetePiecesComptables(this.journalSelected.numero, this.periodeSelected.typePeriodeComptable);
+      if (this.periodeSelected.typePeriodeComptable && this.journalSelected.numero) {
+        const { sortBy, sortDesc, page, itemsPerPage } = this.options;
+        let pagination = new Pagination();
+        pagination.terms = this.search;
+        pagination.sortBy = sortBy;
+        pagination.sortDesc = sortDesc;
+        pagination.page = page;
+        pagination.limit = itemsPerPage;
+
+        this.isLoadingPieces = true;
+        let paginationResult = await FinancierApi.getEntetePiecesComptables(
+          this.journalSelected.numero,
+          this.periodeSelected.typePeriodeComptable,
+          pagination
+        );
+        this.piecesComptables = paginationResult.items.map(i => new EntetePieceComptable(i));
+        this.totalItems = paginationResult.totalCount;
+      }
     } catch (err) {
       this.notifier(displayAxiosError(err), "red");
-    }finally{
+    } finally {
       this.isLoadingPieces = false;
     }
   }
@@ -210,7 +279,7 @@ export default class extends Vue {
   private snackbarMessage: string = "";
   private snackbarColor: string = "";
 
-  private notifier(message: string, color:string){
+  private notifier(message: string, color: string) {
     this.snackbarColor = color;
     this.snackbarMessage = message;
     this.snackbar = true;
