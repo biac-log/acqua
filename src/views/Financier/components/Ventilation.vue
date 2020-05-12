@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="800" @keydown.enter.prevent.stop="sendContrepartie" @click:outside="close()" @keydown.esc="close()">
+  <v-dialog v-model="dialog" width="800" @keydown.enter.prevent.stop="sendVentilation" @click:outside="close()" @keydown.esc="close()">
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
         <v-card-title>
@@ -9,7 +9,7 @@
             </v-alert>
           </v-col>
           <v-col cols="12">
-            Contrepartie
+            Ventilation
           </v-col>
         </v-card-title>
         <v-card-text>
@@ -45,9 +45,9 @@
                   </v-btn>
                 </template>
               </v-text-field>
-              <SearchCompteContrepartieVue
+              <!-- <SearchCompteVentilationVue
                 ref="compteDialog"
-              ></SearchCompteContrepartieVue>
+              ></SearchCompteVentilationVue> -->
             </v-col>  
             <v-col cols="6">
               <v-text-field
@@ -163,7 +163,7 @@
             text
             tabindex="-1"
             v-if="!isNew && !readonly"
-            @click="deleteContrepartie()"
+            @click="deleteVentilation()"
             >
             Suprrimer</v-btn
           >
@@ -177,7 +177,7 @@
             >
             <v-icon left>mdi-close</v-icon> Fermer</v-btn
           >
-          <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" v-if="!readonly" :disabled="!isValid" @click="sendContrepartie">
+          <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" v-if="!readonly" :disabled="!isValid" @click="sendVentilation">
             <v-icon left>mdi-check</v-icon> Valider
           </v-btn>
         </v-card-actions>
@@ -189,7 +189,6 @@
 <script lang="ts">
 import { Component, Vue, PropSync, Emit, Prop, Watch } from "vue-property-decorator";
 import {
-  PieceComptableContrepartie,
   TypeCompte,
   Devise,
   TypeMouvement,
@@ -198,14 +197,15 @@ import {
 } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import { CompteApi } from "@/api/CompteApi";
-import SearchCompteContrepartieVue from "./SearchCompteContrepartie.vue";
+//import SearchCompteVentilationVue from "./SearchCompteVentilation.vue";
 import SearchCaseTvaVue from "@/components/search/SearchCaseTva.vue";
 import axios, { AxiosError } from "axios";
 import CompteGenerealSearch from "../../../models/Compte/CompteGeneralSearch";
+import { Ventilation } from '../../../models/Financier';
 
 @Component({
-  name: "EditContrepartie",
-  components: { SearchCompteContrepartieVue, SearchCaseTvaVue }
+  name: "Ventilation",
+  components: { SearchCaseTvaVue }
 })
 export default class extends Vue {
   private dialog: boolean = false;
@@ -262,18 +262,18 @@ export default class extends Vue {
   }
 
   public open(
-    contrepartie: PieceComptableContrepartie,
+    ventilation: Ventilation,
     numeroJournal: number,
     deviseEntete: Devise,
     ventileDevise: number,
     tvaCalcule : number,
     tvaImpute: number
-  ): Promise<PieceComptableContrepartie> {
+  ): Promise<Ventilation> {
     this.dialog = true;
     this.isNew = false;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.init(contrepartie, numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
+      this.init(ventilation, numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
     });
 
     return new Promise((resolve, reject) => {
@@ -281,19 +281,20 @@ export default class extends Vue {
       this.reject = reject;
     });
   }
+
   public openNew(
     numeroJournal: number,
     deviseEntete: Devise,
     ventileDevise: number,
     tvaCalcule : number,
     tvaImpute: number,
-    contrepartie?: PieceComptableContrepartie,
-  ): Promise<PieceComptableContrepartie> {
+    ventilation?: Ventilation,
+  ): Promise<Ventilation> {
     this.dialog = true;
     this.isNew = true;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.init(contrepartie || new PieceComptableContrepartie(), numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
+      this.init(ventilation || new Ventilation(), numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
     });
 
     return new Promise((resolve, reject) => {
@@ -303,25 +304,25 @@ export default class extends Vue {
   }
 
   private init(
-    contrepartie: PieceComptableContrepartie,
+    ventilation: Ventilation,
     numeroJournal: number,
     deviseEntete: Devise,    
     ventileDevise: number,
     tvaCalcule : number,
     tvaImpute: number
   ) {
-    this.initDevises(deviseEntete, contrepartie);
+    this.initDevises(deviseEntete, ventilation);
     this.numeroJournal = numeroJournal;
-    this.typesComptesSelected =this.typesComptes.find(tc => tc.id == contrepartie.typeCompte) || this.typesComptes[0];
-    this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) ||this.devises[0];
-    this.numeroCompte = contrepartie.numeroCompte ? contrepartie.numeroCompte.toString() : "";
-    this.nomCompte = contrepartie.compteLibelle;
-    this.libelle = contrepartie.libelle;
-    this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
-    this.montant = contrepartie.montantBase && this.devisesSelected ? contrepartie.montantBase.toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
-    this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : "";
-    this.caseTva.Refresh(contrepartie.caseTva);
-    this.libelleCaseTva = contrepartie.caseTva.libelleCase;
+    this.typesComptesSelected =this.typesComptes.find(tc => tc.id == ventilation.typeCompte) || this.typesComptes[0];
+    this.devisesSelected = this.devises.find(d => d.id == ventilation.codeDevise) ||this.devises[0];
+    this.numeroCompte = ventilation.numeroCompte ? ventilation.numeroCompte.toString() : "";
+    this.nomCompte = ventilation.nomCompte;
+    this.libelle = ventilation.libelle;
+    this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == ventilation.codeMouvement) || this.typesMouvements[0];
+    this.montant = ventilation.montantBase && this.devisesSelected ? ventilation.montantBase.toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
+    this.numeroCaseTva = ventilation.codeCaseTVA ? ventilation.codeCaseTVA.toString() : "";
+    //this.caseTva.Refresh(ventilation.caseTva);
+    this.libelleCaseTva = ventilation.libelleCaseTVA;
 
     this.ventileDevise = ventileDevise;
     this.tvaCalcule = tvaCalcule;
@@ -330,22 +331,22 @@ export default class extends Vue {
 
   private initDevises(
     deviseEntete: Devise,
-    contrepartie?: PieceComptableContrepartie
+    ventilation?: Ventilation
   ) {
     this.devises = [];
     this.devises.push(new Devise({ id: 1, libelle: "EUR", typeDevise: "D" }));
     if (deviseEntete && !this.devises.find(d => d.id == deviseEntete.id))
       this.devises.push(deviseEntete);
-    if (contrepartie && contrepartie.codeDevise != 0) {
-      if(!this.devises.find(d => d.id == contrepartie.codeDevise)){
+    if (ventilation && ventilation.codeDevise != 0) {
+      if(!this.devises.find(d => d.id == ventilation.codeDevise)){
         this.devises.push(
           new Devise({
-            id: contrepartie.codeDevise,
-            libelle: contrepartie.libelleDevise,
+            id: ventilation.codeDevise,
+            libelle: ventilation.libelleDevise,
             typeDevise: this.devisesSelected.typeDevise
           })
         );
-        this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) || this.devises[0];
+        this.devisesSelected = this.devises.find(d => d.id == ventilation.codeDevise) || this.devises[0];
       } else this.devisesSelected = this.devises[0];
     }
   }
@@ -365,16 +366,16 @@ export default class extends Vue {
     }
   }
   private OpenSearchCompte(): void {
-    if (this.typesComptesSelected) {
-      (this.$refs.compteDialog as SearchCompteContrepartieVue)
-        .open(this.typesComptesSelected)
-        .then(compte => {
-          this.setCompte(compte);
-          this.$nextTick(() => (this.$refs.libelle as any)?.focus());
-        }).catch(() => {
-          this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
-        });
-    }
+    // if (this.typesComptesSelected) {
+    //   (this.$refs.compteDialog as SearchCompteVentilationVue)
+    //     .open(this.typesComptesSelected)
+    //     .then(compte => {
+    //       this.setCompte(compte);
+    //       this.$nextTick(() => (this.$refs.libelle as any)?.focus());
+    //     }).catch(() => {
+    //       this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+    //     });
+    // }
   }
 
   private setCompte(compte: CompteGenerealSearch) {
@@ -444,32 +445,33 @@ export default class extends Vue {
     }
   }
   private OpenSearchCaseTva(): void { (this.$refs.caseTvaDialog as SearchCaseTvaVue)
-      .open(this.numeroJournal)
-      .then(caseTva => {
-        this.numeroCaseTva = caseTva.numeroCase.toString();
-        this.caseTva = caseTva;
-        this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
-      }).catch(() => {
-        this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus())
-      });
+      // .open(this.numeroJournal)
+      // .then(caseTva => {
+      //   this.numeroCaseTva = caseTva.numeroCase.toString();
+      //   this.caseTva = caseTva;
+      //   this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
+      // }).catch(() => {
+      //   this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus())
+      // });
   }
 
-  private GetModel(): PieceComptableContrepartie {
-    let contrepartie = new PieceComptableContrepartie();
-    contrepartie.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : "";
-    contrepartie.numeroCompte = parseInt(this.numeroCompte);
-    contrepartie.compteLibelle = this.nomCompte;
-    contrepartie.libelle = this.libelle;
-    contrepartie.codeMouvement = this.typesMouvementsSelected ? this.typesMouvementsSelected.id : "";
-    contrepartie.montantDevise = parseFloat(this.montant);
-    contrepartie.montantBase = parseFloat(this.montant);
-    contrepartie.codeDevise = this.devisesSelected ? this.devisesSelected.id : 0;
-    contrepartie.libelleDevise = this.devisesSelected ? this.devisesSelected.libelle : "";
-    contrepartie.caseTva = new CaseTva(this.caseTva);
-    return contrepartie;
+  private GetModel(): Ventilation {
+    let ventilation = new Ventilation();
+    ventilation.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : "";
+    ventilation.numeroCompte = parseInt(this.numeroCompte);
+    ventilation.nomCompte = this.nomCompte;
+    ventilation.libelle = this.libelle;
+    ventilation.codeMouvement = this.typesMouvementsSelected ? this.typesMouvementsSelected.id : "";
+    ventilation.montantDevise = parseFloat(this.montant);
+    ventilation.montantBase = parseFloat(this.montant);
+    ventilation.codeDevise = this.devisesSelected ? this.devisesSelected.id : 0;
+    ventilation.libelleDevise = this.devisesSelected ? this.devisesSelected.libelle : "";
+    ventilation.codeCaseTVA = this.caseTva.numeroCase;
+    ventilation.libelleCaseTVA = this.caseTva.libelleCase;
+    return ventilation;
   }
 
-  private sendContrepartie() {
+  private sendVentilation() {
     (this.$refs.form as any).validate();
     this.$nextTick(() => {
       if (this.isValid) {
@@ -489,7 +491,7 @@ export default class extends Vue {
     if(!this.readonly && !this.montant) this.calculMontant();
   }
 
-  private deleteContrepartie() {
+  private deleteVentilation() {
     this.dialog = false;
     this.resolve();
   }

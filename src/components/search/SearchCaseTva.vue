@@ -39,7 +39,7 @@ import axios from "axios";
 import { AchatVenteApi } from '@/api/AchatVenteApi';
 
 @Component({
-  name: "SearchCompteTier"
+  name: "SearchCaseTva"
 })
 export default class extends Vue {
   private dialog: boolean = false;

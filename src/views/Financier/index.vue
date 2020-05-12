@@ -108,7 +108,7 @@
         </template>
       </v-data-table>
     </v-card>
-    <!-- <AchatVentePieceVue ref="refDialogPiece"></AchatVentePieceVue> -->
+    <PieceComptableVue ref="refDialogPiece"></PieceComptableVue>
     <!-- <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue> -->
     <v-snackbar
       v-model="snackbar"
@@ -138,10 +138,11 @@ import {
   EntetePieceComptable
 } from "@/models/Financier";
 import { Pagination } from "@/models/Pagination";
+import PieceComptableVue from "./components/PieceComptable.vue";
 
 @Component({
-  name: "Financier"
-  //components: { AchatVentePieceVue, PieceAddResultVue }
+  name: "Financier",
+  components: { PieceComptableVue, }
 })
 export default class extends Vue {
   private searchIsValid: boolean = true;
@@ -218,33 +219,35 @@ export default class extends Vue {
     this.LoadPiecesComptables();
   }
 
-  private OpenPieceComptable(entete: EntetePieceComptable) {
-    // (this.$refs.refDialogPiece as AchatVentePieceVue)
-    //   .open(entete, this.periodeData, this.journalSearched)
-    //   .then(resp => {
-    //     if(resp.action == "UPDATE"){
-    //       Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp.data);
-    //       this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, "success");
-    //     }else if(resp.action == "DELETE"){
-    //       this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
-    //       this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, "error");
-    //     }
-    //   })
-    //   .finally(() => {
-    //     this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
-    //   });
+  private async OpenPieceComptable(entete: EntetePieceComptable) {
+    let piece = await FinancierApi.getPieceComptable(entete.numeroJournal, entete.numeroPiece);
+
+    (this.$refs.refDialogPiece as PieceComptableVue)
+      .Open(this.periodeSelected, this.journalSelected, piece)
+      .then(resp => {
+        // if(resp.action == "UPDATE"){
+        //   Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp.data);
+        //   this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, "success");
+        // }else if(resp.action == "DELETE"){
+        //   this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
+        //   this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, "error");
+        // }
+      })
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
+      });
   }
 
   private openNewPieceComptable() {
-    // (this.$refs.refDialogPiece as AchatVentePieceVue)
-    //   .openNew(this.periodeData, this.journalSelected)
-    //   .then((resp) => {
-    //     this.displayAddResult(resp.data);
-    //     this.piecesComptables.unshift(resp.data);
-    //   })
-    //   .finally(() => {
-    //     this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-    //   });
+    (this.$refs.refDialogPiece as PieceComptableVue)
+      .OpenNew(this.periodeSelected, this.journalSelected)
+      .then((resp) => {
+        // this.displayAddResult(resp.data);
+        // this.piecesComptables.unshift(resp.data);
+      })
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+      });
   }
 
   private async LoadPiecesComptables() {
