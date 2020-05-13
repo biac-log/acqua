@@ -62,7 +62,7 @@
           fab
           class="ml-5"
           :disabled="!searchIsValid"
-          @click="openNewPieceComptable"
+          @click.stop="openNewPieceComptable"
         >
           <v-icon>mdi-plus</v-icon>
         </v-btn>

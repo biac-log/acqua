@@ -1,4 +1,5 @@
 import { Extrait } from './Extrait';
+import moment from 'moment';
 
 export class PieceDTO {
   numeroJournal= 0;
@@ -18,5 +19,12 @@ export class Piece extends PieceDTO {
     super();
     Object.assign(this, dto || new PieceDTO());
     this.extraits =  dto?.extraits.map(e => new Extrait(e)) || [];
+  }
+
+  get datePieceDate(): Date {
+    return moment(this.datePiece).toDate();
+  }
+  set datePieceDate(date: Date) {
+    this.datePiece = date.toISOString();
   }
 }

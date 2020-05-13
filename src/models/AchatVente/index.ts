@@ -1,5 +1,5 @@
 export * from './Get/TypeCompte';
-export * from './Get/Devise';
+export * from '../Devise/Devise';
 export * from './Get/PeriodeComptable';
 export * from './Get/EntetePieceComptable';
 export * from './Get/Statut';

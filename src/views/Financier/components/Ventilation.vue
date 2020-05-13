@@ -264,16 +264,13 @@ export default class extends Vue {
   public open(
     ventilation: Ventilation,
     numeroJournal: number,
-    deviseEntete: Devise,
-    ventileDevise: number,
-    tvaCalcule : number,
-    tvaImpute: number
+    deviseEntete: Devise
   ): Promise<Ventilation> {
     this.dialog = true;
     this.isNew = false;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.init(ventilation, numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
+      this.init(ventilation, numeroJournal, deviseEntete);
     });
 
     return new Promise((resolve, reject) => {
@@ -294,7 +291,7 @@ export default class extends Vue {
     this.isNew = true;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.init(ventilation || new Ventilation(), numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
+      this.init(ventilation || new Ventilation(), numeroJournal, deviseEntete);
     });
 
     return new Promise((resolve, reject) => {
@@ -306,10 +303,7 @@ export default class extends Vue {
   private init(
     ventilation: Ventilation,
     numeroJournal: number,
-    deviseEntete: Devise,    
-    ventileDevise: number,
-    tvaCalcule : number,
-    tvaImpute: number
+    deviseEntete: Devise   
   ) {
     this.initDevises(deviseEntete, ventilation);
     this.numeroJournal = numeroJournal;
@@ -324,9 +318,9 @@ export default class extends Vue {
     //this.caseTva.Refresh(ventilation.caseTva);
     this.libelleCaseTva = ventilation.libelleCaseTVA;
 
-    this.ventileDevise = ventileDevise;
-    this.tvaCalcule = tvaCalcule;
-    this.tvaImpute = tvaImpute;
+    // this.ventileDevise = ventileDevise;
+    // this.tvaCalcule = tvaCalcule;
+    // this.tvaImpute = tvaImpute;
   }
 
   private initDevises(

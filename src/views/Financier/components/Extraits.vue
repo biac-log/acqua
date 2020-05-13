@@ -31,7 +31,7 @@
         dense
       >
         <template v-slot:item="{ item }">
-          <tr class="rowParent" @click="editExtrait(item)">
+          <tr class="rowParent" :key="item.id" @click="editExtrait(item)">
             <td>{{ item.numeroExtrait }}</td>
             <td></td>
             <td>{{ item.libelleCompte }}</td>
@@ -43,7 +43,7 @@
             <td></td>
             <td></td>
           </tr>
-          <tr class="rowChild" v-for="ventilation in item.ventilations" :key="ventilation.numeroVentilation">
+          <tr class="rowChild" v-for="ventilation in item.ventilations" :key="`${item.numeroExtrait}.${ventilation.numeroVentilation}`">
             <td ></td>
             <td >{{ ventilation.numeroVentilation }}</td>
             <td >{{ `${ventilation.typeCompte} ${ventilation.nomCompte}` }}</td>
@@ -58,10 +58,10 @@
         </template>
       </v-data-table>
     </v-card>
-    <span :class="ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
+    <!-- <span :class="ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
       <span >Montant à ventille : <b>{{ ventilleDevise }} {{ devise ? devise.libelle : "EUR" }}</b></span>
       <span v-if="devise && devise.id != 1">/ <b>{{ ventilleBase }} EUR</b></span>
-    </span>
+    </span> -->
   </v-container>
 </template>
 
@@ -110,7 +110,6 @@ export default class extends Vue {
   }
 
   private editExtrait(piece: Extrait) {
-    console.log("caca");
     (this.$refs.refExtraitVue as ExtraitVue).open(piece);
     // (this.$refs.editContrepartie as EditContrepartieVue)
     //   .open(piece, this.journal.numero, this.devise, this.getVentileDevise(piece), this.getTvaCalcule(piece), this.getTvaImpute(piece))
@@ -193,5 +192,9 @@ export default class extends Vue {
 
 .rowParent{
   background-color: lightgray;
+}
+
+.v-text-field.v-text-field--enclosed .v-text-field__details {
+  margin-bottom: 0px;
 }
 </style>

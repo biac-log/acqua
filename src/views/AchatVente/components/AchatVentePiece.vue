@@ -369,6 +369,7 @@ import CompteGenerealSearch from '../../../models/Compte/CompteGeneralSearch';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import * as DateMethods from '@/utils/DateMethods'
 import { DateTime } from '../../../models/DateTime';
+import { DeviseApi } from "@/api/DeviseApi";
 
 
 @Component({
@@ -636,7 +637,7 @@ export default class extends Vue {
 
   private async loadDevises() {
     if(this.devises.length <= 1){
-      this.devises = await AchatVenteApi.getAllDevises();
+      this.devises = await DeviseApi.getAllDevises();
     }
   }
   private getDeviseToSelect(deviseSelected: Devise): Devise{
@@ -689,7 +690,7 @@ export default class extends Vue {
     if(!numeroDevise || numeroDevise == 1)
       this.taux = "1";
     else {
-      AchatVenteApi.getTaux(numeroDevise, datePiece)
+      DeviseApi.getTaux(numeroDevise, datePiece)
       .then((resp) => {
         this.taux = resp.toFixed(2);
       }).catch((err) => {
@@ -707,7 +708,7 @@ export default class extends Vue {
   @Watch("deviseSelected")
   private deviseSelectedChanged(val: Devise, oldVal: Devise){
     if(!this.piecereadonly && val){
-      AchatVenteApi.getTaux(this.deviseSelected.id, this.datePiece)
+      DeviseApi.getTaux(this.deviseSelected.id, this.datePiece)
       .then((resp) => {
         this.taux = resp.toFixed(2);
       }).catch((err) => {

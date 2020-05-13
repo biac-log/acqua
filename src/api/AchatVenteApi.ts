@@ -93,23 +93,8 @@ export abstract class AchatVenteApi {
     return new CaseTva(response.data);
   }
 
-  static async getDevises(): Promise<CaseTva> {
-    let response = await this.achatVenteAxios.get<CaseTvaDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDevises`);
-    return new CaseTva(response.data);
-  }
-
-  static async getTaux(devise: number, datePiece: DateTime): Promise<number> {
-    let response = await this.achatVenteAxios.get<number>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetTaux?devise=${devise}&datePiece=${datePiece.toUtc()}`);
-    return response.data;
-  }
-
   static async getAllStatut(): Promise<Statut[]> {
     let response = await this.achatVenteAxios.get<Statut[]>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetStatuts`);
-    return response.data;
-  }
-
-  static async getAllDevises(): Promise<Devise[]> {
-    let response = await this.achatVenteAxios.get<Devise[]>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetDevises`);
     return response.data;
   }
 

@@ -3,6 +3,7 @@ import {JournalDTO, Journal, PeriodeComptable, PeriodeComptableDTO, EntetePieceC
 import { UserModule } from "@/store/modules/user";
 import { Pagination } from '@/models/Pagination';
 import { PaginationResult } from '@/models/PaginationResult';
+import { Reglement, ReglementDTO } from '@/models/Financier/Get/Reglement';
 
 export abstract class FinancierApi {
   private static axios = Axios.create({headers: { Authorization: `Bearer ${UserModule.token}` }});
@@ -29,5 +30,10 @@ export abstract class FinancierApi {
   static async getPieceComptable( numeroJournal: string | number, numeroPiece: string | number): Promise<Piece> {
     let response = await this.axios.get<PieceDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetPieceComptable?journal=${numeroJournal}&piece=${numeroPiece}`);
     return new Piece(response.data);
+  }
+
+  static async getReglements(): Promise<Reglement[]> {
+    let response = await this.axios.get<ReglementDTO[]>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetAllReglements`);
+    return response.data.map(reglement => new Reglement(reglement));
   }
 }

@@ -3,9 +3,10 @@
     v-model="dialog"
     scrollable
     width="2000"
+    eager
     @keydown.f2="ModifierPiece"
     @keydown.del.prevent.stop="DeletePiece"
-    @keydown.plus.prevent.stop="CreateContrepartie"
+    @keydown.plus.prevent.stop="CreateExtrait"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
@@ -49,28 +50,13 @@
             <v-col cols="12" x-lg="5" lg="12">
               <v-row dense>
                 <v-col cols="1">
-                  <DatePicker
-                    label="Date pièce"
-                    :date.sync="datePiece"
-                    :readonly.sync="readonly"
-                    :rules.sync="datePieceRules"
-                  ></DatePicker>
-                </v-col>
-                <v-col cols="1">
                   <v-text-field
                     label="Numéro compte"
                     ref="numeroCompte"
                     v-model="numeroCompte"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :append-icon="readonly ? '' : 'mdi-magnify'"
-                    :rules="numeroCompteRules"
-                    @keypress.enter="loadCompte"
-                    @keyup.enter="$event.target.select()"
-                    @click:append="OpenSearchCompte()"
-                    @focus="$event.target.select()"
-                    @blur="loadCompte"
-                    validate-on-blur
+                    filled
+                    readonly
+                    tabindex="-1"
                   >
                   </v-text-field>
                 </v-col>
@@ -78,31 +64,31 @@
                   <v-text-field
                     label="Nom compte"
                     :value="nomCompte"
-                    :filled="readonly"
+                    filled
                     tabindex="-1"
                     readonly
                   ></v-text-field>
                 </v-col>
               </v-row>
               <v-row dense>
-                <!-- <v-col cols="2">
-                  <v-select
-                    :items="devises"
-                    v-model="deviseSelected"
+                <v-col cols="2">
+                  <DatePicker
+                    ref="refDatePiece"
+                    name="datePiece"
+                    label="Date pièce"
+                    :date.sync="datePiece"
+                    :readonly.sync="readonly"
                     :filled="readonly"
-                    :readonly="readonly"
-                    return-object
-                    item-text="libelle"
-                    label="Devise pièce"
-                  ></v-select>
-                </v-col> -->
+                    :rules.sync="datePieceRules"
+                  ></DatePicker>
+                </v-col>
                 <v-col cols="2">
                   <v-text-field
                     label="Solde initial"
                     v-model="soldeInitial"
                     :rules="numberRules"
-                    :filled="readonly"
-                    :readonly="readonly"
+                     filled
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-col cols="2">
@@ -110,8 +96,8 @@
                     label="Solde actuel"
                     v-model="soldeActuel"
                     :rules="numberRules"
-                    :filled="readonly"
-                    :readonly="readonly"
+                    filled
+                    readonly
                   ></v-text-field>
                 </v-col>
                 <v-col cols="2">
@@ -119,8 +105,8 @@
                     label="A Ventille"
                     v-model="soldeActuel"
                     :rules="numberRules"
-                    :filled="readonly"
-                    :readonly="readonly"
+                    filled
+                    readonly
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -210,6 +196,7 @@ import { AchatVenteApi } from '@/api/AchatVenteApi';
 import { DateTime } from '@/models/DateTime';
 import DatePicker from '@/components/DatePicker.vue';
 import ExtraitsVue from "./Extraits.vue";
+import { DeviseApi } from "@/api/DeviseApi";
 
 @Component({
   name: "PieceComptableVue",
@@ -228,9 +215,10 @@ export default class extends Vue {
   private journal = new Journal();
 
   private numeroPiece = "";
+
   private numeroCompte: string = "";
-  private numeroCompteRules: any = [(v: string) => !!v || "Numéro obligatoire", (v: string) => !!+v || "Numéro invalide"];
   private nomCompte: string = "";
+
   private devises: Devise[] = [];
   private deviseSelected: Devise = new Devise();
   private devisesIsLoading = false;
@@ -245,7 +233,6 @@ export default class extends Vue {
   private soldeActuel: string= "";
   private numberRules: any = [(v: string) => (!v || !!+v || +v == 0)  || "Montant invalide"];
 
-
   private validateDatePiece(date: string) : boolean { 
     let dateTime = new DateTime(date);
     return dateTime.isBetween(this.periode.dateDebut, this.periode.dateFin);
@@ -257,6 +244,8 @@ export default class extends Vue {
     this.readonly = false;
     this.periode = periode;
     this.journal = journal;
+    this.numeroCompte = journal.compteBanque.numero.toString();
+    this.nomCompte = journal.compteBanque.nom;
     this.loadDataForEdit();
 
     let today = DateTime.today();
@@ -266,6 +255,7 @@ export default class extends Vue {
       this.datePiece = this.periode.dateFin;
     else this.datePiece = today;
 
+    this.$nextTick(() => (this.$refs.refDatePiece as DatePicker).focus());
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -278,6 +268,7 @@ export default class extends Vue {
     this.periode = periode;
     this.journal = journal;
     this.init(piece);
+    
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -287,6 +278,7 @@ export default class extends Vue {
   private init(piece: Piece){
     this.numeroPiece = piece.numeroPiece.toString();
     this.numeroCompte = piece.numeroCompteFinancier.toString();
+    this.datePiece = new DateTime(piece.datePiece);
     this.nomCompte = piece.nomCompteFinancier;
     this.deviseSelected = piece ? this.getDeviseToSelect(new Devise({id: piece.codeDeviseJournal, libelle: piece.libelleDeviseJournal, typeDevise: "D"})) : this.devises[0];
     this.soldeInitial = piece.soldeInitial.toFixed(2);
@@ -298,14 +290,15 @@ export default class extends Vue {
     try {
       this.devisesIsLoading = true;
       if(this.devises.length <= 1){
-        this.devises = await AchatVenteApi.getAllDevises();
+        this.devises = await DeviseApi.getAllDevises();
       }
     } catch (err) {
-      this.errorMessage = "Erreur lors du chargement des devises."
+      this.errorMessage = "Erreur lors du chargement des devises.";
     }finally{
       this.devisesIsLoading = false;
     }
   }
+
   private getDeviseToSelect(deviseSelected: Devise): Devise{
     let deviseToSelect = this.devises.find(d => d.id == deviseSelected.id);
     if(!deviseToSelect){
@@ -313,17 +306,6 @@ export default class extends Vue {
       return deviseSelected;
     }
     else return deviseToSelect;
-  }
-  @Watch("deviseSelected")
-  private deviseSelectedChanged(val: Devise, oldVal: Devise){
-    // if(!this.readonly && val){
-    //   AchatVenteApi.getTaux(this.deviseSelected.id, this.datePiece)
-    //   .then((resp) => {
-    //     this.taux = resp.toFixed(2);
-    //   }).catch((err) => {
-    //     this.errorMessage = displayAxiosError(err);
-    //   });
-    // }
   }
 
   private OpenSearchCompte(): void {
@@ -353,6 +335,7 @@ export default class extends Vue {
     // this.codeTaxe = compte ? compte.codeTaxe : 0;
     // this.initDateEcheance(this.numeroCompteTier, this.typeCompte, this.datePiece);
   }
+
   private loadCompte(){
 
   }
@@ -361,12 +344,13 @@ export default class extends Vue {
 
   }
 
-  private CreateContrepartie(){
+  private CreateExtrait(){
 
   }
 
   private ModifierPiece(){
     this.readonly = false;
+    (this.$refs.refDatePiece as DatePicker).focus();
   }
 
   private closeDialog(){

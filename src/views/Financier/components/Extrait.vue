@@ -53,20 +53,29 @@
               <v-text-field
                 label="Montant"
                 v-model="montant"
+                :filled="readonly"
                 :readonly="readonly"
+                autofocus
               ></v-text-field>
             </v-col>
             <v-col cols="3">
-              <v-text-field
+              <v-select
+                :items="reglements"
+                v-model="reglementSelected"
                 label="Règlement"
-                v-model="reglement"
+                item-text="libelle"
+                return-object
+                :filled="readonly"
                 :readonly="readonly"
-              ></v-text-field>
+                :hide-details="readonly"
+                :rules="reglementsRules"
+              ></v-select>
             </v-col>
             <v-col cols="6">
               <v-text-field
                 label="Différence change"
                 v-model="differenceChange"
+                :filled="readonly"
                 :readonly="readonly"
               ></v-text-field>
             </v-col>
@@ -161,6 +170,7 @@ import axios, { AxiosError } from "axios";
 import CompteGenerealSearch from "@/models/Compte/CompteGeneralSearch";
 import { TypeCompte } from "@/models/AchatVente";
 import VentilationVue from "./Ventilation.vue";
+import { Reglement } from '@/models/Financier/Get/Reglement';
 
 @Component({
   name: "Extrait",
@@ -182,6 +192,11 @@ export default class extends Vue {
   private numeroCompte: string = "";
   private nomCompte: string = "";
 
+  private reglementsLoading = false;
+  private reglements: Reglement[] = [];
+  private reglementSelected: Reglement = new Reglement();
+  private reglementsRules = [(v: string) => !!v || "Règlement obligatoire"];
+
   private montant = "";
   private reglement = "";
   private differenceChange = "";
@@ -198,6 +213,10 @@ export default class extends Vue {
     { text: "", value: "libelleDevise", width: 80 },
     { text: "TVA", value: "tva", width: 50 }
   ];
+
+  mounted(){
+    this.loadReglements();
+  }
 
   public open(extrait: Extrait): Promise<Extrait> {
     this.dialog = true;
@@ -226,13 +245,14 @@ export default class extends Vue {
     });
   }
 
-  private editVentilation() {
-    // (this.$refs.refVentilationVue as VentilationVue).open()
-    // .then(() => {
+  private editVentilation(ventilation: Ventilation) {
+    let devise = new Devise({id: ventilation.codeDevise, libelle: ventilation.libelleDevise, typeDevise: "D"});
+    (this.$refs.refVentilationVue as VentilationVue).open(ventilation, this.numeroJournal, devise)
+    .then(() => {
 
-    // }).catch(() => {
+    }).catch(() => {
 
-    // })
+    });
   }
 
   private init(extrait: Extrait) {
@@ -240,8 +260,30 @@ export default class extends Vue {
     this.numeroCompte = extrait.numeroCompte.toFixed(2);
     this.nomCompte = extrait.nomCompte;
     this.ventilations = extrait.ventilations;
+    this.montant = extrait.montantBaseSigned;
+    this.setReglement(extrait.libelleReglement);
     // this.initDevises(deviseEntete, contrepartie);
     // this.numeroJournal = numeroJournal;
+  }
+
+  private async setReglement(libelleReglement: string){
+    if(!this.reglements)
+      await this.loadReglements();
+    
+    let reglementSelected = this.reglements.find(r => r.libelle == libelleReglement);
+    if(reglementSelected)
+      this.reglementSelected = reglementSelected;
+    else
+      this.reglementSelected = new Reglement({numero: 999, libelle: libelleReglement});
+  }
+
+  private async loadReglements(){
+    try {
+      this.reglementsLoading = true;
+      this.reglements = await FinancierApi.getReglements();
+    }finally{
+      this.reglementsLoading = false;
+    }
   }
 
   private initDevises(deviseEntete: Devise, extrait?: Extrait) {
@@ -375,4 +417,8 @@ export default class extends Vue {
 }
 </script>
 
-<style></style>
+<style>
+.v-text-field.v-text-field--enclosed .v-text-field__details {
+  margin-bottom: 0px;
+}
+</style>

@@ -11,6 +11,7 @@
     <template v-slot:activator="{}">
       <v-text-field
         v-model="dateFormatted"
+        ref="refDate"
         :label="label"
         :prepend-icon="isReadonly ? '' : 'mdi-calendar'"
         :filled="isReadonly"
@@ -18,6 +19,7 @@
         :rules="dateRules"
         @click:prepend="menuDate = true"
         @blur="dateSelected = parseDate(dateFormatted)"
+        @focus="$event.target.select()"
         :hide-details="isReadonly"
         validate-on-blur
       ></v-text-field>
@@ -81,6 +83,10 @@ export default class extends Vue {
     if (!val.isValid()) 
       this.dateSelected = ""
     else if (!val.isSame(currentDate)) this.dateSelected = val.toUtc();
+  }
+
+  public focus() {
+    this.$nextTick(() => (this.$refs.refDate as any).focus());
   }
 }
 </script>
