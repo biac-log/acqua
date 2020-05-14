@@ -1,11 +1,11 @@
 import moment from "moment";
 import { DateTime } from '@/models/DateTime';
 
-export const numberToString = (number: number, nbDecimal: number) => {
+export const numberToString = (number: number, nbDecimal: number = 2) => {
   if(!nbDecimal) nbDecimal = 2;
   
   if(!number) return ''; 
-  else return number.toFixed(nbDecimal);
+  else return Intl.NumberFormat("fr-FR", {minimumFractionDigits: 2}).format(number);
 }
 
 export const dateToString = (dateTime: Date, format: string) => {

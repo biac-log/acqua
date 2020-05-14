@@ -257,7 +257,7 @@ export default class extends Vue {
 
   private init(extrait: Extrait) {
     this.typeCompte = extrait.typeCompte;
-    this.numeroCompte = extrait.numeroCompte.toFixed(2);
+    this.numeroCompte = extrait.numeroCompte.toDecimalString(2);
     this.nomCompte = extrait.nomCompte;
     this.ventilations = extrait.ventilations;
     this.montant = extrait.montantBaseSigned;
@@ -307,9 +307,9 @@ export default class extends Vue {
 
   private calculMontant() {
     // if(this.caseTva.typeCase == 50)
-    //   this.montant = this.calculMontantTva().toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+    //   this.montant = this.calculMontantTva().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
     // else if(this.caseTva.typeCase == 1)
-    //   this.montant = this.calculMontantTaxable().toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+    //   this.montant = this.calculMontantTaxable().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
   }
   private calculMontantTva(): number {
     // let montantTva = this.tvaCalcule - this.tvaImpute;

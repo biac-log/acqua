@@ -81,7 +81,7 @@ export abstract class AchatVenteApi {
     let response = await this.achatVenteAxios.get<
     CaseTva[]
     >(
-      `${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetCasesTVADisponibles?numeroJournal=${journal}`
+      `${process.env.VUE_APP_ApiAcQuaCore}/CaseTVA/GetCasesTVADisponibles?numeroJournal=${journal}`
     );
     return response.data.map(
       caseTvaDTO => new CaseTva(caseTvaDTO)
@@ -89,7 +89,7 @@ export abstract class AchatVenteApi {
   }
 
   static async getCaseTVA(numeroCase: number | string, numeroJournal : number | string): Promise<CaseTva> {
-    let response = await this.achatVenteAxios.get<CaseTvaDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetCaseTVA?numeroCase=${numeroCase}&numeroJournal=${numeroJournal}`);
+    let response = await this.achatVenteAxios.get<CaseTvaDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/CaseTVA/GetCaseTVA?numeroCase=${numeroCase}&numeroJournal=${numeroJournal}`);
     return new CaseTva(response.data);
   }
 

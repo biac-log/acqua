@@ -7,6 +7,7 @@ import vuetify from "./plugins/vuetify";
 import * as filters from '@/utils/FiltersMethods'
 import * as moment from 'moment';
 import 'moment/locale/fr';
+import "@/utils/Extensions";
 moment.locale('fr')
 
 Vue.config.productionTip = false;

@@ -26,22 +26,22 @@ export class Extrait extends ExtraitDTO {
   }
 
   get montantDebit(): string {
-    return this.codeMouvement == "DB" ? this.montantDevise.toFixed(2) : "";
+    return this.codeMouvement == "DB" ? this.montantDevise.toDecimalString(2) : "";
   }
 
   get montantCredit(): string {
-    return this.codeMouvement != "DB" ? this.montantDevise.toFixed(2) : "";
+    return this.codeMouvement != "DB" ? this.montantDevise.toDecimalString(2) : "";
   }
 
   get montantBaseSigned(): string {
     return this.codeMouvement == "DB"
-      ? (this.montantBase * -1).toFixed(2)
-      : this.montantBase.toFixed(2);
+      ? (this.montantBase * -1).toDecimalString(2)
+      : this.montantBase.toDecimalString(2);
   }
 
   get montantDeviseSigned(): string {
     return this.codeMouvement != "DB"
-      ? (this.montantDevise * -1).toFixed(2)
-      : this.montantDevise.toFixed(2);
+      ? (this.montantDevise * -1).toDecimalString(2)
+      : this.montantDevise.toDecimalString(2);
   }
 }

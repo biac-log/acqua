@@ -86,11 +86,11 @@ export class PieceComptable extends PieceComptableDTO {
   }
 
   get libelleMontantBase(): string {
-    return `${this.montantBase.toFixed(2)} ${this.deviseComptaLibelle}`;
+    return `${this.montantBase.toDecimalString(2)} ${this.deviseComptaLibelle}`;
   }
 
   get stringMontantBase(): string {
-    return `${this.montantBase.toFixed(2)} ${this.deviseComptaLibelle}`;
+    return `${this.montantBase.toDecimalString(2)} ${this.deviseComptaLibelle}`;
   }
 
   get libelleCompteAssocie(): string {
@@ -102,7 +102,7 @@ export class PieceComptable extends PieceComptableDTO {
   }
 
   get libelleSoldeCompteTiers(): string {
-    return `${this.compteTiersSoldeComptable.toFixed(2)} ${
+    return `${this.compteTiersSoldeComptable.toDecimalString(2)} ${
       this.compteTiersLibelleDevise
     }`;
   }

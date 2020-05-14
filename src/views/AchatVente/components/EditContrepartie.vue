@@ -191,7 +191,6 @@ import { Component, Vue, PropSync, Emit, Prop, Watch } from "vue-property-decora
 import {
   PieceComptableContrepartie,
   TypeCompte,
-  Devise,
   TypeMouvement,
   getTypesMouvements,
 	CaseTva
@@ -202,6 +201,8 @@ import SearchCompteContrepartieVue from "./SearchCompteContrepartie.vue";
 import SearchCaseTvaVue from "@/components/search/SearchCaseTva.vue";
 import axios, { AxiosError } from "axios";
 import CompteGenerealSearch from "../../../models/Compte/CompteGeneralSearch";
+import { Devise } from '@/models/Devise/Devise'
+
 
 @Component({
   name: "EditContrepartie",
@@ -241,7 +242,7 @@ export default class extends Vue {
   private numeroCaseTva: string = "";
   private numeroCaseTvaRules: any = [
     (v: string) => !!v || "Case tva obligatoire",
-    (v: string) => (Number.isInteger(+v) && +v != 0) || "Numero invalide"
+    (v: string) => (v.isInt() && v.toNumber() != 0) || "Numero invalide"
   ];
   private caseTva: CaseTva = new CaseTva();
 
@@ -318,7 +319,7 @@ export default class extends Vue {
     this.nomCompte = contrepartie.compteLibelle;
     this.libelle = contrepartie.libelle;
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
-    this.montant = contrepartie.montantBase && this.devisesSelected ? contrepartie.montantBase.toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
+    this.montant = contrepartie.montantBase && this.devisesSelected ? contrepartie.montantBase.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
     this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : "";
     this.caseTva.Refresh(contrepartie.caseTva);
     this.libelleCaseTva = contrepartie.caseTva.libelleCase;
@@ -395,9 +396,9 @@ export default class extends Vue {
 
   private calculMontant(){
     if(this.caseTva.typeCase == 50)
-      this.montant = this.calculMontantTva().toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+      this.montant = this.calculMontantTva().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
     else if(this.caseTva.typeCase == 1)
-      this.montant = this.calculMontantTaxable().toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+      this.montant = this.calculMontantTaxable().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
   }
   private calculMontantTva() : number{
     let montantTva = this.tvaCalcule - this.tvaImpute;
@@ -421,7 +422,7 @@ export default class extends Vue {
   }
 
   private loadCaseTva() {
-    if (+this.numeroCaseTva) {
+    if (this.numeroCaseTva.isInt()) {
       this.tvaLoading = true;
       AchatVenteApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
         .then(caseTva => {
@@ -457,12 +458,12 @@ export default class extends Vue {
   private GetModel(): PieceComptableContrepartie {
     let contrepartie = new PieceComptableContrepartie();
     contrepartie.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : "";
-    contrepartie.numeroCompte = parseInt(this.numeroCompte);
+    contrepartie.numeroCompte = +this.numeroCompte;
     contrepartie.compteLibelle = this.nomCompte;
     contrepartie.libelle = this.libelle;
     contrepartie.codeMouvement = this.typesMouvementsSelected ? this.typesMouvementsSelected.id : "";
-    contrepartie.montantDevise = parseFloat(this.montant);
-    contrepartie.montantBase = parseFloat(this.montant);
+    contrepartie.montantDevise = this.montant.toNumber();
+    contrepartie.montantBase = this.montant.toNumber();
     contrepartie.codeDevise = this.devisesSelected ? this.devisesSelected.id : 0;
     contrepartie.libelleDevise = this.devisesSelected ? this.devisesSelected.libelle : "";
     contrepartie.caseTva = new CaseTva(this.caseTva);

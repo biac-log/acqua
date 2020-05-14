@@ -28,6 +28,6 @@ export default class CompteGenerealSearch extends CompteGeneralSearchDTO {
   }
 
   get libelleSolde(){
-    return this.solde.toFixed(2);
+    return this.solde.toDecimalString(2);
   }
 }

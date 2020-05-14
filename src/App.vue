@@ -14,7 +14,9 @@ import ServiceWorkerUpdatePopup from '@/components/ServiceWorkerUpdatePopup.vue'
 	name: "App",
 	components: { ServiceWorkerUpdatePopup }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+    
+}
 </script>
 
 <style lang="scss">

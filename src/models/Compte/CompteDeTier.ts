@@ -45,10 +45,10 @@ export class CompteDeTier extends CompteDeTierDTO {
   }
 
   get libelleCompteVenteAchat(): string{
-    return this.compteVenteAchatNumero ? `${this.compteVenteAchatNumero} ${this.compteVenteAchatNom}` : "";
+    return !!this.compteVenteAchatNumero ? `${this.compteVenteAchatNumero} ${this.compteVenteAchatNom}` : "";
   }
 
   get libelleSoldeCompteTiers(): string{
-    return `${this.soldeComptable.toFixed(2)} ${this.libelleDevise}`;
+    return `${this.soldeComptable.toDecimalString(2)} ${this.libelleDevise}`;
   }
 }

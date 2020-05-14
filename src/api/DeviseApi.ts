@@ -8,8 +8,8 @@ export abstract class DeviseApi {
   private static achatVenteAxios = Axios.create({headers: { Authorization: `Bearer ${UserModule.token}` }});
 
   static async getAllDevises(): Promise<Devise[]> {
-    let response = await this.achatVenteAxios.get<Devise[]>(`${process.env.VUE_APP_ApiAcQuaCore}/Devise/GetDevises`);
-    return response.data;
+    let response = await this.achatVenteAxios.get<DeviseDTO[]>(`${process.env.VUE_APP_ApiAcQuaCore}/Devise/GetDevises`);
+    return response.data.map(dev => new Devise(dev));
   }
 
   static async getTaux(devise: number, datePiece: DateTime): Promise<number> {

@@ -22,10 +22,10 @@ export class Ventilation extends VentilationDTO {
   }
 
   get montantDebit(): string{
-    return this.codeMouvement == "DB" ? this.montantDevise.toFixed(2) : "";
+    return this.codeMouvement == "DB" ? this.montantDevise.toDecimalString(2) : "";
   }
 
   get montantCredit(): string{
-    return this.codeMouvement != "DB" ? this.montantDevise.toFixed(2) : "";
+    return this.codeMouvement != "DB" ? this.montantDevise.toDecimalString(2) : "";
   }
 }

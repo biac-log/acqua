@@ -112,7 +112,7 @@
                     :readonly="piecereadonly"
                     :hide-details="piecereadonly"
                     return-object
-                    item-text="typePeriodeComptableLibelle"
+                    item-text="libelle"
                     label="Devise pièce"
                   ></v-select>
                 </v-col>
@@ -120,7 +120,7 @@
                   <v-text-field
                     label="Montant"
                     v-model="montantDevise"
-                    :rules="numberRules"
+                    :rules="montantRules"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
                     :hide-details="piecereadonly"
@@ -130,7 +130,7 @@
                   <v-text-field
                     label="Montant Escompte"
                     v-model="montantEscompte"
-                    :rules="numberRules"
+                    :rules="montantEscompteRules"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
                     :hide-details="piecereadonly"
@@ -349,7 +349,6 @@ import {
   EntetePieceComptable,
   PieceComptable,
   PieceComptableContrepartie,
-  Devise,
   Statut,
   Journal,
 	PieceComptableContrepartieSaveDTO,
@@ -370,7 +369,8 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import * as DateMethods from '@/utils/DateMethods'
 import { DateTime } from '../../../models/DateTime';
 import { DeviseApi } from "@/api/DeviseApi";
-
+import { Devise } from '@/models/Devise/Devise';
+import { numberToString } from '@/utils/FiltersMethods';
 
 @Component({
   name: "AchatVentePiece",
@@ -389,13 +389,14 @@ export default class extends Vue {
 
   //Encodage
   private numeroCompteTier: string = "";
-  private numeroCompteTierRules: any = [(v: string) => !!v || "Numéro obligatoire",(v: string) => !!+v || "Numéro invalide"];
+  private numeroCompteTierRules: any = [(v: string) => !!v || "Numéro obligatoire", (v: string) => v.isInt(true) || "Numéro invalide"];
   private libelle: string = "";
   private libelleRules: any = [(v: string) => !!v || "Libellé obligatoire"];
   private libelleWarningMessage: string = "";
   private montantDevise: string = "";
+  private montantRules: any = [(v: string) => v.isDecimal(true) || "Montant invalide"];
   private montantEscompte: string = "0";
-  private numberRules: any = [(v: string) => (!v || !!+v || +v == 0)  || "Montant invalide"];
+  private montantEscompteRules: any = [(v: string) => v.isDecimal(false) || "Montant invalide"];
   private devises: Devise[] = [];
   private deviseSelected: Devise = new Devise();
   private statuts: Statut[] = [];
@@ -451,7 +452,7 @@ export default class extends Vue {
   private forcerNumero: boolean = true;
   private numeroToForce: string = "";
   private numeroToForceRules: any = [(v: string) =>  !!v || "Numéro obligatoire", 
-                                     (v: string) => !!+v || "Numéro invalide"];
+                                     (v: string) => !!v.toNumber() || "Numéro invalide"];
 
   public async openNew(periode: PeriodeComptable, journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
     this.dialog= true;
@@ -560,12 +561,12 @@ export default class extends Vue {
     this.datePiece = new DateTime(pieceComptable.datePiece);
     this.dateEcheance = new DateTime(pieceComptable.dateEcheance);
 
-    this.montantDevise = pieceComptable.montantDevise.toString();
-    this.montantBase = pieceComptable.montantBase.toString();
-    this.montantEscompte = pieceComptable.montantEscompteDevise.toString();
+    this.montantDevise = pieceComptable.montantDevise.toDecimalString(2);
+    this.montantBase = pieceComptable.montantBase.toDecimalString(2);
+    this.montantEscompte = pieceComptable.montantEscompteDevise.toDecimalString(2);
     this.compteTiersNom = pieceComptable.compteTiersNom;
     this.libellePiece = pieceComptable.libelle;
-    this.taux = pieceComptable.taux.toString();
+    this.taux = pieceComptable.taux.toDecimalString(2);
     this.pieceAcquittee = pieceComptable.pieceAcquittee;
     this.libelleMontantBase = pieceComptable.libelleMontantBase;
     this.libelleSoldeCompteTiers = pieceComptable.libelleSoldeCompteTiers;
@@ -573,7 +574,7 @@ export default class extends Vue {
     this.compteTiersEscomptePourcentage = pieceComptable.compteTiersEscomptePourcentage;
     this.compteTiersEscompteNombreJours = pieceComptable.compteTiersEscompteNombreJours;
     this.libelleCompteAssocie = pieceComptable.libelleCompteAssocie;
-    this.numeroCompteAchatVente = pieceComptable.compteVenteAchatNumero.toString();
+    this.numeroCompteAchatVente = pieceComptable.compteVenteAchatNumero.toDecimalString(2);
     this.libelleCompteVenteAchat = pieceComptable.libelleCompteVenteAchat;
     
     this.deviseSelected = pieceComptable ? this.getDeviseToSelect(new Devise({id: pieceComptable.codeDevise, libelle: pieceComptable.libelleDevise, typeDevise: "D"})) : this.devises[0];
@@ -619,8 +620,8 @@ export default class extends Vue {
     this.compteTiersNom = compte ?  compte.nom : "";
     this.deviseSelected = compte ? this.getDeviseToSelect(new Devise({id: compte.codeDevise, libelle: compte.libelleDevise, typeDevise: "D"})) : this.devises[0];
     this.libelleSoldeCompteTiers = compte ? compte.libelleSoldeCompteTiers: "";
-    this.compteTiersEscomptePourcentage = compte ? compte.escomptePourcentage.toString(): "";
-    this.compteTiersEscompteNombreJours = compte ? compte.escompteNombreJours.toString(): "";
+    this.compteTiersEscomptePourcentage = compte ? compte.escomptePourcentage.toDecimalString(2): "";
+    this.compteTiersEscompteNombreJours = compte ? compte.escompteNombreJours.toDecimalString(2): "";
     this.libelleCompteAssocie = compte ? compte.libelleCompteAssocie: "";
     this.numeroCompteAchatVente = compte ? compte.compteVenteAchatNumero.toString(): "";
     this.libelleCompteVenteAchat = compte ? compte.libelleCompteVenteAchat : "";
@@ -692,7 +693,7 @@ export default class extends Vue {
     else {
       DeviseApi.getTaux(numeroDevise, datePiece)
       .then((resp) => {
-        this.taux = resp.toFixed(2);
+        this.taux = resp.toDecimalString(2);
       }).catch((err) => {
         this.errorMessage = displayAxiosError(err);
       });
@@ -710,7 +711,7 @@ export default class extends Vue {
     if(!this.piecereadonly && val){
       DeviseApi.getTaux(this.deviseSelected.id, this.datePiece)
       .then((resp) => {
-        this.taux = resp.toFixed(2);
+        this.taux = resp.toDecimalString(2);
       }).catch((err) => {
         this.errorMessage = displayAxiosError(err);
       });
@@ -720,8 +721,8 @@ export default class extends Vue {
   private recalculmontantBase(){
     if(this.piecereadonly) return;
 
-    if(+this.taux && +this.montantDevise){
-      this.montantBase = (Number.parseFloat(this.montantDevise) * Number.parseFloat(this.taux)).toFixed(2);
+    if(this.taux.isDecimal(true) && this.montantDevise.isDecimal(true)){
+      this.montantBase = (this.montantDevise.toNumber() * this.taux.toNumber()).toDecimalString(2);
       this.libelleMontantBase = `${this.montantBase} ${this.deviseSelected?.libelle}`;
     }
     else{
@@ -814,18 +815,18 @@ export default class extends Vue {
 
     pieceComptaSave.periode = this.periode.typePeriodeComptable;
     pieceComptaSave.numeroJournal = this.journal.numero;
-    pieceComptaSave.numeroPiece = +this.numeroPiece;
+    pieceComptaSave.numeroPiece = this.numeroPiece.toNumber();
     pieceComptaSave.datePiece = this.datePiece.toUtc();
     pieceComptaSave.dateEcheance = this.dateEcheance.toUtc();
-    pieceComptaSave.montantBase = +this.montantBase;
-    pieceComptaSave.montantDevise = +this.montantDevise;
+    pieceComptaSave.montantBase = this.montantBase.toNumber();
+    pieceComptaSave.montantDevise = this.montantDevise.toNumber();
     pieceComptaSave.codeDevise = this.deviseSelected.id;
     pieceComptaSave.libelle = this.libelle;
     pieceComptaSave.typeCompte = this.typeCompte;
-    pieceComptaSave.numeroCompte = +this.numeroCompteTier;
-    pieceComptaSave.numeroCompteAssocie = +this.numeroCompteAchatVente;
-    pieceComptaSave.montantEscompteBase = +this.montantEscompte * +this.taux
-    pieceComptaSave.montantEscompteDevise = +this.montantEscompte;
+    pieceComptaSave.numeroCompte = this.numeroCompteTier.toNumber();
+    pieceComptaSave.numeroCompteAssocie = this.numeroCompteAchatVente.toNumber();
+    pieceComptaSave.montantEscompteBase = this.montantEscompte.toNumber() * this.taux.toNumber();
+    pieceComptaSave.montantEscompteDevise = this.montantEscompte.toNumber();
     pieceComptaSave.codeBlocage = this.statutSelected.id;
     pieceComptaSave.pieceAcquittee = this.pieceAcquittee;
     pieceComptaSave.codeMouvement = this.journal.codeMouvement;
@@ -850,15 +851,15 @@ export default class extends Vue {
   private GetModelForGrid(): EntetePieceComptable {
     let entete = new EntetePieceComptable();
     entete.codeJournal = this.journal.numero;
-    entete.codePiece = +this.numeroPiece;
-    entete.escompte = +this.montantEscompte;
+    entete.codePiece = this.numeroPiece.toNumber();
+    entete.escompte = this.montantEscompte.toNumber();
     entete.libelle = this.libelle;
     entete.datePieceDate = this.datePiece;
     entete.dateEcheanceDate = this.dateEcheance;
     entete.status = this.statutSelected.id;
     entete.statusLibelle = this.statutSelected.libelle;
-    entete.montant = +this.montantDevise;
-    entete.numeroCompte = +this.numeroCompteTier;
+    entete.montant = this.montantDevise.toNumber();
+    entete.numeroCompte = this.numeroCompteTier.toNumber();
     entete.nomCompte = this.compteTiersNom;
     entete.devise = this.deviseSelected.libelle;
     return entete;
@@ -875,7 +876,7 @@ export default class extends Vue {
 
   private cancelEdit(){
     this.piecereadonly = true;
-    if(+this.numeroPiece != 0){
+    if(this.numeroPiece.toNumber() != 0){
       this.closeDialog
     }else this.closeDialog();
   }

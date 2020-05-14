@@ -14,6 +14,11 @@
         >
           <v-icon>mdi-plus</v-icon>
         </v-btn>
+        <v-spacer></v-spacer>
+        <span :class="!ventilleBase || ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
+          <span >Montant à ventiller : <b>{{ ventilleDevise }} {{ devise ? devise.libelle : "EUR" }}</b></span>
+          <span v-if="devise && devise.id != 1">/ <b>{{ ventilleBase }} EUR</b></span>
+        </span>
         <EditContrepartieVue
           ref="editContrepartie"
           :isReadOnly.sync="readonly"
@@ -31,21 +36,18 @@
       >
       </v-data-table>
     </v-card>
-    <span :class="ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
-      <span >Montant à ventille : <b>{{ ventilleDevise }} {{ devise ? devise.libelle : "EUR" }}</b></span>
-      <span v-if="devise && devise.id != 1">/ <b>{{ ventilleBase }} EUR</b></span>
-    </span>
   </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue, PropSync, Emit, Prop, Watch } from "vue-property-decorator";
-import { PieceComptableContrepartie, Devise, Journal } from "@/models/AchatVente";
+import { PieceComptableContrepartie, Journal } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import axios from "axios";
 import EditContrepartieVue from "./EditContrepartie.vue";
 import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
 import { CompteApi } from '@/api/CompteApi';
+import { Devise } from '@/models/Devise/Devise';
 
 @Component({
   name: "GridContreparties",
@@ -118,8 +120,7 @@ export default class extends Vue {
   public async createContrepartie(){
     if(!this.numeroCompteAchatVente || this.numeroCompteAchatVente == "0")
       this.addContrepartie();
-
-    if(this.contreparties.length == 0)
+    else if(this.contreparties.length == 0)
     {
       let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
       let tva = await AchatVenteApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
@@ -128,8 +129,8 @@ export default class extends Vue {
       contrepartie.compteLibelle = compteAchatVente.nom;
       contrepartie.libelle = this.nomCompteDeTier;
       contrepartie.codeMouvement = this.journal.codeMouvement == "DB" ? "CR" : "DB";
-      contrepartie.montantDevise = (+this.montantDevise / (1+(tva.tauxTvaCase/100)));
-      contrepartie.montantBase = +this.montantDevise / (1+(tva.tauxTvaCase/100));
+      contrepartie.montantDevise = this.montantDevise.toNumber() / ( 1 + (tva.tauxTvaCase/100));
+      contrepartie.montantBase = this.montantDevise.toNumber() / ( 1 + (tva.tauxTvaCase/100));
       contrepartie.caseTva = tva;
       this.addContrepartie(contrepartie);
     }
@@ -160,7 +161,7 @@ export default class extends Vue {
     if(!this.contreparties || ! this.journal)
       return 0;
 
-    let ventileCompta : number = +this.montantBase;
+    let ventileCompta : number = this.montantBase.toNumber();
     if(this.journal.codeMouvement == "CR")
       ventileCompta = ventileCompta * -1;
 
@@ -174,13 +175,13 @@ export default class extends Vue {
     if(!this.devise || !this.journal || !this.contreparties)
       return 0;
 
-    let ventileDevise : number = +this.montantBase;
+    let ventileDevise : number = this.montantBase.toNumber();
     if(this.journal.codeMouvement == "CR")
       ventileDevise = ventileDevise * -1;
-    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => +c.montantCredit).reduce((a,b) => a + b, 0);
-    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => +c.montantDebit).reduce((a,b) => a + b, 0);
+    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => c.montantCredit.toNumber()).reduce((a,b) => a + b, 0);
+    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => c.montantDebit.toNumber()).reduce((a,b) => a + b, 0);
     ventileDevise = ventileDevise + debit - credit;
-    return +ventileDevise.toFixed(this.devise.typeDevise == "E" ? 0 : 2);
+    return ventileDevise.toFixed(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
   }
 
   private getTvaCalcule(contrepartieToIgnore?: PieceComptableContrepartie): number {
@@ -191,15 +192,15 @@ export default class extends Vue {
     this.contreparties.filter(c => c !== contrepartieToIgnore).forEach(element => {
       let montantCase =  montantsCaseTva.find(c => c.case == element.caseTva.numeroCase);
       if(montantCase)
-        montantCase.montant += +element.montantCredit - +element.montantDebit;
+        montantCase.montant += element.montantCredit.toNumber() - element.montantDebit.toNumber();
       else if(element.caseTva.typeCase > 0 && element.caseTva.typeCase < 4 ){
         montantsCaseTva.push({case: element.caseTva.numeroCase, 
         caseTaux: element.caseTva.tauxTvaCase,
-        montant: +element.montantCredit - +element.montantDebit});
+        montant: element.montantCredit.toNumber() - element.montantDebit.toNumber()});
       }
     });
     
-    return +montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b, 0).toFixed(this.devise.typeDevise == "E" ? 0 : 2);
+    return montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b, 0).toFixed(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
   }
 
   private getTvaImpute(contrepartieToIgnore?: PieceComptableContrepartie): number {
@@ -207,7 +208,7 @@ export default class extends Vue {
       return 0;
 
     return this.contreparties.filter(c => (c.caseTva.typeCase == 50 || c.caseTva.typeCase == 51) && c.codeDevise == this.devise.id && c !== contrepartieToIgnore)
-      .map(c => +c.montantCredit - +c.montantDebit)
+      .map(c => c.montantCredit.toNumber() - c.montantDebit.toNumber())
       .reduce((a,b) => a + b, 0);
   }
 

@@ -44,19 +44,19 @@ export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
   }
 
   get montantDebit(): string{
-    return this.codeMouvement == "DB" ? this.montantDevise.toFixed(2) : "";
+    return this.codeMouvement == "DB" ? this.montantDevise.toDecimalString(2) : "";
   }
 
   get montantCredit(): string{
-    return this.codeMouvement != "DB" ? this.montantDevise.toFixed(2) : "";
+    return this.codeMouvement != "DB" ? this.montantDevise.toDecimalString(2) : "";
   }
 
   get montantDebitBase(): string{
-    return this.codeMouvement == "DB" ? this.montantBase.toFixed(2) : "";
+    return this.codeMouvement == "DB" ? this.montantBase.toDecimalString(2) : "";
   }
 
   get montantCreditBase(): string{
-    return this.codeMouvement != "DB" ? this.montantBase.toFixed(2) : "";
+    return this.codeMouvement != "DB" ? this.montantBase.toDecimalString(2) : "";
   }
 
   get libelleCaseTva():string{

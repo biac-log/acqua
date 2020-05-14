@@ -231,7 +231,7 @@ export default class extends Vue {
   private extraits: Extrait[] = [];
   private soldeInitial: string = "";
   private soldeActuel: string= "";
-  private numberRules: any = [(v: string) => (!v || !!+v || +v == 0)  || "Montant invalide"];
+  private numberRules: any = [(v: string) => v.isDecimal(true)  || "Montant invalide"];
 
   private validateDatePiece(date: string) : boolean { 
     let dateTime = new DateTime(date);
@@ -281,7 +281,7 @@ export default class extends Vue {
     this.datePiece = new DateTime(piece.datePiece);
     this.nomCompte = piece.nomCompteFinancier;
     this.deviseSelected = piece ? this.getDeviseToSelect(new Devise({id: piece.codeDeviseJournal, libelle: piece.libelleDeviseJournal, typeDevise: "D"})) : this.devises[0];
-    this.soldeInitial = piece.soldeInitial.toFixed(2);
+    this.soldeInitial = piece.soldeInitial.toDecimalString(2);
     this.extraits = piece.extraits;
     this.hash = piece.hash;
   }

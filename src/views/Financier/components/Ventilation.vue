@@ -241,7 +241,7 @@ export default class extends Vue {
   private numeroCaseTva: string = "";
   private numeroCaseTvaRules: any = [
     (v: string) => !!v || "Case tva obligatoire",
-    (v: string) => (Number.isInteger(+v) && +v != 0) || "Numero invalide"
+    (v: string) => (Number.isInteger(v.toNumber()) && v.toNumber() != 0) || "Numero invalide"
   ];
   private caseTva: CaseTva = new CaseTva();
 
@@ -313,7 +313,7 @@ export default class extends Vue {
     this.nomCompte = ventilation.nomCompte;
     this.libelle = ventilation.libelle;
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == ventilation.codeMouvement) || this.typesMouvements[0];
-    this.montant = ventilation.montantBase && this.devisesSelected ? ventilation.montantBase.toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
+    this.montant = ventilation.montantBase && this.devisesSelected ? ventilation.montantBase.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
     this.numeroCaseTva = ventilation.codeCaseTVA ? ventilation.codeCaseTVA.toString() : "";
     //this.caseTva.Refresh(ventilation.caseTva);
     this.libelleCaseTva = ventilation.libelleCaseTVA;
@@ -390,9 +390,9 @@ export default class extends Vue {
 
   private calculMontant(){
     if(this.caseTva.typeCase == 50)
-      this.montant = this.calculMontantTva().toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+      this.montant = this.calculMontantTva().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
     else if(this.caseTva.typeCase == 1)
-      this.montant = this.calculMontantTaxable().toFixed(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+      this.montant = this.calculMontantTaxable().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
   }
   private calculMontantTva() : number{
     let montantTva = this.tvaCalcule - this.tvaImpute;
@@ -452,12 +452,12 @@ export default class extends Vue {
   private GetModel(): Ventilation {
     let ventilation = new Ventilation();
     ventilation.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : "";
-    ventilation.numeroCompte = parseInt(this.numeroCompte);
+    ventilation.numeroCompte = +this.numeroCompte;
     ventilation.nomCompte = this.nomCompte;
     ventilation.libelle = this.libelle;
     ventilation.codeMouvement = this.typesMouvementsSelected ? this.typesMouvementsSelected.id : "";
-    ventilation.montantDevise = parseFloat(this.montant);
-    ventilation.montantBase = parseFloat(this.montant);
+    ventilation.montantDevise = this.montant.toNumber();
+    ventilation.montantBase = this.montant.toNumber();
     ventilation.codeDevise = this.devisesSelected ? this.devisesSelected.id : 0;
     ventilation.libelleDevise = this.devisesSelected ? this.devisesSelected.libelle : "";
     ventilation.codeCaseTVA = this.caseTva.numeroCase;

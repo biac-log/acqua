@@ -92,7 +92,7 @@ export default class extends Vue {
   private journal: number = 0;
   private nouveauNumero: string = "";
   private nouveauNumeroRules: any = [(v: string) =>  !!v || "Numéro obligatoire", 
-                                     (v: string) => (!!+v && v.length == 6) || "Numéro invalide"];
+                                     (v: string) => (!!v.toNumber() && v.length == 6) || "Numéro invalide"];
 
   private numeroLoading: boolean = false;
   private errorMessage: string = "";
@@ -125,10 +125,10 @@ export default class extends Vue {
 
   private saveNewNumero(){
     this.numeroLoading = true;
-    AchatVenteApi.ChangeNumero(this.periode, this.journal, +this.numero, +this.nouveauNumero)
+    AchatVenteApi.ChangeNumero(this.periode, this.journal, this.numero, this.nouveauNumero.toNumber())
       .then((resp) =>
       {
-        this.numero = +this.nouveauNumero;
+        this.numero = this.nouveauNumero.toNumber();
         this.$nextTick(() => (this.$refs.btnClose as any)?.$el?.focus());
       }).catch((err) => {
         this.errorMessage = displayAxiosError(err);
