@@ -2,7 +2,7 @@ import moment, { Moment } from "moment";
 // import { Permission } from "./Permission";
 
 export class DateTime {
-  private date: Moment;
+  public date: Moment;
 
   constructor(date?: string | Date | Moment){
     this.date = this.momentify(date);
@@ -11,15 +11,21 @@ export class DateTime {
   private momentify(date: string | Date | Moment | undefined) : Moment {
     if(date)
     {
-      if(moment(date).isValid())
+      if(typeof date === "string" && (date.length == 10 || date.length == 8)){
+        if (date.indexOf('-') > -1 && date.split('-')[0].length == 4)
+          return moment(date, "YYYY-MM-DD");
+        else if (date.indexOf('-') > -1 && date.split('-')[0].length == 2)
+          return moment(date, "DD-MM-YYYY");
+        else if (date.indexOf('/') > -1)
+          return moment(date, "DD/MM/YYYY");
+        else if (moment(date, "DDMMYYYY").isValid())
+          return moment(date, "DDMMYYYY");
+        else
+          return moment.invalid();
+      }else if(moment(date).isValid())
         return moment(date);
-      else if (moment(date, "DD/MM/YYYY").isValid())
-        return moment(date, "DD/MM/YYYY");
-      else if (moment(date, "DD-MM-YYYY").isValid())
-        return moment(date, "DD/MM/YYYY");
-      else if (moment(date, "DDMMYYYY").isValid())
-        return moment(date, "DDMMYYYY");
-      else return moment.invalid();
+      else
+        return moment.invalid();
     } 
     else return moment.invalid();
   }

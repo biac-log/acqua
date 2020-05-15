@@ -191,7 +191,6 @@ export default class extends Vue {
       });
   }
 
-
   @Watch("options")
   onOptionsChanged() {
     this.LoadPiecesComptables();
@@ -218,7 +217,7 @@ export default class extends Vue {
         this.piecesComptables = paginationResult.items.map(i => new EntetePieceComptable(i));
         this.totalItems = paginationResult.totalCount;
       }
-    } catch (err) {
+    }catch (err) {
       
     }finally{
       this.isLoadingPieces = false;

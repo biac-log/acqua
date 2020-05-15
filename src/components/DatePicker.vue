@@ -57,20 +57,16 @@ export default class extends Vue {
   private parseDate(date: string): string {
     if (!date) return "";
     else {
-      let dateClean = date.replace(/\-/g, "/");
-      if (moment(dateClean, "DD/MM/YYYY").isValid())
-        return moment(date, "DD/MM/YYYY").format("YYYY-MM-DD");
-      else if (moment(dateClean, "DDMMYYYY").isValid())
-        return moment(date, "DDMMYYYY").format("YYYY-MM-DD");
-      else return "";
+      return new DateTime(date).toString("YYYY-MM-DD")
     }
   }
 
   @Watch("dateSelected")
   private dateSelectedChanged(val: string, oldVal: string) {
     if (val) {
-      this.dateFormatted = moment(val, "YYYY-MM-DD").format("DD/MM/YYYY");
-      this.syncedDate = new DateTime(this.dateFormatted);
+      let date = new DateTime(val);
+      this.dateFormatted = date.toString();
+      this.syncedDate = date;
     } else {
       this.dateFormatted = "";
       this.syncedDate = new DateTime();
