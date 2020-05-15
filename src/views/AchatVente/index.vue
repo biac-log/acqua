@@ -10,12 +10,14 @@
               outlined
               persistent-hint
               required
-              :items="periodes"
+              return-object
+              item-text="typePeriodeComptableLibelle"
               v-model="periodeSelected"
+              :items="periodes"
               :loading="periodeIsLoading"
-              :hint="periodeData.libellePeriode"
+              :hint="periodeSelected.libellePeriode"
               :rules="periodesRules"
-              @change="LoadPeriode"
+              @change="LoadPiecesComptables"
             ></v-select>
           </v-col>
           <v-col cols="12" xs="12" md="6" lg="3">
@@ -29,17 +31,16 @@
               item-value="numero"
               :hint="
                 `Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`
-              "
+              "              
               return-object
               persistent-hint
-              @focus="LoadJournaux"
+              @change="LoadPiecesComptables"
               :rules="journalRules"
               required
             >
             </v-select>
-
           </v-col>
-          <v-col cols="12" xs="12" md="3" lg="3">
+          <!-- <v-col cols="12" xs="12" md="3" lg="3">
             <v-btn
               color="primary"
               id="btn-acqua"
@@ -50,7 +51,7 @@
               <v-icon>mdi-magnify</v-icon>
               Charger
             </v-btn>
-          </v-col>
+          </v-col> -->
         </v-row>
       </v-form>
     </v-card>
@@ -122,28 +123,27 @@ import { Pagination } from '@/models/Pagination';
 export default class extends Vue {
   private searchIsValid: boolean = true;
   private isErrorPeriode: boolean = false;
-  private periodeIsLoading: boolean = false;
   private libellePeriode: string = "";
   
-  private periodes: string[] = ["Période courante", "Période précédente"];
-  private periodeSelected: string = "";
+  private periodeIsLoading: boolean = false;
+  private periodes: PeriodeComptable[] = [];
+  private periodeSelected: PeriodeComptable = new PeriodeComptable();
   private periodesRules: any = [
     (v: string) => !this.isErrorPeriode || "Connexion impossible",
     (v: string) => !!v || "La période est obligatoire"
   ];
 
+  private isErrorJournaux: boolean = false;
   private journaux: Journal[] = [];
   private journauxIsLoading: boolean = false;
   private journalSelected: Journal = new Journal();
   private detailJournalSelected: string = "";
   private journalRules: any = [
+    (v: Journal) => !this.isErrorJournaux || "Connexion impossible",
     (v: Journal) => !!v || "Sélection de journal obligatoire",
     (v: Journal) => v.numero != 0 || "Sélection de journal obligatoire"
   ];
 
-  private periodeData: PeriodeComptable = new PeriodeComptable();
-  private periodeSearched: PeriodeComptable = new PeriodeComptable();
-  private journalSearched: Journal = new Journal();
   private selectedPiece!: EntetePieceComptable;
 
   private headers = [
@@ -164,31 +164,34 @@ export default class extends Vue {
   private options: any = {};
   private totalItems: number = 0;
 
-  private LoadPeriode() {
-    this.periodeIsLoading = true;
-    const periodeString: string =
-      this.periodeSelected == "Période précédente" ? "Precedente" : "Courante";
-    AchatVenteApi.getPeriodeComptable(periodeString)
-      .then(resp => {
-        this.periodeData = resp;
-      })
-      .catch(error => {
-        this.isErrorPeriode = true;
-      })
-      .finally(() => {
-        this.periodeIsLoading = false;
-      });
+  mounted() {
+    this.LoadPeriodes();
+    this.LoadJournaux();
   }
-  private LoadJournaux() {
-    this.journauxIsLoading = true;
-    JournalApi.getAll()
-      .then(resp => {
-        this.journaux = resp;
-      })
-      .catch(error => {})
-      .finally(() => {
-        this.journauxIsLoading = false;
-      });
+
+  private async LoadPeriodes() {
+    try {
+      this.periodeIsLoading = true;
+      let periodes = await AchatVenteApi.getPeriodes();
+      console.log(periodes);
+      periodes.forEach(p => this.periodes.push(p));
+    } catch (err) {
+      this.isErrorPeriode = true;
+    } finally {
+      this.periodeIsLoading = false;
+    }
+  }
+
+  private async LoadJournaux() {
+    try {
+      this.journauxIsLoading = true;
+      let journaux = await AchatVenteApi.getJournaux();
+      journaux.forEach(j => this.journaux.push(j));
+    } catch (err) {
+      this.isErrorJournaux = true;
+    } finally {
+      this.journauxIsLoading = false;
+    }
   }
 
   @Watch("options")
@@ -199,12 +202,7 @@ export default class extends Vue {
     try {
       if(this.periodeSelected && this.journalSelected.numero){
         this.isLoadingPieces = true;
-        let periode: string = "courante";
-        if (this.periodeSelected == "Période précédente") periode = "precedente";
         const { sortBy, sortDesc, page, itemsPerPage } = this.options;
-
-        this.periodeSearched = this.periodeData;
-        this.journalSearched = this.journalSelected;
 
         let pagination = new Pagination();
         pagination.terms = this.search;
@@ -213,7 +211,7 @@ export default class extends Vue {
         pagination.page = page;
         pagination.limit = itemsPerPage;
 
-        let paginationResult = await AchatVenteApi.GetEntetePiecesComptables(this.journalSelected.numero, periode, pagination);
+        let paginationResult = await AchatVenteApi.GetEntetePiecesComptables(this.journalSelected.numero, this.periodeSelected.typePeriodeComptable, pagination);
         this.piecesComptables = paginationResult.items.map(i => new EntetePieceComptable(i));
         this.totalItems = paginationResult.totalCount;
       }
@@ -226,7 +224,7 @@ export default class extends Vue {
 
   private OpenPieceComptable(entete: EntetePieceComptable) {
     (this.$refs.refDialogPiece as AchatVentePieceVue)
-      .open(entete, this.periodeData, this.journalSearched)
+      .open(entete, this.periodeSelected, this.journalSelected)
       .then(resp => {
         if(resp.action == "UPDATE"){
           Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp.data);
@@ -243,7 +241,7 @@ export default class extends Vue {
 
   private openNewPieceComptable() {
     (this.$refs.refDialogPiece as AchatVentePieceVue)
-      .openNew(this.periodeData, this.journalSelected)
+      .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
         this.displayAddResult(resp.data);
         this.piecesComptables.unshift(resp.data);
@@ -254,8 +252,7 @@ export default class extends Vue {
   }
 
   private displayAddResult(piece : EntetePieceComptable){
-    const periode = this.periodeSelected == "Période précédente" ? "precedente" : "courante";
-    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, periode).then((numero) => {
+    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected.typePeriodeComptable).then((numero) => {
       if(piece.codePiece != numero){
         piece.codePiece = numero;
         Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);

@@ -16,7 +16,9 @@ import {
   EntetePieceComptableDTO,
   EntetePieceComptable,
   Statut,
-  Devise
+  Devise,
+  Journal,
+  JournalDTO
 } from "@/models/AchatVente";
 import CompteGenerealSearch from '@/models/Compte/CompteGeneralSearch';
 import { PieceComptableSaveDTO } from '@/models/AchatVente';
@@ -28,9 +30,18 @@ import { Pagination } from '@/models/Pagination';
 export abstract class AchatVenteApi {
   private static achatVenteAxios = Axios.create({headers: { Authorization: `Bearer ${UserModule.token}` }});
 
-  static async getPeriodeComptable(periode: string) : Promise<PeriodeComptable>{
-    let response = await this.achatVenteAxios.get<PeriodeComptableDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetPeriode${periode}`);
-    return new PeriodeComptable(response.data);
+  static async getPeriodes(): Promise<PeriodeComptable[]>{
+    let responseCourante = await this.achatVenteAxios.get<PeriodeComptableDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetPeriodeCourante`);
+    let responsePrecedente = await this.achatVenteAxios.get<PeriodeComptableDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetPeriodePrecedente`);
+    let periodes: PeriodeComptable[] = [];
+    periodes.push(new PeriodeComptable(responseCourante.data));
+    periodes.push(new PeriodeComptable(responsePrecedente.data));
+    return periodes;
+  }
+
+  static async getJournaux(): Promise<Journal[]>{
+    let response = await this.achatVenteAxios.get<JournalDTO[]>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetJournaux`);
+    return response.data.map(journal => new Journal(journal));
   }
 
   static async GetEntetePiecesComptables(numeroJournal: number, periode: string, pagination: Pagination): Promise<PaginationResult<EntetePieceComptable>>{

@@ -57,7 +57,7 @@ export class EntetePieceComptable extends EntetePieceComptableDTO {
     return this._dateEcheanceDate;
   }
   set dateEcheanceDate(date: DateTime){
-    this._datePieceDate = date;
+    this._dateEcheanceDate = date;
     this.dateEcheance = date.toUtc();
   }
 }
