@@ -75,20 +75,20 @@
                     v-model="numeroCompteTierSelected"
                     :items="comptesTiersSearch"
                     :search-input.sync="searchCompteDeTier"
-                    :filled="piecereadonly"
-                    :readonly="piecereadonly"
                     :rules="numeroCompteTierRules"
                     @keypress.enter="loadCompte"
                     @keyup.enter="$event.target.select()"
                     @focus="$event.target.select()"
                     @change="numeroCompteTierChange"
                     :hide-details="piecereadonly"
+                    :filled="piecereadonly"
+                    :readonly="piecereadonly"
                     hide-selected
                     item-text="nom"
                     item-value="numero"
                     hide-no-data
                   >
-                   <template v-slot:append>
+                    <template v-slot:append>
                       <v-btn icon small :disabled="piecereadonly" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
                         <v-icon>mdi-magnify</v-icon>
                       </v-btn>
@@ -688,6 +688,7 @@ export default class extends Vue {
   private async setCompteDeTier(compte?: CompteDeTier) {
     if(compte){
       let compteToSelect = {numero:compte.numero, nom:compte.nom };
+      this.comptesTiersSearch = [];
       this.comptesTiersSearch.push(compteToSelect);
       this.numeroCompteTierSelected = compteToSelect;
     }
