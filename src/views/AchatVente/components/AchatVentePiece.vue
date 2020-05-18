@@ -49,7 +49,7 @@
           <v-row fill-height>
             <v-col cols="5">
               <v-row dense>
-                <v-col cols="4">
+                <!-- <v-col cols="4">
                   <v-text-field
                     label="Numéro compte tiers"
                     ref="numeroCompteTier"
@@ -67,6 +67,39 @@
                     :hide-details="piecereadonly"
                   >
                   </v-text-field>
+                </v-col> -->
+                <v-col cols="4">
+                  <v-combobox
+                    ref="numeroCompteTier"
+                    label="Numéro compte tiers"
+                    v-model="numeroCompteTierSelected"
+                    :items="comptesTiersSearch"
+                    :search-input.sync="searchCompteDeTier"
+                    :filled="piecereadonly"
+                    :readonly="piecereadonly"
+                    :rules="numeroCompteTierRules"
+                    @keypress.enter="loadCompte"
+                    @keyup.enter="$event.target.select()"
+                    @focus="$event.target.select()"
+                    @change="numeroCompteTierChange"
+                    :hide-details="piecereadonly"
+                    hide-selected
+                    item-text="nom"
+                    item-value="numero"
+                    hide-no-data
+                  >
+                   <template v-slot:append>
+                      <v-btn icon small :disabled="piecereadonly" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
+                        <v-icon>mdi-magnify</v-icon>
+                      </v-btn>
+                    </template>
+                    <template v-slot:selection="{ attr, on, item }">
+                      {{ item.numero }}
+                    </template>
+                    <template v-slot:item="{ item }">
+                      {{ item.nom }}
+                    </template>
+                  </v-combobox>
                 </v-col>
                 <v-col cols="8">
                   <v-text-field
@@ -104,18 +137,6 @@
                 </v-col>
               </v-row>
               <v-row dense>
-                <v-col cols="2">
-                  <v-select
-                    :items="devises"
-                    v-model="deviseSelected"
-                    :filled="piecereadonly"
-                    :readonly="piecereadonly"
-                    :hide-details="piecereadonly"
-                    return-object
-                    item-text="libelle"
-                    label="Devise pièce"
-                  ></v-select>
-                </v-col>
                 <v-col cols="4">
                   <v-text-field
                     label="Montant"
@@ -126,6 +147,19 @@
                     :hide-details="piecereadonly"
                   ></v-text-field>
                 </v-col>
+                <v-col cols="2">
+                  <v-select
+                    :items="devises"
+                    v-model="deviseSelected"
+                    :filled="piecereadonly"
+                    :readonly="piecereadonly"
+                    :hide-details="piecereadonly"
+                    tabindex="-1"
+                    return-object
+                    item-text="libelle"
+                    label="Devise pièce"
+                  ></v-select>
+                </v-col>
                 <v-col cols="4">
                   <v-text-field
                     label="Montant Escompte"
@@ -134,11 +168,12 @@
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
                     :hide-details="piecereadonly"
+                    tabindex="-1"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="2">
                   <v-text-field
-                    label="Taux"
+                    label="Taux devise"
                     readonly
                     v-model="taux"
                     :filled="piecereadonly"
@@ -175,6 +210,7 @@
                     item-text="libelle"
                     label="Statut"
                     hide-details="auto"
+                    tabindex="-1"
                   ></v-select>
                 </v-col>
               </v-row>
@@ -184,6 +220,7 @@
                     label="Pièce acquitée"
                     v-model="pieceAcquittee"
                     :readonly="piecereadonly"
+                    tabindex="-1"
                   ></v-checkbox>
                 </v-col>
                 <v-col cols="4">
@@ -283,7 +320,7 @@
           </v-row>
         </v-card-text>
         <v-divider v-if="!piecereadonly"></v-divider>
-        <v-card-actions v-if="!piecereadonly" class="d-flex">
+        <v-card-actions v-if="saveLoading || !piecereadonly" class="d-flex">
           <v-btn
             color="error"
             class="ma-2 pr-4 align-self-start"
@@ -388,8 +425,11 @@ export default class extends Vue {
   private numeroPiece: string = "";
 
   //Encodage
-  private numeroCompteTier: string = "";
-  private numeroCompteTierRules: any = [(v: string) => !!v || "Numéro obligatoire", (v: string) => v.isInt(true) || "Numéro invalide"];
+  private numeroCompteTier: string= "";
+  private numeroCompteTierRules: any = [(v: { numero: number | string }) => !!v?.numero || "Numéro obligatoire"];
+  private numeroCompteTierSelected: { numero: number | string, nom:string } = { numero: "", nom:"" };
+  private comptesTiersSearch: { numero: number, nom: string }[] = [];
+  private searchCompteDeTier: string = '';
   private libelle: string = "";
   private libelleRules: any = [(v: string) => !!v || "Libellé obligatoire"];
   private libelleWarningMessage: string = "";
@@ -509,6 +549,9 @@ export default class extends Vue {
     this.forcerNumero = false;
     this.numeroToForce = "";
 
+    this.comptesTiersSearch= [];
+    this.numeroCompteTierSelected = {numero:'', nom:'' };
+
     this.periodeDisplay = "";
     this.journal = new Journal();
     this.numeroPiece= "";
@@ -521,7 +564,6 @@ export default class extends Vue {
     this.datePiece = new DateTime();
     this.dateEcheance = new DateTime();
     this.typeCompte= "";
-    this.numeroCompteTier= "";
       
     this.compteTiersNom = "";
     this.libellePiece = "";
@@ -558,6 +600,13 @@ export default class extends Vue {
     this.numeroCompteTier = pieceComptable.compteTiersNumero.toString();
     this.libelle = pieceComptable.libelle;
 
+    if(pieceComptable){
+      let compteToSelect = {numero:pieceComptable.compteTiersNumero, nom:pieceComptable.compteTiersNom };
+      this.comptesTiersSearch = [];
+      this.comptesTiersSearch.push(compteToSelect);
+      this.numeroCompteTierSelected = compteToSelect;
+    }
+
     this.datePiece = new DateTime(pieceComptable.datePiece);
     this.dateEcheance = new DateTime(pieceComptable.dateEcheance);
 
@@ -585,8 +634,6 @@ export default class extends Vue {
   private compteLoading: boolean = false;
   private loadCompte() {
     if(this.piecereadonly) return;
-
-
     this.compteLoading = true;
     if(+this.numeroCompteTier){
       CompteApi.getCompteDeTier(this.typeCompte, this.numeroCompteTier.toString())
@@ -615,7 +662,36 @@ export default class extends Vue {
         this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
       });
   }
+  @Watch("searchCompteDeTier")
+  private async searchCompteDeTierChanged(matchCode: string){
+    try {
+      if(matchCode && !matchCode.toNumber()){
+        this.compteLoading = true;
+        this.comptesTiersSearch = await CompteApi.searchCompteDeTier(this.typeCompte, matchCode.toUpperCase(), 5);
+      }
+      else this.comptesTiersSearch = [];
+    } catch (err) {
+      
+    }finally{
+      this.compteLoading = false;
+    }
+  }
+  private numeroCompteTierChange(value: string | CompteSearch){
+    if(typeof value === "string")
+      this.numeroCompteTier = value;
+    else if(value instanceof CompteSearch)
+      this.numeroCompteTier = value.numero.toString();
+    else this.numeroCompteTier = "";
+    this.loadCompte();
+  }
+
   private async setCompteDeTier(compte?: CompteDeTier) {
+    if(compte){
+      let compteToSelect = {numero:compte.numero, nom:compte.nom };
+      this.comptesTiersSearch.push(compteToSelect);
+      this.numeroCompteTierSelected = compteToSelect;
+    }
+
     this.numeroCompteTier = compte ? compte.numero.toString() : "";
     this.compteTiersNom = compte ?  compte.nom : "";
     this.deviseSelected = compte ? this.getDeviseToSelect(new Devise({id: compte.codeDevise, libelle: compte.libelleDevise, typeDevise: "D"})) : this.devises[0];

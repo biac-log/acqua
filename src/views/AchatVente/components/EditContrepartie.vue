@@ -105,7 +105,7 @@
                 @blur="loadCaseTva"
               >
               <template v-slot:append>
-                <v-btn icon small :disabled="readonly" @click="OpenSearchCaseTva()" @keydown.enter.prevent.stop="OpenSearchCaseTva()">
+                <v-btn  icon small :disabled="readonly" @click="OpenSearchCaseTva()" @keydown.enter.prevent.stop="OpenSearchCaseTva()">
                   <v-icon>mdi-magnify</v-icon>
                 </v-btn>
               </template>
@@ -148,7 +148,7 @@
                 :hide-details="readonly"
               >
                 <template v-slot:append>
-                  <v-btn icon small :disabled="readonly" @click="calculMontant()" @keydown.enter.prevent.stop="calculMontant()">
+                  <v-btn icon small :disabled="readonly" @click="calculMontant()" @keydown.enter.prevent.stop="calculMontant()" tabindex="-1">
                     <v-icon>mdi-calculator</v-icon>
                   </v-btn>
                 </template>
@@ -422,7 +422,10 @@ export default class extends Vue {
   }
 
   private loadCaseTva() {
-    if (this.numeroCaseTva.isInt()) {
+    if(this.readonly)
+      return;
+
+    if ( this.numeroCaseTva.isInt()) {
       this.tvaLoading = true;
       AchatVenteApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
         .then(caseTva => {
@@ -444,11 +447,13 @@ export default class extends Vue {
       this.caseTva = new CaseTva();
     }
   }
-  private OpenSearchCaseTva(): void { (this.$refs.caseTvaDialog as SearchCaseTvaVue)
+  private OpenSearchCaseTva(): void { 
+    (this.$refs.caseTvaDialog as SearchCaseTvaVue)
       .open(this.numeroJournal)
       .then(caseTva => {
         this.numeroCaseTva = caseTva.numeroCase.toString();
         this.caseTva = caseTva;
+        //this.calculMontant();
         this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
       }).catch(() => {
         this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus())

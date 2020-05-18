@@ -27,6 +27,11 @@ export abstract class CompteApi {
     return new CompteDeTier(response.data);
   }
 
+  static async searchCompteDeTier(type: string, matchcode: string, nbrElement: number): Promise<CompteSearch[]> {
+    let response = await this.CompteAxios.get<CompteSearchDTO[]>(`${process.env.VUE_APP_ApiAcQuaCore}/Compte/GetComptesDeTiersByMatchcode?typeCompte=${type}&matchcode=${matchcode}&nbrElement=${nbrElement}`);
+    return response.data.map(CompteSearchDTO => new CompteSearch(CompteSearchDTO));
+  }
+
   static async getComptesGeneraux(
     type: string
   ): Promise<CompteGeneralSearch[]> {
