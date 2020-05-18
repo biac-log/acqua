@@ -83,9 +83,9 @@ export const asyncRoutes: RouteConfig[] = [
     ]
   },
   {
-    path: "/gestionUtilisateur",
+    path: "/utilisateurs",
     component: Layout,
-    redirect: "gestionUtilisateur/index",
+    redirect: "utilisateurs/index",
     meta: { roles: ["admin", "ACQUAACHATVENTE"] },
     children: [
       {
@@ -96,7 +96,7 @@ export const asyncRoutes: RouteConfig[] = [
           ),
         name: "Utilisateurs",
         meta: {
-          title: "Gestion Utilisateurs",
+          title: "Utilisateurs",
           icon: "mdi-account-outline",
           affix: true
         }
