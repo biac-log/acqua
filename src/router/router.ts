@@ -81,6 +81,27 @@ export const asyncRoutes: RouteConfig[] = [
         }
       }
     ]
+  },
+  {
+    path: "/gestionUtilisateur",
+    component: Layout,
+    redirect: "gestionUtilisateur/index",
+    meta: { roles: ["admin", "ACQUAACHATVENTE"] },
+    children: [
+      {
+        path: "index",
+        component: () =>
+          import(
+            "@/views/GestionUtilisateur/index.vue"
+          ),
+        name: "Utilisateurs",
+        meta: {
+          title: "Gestion Utilisateurs",
+          icon: "mdi-account-outline",
+          affix: true
+        }
+      }
+    ]
   }
 ];
 
