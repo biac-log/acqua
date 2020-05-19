@@ -350,7 +350,7 @@ export default class extends Vue {
 
     this.nomPrenom = utilisateur?.NomPrenom;
     this.code = utilisateur?.ID;
-    this.motDePasse = utilisateur?.MotDePasseApollo;
+    this.motDePasse = !!utilisateur ? 'xxxxxxx' : '';
     this.idActiveDirectory = utilisateur?.IdActiveDirectory;
     this.fonction = utilisateur?.Fonction;
     this.departement = utilisateur?.Departement;
@@ -400,7 +400,7 @@ export default class extends Vue {
 
   private GetModelToSave(): Utilisateur {
     this.utilisateur.NomPrenom = this.nomPrenom;
-    this.utilisateur.MotDePasseApollo = this.motDePasse;
+    this.utilisateur.MotDePasseApollo = this.motDePasse !== 'xxxxxxx' ? this.motDePasse : '';
     this.utilisateur.IdActiveDirectory = this.idActiveDirectory;
     this.utilisateur.Fonction = this.fonction;
     this.utilisateur.Departement = this.departement;
