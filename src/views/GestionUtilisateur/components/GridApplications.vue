@@ -75,7 +75,7 @@ export default class extends Vue {
   }
 
   private HasAccessApplication(application: Application) {
-    return !!this.allPermissions.find(e => e.ApplicationId === application.Id);
+    return !!this.allPermissions?.find(e => e.ApplicationId === application.Id);
   }
 }
 </script>

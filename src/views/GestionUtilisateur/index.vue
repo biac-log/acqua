@@ -3,6 +3,9 @@
     <v-card>
       <v-card-title>
         Utilisateurs
+        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click="OpenUtilisateur()">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
         <v-spacer></v-spacer>
         <v-checkbox v-model="exclureInactifs" label="Exclure utilisateurs inactifs" hide-details></v-checkbox>
         <v-spacer></v-spacer>
@@ -113,7 +116,11 @@ export default class extends Vue {
           this.utilisateurs.findIndex(e => e.ID == resp.ID),
           resp
         );
-        this.notifier(`Utilisateur <b>${resp.ID}</b> mis à jour.`, "success");
+        this.notifier(
+          `Utilisateur <b>${resp.NomPrenom}</b> mis à jour.`,
+          "success"
+        );
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
       })
       .catch(() => {});
   }

@@ -11,8 +11,8 @@
         <v-card-title class="d-flex justify-start">
           <div class="font-weight-light mr-2">Permissions de</div>
           <div class="font-weight-medium mr-2">{{ applicationNom }}</div>
-          <div class="font-weight-light mr-2">pour</div>
-          <div class="font-weight-medium mr-5">{{ utilisateur.NomPrenom }}</div>
+          <div v-if="utilisateur.ID" class="font-weight-light mr-2">pour</div>
+          <div v-if="utilisateur.ID" class="font-weight-medium mr-5">{{ utilisateur.NomPrenom }}</div>
           <v-spacer></v-spacer>
           <v-btn ref="buttonClose" class="ml-10" icon @click="closeDialog()">
             <v-icon>mdi-close</v-icon>
@@ -27,16 +27,10 @@
             dense
             sort-by="Nom"
             :loading="loading"
-          >
-            <template v-slot:item.Acces="{ item }">
-              <v-checkbox
-                class="ma-0 pa-0"
-                :value="HasAccessPermission(item)"
-                @change="changePermission(item, HasAccessPermission(item))"
-                hide-details
-              ></v-checkbox>
-            </template>
-          </v-data-table>
+            show-select
+            item-key="Id"
+            v-model="selected"
+          ></v-data-table>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions class="d-flex">
@@ -89,6 +83,8 @@ export default class extends Vue {
   private loading = false;
   private errorMessage = "";
 
+  private selected: Permission[] = [];
+
   public isValid = false;
   public dialog = false;
   private resolve!: any;
@@ -96,8 +92,7 @@ export default class extends Vue {
 
   private headersPermissions = [
     { text: "Nom", value: "Nom" },
-    { text: "Description", value: "Description" },
-    { text: "Accès", value: "Acces" }
+    { text: "Description", value: "Description" }
   ];
 
   public open(
@@ -106,10 +101,10 @@ export default class extends Vue {
     permissions: Permission[]
   ): Promise<Permission[]> {
     this.dialog = true;
+    this.permissionsUtilisateur = permissions ? Array.from(permissions) : [];
     this.applicationId = application.Id;
     this.applicationNom = application.Nom;
     this.utilisateur = utilisateur;
-    this.permissionsUtilisateur = Array.from(permissions);
     this.LoadPermissions();
 
     return new Promise((resolve, reject) => {
@@ -118,28 +113,29 @@ export default class extends Vue {
     });
   }
 
-  private changePermission(permission: Permission, value: boolean) {
-    if (!value) {
-      this.permissionsUtilisateur.push(permission)
-    } else {
-      const index = this.permissionsUtilisateur.indexOf(permission);
-      if (index > -1) {
-        this.permissionsUtilisateur.splice(index, 1);
-      }
-    }
-  }
-
-  private async LoadPermissions() {
+  private LoadPermissions() {
     try {
+      this.permissions = [];
+      this.selected = [];
       this.loading = true;
-      this.permissions = await GestionUtilisateurApi.getPermissionsForApplication(
+      GestionUtilisateurApi.getPermissionsForApplication(
         this.applicationId
-      );
+      ).then(resp => {
+        this.permissions = resp;
+        this.GivePermissions();
+      });
     } catch (err) {
       this.errorMessage = err;
     } finally {
       this.loading = false;
     }
+  }
+
+  private GivePermissions() {
+    this.permissions.forEach(permission => {
+      if (!!this.permissionsUtilisateur.find(e => e.Id === permission.Id))
+        this.selected.push(permission);
+    });
   }
 
   private closeDialog() {
@@ -151,12 +147,16 @@ export default class extends Vue {
     (this.$refs.form as any).validate();
     if (this.isValid) {
       this.dialog = false;
-      this.resolve(this.permissionsUtilisateur);
+      this.resolve(this.getModel());
     }
   }
 
-  private HasAccessPermission(permission: Permission) {
-    return !!this.permissionsUtilisateur.find(e => e.Id === permission.Id);
+  private getModel(): Permission[] {
+    this.permissionsUtilisateur = this.permissionsUtilisateur.filter(e => e.ApplicationId !== this.applicationId);
+    this.selected.forEach(element => {
+      this.permissionsUtilisateur.push(element)
+    });
+    return this.permissionsUtilisateur;
   }
 }
 </script>
@@ -171,7 +171,4 @@ export default class extends Vue {
   cursor: pointer;
 }
 
-tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, .05);
-}
 </style>

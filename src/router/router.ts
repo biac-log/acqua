@@ -86,7 +86,7 @@ export const asyncRoutes: RouteConfig[] = [
     path: "/utilisateurs",
     component: Layout,
     redirect: "utilisateurs/index",
-    meta: { roles: ["admin", "ACQUAACHATVENTE"] },
+    meta: { roles: ["ACQUAGESTIONUTILISATEUR"] },
     children: [
       {
         path: "index",

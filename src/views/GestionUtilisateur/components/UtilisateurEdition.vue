@@ -1,19 +1,16 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    :height=1000
-    :width=1000
-    @keydown.f2="ModifierUtilisateur"
-  >
+  <v-dialog v-model="dialog" :height="1000" :width="1000" @keydown.f2="ModifierUtilisateur">
     <v-form ref="form" v-model="isValid" lazy-validation>
-      <v-card class="">
+      <v-card class>
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
-            <div class="font-weight-light mr-2">Code</div>
-            <div class="font-weight-medium mr-5">{{ utilisateur.ID }}</div>
+            <div v-if="utilisateur.ID" class="font-weight-light mr-2">Code</div>
+            <div v-if="utilisateur.ID" class="font-weight-medium mr-5">{{ utilisateur.ID }}</div>
 
-            <div class="font-weight-light mr-2">Nom</div>
-            <div class="font-weight-medium mr-5">{{ utilisateur.NomPrenom }}</div>
+            <div v-if="utilisateur.ID" class="font-weight-light mr-2">Nom</div>
+            <div v-if="utilisateur.ID" class="font-weight-medium mr-5">{{ utilisateur.NomPrenom }}</div>
+
+            <div v-if="!utilisateur.ID" class="font-weight-light mr-2">Nouveau utilisateur</div>
           </v-card-title>
           <v-spacer></v-spacer>
           <v-btn
@@ -35,37 +32,66 @@
             <v-tab-item key="tabOne">
               <v-row>
                 <v-col>
-                  <ImageUploader :IsReadOnly.sync='utilisateurReadonly' :Avatar.sync='Avatar'></ImageUploader>
-                </v-col>
-                <v-col>
                   <v-text-field
+                    v-if="utilisateur.ID"
                     label="Nom prénom"
                     ref="nomPrenom"
                     v-model="nomPrenom"
                     :value="nomPrenom"
                     :filled="utilisateurReadonly"
-                    :readonly=true
+                    :readonly="true"
                     :hide-details="utilisateurReadonly"
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
+                    v-else
+                    label="Nom prénom"
+                    ref="nomPrenom"
+                    v-model="nomPrenom"
+                    :value="nomPrenom"
+                    validate-on-blur
+                    autofocus
+                  ></v-text-field>
+                  <v-text-field
+                    v-if="utilisateur.ID"
                     label="Code"
                     ref="code"
                     v-model="code"
                     :value="code"
                     :filled="utilisateurReadonly"
-                    :readonly=true
+                    :readonly="true"
                     :hide-details="utilisateurReadonly"
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
+                    v-else
+                    label="Code"
+                    ref="code"
+                    v-model="code"
+                    :value="code"
+                    :readonly="true"
+                    tabindex="-1"
+                    validate-on-blur
+                  ></v-text-field>
+                  <v-text-field
+                    v-if="utilisateur.ID"
                     label="Mot de passe"
                     ref="motDePasse"
                     v-model="motDePasse"
+                    type="password"
                     :value="motDePasse"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
                     :hide-details="utilisateurReadonly"
+                    validate-on-blur
+                  ></v-text-field>
+                  <v-text-field
+                    v-else
+                    label="Mot de passe"
+                    ref="motDePasse"
+                    v-model="motDePasse"
+                    type="password"
+                    :value="motDePasse"
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -197,31 +223,35 @@
           </v-tabs>
         </v-card-text>
         <v-divider v-if="!utilisateurReadonly"></v-divider>
-        <v-card-actions v-if="!utilisateurReadonly" class="d-flex">
-          <v-btn
-            color="blue darken-1"
-            class="ma-2 mt-0 pr-4 align-self-start"
-            tile
-            outlined
-            @click="cancelEdit()"
-            tabindex="-1"
-          >
-            <v-icon left>mdi-close</v-icon>Annuler
-          </v-btn>
-          <v-btn
-            ref="btnValidate"
-            class="ma-2 mt-0 pr-4 align-self-start"
-            tile
-            color="success"
-            :loading="saveLoading"
-            :disabled="!isValid"
-            @click="savePiece()"
-          >
-            <v-icon left>mdi-content-save</v-icon>Sauvegarder
-          </v-btn>
+        <v-card-actions v-if="!utilisateurReadonly" class="d-flex">         
+            <v-btn
+              color="blue darken-1"
+              class="ma-2 mt-0 pr-4 align-self-start"
+              tile
+              outlined
+              @click="cancelEdit()"
+              tabindex="-1"
+            >
+              <v-icon left>mdi-close</v-icon>Annuler
+            </v-btn>
+            <v-btn
+              ref="btnValidate"
+              class="ma-2 mt-0 pr-4 align-self-start"
+              tile
+              color="success"
+              :loading="saveLoading"
+              :disabled="!isValid"
+              @click="save()"
+            >
+              <v-icon left>mdi-content-save</v-icon>Sauvegarder
+            </v-btn>  
         </v-card-actions>
-        <v-alert type="error" border="left" v-if="errorMessage" class="ml-4 mr-4">{{errorMessage}}</v-alert>
-        <Confirm ref="confirmDialog"></Confirm>
+        <v-alert
+              type="error"
+              border="left"
+              v-if="errorMessage"
+              class="ml-4 mr-4"
+            >{{errorMessage}}</v-alert>
       </v-card>
     </v-form>
   </v-dialog>
@@ -232,7 +262,6 @@ import moment from "moment";
 import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
 import { Utilisateur } from "@/models/GestionUtilisateur/Utilisateur";
 import { Permission } from "@/models/GestionUtilisateur/Permission";
-import Confirm from "@/components/Confirm.vue";
 import ImageUploader from "@/components/imageUploader/imageUploader.vue";
 import { GestionUtilisateurApi } from "@/api/GestionUtilisateurApi";
 import { DepartementApi } from "@/api/DepartementApi";
@@ -242,14 +271,14 @@ import { Application } from "../../../models/GestionUtilisateur/Application";
 
 @Component({
   name: "UtilisateurEdition",
-  components: { GridApplications, Confirm, ImageUploader }
+  components: { GridApplications, ImageUploader }
 })
 export default class extends Vue {
   public utilisateurReadonly: boolean = true;
   private errorMessage: string = "";
   private isValid: boolean = true;
 
-  private Avatar: any = null
+  private Avatar: any = null;
 
   //Statiques
   private departements: string[] = [];
@@ -303,7 +332,7 @@ export default class extends Vue {
     apps: Application[]
   ): Promise<Utilisateur> {
     this.dialog = true;
-    this.utilisateurReadonly = true;
+    this.utilisateurReadonly = !!utilisateur;
     this.applications = apps;
     this.SetUtilisateur(utilisateur);
     // this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
@@ -314,30 +343,30 @@ export default class extends Vue {
   }
 
   private SetUtilisateur(utilisateur: Utilisateur) {
-    this.permissions = utilisateur.Permissions;
+    this.permissions = utilisateur?.Permissions;
 
-    this.utilisateur = utilisateur;
-    this.numeroUtilisateur = utilisateur.ID;
+    this.utilisateur = !!utilisateur ? utilisateur : new Utilisateur();
+    this.numeroUtilisateur = utilisateur?.ID;
 
-    this.nomPrenom = utilisateur.NomPrenom;
-    this.code = utilisateur.ID;
-    this.motDePasse = utilisateur.MotDePasseApollo;
-    this.idActiveDirectory = utilisateur.IdActiveDirectory;
-    this.fonction = utilisateur.Fonction;
-    this.departement = utilisateur.Departement;
-    this.langue = utilisateur.Langue;
-    this.adresseLigne1 = utilisateur.AdresseLigne1;
-    this.adresseLigne2 = utilisateur.AdresseLigne2;
-    this.adresseLigne3 = utilisateur.AdresseLigne3;
-    this.telephone = utilisateur.Telephone;
-    this.numeroInterne = utilisateur.TelephoneInterne;
-    this.fax = utilisateur.Fax;
-    this.email = utilisateur.Email;
+    this.nomPrenom = utilisateur?.NomPrenom;
+    this.code = utilisateur?.ID;
+    this.motDePasse = utilisateur?.MotDePasseApollo;
+    this.idActiveDirectory = utilisateur?.IdActiveDirectory;
+    this.fonction = utilisateur?.Fonction;
+    this.departement = utilisateur?.Departement;
+    this.langue = utilisateur?.Langue;
+    this.adresseLigne1 = utilisateur?.AdresseLigne1;
+    this.adresseLigne2 = utilisateur?.AdresseLigne2;
+    this.adresseLigne3 = utilisateur?.AdresseLigne3;
+    this.telephone = utilisateur?.Telephone;
+    this.numeroInterne = utilisateur?.TelephoneInterne;
+    this.fax = utilisateur?.Fax;
+    this.email = utilisateur?.Email;
   }
 
   private async ModifierUtilisateur() {
     this.utilisateurReadonly = false;
-    this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
+    this.$nextTick(() => (this.$refs.nomPrenom as any)?.focus());
   }
 
   private saveLoading: boolean = false;
@@ -356,8 +385,8 @@ export default class extends Vue {
     let model = this.GetModelToSave();
     this.utilisateurReadonly = true;
     GestionUtilisateurApi.save(model)
-      .then(() => {
-        this.resolve(model);
+      .then(resp => {
+        this.resolve(resp);
         this.dialog = false;
       })
       .catch(err => {
@@ -370,29 +399,28 @@ export default class extends Vue {
   }
 
   private GetModelToSave(): Utilisateur {
-    let userToSave: Utilisateur = new Utilisateur();
-
-    userToSave.NomPrenom = this.nomPrenom;
-    userToSave.ID = this.code;
-    userToSave.MotDePasseApollo = this.motDePasse;
-    userToSave.IdActiveDirectory = this.idActiveDirectory;
-    userToSave.Fonction = this.fonction;
-    userToSave.Departement = this.departement;
-    userToSave.Langue = this.langue;
-    userToSave.AdresseLigne1 = this.adresseLigne1;
-    userToSave.AdresseLigne2 = this.adresseLigne2;
-    userToSave.AdresseLigne3 = this.adresseLigne3;
-    userToSave.Telephone = this.telephone;
-    userToSave.TelephoneInterne = this.numeroInterne;
-    userToSave.Fax = this.fax;
-    userToSave.Email = this.email;
-    userToSave.Permissions = this.permissions;
-    return userToSave;
+    this.utilisateur.NomPrenom = this.nomPrenom;
+    this.utilisateur.MotDePasseApollo = this.motDePasse;
+    this.utilisateur.IdActiveDirectory = this.idActiveDirectory;
+    this.utilisateur.Fonction = this.fonction;
+    this.utilisateur.Departement = this.departement;
+    this.utilisateur.Langue = this.langue;
+    this.utilisateur.AdresseLigne1 = this.adresseLigne1;
+    this.utilisateur.AdresseLigne2 = this.adresseLigne2;
+    this.utilisateur.AdresseLigne3 = this.adresseLigne3;
+    this.utilisateur.Telephone = this.telephone;
+    this.utilisateur.TelephoneInterne = this.numeroInterne;
+    this.utilisateur.Fax = this.fax;
+    this.utilisateur.Email = this.email;
+    this.utilisateur.Permissions = this.permissions;
+    return this.utilisateur;
   }
 
   private cancelEdit() {
-    this.utilisateurReadonly = true;
-    this.SetUtilisateur(this.utilisateur)
+    if (!!this.utilisateur.ID) {
+      this.utilisateurReadonly = true;
+      this.SetUtilisateur(this.utilisateur);
+    } else this.closeDialog();
   }
 
   private closeDialog() {
