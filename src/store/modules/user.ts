@@ -65,12 +65,10 @@ class User extends VuexModule implements IUserState {
           let tokenDecode = jwtDecode(resp.data.value);
           let jsonConvert: JsonConvert = new JsonConvert();
           let user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
-          console.log("after deserialise");
           this.SET_USER(user);
           resolve(resp);
         })
         .catch((err) => {
-          console.log("after deserialise");
           this.LOGIN_FAIL();
           let errorMessage: string = "Impossible de se connecter au serveur d'authentification";
           if (err.response && err.response.status === 400) {

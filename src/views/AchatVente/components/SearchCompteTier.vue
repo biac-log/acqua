@@ -14,9 +14,20 @@
           single-line
           hide-details
           autofocus
+          @keydown.down="giveFocusToRow(0)"
+          autocomplete="off"
         ></v-text-field>
       </v-card-title>
-      <v-data-table
+      <AgGridVue 
+        style="height: 561px; width: 1000px;"
+        id="dataTable"
+        class="ag-theme-alpine"
+        :columnDefs="headersComptes"
+        :rowData="comptes"
+        rowSelection="single"
+        :gridOptions="gridOptions">
+      </AgGridVue>
+      <!-- <v-data-table
         id="dataTable"
         height="530"
         dense
@@ -31,19 +42,22 @@
         :search="filtreCompte"
         @click:row="sendCompte"
       >
-      </v-data-table>
+      </v-data-table> -->
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Emit } from "vue-property-decorator";
+import { AgGridVue } from "ag-grid-vue";
+import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
 import CompteSearch from "@/models/Compte/CompteSearch";
 import { CompteApi } from "@/api/CompteApi";
 import axios from "axios";
+import { GridOptions } from 'ag-grid-community';
 
 @Component({
-  name: "SearchCompteTier"
+  name: "SearchCompteTier",
+  components: { AgGridVue }
 })
 export default class extends Vue {
   private dialog: boolean = false;
@@ -53,14 +67,30 @@ export default class extends Vue {
   private isLoading: boolean = false;
   private comptes: CompteSearch[] = [];
   private headersComptes = [
-    { text: "Numéro", value: "numero" },
-    { text: "Nom", value: "nom" },
-    { text: "Raison sociale", value: "raisonSocial" },
-    { text: "Adresse", value: "adresse" }
+    { headerName: "Numéro", field: "numero", width: 120 },
+    { headerName: "Nom", field: "nom", width: 300 },
+    { headerName: "Raison sociale", field: "raisonSocial", width: 140 },
+    { headerName: "Adresse", field: "adresse", flex:1 }
   ];
 
   private resolve!: any;
   private reject!: any;
+
+  private gridOptions: GridOptions = {
+    columnDefs: this.headersComptes,
+    rowSelection: "single",
+    rowData: this.comptes,
+    navigateToNextCell: this.navigateToNextCell,
+    suppressHorizontalScroll: true,
+    onCellKeyPress: this.keypress,
+    overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
+    pagination: true,
+    paginationAutoPageSize:true
+  };
+
+  mounted(){
+    this.gridOptions?.api?.sizeColumnsToFit();
+  }
 
   public open(typeToLoad: string): Promise<CompteSearch> {
     this.dialog = true;
@@ -78,6 +108,67 @@ export default class extends Vue {
       this.refreshComptes();
     }
   }
+
+  private giveFocusToRow(id: number) {
+    let ds = 0;
+    this.gridOptions?.api?.forEachNode(function(node) {
+      if (node.rowIndex === id) {
+        node.setSelected(true);
+        ds = node.rowIndex;
+      }
+    });
+    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, "numero"));
+  }
+
+  @Watch("filtreCompte")
+  private filterGrid(){
+    this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
+  }
+
+  private navigateToNextCell(params: any) {
+    let previousCell = params.previousCellPosition;
+    const suggestedNextCell = params.nextCellPosition;
+
+    const KEY_UP = 38;
+    const KEY_DOWN = 40;
+    const KEY_LEFT = 37;
+    const KEY_RIGHT = 39;
+
+    switch (params.key) {
+      case KEY_DOWN:
+        previousCell = params.previousCellPosition;
+        // set selected cell on current cell + 1
+        this.gridOptions?.api?.forEachNode(function(node) {
+          if (previousCell.rowIndex + 1 === node.rowIndex) {
+            node.setSelected(true);
+          }
+        });
+        return suggestedNextCell;
+      case KEY_UP:
+        previousCell = params.previousCellPosition;
+        // set selected cell on current cell - 1
+        this.gridOptions?.api?.forEachNode(function(node) {
+          if (previousCell.rowIndex - 1 === node.rowIndex) {
+            node.setSelected(true);
+          }
+        });
+        return suggestedNextCell;
+      case KEY_LEFT:
+      case KEY_RIGHT:
+        return suggestedNextCell;
+      default:
+        console.log(
+          "this will never happen, navigation is always one of the 4 keys above"
+        );
+    }
+  }
+
+  private keypress(event: any) {
+    if(event?.event.key === "Enter"){
+      var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteSearch;
+      this.sendCompte(selectedRow)
+    }
+  } 
 
   private refreshComptes() {
     if (this.typeLoad) {

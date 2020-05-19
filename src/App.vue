@@ -20,14 +20,17 @@ export default class App extends Vue {
 </script>
 
 <style lang="scss">
-#nprogress .bar {
-	background-color: #FFB74D !important;
-}
+    @import "../node_modules/ag-grid-community/dist/styles/ag-grid.css";
+    @import "../node_modules/ag-grid-community/dist/styles/ag-theme-alpine.css";
 
-.v-btn:not(.v-btn--text):not(.v-btn--outlined):focus:before {
-    opacity: 0.30;
-    border: grey;
-    border-style: dotted;
-    border-width: 2.5px;
-}
+    #nprogress .bar {
+        background-color: #FFB74D !important;
+    }
+
+    .v-btn:not(.v-btn--text):not(.v-btn--outlined):focus:before {
+        opacity: 0.30;
+        border: grey;
+        border-style: dotted;
+        border-width: 2.5px;
+    }
 </style>

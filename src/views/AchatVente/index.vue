@@ -173,7 +173,6 @@ export default class extends Vue {
     try {
       this.periodeIsLoading = true;
       let periodes = await AchatVenteApi.getPeriodes();
-      console.log(periodes);
       periodes.forEach(p => this.periodes.push(p));
     } catch (err) {
       this.isErrorPeriode = true;

@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="dialog" width="800" @keydown.enter.prevent.stop="sendContrepartie" @click:outside="close()" @keydown.esc="close()">
-    <v-form ref="form" v-model="isValid" lazy-validation>
+    <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
       <v-card>
         <v-card-title>
           <v-col cols="12" v-if="errorMessage">
@@ -48,7 +48,7 @@
               <SearchCompteContrepartieVue
                 ref="compteDialog"
               ></SearchCompteContrepartieVue>
-            </v-col>  
+            </v-col>
             <v-col cols="6">
               <v-text-field
                 label="Nom compte"

@@ -1,5 +1,5 @@
 <template>
-  <v-snackbar v-model="snackbar" color="info" :timeout="timeout">
+  <v-snackbar v-model="snackbar" color="info" :timeout="10000">
       {{ notificationText }}
       <v-btn
         color="orange"
@@ -20,10 +20,9 @@ import { Component, Vue } from 'vue-property-decorator'
 export default class extends Vue {
   private snackbar = false;
   private refreshing = false;
-  private notificationText = "L'application à été mise à jour, veuillez recharger";
-  private refreshButtonText = 'Recharger';
+  private notificationText = 'New content is available! refresh to update';
+  private refreshButtonText = 'Refresh';
   private registration: ServiceWorkerRegistration | null = null
-  private timeout: number = 10000;
 
   created() {
     // Listen for swUpdated event and display refresh notification as required.
@@ -32,8 +31,8 @@ export default class extends Vue {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (this.refreshing) return
       this.refreshing = true
-      window.location.reload(true);
-    });
+      window.location.reload()
+    })
   }
 
   render() {
@@ -51,10 +50,9 @@ export default class extends Vue {
   }
 
   private refreshApp() {
-    window.location.reload(true);
-    // // Protect against missing registration.waiting.
-    // if (!this.registration || !this.registration.waiting) return
-    // this.registration.waiting.postMessage('skipWaiting')
+    // Protect against missing registration.waiting.
+    if (!this.registration || !this.registration.waiting) return
+    this.registration.waiting.postMessage('skipWaiting')
   }
 }
 </script>

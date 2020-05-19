@@ -8,7 +8,7 @@
     @keydown.del.prevent.stop="DeletePiece"
     @keydown.plus.prevent.stop="createContrepartie"
   >
-    <v-form ref="form" v-model="isValid" lazy-validation>
+    <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
       <v-card>
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
@@ -117,6 +117,7 @@
                   <v-text-field
                     label="Libelle"
                     ref="libellePiece"
+                    autocomplete="off"
                     counter
                     maxlength="23"
                     v-model="libelle"
