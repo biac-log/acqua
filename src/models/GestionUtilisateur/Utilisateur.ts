@@ -1,4 +1,5 @@
 import { Permission } from './Permission';
+import { Application, ApplicationDTO } from './Application';
 
 export interface IUtilisateur { 
     ID: string;
@@ -19,6 +20,7 @@ export interface IUtilisateur {
     Photo: string;
     PhotoExtension: string;
     Permissions: Permission[]
+    Applications: Application[]
   }
     
   export class UtilisateurDTO implements IUtilisateur{
@@ -40,6 +42,7 @@ export interface IUtilisateur {
     Photo = "";
     PhotoExtension = "";
     Permissions: Permission[] = []
+    Applications: Application[] = []
   }
     
   export class Utilisateur extends UtilisateurDTO {
@@ -52,11 +55,30 @@ export interface IUtilisateur {
       return !!this.Email
     }
 
-    get Applications(): string{
-      return "App";
+    get ApplicationsList(): string[]{
+      const appIds = this.Permissions?.map(e => e.ApplicationId).filter(
+        this.onlyUnique
+      );
+      const appNames: string[] = [];
+  
+      appIds.forEach(element => {
+        const app = this.Applications.find(e => e.Id === element);
+        if (app) appNames.push(app.Nom);
+      });
+      return appNames;
+    }
+
+    get ApplicationsNom(): string{
+      
+      return this.ApplicationsList.join(', ');
     }
 
     get Permission(): string{
         return this.Permissions?.map(e => e.Nom).join(', ') 
     }
+
+    private onlyUnique(value: any, index: any, self: any) {
+      return self.indexOf(value) === index;
+    }
   }
+  

@@ -40,8 +40,8 @@
                     :value="nomPrenom"
                     :filled="utilisateurReadonly"
                     :readonly="true"
-                    :hide-details="utilisateurReadonly"
                     validate-on-blur
+                    outlined
                   ></v-text-field>
                   <v-text-field
                     v-else
@@ -51,6 +51,7 @@
                     :value="nomPrenom"
                     validate-on-blur
                     autofocus
+                    outlined
                   ></v-text-field>
                   <v-text-field
                     v-if="utilisateur.ID"
@@ -60,8 +61,8 @@
                     :value="code"
                     :filled="utilisateurReadonly"
                     :readonly="true"
-                    :hide-details="utilisateurReadonly"
                     validate-on-blur
+                    outlined
                   ></v-text-field>
                   <v-text-field
                     v-else
@@ -72,6 +73,7 @@
                     :readonly="true"
                     tabindex="-1"
                     validate-on-blur
+                    outlined
                   ></v-text-field>
                   <v-text-field
                     v-if="utilisateur.ID"
@@ -81,9 +83,8 @@
                     type="password"
                     :value="motDePasse"
                     :filled="utilisateurReadonly"
-                    :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
                     validate-on-blur
+                    outlined
                   ></v-text-field>
                   <v-text-field
                     v-else
@@ -93,6 +94,7 @@
                     type="password"
                     :value="motDePasse"
                     validate-on-blur
+                    outlined
                   ></v-text-field>
                   <v-text-field
                     label="ID active directory"
@@ -101,8 +103,8 @@
                     :value="idActiveDirectory"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
                     validate-on-blur
+                    outlined
                   ></v-text-field>
                   <v-text-field
                     label="Fonction"
@@ -111,8 +113,8 @@
                     :value="fonction"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
                     validate-on-blur
+                    outlined
                   ></v-text-field>
                 </v-col>
                 <v-col>
@@ -122,7 +124,8 @@
                     :items="departements"
                     v-model="departement"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
+                                        :filled="utilisateurReadonly"
+                    outlined
                     :height="utilisateurReadonly ? '40' : '30'"
                   ></v-select>
                   <v-select
@@ -131,7 +134,8 @@
                     :items="langues"
                     v-model="langue"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
+                                        :filled="utilisateurReadonly"
+                    outlined
                     :height="utilisateurReadonly ? '40' : '30'"
                   ></v-select>
                   <v-text-field
@@ -141,7 +145,7 @@
                     :value="adresseLigne1"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
+                    outlined
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -151,7 +155,7 @@
                     :value="adresseLigne2"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
+                    outlined
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -161,7 +165,7 @@
                     :value="adresseLigne3"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
+                    outlined
                     validate-on-blur
                   ></v-text-field>
                 </v-col>
@@ -173,7 +177,7 @@
                     :value="telephone"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
+                    outlined
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -183,7 +187,7 @@
                     :value="numeroInterne"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
+                    outlined
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -193,7 +197,7 @@
                     :value="fax"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
+                    outlined
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -203,7 +207,7 @@
                     :value="email"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    :hide-details="utilisateurReadonly"
+                    outlined
                     validate-on-blur
                   ></v-text-field>
                 </v-col>

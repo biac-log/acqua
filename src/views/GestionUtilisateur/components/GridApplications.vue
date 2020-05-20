@@ -81,7 +81,7 @@ export default class extends Vue {
 </script>
 
 <style scopped>
-.v-data-table {
+#data-table {
   word-break: initial;
   white-space: nowrap;
 }

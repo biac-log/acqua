@@ -15,6 +15,8 @@
           label="Search"
           single-line
           hide-details
+          autofocus
+          ref="recherche"
         ></v-text-field>
       </v-card-title>
       <v-card-text>
@@ -24,14 +26,24 @@
           :items="utilisateurs"
           :search="search"
           :loading="isLoading"
+          fixed-header
           @click:row="OpenUtilisateur"
           sort-by="ID"
-          :footer-props="{'items-per-page-options': [25,100,500]}"
-          :items-per-page="25"
-          dense
+          :footer-props="{'items-per-page-options': [12,100,500]}"
+          :items-per-page="12"
+          height="690"
         >
-          <template v-slot:item.Applications="{ item }">
-            <span>{{ getApplications(item, applications) }}</span>
+          <template v-slot:item.ApplicationsNom="{ item }">
+            <v-chip
+              class="ma-1"
+              text-color="white"
+              :color="getColor(app)"
+              v-for="app in item.ApplicationsList"
+              :key="app"
+              @click.stop="setFiltre(app)"
+            >
+              <span>{{ app }}</span>
+            </v-chip>
           </template>
           <template v-slot:item.Email="{ item }">
             <v-simple-checkbox v-model="item.HasEmail" disabled></v-simple-checkbox>
@@ -83,8 +95,7 @@ export default class extends Vue {
     { text: "Nom Prénom", value: "NomPrenom", width: 200 },
     { text: "Email", value: "Email", width: 40 },
     { text: "Département", value: "Departement", width: 150 },
-    { text: "Applications", value: "Applications", width: 250 },
-    { text: "Permissions", value: "Permission", width: 250 }
+    { text: "Applications", value: "ApplicationsNom", width: 250 }
   ];
 
   mounted() {
@@ -97,9 +108,14 @@ export default class extends Vue {
       this.utilisateurs = [];
       this.isLoading = true;
       this.applications = await GestionUtilisateurApi.getApplications();
-      this.utilisateurs = await GestionUtilisateurApi.getUtilisateurs(
+      const utilisateurs = await GestionUtilisateurApi.getUtilisateurs(
         this.exclureInactifs
       );
+      this.utilisateurs = []
+      utilisateurs.forEach(element => {
+        element.Applications = this.applications;
+        this.utilisateurs.push(element);
+      });
     } catch (err) {
       this.isErrorUtilisateur = true;
     } finally {
@@ -125,21 +141,38 @@ export default class extends Vue {
       .catch(() => {});
   }
 
-  private getApplications = (utilisateur: Utilisateur, apps: Application[]) => {
-    const appIds = utilisateur.Permissions?.map(e => e.ApplicationId).filter(
-      this.onlyUnique
-    );
-    const appNames: string[] = [];
+  private colorsApplications: [string, string][] = [];
+  private colorsAvailable: string[] = [
+    "primary",
+    "indigo",
+    "orange",
+    "green",
+    "teal",
+    "black",
+    "red",
+    "pink",
+    "cyan",
+    "mauve",
+    "purple",
+    "yellow",
+    "grey",
+    "brown",
+    ""
+  ];
 
-    appIds.forEach(element => {
-      const app = apps.find(e => e.Id === element);
-      if (app) appNames.push(app.Nom);
-    });
-    return appNames.join(", ");
-  };
+  private getColor(nomApplication: string): string {
+    const sameApp = this.colorsApplications.find(e => e[0] === nomApplication);
+    if (sameApp) return sameApp[1];
 
-  private onlyUnique(value: any, index: any, self: any) {
-    return self.indexOf(value) === index;
+    const color = this.colorsAvailable[0];
+    this.colorsAvailable.splice(0, 1);
+    this.colorsApplications.push([nomApplication, color]);
+    return color;
+  }
+
+  private setFiltre(app: string) {
+    this.search = app;
+    this.$nextTick(() => (this.$refs.recherche as any).$el.focus());
   }
 
   private snackbar: boolean = false;
@@ -156,11 +189,6 @@ export default class extends Vue {
 </script>
 
 <style scopped>
-.v-data-table {
-  word-break: initial;
-  white-space: nowrap;
-}
-
 #dataTable tbody tr {
   cursor: pointer;
 }
