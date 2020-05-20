@@ -18,7 +18,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
-        <v-card-text>
+        <v-card-text class="ma-0 pa-0">
           <v-data-table
             :headers="headersPermissions"
             :items="permissions"
@@ -27,13 +27,14 @@
             dense
             sort-by="Nom"
             :loading="loading"
-            show-select
+            :show-select="!isReadOnly"
             item-key="Id"
             v-model="selected"
           ></v-data-table>
         </v-card-text>
         <v-divider></v-divider>
-        <v-card-actions class="d-flex">
+        <v-card-actions v-if="!isReadOnly" class="d-flex">
+                    <v-spacer></v-spacer>     
           <v-btn
             color="blue darken-1"
             class="ma-2 mt-0 pr-4 align-self-start"
@@ -85,6 +86,7 @@ export default class extends Vue {
 
   private selected: Permission[] = [];
 
+  private isReadOnly = false;
   public isValid = false;
   public dialog = false;
   private resolve!: any;
@@ -98,9 +100,11 @@ export default class extends Vue {
   public open(
     application: Application,
     utilisateur: Utilisateur,
-    permissions: Permission[]
+    permissions: Permission[],
+    readOnly: boolean
   ): Promise<Permission[]> {
     this.dialog = true;
+    this.isReadOnly = readOnly;
     this.permissionsUtilisateur = permissions ? Array.from(permissions) : [];
     this.applicationId = application.Id;
     this.applicationNom = application.Nom;
@@ -121,8 +125,17 @@ export default class extends Vue {
       GestionUtilisateurApi.getPermissionsForApplication(
         this.applicationId
       ).then(resp => {
-        this.permissions = resp;
-        this.GivePermissions();
+        if (this.isReadOnly) {
+          resp.forEach(permission => {
+            if (!!this.permissionsUtilisateur.find(e => e.Id === permission.Id)) {
+              this.permissions.push(permission);
+            }
+          });
+        } 
+        else {
+          this.permissions = resp;
+          this.GivePermissions();
+        }
       });
     } catch (err) {
       this.errorMessage = err;
@@ -152,9 +165,11 @@ export default class extends Vue {
   }
 
   private getModel(): Permission[] {
-    this.permissionsUtilisateur = this.permissionsUtilisateur.filter(e => e.ApplicationId !== this.applicationId);
+    this.permissionsUtilisateur = this.permissionsUtilisateur.filter(
+      e => e.ApplicationId !== this.applicationId
+    );
     this.selected.forEach(element => {
-      this.permissionsUtilisateur.push(element)
+      this.permissionsUtilisateur.push(element);
     });
     return this.permissionsUtilisateur;
   }
@@ -162,13 +177,7 @@ export default class extends Vue {
 </script>
 
 <style scopped>
-#data-table {
-  word-break: initial;
-  white-space: nowrap;
-}
-
 #dataTable tbody tr {
   cursor: pointer;
 }
-
 </style>
