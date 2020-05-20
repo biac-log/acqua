@@ -1,6 +1,6 @@
 <template>
 	<v-app id="inspire">
-		<v-navigation-drawer v-model="drawer" :mini-variant.sync="mini" app>
+		<v-navigation-drawer v-model="drawer" :mini-variant="mini" app>
 			<v-list dense>
 				<v-list-item v-for="item in routes" 
 										:key="item.title"
@@ -52,7 +52,7 @@ import { PermissionModule } from '@/store/modules/permissions'
 })
 export default class extends Vue {
   private drawer: Boolean = true;
-  private mini: Boolean = false;
+  private mini: Boolean = true;
   private source: String = "";
   private currentRoute: any = "";
 
