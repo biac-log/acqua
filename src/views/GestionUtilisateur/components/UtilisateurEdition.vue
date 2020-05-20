@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" :height="1000" :width="1000" @keydown.f2="ModifierUtilisateur">
-    <v-form ref="form" v-model="isValid" lazy-validation>
-      <v-card class>
+    <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
+      <v-card>
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
             <div v-if="utilisateur.ID" class="font-weight-light mr-2">Code</div>
@@ -25,12 +25,13 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-card-text>
+        <v-card-text style="width:100%; height:680px;"
+>
           <v-tabs>
             <v-tab key="tabOne">Informations générales</v-tab>
             <v-tab key="tabTwo">Permissions</v-tab>
             <v-tab-item key="tabOne">
-              <v-row>
+              <v-row class="mt-5">
                 <v-col>
                   <v-text-field
                     v-if="utilisateur.ID"
@@ -49,6 +50,7 @@
                     ref="nomPrenom"
                     v-model="nomPrenom"
                     :value="nomPrenom"
+                    :rules="nomRules"
                     validate-on-blur
                     autofocus
                     outlined
@@ -85,6 +87,7 @@
                     :filled="utilisateurReadonly"
                     validate-on-blur
                     outlined
+                    autocomplete="off"
                   ></v-text-field>
                   <v-text-field
                     v-else
@@ -93,8 +96,10 @@
                     v-model="motDePasse"
                     type="password"
                     :value="motDePasse"
+                    :rules="nomRules"
                     validate-on-blur
                     outlined
+                    autocomplete="off"
                   ></v-text-field>
                   <v-text-field
                     label="ID active directory"
@@ -227,7 +232,8 @@
           </v-tabs>
         </v-card-text>
         <v-divider v-if="!utilisateurReadonly"></v-divider>
-        <v-card-actions v-if="!utilisateurReadonly" class="d-flex">         
+        <v-card-actions v-if="!utilisateurReadonly" class="d-flex">    
+          <v-spacer></v-spacer>     
             <v-btn
               color="blue darken-1"
               class="ma-2 mt-0 pr-4 align-self-start"
@@ -283,6 +289,7 @@ export default class extends Vue {
   private isValid: boolean = true;
 
   private Avatar: any = null;
+  private nomRules: any = [(v: string) => (!!v || "Valeur obligatoire")];
 
   //Statiques
   private departements: string[] = [];
@@ -326,6 +333,7 @@ export default class extends Vue {
     try {
       const departements = await DepartementApi.getDepartements();
       this.departements = departements.map(e => e.Nom);
+      this.departements.unshift('')
     } catch (err) {
       this.isErrorLoading = true;
     }
@@ -347,11 +355,10 @@ export default class extends Vue {
   }
 
   private SetUtilisateur(utilisateur: Utilisateur) {
-    this.permissions = utilisateur?.Permissions;
-
     this.utilisateur = !!utilisateur ? utilisateur : new Utilisateur();
     this.numeroUtilisateur = utilisateur?.ID;
 
+    this.permissions = utilisateur?.Permissions;
     this.nomPrenom = utilisateur?.NomPrenom;
     this.code = utilisateur?.ID;
     this.motDePasse = !!utilisateur ? 'xxxxxxx' : '';

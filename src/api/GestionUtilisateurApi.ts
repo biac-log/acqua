@@ -28,7 +28,7 @@ export abstract class GestionUtilisateurApi {
   }  
 
   static async save(user: Utilisateur): Promise<Utilisateur> {
-    let response = await this.GestionUtilisateurAxios.post(`${process.env.VUE_APP_ApiGestionUser}/User/Save`, user);
-    return response.data;
+    let response = await this.GestionUtilisateurAxios.post<UtilisateurDTO>(`${process.env.VUE_APP_ApiGestionUser}/User/Save`, user);
+    return new Utilisateur(response.data);
   }  
 }

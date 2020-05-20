@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
-    <v-row>
-      <v-col>
+    <v-row class="ma-0 pa-0">
+      <v-col class="ma-0 pa-0">
       <v-data-table
         :headers="headersApplications"
         :items="applications"
@@ -11,7 +11,7 @@
         dense
         sort-by="Nom"
         @click:row="loadPermissions"
-        width="500"
+        style="width:500px;"
       >
         <template v-slot:item.Acces="{ item }">
           <v-simple-checkbox :value="HasAccessApplication(item)" disabled></v-simple-checkbox>
@@ -50,7 +50,7 @@ export default class extends Vue {
 
   private headersApplications = [
     { text: "Nom", value: "Nom", width: 300 },
-    { text: "Accès", value: "Acces", width: 50 }
+    { text: "Accès", value: "Acces", width: 70 }
   ];
 
   @Watch("selected")
@@ -64,14 +64,12 @@ export default class extends Vue {
   }
 
   public loadPermissions(application: Application) {
-    if (!this.readonly) {
       (this.$refs.PermissionsVue as GridPermissionsVue)
-        .open(application, this.utilisateur, this.allPermissions)
+        .open(application, this.utilisateur, this.allPermissions, this.readonly)
         .then((resp: Permission[]) => {
           this.allPermissions = resp;
         })
         .catch((err) => {});
-    }
   }
 
   private HasAccessApplication(application: Application) {
@@ -81,10 +79,6 @@ export default class extends Vue {
 </script>
 
 <style scopped>
-#data-table {
-  word-break: initial;
-  white-space: nowrap;
-}
 
 #dataTable tbody tr {
   cursor: pointer;

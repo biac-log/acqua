@@ -19,7 +19,7 @@
           ref="recherche"
         ></v-text-field>
       </v-card-title>
-      <v-card-text>
+      <v-card-text class="ma-0 pa-0">
         <v-data-table
           id="dataTable"
           :headers="headers"
@@ -29,9 +29,9 @@
           fixed-header
           @click:row="OpenUtilisateur"
           sort-by="ID"
-          :footer-props="{'items-per-page-options': [12,100,500]}"
-          :items-per-page="12"
-          height="690"
+          :footer-props="{'items-per-page-options': [10,100,500]}"
+          :items-per-page="10"
+          style="width:100%; height:100%;"
         >
           <template v-slot:item.ApplicationsNom="{ item }">
             <v-chip
@@ -45,7 +45,7 @@
               <span>{{ app }}</span>
             </v-chip>
           </template>
-          <template v-slot:item.Email="{ item }">
+          <template v-slot:item.HasEmail="{ item }">
             <v-simple-checkbox v-model="item.HasEmail" disabled></v-simple-checkbox>
           </template>
         </v-data-table>
@@ -93,7 +93,7 @@ export default class extends Vue {
   private headers = [
     { text: "Code", value: "ID", width: 80 },
     { text: "Nom Prénom", value: "NomPrenom", width: 200 },
-    { text: "Email", value: "Email", width: 40 },
+    { text: "Email", value: "HasEmail", width: 40 },
     { text: "Département", value: "Departement", width: 150 },
     { text: "Applications", value: "ApplicationsNom", width: 250 }
   ];
@@ -111,7 +111,7 @@ export default class extends Vue {
       const utilisateurs = await GestionUtilisateurApi.getUtilisateurs(
         this.exclureInactifs
       );
-      this.utilisateurs = []
+      this.utilisateurs = [];
       utilisateurs.forEach(element => {
         element.Applications = this.applications;
         this.utilisateurs.push(element);
@@ -127,18 +127,31 @@ export default class extends Vue {
     (this.$refs.UtilisateurEdition as UtilisateurEditionVue)
       .open(utilisateur, this.applications)
       .then(resp => {
-        Vue.set(
-          this.utilisateurs,
-          this.utilisateurs.findIndex(e => e.ID == resp.ID),
-          resp
-        );
-        this.notifier(
-          `Utilisateur <b>${resp.NomPrenom}</b> mis à jour.`,
-          "success"
-        );
-        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+        if (this.utilisateurs.some(e => e.ID === resp.ID)) {
+          resp.Applications = this.applications
+          Vue.set(
+            this.utilisateurs,
+            this.utilisateurs.findIndex(e => e.ID === resp.ID),
+            resp
+          );
+          this.notifier(
+            `Utilisateur <b>${resp.NomPrenom} (${resp.ID})</b> mis à jour.`,
+            "success"
+          );
+        } 
+        else {
+          resp.Applications = this.applications;
+          this.utilisateurs.push(resp);
+          this.notifier(
+            `Utilisateur <b>${resp.NomPrenom} (${resp.ID})</b> ajouté.`,
+            "success"
+          );
+        }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+      });
   }
 
   private colorsApplications: [string, string][] = [];
@@ -152,12 +165,17 @@ export default class extends Vue {
     "red",
     "pink",
     "cyan",
-    "mauve",
+    "deep purple",
     "purple",
     "yellow",
     "grey",
     "brown",
-    ""
+    "lime",
+    "blue grey",
+    "light blue",
+    "amber",
+    "#76FF03",
+    "#E65100"
   ];
 
   private getColor(nomApplication: string): string {
