@@ -1,12 +1,19 @@
 <template>
   <v-dialog v-model="dialog" width="420" @keypress.enter="sendResponse()"  @click:outside="sendResponse()" @keydown.esc="sendResponse()">
     <v-card class="pa-3 pb-0 ma-0">
-      <v-card-title>
+      <v-card-title class="pa-0 ma-0">
+          <v-spacer></v-spacer>
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-checkbox label="Ne plus afficher" v-model="skipDialog" v-on="on" class="pa-0 ma-0"></v-checkbox>
+            </template>
+            <span>Ce message ne sera plus affiché jusqu'au prochain lancement du programme.</span>
+          </v-tooltip>
+      </v-card-title>
+      <v-card-text class="pa-0 ma-0">
         <v-row justify="center">
           <v-icon x-large color="success" class="justify-end" style="font-size: 100px">mdi-check-circle-outline</v-icon>
         </v-row>
-      </v-card-title>
-      <v-card-text class="pa-0 ma-0">
         <v-row justify="center" class="mb-5">
           <h1>Ajout réussi !</h1>
         </v-row>
@@ -87,6 +94,8 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 })
 export default class extends Vue {
   private dialog: boolean = false;
+  @PropSync("SkipDialog")
+  private skipDialog!: boolean;
   private numero: number = 0;
   private periode: string = "";
   private journal: number = 0;
@@ -97,7 +106,7 @@ export default class extends Vue {
   private numeroLoading: boolean = false;
   private errorMessage: string = "";
   private changeNumeroDialog: boolean = false;
-
+  
   private isValid: boolean = true;
 
   private resolve: any;

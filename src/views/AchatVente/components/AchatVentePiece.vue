@@ -528,7 +528,6 @@ export default class extends Vue {
   }
 
 	private init(periode: PeriodeComptable, journal: Journal, entete?: EntetePieceComptable) {
-    this.resetForm();
     this.journal = journal;
     this.periode = periode;
     this.periodeDisplay = periode.libellePeriodeFull;
@@ -552,8 +551,9 @@ export default class extends Vue {
     this.numeroToForce = "";
 
     this.comptesTiersSearch= [];
+    this.searchCompteDeTier = "";
     this.numeroCompteTierSelected = {numero:'', nom:'' };
-
+    
     this.periodeDisplay = "";
     this.journal = new Journal();
     this.numeroPiece= "";
@@ -852,6 +852,7 @@ export default class extends Vue {
       this.resolve({ action: "ADD", data: this.GetModelForGrid()});
       (this.$refs.form as any).resetValidation();
       this.dialog = false;
+      this.resetForm();
     }).catch((err) => {
       this.errorMessage = displayAxiosError(err);
       this.piecereadonly = false;
@@ -869,6 +870,7 @@ export default class extends Vue {
       this.resolve({ action: "UPDATE", data: this.GetModelForGrid()});
       (this.$refs.form as any).resetValidation();
       this.dialog = false;
+      this.resetForm();
     }).catch((err) => {
         this.errorMessage = displayAxiosError(err);
         this.piecereadonly = false;
@@ -968,6 +970,7 @@ export default class extends Vue {
 
   private closeDialog(){
     this.dialog = false;
+    this.resetForm();
     (this.$refs.form as any).resetValidation();
     this.reject();
   }

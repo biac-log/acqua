@@ -68,6 +68,7 @@
           label="Search"
           single-line
           hide-details
+          @keydown.enter="LoadPiecesComptables()"
         ></v-text-field>
       </v-card-title>
       <v-data-table
@@ -92,7 +93,7 @@
       </v-data-table>
     </v-card>
     <AchatVentePieceVue ref="refDialogPiece"></AchatVentePieceVue>
-    <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue>
+    <PieceAddResultVue ref="PieceAddResultVue" :SkipDialog.sync="skipAddResult"></PieceAddResultVue>
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">{{ snackbarColor == "error" ? "mdi-delete" : "mdi-check" }}</v-icon>
       <span v-html="snackbarMessage"></span>
@@ -121,10 +122,11 @@ import { Pagination } from '@/models/Pagination';
   components: { AchatVentePieceVue, PieceAddResultVue }
 })
 export default class extends Vue {
+  private skipAddResult: boolean = false;
   private searchIsValid: boolean = true;
   private isErrorPeriode: boolean = false;
   private libellePeriode: string = "";
-  
+
   private periodeIsLoading: boolean = false;
   private periodes: PeriodeComptable[] = [];
   private periodeSelected: PeriodeComptable = new PeriodeComptable();
@@ -193,10 +195,8 @@ export default class extends Vue {
     }
   }
 
+  
   @Watch("options")
-  onOptionsChanged() {
-    this.LoadPiecesComptables();
-  }
   private async LoadPiecesComptables() {
     try {
       if(this.periodeSelected && this.journalSelected.numero){
@@ -242,7 +242,7 @@ export default class extends Vue {
     (this.$refs.refDialogPiece as AchatVentePieceVue)
       .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
-        this.displayAddResult(resp.data);
+        if(!this.skipAddResult) this.displayAddResult(resp.data);
         this.piecesComptables.unshift(resp.data);
       })
       .finally(() => {
@@ -251,14 +251,14 @@ export default class extends Vue {
   }
 
   private displayAddResult(piece : EntetePieceComptable){
-    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected.typePeriodeComptable).then((numero) => {
-      if(piece.codePiece != numero){
-        piece.codePiece = numero;
-        Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);
-      }
-    }).finally(() => {
-      this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-    });
+      (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected.typePeriodeComptable).then((numero) => {
+          if(piece.codePiece != numero){
+            piece.codePiece = numero;
+          Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);
+        }
+      }).finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+      });
   }
 
   private snackbar: boolean = false;
