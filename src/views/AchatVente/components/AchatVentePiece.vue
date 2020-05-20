@@ -434,6 +434,8 @@ export default class extends Vue {
   private libelle: string = "";
   private libelleRules: any = [(v: string) => !!v || "Libellé obligatoire"];
   private libelleWarningMessage: string = "";
+  private compteAssocieNumero:string = "";
+  private compteAssocieNom:string = "";
   private montantDevise: string = "";
   private montantRules: any = [(v: string) => v.isDecimal(true) || "Montant invalide"];
   private montantEscompte: string = "0";
@@ -583,6 +585,8 @@ export default class extends Vue {
     this.libelleCompteVenteAchat = "";
     this.codeTaxe = 0;
     this.contreparties = [];
+    this.compteAssocieNumero = "";
+    this.compteAssocieNom = "";
     this.hash = "";
   }
 
@@ -627,7 +631,9 @@ export default class extends Vue {
     this.libelleCompteAssocie = pieceComptable.libelleCompteAssocie;
     this.numeroCompteAchatVente = pieceComptable.compteVenteAchatNumero.toDecimalString(2);
     this.libelleCompteVenteAchat = pieceComptable.libelleCompteVenteAchat;
-    
+    this.compteAssocieNom = pieceComptable.compteAssocieNom;
+    this.compteAssocieNumero = pieceComptable.compteAssocieNumero;
+
     this.deviseSelected = pieceComptable ? this.getDeviseToSelect(new Devise({id: pieceComptable.codeDevise, libelle: pieceComptable.libelleDevise, typeDevise: "D"})) : this.devises[0];
     this.statutSelected = pieceComptable ? this.getStatutToSelect(new Statut({id: pieceComptable.statut, libelle: pieceComptable.statutLibelle})) : this.statuts[0];
     this.hash = pieceComptable.hash;
@@ -710,6 +716,8 @@ export default class extends Vue {
     this.libelleCompteVenteAchat = compte ? compte.libelleCompteVenteAchat : "";
     this.delaiPaiementLibelle = compte ? compte.delaiPaiementLibelle : "";
     this.codeTaxe = compte ? compte.codeTaxe : 0;
+    this.compteAssocieNumero = compte ? compte.compteAssocieNumero.toString() : "";
+    this.compteAssocieNom = compte ? compte.compteAssocieNom : "";
     this.initDateEcheance(this.numeroCompteTier, this.typeCompte, this.datePiece);
   }
 
@@ -920,13 +928,15 @@ export default class extends Vue {
     pieceComptaSave.libelle = this.libelle;
     pieceComptaSave.typeCompte = this.typeCompte;
     pieceComptaSave.numeroCompte = this.numeroCompteTier.toNumber();
-    pieceComptaSave.numeroCompteAssocie = this.numeroCompteAchatVente.toNumber();
+    pieceComptaSave.numeroCompteAssocie = this.compteAssocieNumero.toNumber();
     pieceComptaSave.montantEscompteBase = this.montantEscompte.toNumber() * this.taux.toNumber();
     pieceComptaSave.montantEscompteDevise = this.montantEscompte.toNumber();
     pieceComptaSave.codeBlocage = this.statutSelected.id;
     pieceComptaSave.pieceAcquittee = this.pieceAcquittee;
     pieceComptaSave.codeMouvement = this.journal.codeMouvement;
     pieceComptaSave.contreparties = [];
+
+
     let i = 1;
     this.contreparties.forEach(c => {
       let contr : PieceComptableContrepartieSaveDTO = new PieceComptableContrepartieSaveDTO();

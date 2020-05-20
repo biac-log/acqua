@@ -16,7 +16,7 @@
         </v-btn>
         <v-spacer></v-spacer>
         <span :class="!ventilleBase || ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
-          <span >Montant à ventiller : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b></span>
+          <span >Montant à ventiler : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b></span>
           <span v-if="devise && devise.id != 1">/ <b>{{ ventilleBase | numberToStringEvenZero }} EUR</b></span>
         </span>
         <EditContrepartieVue
@@ -118,7 +118,7 @@ export default class extends Vue {
   }
 
   public async createContrepartie(){
-    if(!this.numeroCompteAchatVente || this.numeroCompteAchatVente == "0")
+    if((!this.numeroCompteAchatVente || this.numeroCompteAchatVente == "0") && this.contreparties.length == 0)
       this.addContrepartie();
     else if(this.contreparties.length == 0)
     {

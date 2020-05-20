@@ -432,6 +432,7 @@ export default class extends Vue {
         .then(caseTva => {
           this.numeroCaseTva = caseTva.numeroCase.toString();
           this.caseTva = caseTva;
+          this.calculMontant();
         })
         .catch((err: AxiosError) => {
           this.numeroCaseTva = "";
