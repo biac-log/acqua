@@ -1,7 +1,7 @@
   <template>
   <v-dialog
     v-model="dialog"
-    width="1500"
+    width="900"
     scrollable
     @click:outside="closeDialog"
     @keydown.esc="closeDialog()"
@@ -18,7 +18,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
-        <v-card-text class="ma-0 pa-0">
+        <v-card-text class="ml-0 mr-0 pl-0 pr-0">
           <v-data-table
             :headers="headersPermissions"
             :items="permissions"
@@ -93,8 +93,8 @@ export default class extends Vue {
   private reject!: any;
 
   private headersPermissions = [
-    { text: "Nom", value: "Nom" },
-    { text: "Description", value: "Description" }
+    { text: "Nom", value: "Nom", width: 150 },
+    { text: "Description", value: "Description", width: 300 }
   ];
 
   public open(

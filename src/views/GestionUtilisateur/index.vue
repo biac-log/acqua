@@ -12,7 +12,7 @@
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
-          label="Search"
+          label="Filtrer"
           single-line
           hide-details
           autofocus
