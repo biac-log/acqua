@@ -490,7 +490,7 @@ export default class extends Vue {
   private resolve!: any;
   private reject!: any;
 
-  private forcerNumero: boolean = true;
+  private forcerNumero: boolean = false;
   private numeroToForce: string = "";
   private numeroToForceRules: any = [(v: string) =>  !!v || "Numéro obligatoire", 
                                      (v: string) => !!v.toNumber() || "Numéro invalide"];
@@ -782,7 +782,7 @@ export default class extends Vue {
   private initTauxDevise(numeroDevise: number, datePiece: DateTime){
     if(!numeroDevise || numeroDevise == 1)
       this.taux = "1";
-    else {
+    else if(this.datePiece.isValid() && numeroDevise) {
       DeviseApi.getTaux(numeroDevise, datePiece)
       .then((resp) => {
         this.taux = resp.toDecimalString(2);
@@ -800,7 +800,7 @@ export default class extends Vue {
 
   @Watch("deviseSelected")
   private deviseSelectedChanged(val: Devise, oldVal: Devise){
-    if(!this.piecereadonly && val){
+    if(!this.piecereadonly && val && this.datePiece.isValid()){
       DeviseApi.getTaux(this.deviseSelected.id, this.datePiece)
       .then((resp) => {
         this.taux = resp.toDecimalString(2);

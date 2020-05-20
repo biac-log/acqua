@@ -13,16 +13,20 @@
         v-model="dateFormatted"
         ref="refDate"
         :label="label"
-        :prepend-icon="isReadonly ? '' : 'mdi-calendar'"
         :filled="isReadonly"
         :readonly="isReadonly"
         :rules="dateRules"
-        @click:prepend="menuDate = true"
         @blur.prevent="dateSelected = parseDate(dateFormatted)"
         @focus="$event.target.select()"
         :hide-details="isReadonly"
         validate-on-blur
-      ></v-text-field>
+      >
+        <template v-slot:prepend>
+          <v-btn icon small :disabled="isReadonly" @click="menuDate = true" @keydown.enter.prevent.stop="menuDate = true" tabindex="-1">
+            <v-icon>mdi-calendar</v-icon>
+          </v-btn>
+        </template>
+      </v-text-field>
     </template>
     <v-date-picker
       no-title
