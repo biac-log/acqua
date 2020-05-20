@@ -425,13 +425,13 @@ export default class extends Vue {
     if(this.readonly)
       return;
 
-    if ( this.numeroCaseTva.isInt()) {
+    if (this.numeroCaseTva) {
       this.tvaLoading = true;
+      this.errorMessage = "";
       AchatVenteApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
         .then(caseTva => {
           this.numeroCaseTva = caseTva.numeroCase.toString();
           this.caseTva = caseTva;
-          this.errorMessage = "";
         })
         .catch((err: AxiosError) => {
           this.numeroCaseTva = "";
@@ -447,6 +447,7 @@ export default class extends Vue {
       this.caseTva = new CaseTva();
     }
   }
+  
   private OpenSearchCaseTva(): void { 
     (this.$refs.caseTvaDialog as SearchCaseTvaVue)
       .open(this.numeroJournal)

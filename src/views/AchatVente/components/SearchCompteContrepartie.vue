@@ -14,39 +14,36 @@
           single-line
           hide-details
           autofocus
-          @keydown.enter="trySend"
+          @keydown.down="giveFocusToRow(0)"
+          autocomplete="off"
         ></v-text-field>
       </v-card-title>
-      <v-data-table
+      <AgGridVue 
+        style="height: 561px;"
         id="dataTable"
-        ref="dataTable"
-        height="600"
-        dense
-        disable-pagination
-        fixed-header
-        hide-default-footer
-        :headers="headersComptes"
-        :items="comptes"
-        :loading="isLoading"
-        :search="filtreCompte"
-        @click:row="sendCompte"
-        @current-items="setFilteredItems"
-      >
-      </v-data-table>
+        class="ag-theme-alpine"
+        :columnDefs="headersComptes"
+        :rowData="comptes"
+        rowSelection="single"
+        :gridOptions="gridOptions">
+      </AgGridVue>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Emit } from "vue-property-decorator";
+import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
 import {TypeCompte} from "@/models/AchatVente";
 import CompteGeneralSearch from "@/models/Compte/CompteGeneralSearch";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import { CompteApi } from "@/api/CompteApi";
 import axios from "axios";
+import { ICellRenderer, GridOptions, GridApi } from 'ag-grid-community';
+import { AgGridVue } from "ag-grid-vue";
 
 @Component({
-  name: "SearchCompteContrepartie"
+  name: "SearchCompteContrepartie",
+  components: { AgGridVue }
 })
 export default class extends Vue {
   private dialog: boolean = false;
@@ -56,15 +53,30 @@ export default class extends Vue {
   private comptes: CompteGeneralSearch[] = [];
   private displayComptes: CompteGeneralSearch[] = [];
   private headersComptes = [
-    { text: "Numéro", value: "numero", width: 100 },
-    { text: "Nom", value: "nom", width: 100 },
-    { text: "Solde", value: "libelleSolde", align: "end", width: 100 },
-    { text: "Nature", value: "libelleNature", width: 100 },
-    { text: "Case TVA", value: "libelleCase", width: 100 }
+    { headerName: "Numéro", field: "numero", filter:true, width: 120 },
+    { headerName: "Nom", field: "nom", filter:true, flex:1 },
+    { headerName: "Solde", field: "libelleSolde", filter:true, cellStyle: { textAlign: "right" }, width: 100 },
+    { headerName: "Nature", field: "libelleNature", filter:true, width: 120 },
+    { headerName: "Case TVA", field: "libelleCase", filter:true, width: 120 }
   ];
 
   private resolve!: any;
   private reject!: any;
+
+  private loadingCellRenderer: string | undefined | (new () => ICellRenderer) = undefined;
+  private loadingCellRendererParams = null;
+  private gridOptions: GridOptions = {
+    columnDefs: this.headersComptes,
+    rowSelection: "single",
+    rowData: this.comptes,
+    navigateToNextCell: this.navigateToNextCell,
+    suppressHorizontalScroll: true,
+    onCellKeyPress: this.keypress,
+    overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
+    pagination: true,
+    paginationAutoPageSize:true,
+    onRowDoubleClicked: this.rowDoubleClick
+  };
 
   public open(typeToLoad: TypeCompte): Promise<CompteGeneralSearch> {
     this.dialog = true;
@@ -100,20 +112,89 @@ export default class extends Vue {
     }
   }
 
-  private trySend(){
-    if(this.displayComptes.length == 1)
-      this.sendCompte(this.displayComptes[0]);
+  private giveFocusToRow(id: number) {
+    let ds = 0;
+    this.gridOptions?.api?.forEachNode(function(node) {
+      if (node.rowIndex === id) {
+        node.setSelected(true);
+        ds = node.rowIndex;
+      }
+    });
+    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, "numero"));
+  }
+
+  @Watch("filtreCompte")
+  private filterGrid(){
+    this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
+  }
+
+  private navigateToNextCell(params: any) {
+    let previousCell = params.previousCellPosition;
+    const suggestedNextCell = params.nextCellPosition;
+
+    const KEY_UP = 38;
+    const KEY_DOWN = 40;
+    const KEY_LEFT = 37;
+    const KEY_RIGHT = 39;
+
+    switch (params.key) {
+      case KEY_DOWN:
+        previousCell = params.previousCellPosition;
+        // set selected cell on current cell + 1
+        this.gridOptions?.api?.forEachNode(function(node) {
+          if (previousCell.rowIndex + 1 === node.rowIndex) {
+            node.setSelected(true);
+          }
+        });
+        return suggestedNextCell;
+      case KEY_UP:
+        previousCell = params.previousCellPosition;
+        // set selected cell on current cell - 1
+        this.gridOptions?.api?.forEachNode(function(node) {
+          if (previousCell.rowIndex - 1 === node.rowIndex) {
+            node.setSelected(true);
+          }
+        });
+        return suggestedNextCell;
+      case KEY_LEFT:
+      case KEY_RIGHT:
+        return suggestedNextCell;
+      default:
+        console.log(
+          "this will never happen, navigation is always one of the 4 keys above"
+        );
+    }
+  }
+
+  private keypress(event: any) {
+    if(event?.event.key === "Enter"){
+      var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
+      this.sendCompte(selectedRow)
+    }
+  } 
+
+  private rowDoubleClick(vlaue : any){
+    var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
+    this.reinitGrid();
+    this.sendCompte(selectedRow)
+  }
+
+  private reinitGrid(){
+    (this.gridOptions.api as GridApi).deselectAll();
+    (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 
   private sendCompte(compte: CompteGeneralSearch) {
     this.filtreCompte = "";
     this.dialog = false;
+    this.reinitGrid();
     this.resolve(compte);
   }
 
   private close(){
     this.filtreCompte = "";
     this.dialog = false;
+    this.reinitGrid();
     this.reject();
   }
 }

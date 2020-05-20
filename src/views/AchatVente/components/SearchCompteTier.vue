@@ -19,7 +19,7 @@
         ></v-text-field>
       </v-card-title>
       <AgGridVue 
-        style="height: 561px; width: 1000px;"
+        style="height: 561px;"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersComptes"
@@ -27,22 +27,6 @@
         rowSelection="single"
         :gridOptions="gridOptions">
       </AgGridVue>
-      <!-- <v-data-table
-        id="dataTable"
-        height="530"
-        dense
-        fixed-header
-        :footer-props="{
-          'items-per-page-options': [30,50,100]
-        }"
-        :items-per-page="30"
-        :headers="headersComptes"
-        :items="comptes"
-        :loading="isLoading"
-        :search="filtreCompte"
-        @click:row="sendCompte"
-      >
-      </v-data-table> -->
     </v-card>
   </v-dialog>
 </template>
@@ -53,7 +37,7 @@ import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
 import CompteSearch from "@/models/Compte/CompteSearch";
 import { CompteApi } from "@/api/CompteApi";
 import axios from "axios";
-import { GridOptions } from 'ag-grid-community';
+import { GridOptions, ICellRenderer, GridApi } from 'ag-grid-community';
 
 @Component({
   name: "SearchCompteTier",
@@ -67,15 +51,17 @@ export default class extends Vue {
   private isLoading: boolean = false;
   private comptes: CompteSearch[] = [];
   private headersComptes = [
-    { headerName: "Numéro", field: "numero", width: 120 },
-    { headerName: "Nom", field: "nom", width: 300 },
-    { headerName: "Raison sociale", field: "raisonSocial", width: 140 },
-    { headerName: "Adresse", field: "adresse", flex:1 }
+    { headerName: "Numéro", field: "numero", filter:true, width: 120 },
+    { headerName: "Nom", field: "nom", filter:true, width: 300 },
+    { headerName: "Raison sociale", field: "raisonSocial", filter:true, width: 140 },
+    { headerName: "Adresse", field: "adresse", filter:true, flex:1 }
   ];
 
   private resolve!: any;
   private reject!: any;
 
+  private loadingCellRenderer: string | undefined | (new () => ICellRenderer) = undefined;
+  private loadingCellRendererParams = null;
   private gridOptions: GridOptions = {
     columnDefs: this.headersComptes,
     rowSelection: "single",
@@ -85,12 +71,9 @@ export default class extends Vue {
     onCellKeyPress: this.keypress,
     overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
     pagination: true,
-    paginationAutoPageSize:true
+    paginationAutoPageSize:true,
+    onRowDoubleClicked: this.rowDoubleClick
   };
-
-  mounted(){
-    this.gridOptions?.api?.sizeColumnsToFit();
-  }
 
   public open(typeToLoad: string): Promise<CompteSearch> {
     this.dialog = true;
@@ -106,6 +89,19 @@ export default class extends Vue {
     if (this.typeLoad != typeToLoad) {
       this.typeLoad = typeToLoad;
       this.refreshComptes();
+    }
+  }
+
+  private refreshComptes() {
+    if (this.typeLoad) {
+      this.isLoading = true;
+      CompteApi.getComptesTiers(this.typeLoad)
+        .then(resp => {
+          this.comptes = resp;
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     }
   }
 
@@ -170,39 +166,32 @@ export default class extends Vue {
     }
   } 
 
-  private refreshComptes() {
-    if (this.typeLoad) {
-      this.isLoading = true;
-      CompteApi.getComptesTiers(this.typeLoad)
-        .then(resp => {
-          this.comptes = resp;
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    }
+  private rowDoubleClick(vlaue : any){
+    var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteSearch;
+    this.sendCompte(selectedRow)
+  }
+
+  private reinitGrid(){
+    (this.gridOptions.api as GridApi).deselectAll();
+    (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 
   private sendCompte(compte: CompteSearch) {
     this.filtreCompte = "";
     this.dialog = false;
+    this.reinitGrid();
     this.resolve(compte);
   }
 
   private close(){
     this.filtreCompte = "";
     this.dialog = false;
+    this.reinitGrid();
     this.reject();
   }
 }
 </script>
 
 <style>
-#btn-acqua {
-  height: 56px;
-}
 
-#dataTable tbody tr {
-  cursor: pointer;
-}
 </style>

@@ -427,8 +427,8 @@ export default class extends Vue {
 
   //Encodage
   private numeroCompteTier: string= "";
-  private numeroCompteTierRules: any = [(v: { numero: number | string }) => !!v?.numero || "Numéro obligatoire"];
   private numeroCompteTierSelected: { numero: number | string, nom:string } = { numero: "", nom:"" };
+  private numeroCompteTierRules: any = [(v: { numero: number | string }) => !!v?.numero || "Numéro obligatoire"];
   private comptesTiersSearch: { numero: number, nom: string }[] = [];
   private searchCompteDeTier: string = '';
   private libelle: string = "";
@@ -520,7 +520,7 @@ export default class extends Vue {
     this.dialog=true;
     this.piecereadonly=true;
     this.init(periode, journal, entete);
-     this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
+    this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -540,6 +540,7 @@ export default class extends Vue {
   }
   
   private async loadDataForEdit(){
+    await this.loadCompte();
     await this.loadDevises();
     await this.loadStatuts();
   }
@@ -660,9 +661,10 @@ export default class extends Vue {
         this.loadCompte();
         this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
       }).catch(() => {
-        this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+        this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
       });
   }
+
   @Watch("searchCompteDeTier")
   private async searchCompteDeTierChanged(matchCode: string){
     try {
@@ -681,7 +683,10 @@ export default class extends Vue {
     if(typeof value === "string")
       this.numeroCompteTier = value;
     else if(value instanceof CompteSearch)
+    {
       this.numeroCompteTier = value.numero.toString();
+      this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
+    }
     else this.numeroCompteTier = "";
     this.loadCompte();
   }
@@ -708,9 +713,18 @@ export default class extends Vue {
     this.initDateEcheance(this.numeroCompteTier, this.typeCompte, this.datePiece);
   }
 
+  private validateLibelle(){
+    if(!this.piecereadonly && this.libelle){
+      AchatVenteApi.ValidateLibelle(this.libelle,this.typeCompte,this.numeroCompteTier).then((isUsed) => {
+        if(isUsed) this.libelleWarningMessage = "Attention, ce libellé est déjà utilisé par une autre pièce";
+        else this.libelleWarningMessage = "";
+     });
+    } else this.libelleWarningMessage = "";
+  }
+
   private async ModifierPiece() {
-    await this.loadDataForEdit();
     this.piecereadonly = false;
+    await this.loadDataForEdit();
     this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
   }
 
@@ -836,6 +850,7 @@ export default class extends Vue {
     AchatVenteApi.AddPiece(piece).then((numeroPiece) => {
       this.numeroPiece = numeroPiece.toString();
       this.resolve({ action: "ADD", data: this.GetModelForGrid()});
+      (this.$refs.form as any).resetValidation();
       this.dialog = false;
     }).catch((err) => {
       this.errorMessage = displayAxiosError(err);
@@ -852,6 +867,7 @@ export default class extends Vue {
     this.piecereadonly = true;
     AchatVenteApi.UpdatePiece(pieceComptaToSave).then(() => {
       this.resolve({ action: "UPDATE", data: this.GetModelForGrid()});
+      (this.$refs.form as any).resetValidation();
       this.dialog = false;
     }).catch((err) => {
         this.errorMessage = displayAxiosError(err);
@@ -943,15 +959,6 @@ export default class extends Vue {
     return entete;
   }
 
-  private validateLibelle(){
-    if(!this.piecereadonly && this.libelle){
-      AchatVenteApi.ValidateLibelle(this.libelle,this.typeCompte,this.numeroCompteTier).then((isUsed) => {
-        if(isUsed) this.libelleWarningMessage = "Attention, ce libellé est déjà utilisé par une autre pièce";
-        else this.libelleWarningMessage = "";
-     });
-    } else this.libelleWarningMessage = "";
-  }
-
   private cancelEdit(){
     this.piecereadonly = true;
     if(this.numeroPiece.toNumber() != 0){
@@ -961,6 +968,7 @@ export default class extends Vue {
 
   private closeDialog(){
     this.dialog = false;
+    (this.$refs.form as any).resetValidation();
     this.reject();
   }
 }

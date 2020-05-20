@@ -1,6 +1,6 @@
 
 interface Number {
-  toDecimalString(nbDecimal: number | undefined): string;
+  toDecimalString(nbDecimal?: number): string;
   toIntString(): string;
 }
 
@@ -44,5 +44,5 @@ String.prototype.toNumber = function () {
     let number = +this;
     if(number || number == 0)
       return number;
-    else return +this.replace(/\./g, '').replace(',', '.');
+    else return +this.replace(/\./g, '').replace(/\s/g, '').replace(',', '.');
 }

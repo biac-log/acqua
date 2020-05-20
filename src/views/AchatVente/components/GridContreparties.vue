@@ -16,8 +16,8 @@
         </v-btn>
         <v-spacer></v-spacer>
         <span :class="!ventilleBase || ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
-          <span >Montant à ventiller : <b>{{ ventilleDevise }} {{ devise ? devise.libelle : "EUR" }}</b></span>
-          <span v-if="devise && devise.id != 1">/ <b>{{ ventilleBase }} EUR</b></span>
+          <span >Montant à ventiller : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b></span>
+          <span v-if="devise && devise.id != 1">/ <b>{{ ventilleBase | numberToStringEvenZero }} EUR</b></span>
         </span>
         <EditContrepartieVue
           ref="editContrepartie"
@@ -181,7 +181,7 @@ export default class extends Vue {
     let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => c.montantCredit.toNumber()).reduce((a,b) => a + b, 0);
     let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => c.montantDebit.toNumber()).reduce((a,b) => a + b, 0);
     ventileDevise = ventileDevise + debit - credit;
-    return ventileDevise.toFixed(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
+    return ventileDevise.toDecimalString(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
   }
 
   private getTvaCalcule(contrepartieToIgnore?: PieceComptableContrepartie): number {
@@ -200,7 +200,7 @@ export default class extends Vue {
       }
     });
     
-    return montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b, 0).toFixed(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
+    return montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b, 0).toDecimalString(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
   }
 
   private getTvaImpute(contrepartieToIgnore?: PieceComptableContrepartie): number {
