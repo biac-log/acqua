@@ -18,7 +18,7 @@
         :readonly="isReadonly"
         :rules="dateRules"
         @click:prepend="menuDate = true"
-        @blur="dateSelected = parseDate(dateFormatted)"
+        @blur.prevent="dateSelected = parseDate(dateFormatted)"
         @focus="$event.target.select()"
         :hide-details="isReadonly"
         validate-on-blur
@@ -57,7 +57,14 @@ export default class extends Vue {
   private parseDate(date: string): string {
     if (!date) return "";
     else {
-      return new DateTime(date).toString("YYYY-MM-DD")
+      let dateString = date;
+      if(date.length === 2)
+        dateString = `${date}/${this.syncedDate.date.format("MM/YYYY")}`;
+      else if(date.length === 4)
+        dateString = `${date}${this.syncedDate.date.format("YYYY")}`;
+      else if(date.length === 5)
+        dateString = `${date}/${this.syncedDate.date.format("YYYY")}`;
+      return new DateTime(dateString).toString("YYYY-MM-DD")
     }
   }
 
@@ -65,8 +72,9 @@ export default class extends Vue {
   private dateSelectedChanged(val: string, oldVal: string) {
     if (val) {
       let date = new DateTime(val);
-      this.dateFormatted = date.toString();
+      this.dateFormatted = date.toString(); 
       this.syncedDate = date;
+      this.$nextTick(() => (this.$refs.refDate as any).validate(true));
     } else {
       this.dateFormatted = "";
       this.syncedDate = new DateTime();
