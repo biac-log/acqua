@@ -164,8 +164,4 @@ export default class extends Vue {
 #dataTable tbody tr {
   cursor: pointer;
 }
-
-tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.05);
-}
 </style>
