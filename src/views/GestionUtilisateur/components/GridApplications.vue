@@ -11,7 +11,6 @@
         dense
         sort-by="Nom"
         @click:row="loadPermissions"
-        style="width:500px;"
       >
         <template v-slot:item.Acces="{ item }">
           <v-simple-checkbox :value="HasAccessApplication(item)" disabled></v-simple-checkbox>

@@ -97,7 +97,7 @@ export const asyncRoutes: RouteConfig[] = [
         name: "Utilisateurs",
         meta: {
           title: "Utilisateurs",
-          icon: "mdi-account-outline",
+          icon: "mdi-account-multiple",
           affix: true
         }
       }

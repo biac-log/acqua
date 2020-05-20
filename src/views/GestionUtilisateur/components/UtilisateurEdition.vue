@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" :height="1000" :width="1000" @keydown.f2="ModifierUtilisateur">
+  <v-dialog v-model="dialog" :width="1750" @keydown.f2="ModifierUtilisateur">
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
       <v-card>
         <v-toolbar color="primary" dark flat>
@@ -25,12 +25,12 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-card-text style="width:100%; height:680px;"
->
-          <v-tabs>
-            <v-tab key="tabOne">Informations générales</v-tab>
-            <v-tab key="tabTwo">Permissions</v-tab>
-            <v-tab-item key="tabOne">
+        <v-card-text>
+          <v-row>
+            <v-col cols="8">              
+              <v-row class="ma-0 pa-0">
+                <v-card-title class="font-weight-medium ma-0 pa-0 ml-2">Informations générales</v-card-title>
+              </v-row>
               <v-row class="mt-5">
                 <v-col>
                   <v-text-field
@@ -38,11 +38,10 @@
                     label="Nom prénom"
                     ref="nomPrenom"
                     v-model="nomPrenom"
-                    :value="nomPrenom"
                     :filled="utilisateurReadonly"
-                    :readonly="true"
+                    readonly
                     validate-on-blur
-                    outlined
+                    prepend-inner-icon="mdi-account-box"
                   ></v-text-field>
                   <v-text-field
                     v-else
@@ -53,7 +52,7 @@
                     :rules="nomRules"
                     validate-on-blur
                     autofocus
-                    outlined
+                    prepend-inner-icon="mdi-account-box"
                   ></v-text-field>
                   <v-text-field
                     v-if="utilisateur.ID"
@@ -62,9 +61,9 @@
                     v-model="code"
                     :value="code"
                     :filled="utilisateurReadonly"
-                    :readonly="true"
+                    readonly
                     validate-on-blur
-                    outlined
+                    prepend-inner-icon="mdi-account"
                   ></v-text-field>
                   <v-text-field
                     v-else
@@ -72,10 +71,10 @@
                     ref="code"
                     v-model="code"
                     :value="code"
-                    :readonly="true"
+                    readonly
                     tabindex="-1"
                     validate-on-blur
-                    outlined
+                    prepend-inner-icon="mdi-account"
                   ></v-text-field>
                   <v-text-field
                     v-if="utilisateur.ID"
@@ -84,9 +83,10 @@
                     v-model="motDePasse"
                     type="password"
                     :value="motDePasse"
+                    readonly
                     :filled="utilisateurReadonly"
                     validate-on-blur
-                    outlined
+                    prepend-inner-icon="mdi-lock"
                     autocomplete="off"
                   ></v-text-field>
                   <v-text-field
@@ -98,7 +98,7 @@
                     :value="motDePasse"
                     :rules="nomRules"
                     validate-on-blur
-                    outlined
+                    prepend-inner-icon="mdi-lock"
                     autocomplete="off"
                   ></v-text-field>
                   <v-text-field
@@ -109,7 +109,7 @@
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
                     validate-on-blur
-                    outlined
+                    prepend-inner-icon="mdi-card-account-details"
                   ></v-text-field>
                   <v-text-field
                     label="Fonction"
@@ -119,19 +119,16 @@
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
                     validate-on-blur
-                    outlined
+                    prepend-inner-icon="mdi-briefcase"
                   ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-select
+                    <v-select
                     label="Département"
                     persistent-hint
-                    :items="departements"
                     v-model="departement"
+                    :filled="utilisateurReadonly"
+                    :items="departements"
                     :readonly="utilisateurReadonly"
-                                        :filled="utilisateurReadonly"
-                    outlined
-                    :height="utilisateurReadonly ? '40' : '30'"
+                    prepend-inner-icon="mdi-sitemap"
                   ></v-select>
                   <v-select
                     label="Langue"
@@ -139,10 +136,11 @@
                     :items="langues"
                     v-model="langue"
                     :readonly="utilisateurReadonly"
-                                        :filled="utilisateurReadonly"
-                    outlined
-                    :height="utilisateurReadonly ? '40' : '30'"
+                    :filled="utilisateurReadonly"
+                    prepend-inner-icon="mdi-translate"
                   ></v-select>
+                </v-col>
+                <v-col>                
                   <v-text-field
                     label="Adresse 1"
                     ref="adresseLigne1"
@@ -150,7 +148,7 @@
                     :value="adresseLigne1"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    outlined
+                    prepend-inner-icon="mdi-map-marker"
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -160,7 +158,7 @@
                     :value="adresseLigne2"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    outlined
+                    prepend-inner-icon="mdi-map-marker"
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -170,19 +168,17 @@
                     :value="adresseLigne3"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    outlined
+                    prepend-inner-icon="mdi-map-marker"
                     validate-on-blur
                   ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
+                    <v-text-field
                     label="Téléphone"
                     ref="telephone"
                     v-model="telephone"
                     :value="telephone"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    outlined
+                    prepend-inner-icon="mdi-phone"
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -192,7 +188,7 @@
                     :value="numeroInterne"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    outlined
+                    prepend-inner-icon="mdi-phone-in-talk"
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -202,7 +198,7 @@
                     :value="fax"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    outlined
+                    prepend-inner-icon="mdi-fax"
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -212,13 +208,19 @@
                     :value="email"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    outlined
+                    prepend-inner-icon="mdi-email"
                     validate-on-blur
                   ></v-text-field>
-                </v-col>
+                </v-col>              
               </v-row>
-            </v-tab-item>
-            <v-tab-item key="tabTwo">
+            </v-col>
+            <v-col cols="auto">
+              <v-divider vertical> </v-divider>
+            </v-col>
+            <v-col cols="auto">
+              <v-row class="ma-0 pa-0">
+                <v-card-title class="font-weight-medium ma-0 pa-0 ml-2">Permissions</v-card-title>
+              </v-row>
               <v-row fill-height>
                 <GridApplications
                   ref="gridApplications"
@@ -228,40 +230,35 @@
                   :Utilisateur.sync="utilisateur"
                 ></GridApplications>
               </v-row>
-            </v-tab-item>
-          </v-tabs>
+            </v-col>
+          </v-row>
         </v-card-text>
         <v-divider v-if="!utilisateurReadonly"></v-divider>
-        <v-card-actions v-if="!utilisateurReadonly" class="d-flex">    
-          <v-spacer></v-spacer>     
-            <v-btn
-              color="blue darken-1"
-              class="ma-2 mt-0 pr-4 align-self-start"
-              tile
-              outlined
-              @click="cancelEdit()"
-              tabindex="-1"
-            >
-              <v-icon left>mdi-close</v-icon>Annuler
-            </v-btn>
-            <v-btn
-              ref="btnValidate"
-              class="ma-2 mt-0 pr-4 align-self-start"
-              tile
-              color="success"
-              :loading="saveLoading"
-              :disabled="!isValid"
-              @click="save()"
-            >
-              <v-icon left>mdi-content-save</v-icon>Sauvegarder
-            </v-btn>  
+        <v-card-actions v-if="!utilisateurReadonly" class="d-flex">
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1"
+            class="ma-2 mt-0 pr-4 align-self-start"
+            tile
+            outlined
+            @click="cancelEdit()"
+            tabindex="-1"
+          >
+            <v-icon left>mdi-close</v-icon>Annuler
+          </v-btn>
+          <v-btn
+            ref="btnValidate"
+            class="ma-2 mt-0 pr-4 align-self-start"
+            tile
+            color="success"
+            :loading="saveLoading"
+            :disabled="!isValid"
+            @click="save()"
+          >
+            <v-icon left>mdi-content-save</v-icon>Sauvegarder
+          </v-btn>
         </v-card-actions>
-        <v-alert
-              type="error"
-              border="left"
-              v-if="errorMessage"
-              class="ml-4 mr-4"
-            >{{errorMessage}}</v-alert>
+        <v-alert type="error" border="left" v-if="errorMessage" class="ml-4 mr-4">{{errorMessage}}</v-alert>
       </v-card>
     </v-form>
   </v-dialog>
@@ -289,7 +286,7 @@ export default class extends Vue {
   private isValid: boolean = true;
 
   private Avatar: any = null;
-  private nomRules: any = [(v: string) => (!!v || "Valeur obligatoire")];
+  private nomRules: any = [(v: string) => !!v || "Valeur obligatoire"];
 
   //Statiques
   private departements: string[] = [];
@@ -333,7 +330,7 @@ export default class extends Vue {
     try {
       const departements = await DepartementApi.getDepartements();
       this.departements = departements.map(e => e.Nom);
-      this.departements.unshift('')
+      this.departements.unshift("");
     } catch (err) {
       this.isErrorLoading = true;
     }
@@ -361,7 +358,7 @@ export default class extends Vue {
     this.permissions = utilisateur?.Permissions;
     this.nomPrenom = utilisateur?.NomPrenom;
     this.code = utilisateur?.ID;
-    this.motDePasse = !!utilisateur ? 'xxxxxxx' : '';
+    this.motDePasse = !!utilisateur ? "xxxxxxx" : "";
     this.idActiveDirectory = utilisateur?.IdActiveDirectory;
     this.fonction = utilisateur?.Fonction;
     this.departement = utilisateur?.Departement;
@@ -411,7 +408,8 @@ export default class extends Vue {
 
   private GetModelToSave(): Utilisateur {
     this.utilisateur.NomPrenom = this.nomPrenom;
-    this.utilisateur.MotDePasseApollo = this.motDePasse !== 'xxxxxxx' ? this.motDePasse : '';
+    this.utilisateur.MotDePasseApollo =
+      this.motDePasse !== "xxxxxxx" ? this.motDePasse : "";
     this.utilisateur.IdActiveDirectory = this.idActiveDirectory;
     this.utilisateur.Fonction = this.fonction;
     this.utilisateur.Departement = this.departement;
