@@ -7,6 +7,7 @@
     @keydown.f2="ModifierPiece"
     @keydown.del.prevent.stop="DeletePiece"
     @keydown.plus.prevent.stop="createContrepartie"
+    @keydown.alt.enter="savePiece()"
   >
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
       <v-card>

@@ -40,7 +40,7 @@ export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
   }
 
   get libelleNumero(): string{
-    return `${this.typeCompte}${this.numeroCompte}`;
+    return `${this.typeCompte} ${this.numeroCompte}`;
   }
 
   get montantDebit(): string{

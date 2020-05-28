@@ -89,6 +89,7 @@
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
+                tabindex="-1"
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -136,6 +137,7 @@
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
+                tabindex="-1"
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -268,13 +270,13 @@ export default class extends Vue {
     deviseEntete: Devise,
     ventileDevise: number,
     tvaCalcule : number,
-    tvaImpute: number
+    tvaImpute: number,
   ): Promise<PieceComptableContrepartie> {
     this.dialog = true;
     this.isNew = false;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.init(contrepartie, numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
+      this.init(contrepartie, numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute, "");
     });
 
     return new Promise((resolve, reject) => {
@@ -288,13 +290,14 @@ export default class extends Vue {
     ventileDevise: number,
     tvaCalcule : number,
     tvaImpute: number,
-    contrepartie?: PieceComptableContrepartie,
+    propositionLibelle : string,
+    contrepartie?: PieceComptableContrepartie
   ): Promise<PieceComptableContrepartie> {
     this.dialog = true;
     this.isNew = true;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.init(contrepartie || new PieceComptableContrepartie(), numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
+      this.init(contrepartie || new PieceComptableContrepartie(), numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute, propositionLibelle);
     });
 
     return new Promise((resolve, reject) => {
@@ -309,7 +312,8 @@ export default class extends Vue {
     deviseEntete: Devise,    
     ventileDevise: number,
     tvaCalcule : number,
-    tvaImpute: number
+    tvaImpute: number,
+    propositionLibelle:string
   ) {
     this.initDevises(deviseEntete, contrepartie);
     this.numeroJournal = numeroJournal;
@@ -317,7 +321,7 @@ export default class extends Vue {
     this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) ||this.devises[0];
     this.numeroCompte = contrepartie.numeroCompte ? contrepartie.numeroCompte.toString() : "";
     this.nomCompte = contrepartie.compteLibelle;
-    this.libelle = contrepartie.libelle;
+    this.libelle = contrepartie.libelle ? contrepartie.libelle : propositionLibelle;
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
     this.montant = contrepartie.montantBase && this.devisesSelected ? contrepartie.montantBase.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
     this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : "";

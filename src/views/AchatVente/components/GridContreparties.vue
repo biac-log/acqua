@@ -16,8 +16,10 @@
         </v-btn>
         <v-spacer></v-spacer>
         <span :class="!ventilleBase || ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
-          <span >Montant à ventiler : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b></span>
-          <span v-if="devise && devise.id != 1">/ <b>{{ ventilleBase | numberToStringEvenZero }} EUR</b></span>
+          <span v-if="!devise || devise.id == 1">Montant à ventiler : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b></span>
+          <span v-if="devise && devise.id != 1">
+              Ventiler base : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b>
+               - Ventiler devise : <b>{{ ventilleBase | numberToStringEvenZero }} EUR</b></span>
         </span>
         <EditContrepartieVue
           ref="editContrepartie"
@@ -77,6 +79,7 @@ export default class extends Vue {
 
   private ventilleDevise: number = 0;
   private ventilleBase: number = 0;
+  private propositionLibelle : string ="";
 
   private headersContreparties = [
     { text: "N° Compte", value: "libelleNumero" },
@@ -90,13 +93,15 @@ export default class extends Vue {
 
   private addContrepartie(contrepartie?: PieceComptableContrepartie) {
     (this.$refs.editContrepartie as EditContrepartieVue)
-      .openNew(this.journal.numero, this.devise, this.getVentileDevise(), this.getTvaCalcule(), this.getTvaImpute(), contrepartie)
+      .openNew(this.journal.numero, this.devise, this.getVentileDevise(), this.getTvaCalcule(), this.getTvaImpute(), this.propositionLibelle, contrepartie)
       .then((resp: PieceComptableContrepartie) => {
+        this.propositionLibelle = resp.libelle;
         const maxLigne = Math.max(...this.contreparties.map(i => i.numeroLigne))
         resp.numeroLigne = maxLigne + 1;
         this.contreparties.push(resp);
       }).finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+        if(this.ventilleBase != 0 || this.ventilleDevise != 0) this.createContrepartie();
       });
   }
 
@@ -119,9 +124,13 @@ export default class extends Vue {
 
   public async createContrepartie(){
     if((!this.numeroCompteAchatVente || this.numeroCompteAchatVente == "0") && this.contreparties.length == 0)
+    {
+      this.propositionLibelle = this.nomCompteDeTier;
       this.addContrepartie();
+    }
     else if(this.contreparties.length == 0)
     {
+
       let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
       let tva = await AchatVenteApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
       let contrepartie = new PieceComptableContrepartie();
@@ -165,8 +174,8 @@ export default class extends Vue {
     if(this.journal.codeMouvement == "CR")
       ventileCompta = ventileCompta * -1;
 
-    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c !== contrepartieToIgnore).map(c => +c.montantCreditBase).reduce((a,b) => a + b, 0);
-    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c !== contrepartieToIgnore).map(c => +c.montantDebitBase).reduce((a,b) => a + b, 0);
+    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c !== contrepartieToIgnore).map(c => c.montantCreditBase.toNumber()).reduce((a,b) => a + b, 0);
+    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c !== contrepartieToIgnore).map(c => c.montantDebitBase.toNumber()).reduce((a,b) => a + b, 0);
     ventileCompta = ventileCompta + debit - credit;
     return ventileCompta;
   }
