@@ -1,5 +1,9 @@
 <template>
-  <v-container fluid @keydown.plus.prevent="openNewPieceComptable">
+  <v-container 
+    fluid 
+    @keydown.107.prevent="openNewPieceComptable"
+    @keydown.page-up="nextPage()"
+    @keydown.page-down="previousPage()">
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
@@ -80,6 +84,8 @@
         @click:row="OpenPieceComptable"
         :options.sync="options"
         :server-items-length="totalItems"
+        :page.sync="currentPage"
+        @page-count="pageCount = $event"
       >
         <template v-slot:item.datePieceDate="{ item }">
           <span>{{ item.datePieceDate.toString() }}</span>
@@ -147,8 +153,7 @@ export default class extends Vue {
   ];
 
   private selectedPiece!: EntetePieceComptable;
-
-  private headers = [
+   private headers = [
     { text: "Numéro pièce", value: "codePieceDisplay" },
     { text: "Date pièce", value: "datePieceDate" },
     { text: "Date échéance", value: "dateEcheanceDate" },
@@ -156,7 +161,7 @@ export default class extends Vue {
     { text: "Nom compte", value: "nomCompte" },
     { text: "Libelle", value: "libelle" },
     { text: "Montant", value: "montant", align: "end" },
-    { text: "Escompte", value: "escompte", align: "end" },
+    { text: "Escompte", value: "escompteDisplay", align: "end" },
     { text: "Devise", value: "devise" },
     { text: "Status", value: "statusLibelle" }
   ];
@@ -165,6 +170,8 @@ export default class extends Vue {
   private isLoadingPieces: boolean = false;
   private options: any = {};
   private totalItems: number = 0;
+  private currentPage: number = 1;
+  private pageCount: number = 0;
 
   mounted() {
     this.LoadPeriodes();
@@ -195,7 +202,6 @@ export default class extends Vue {
     }
   }
 
-  
   @Watch("options")
   private async LoadPiecesComptables() {
     try {
@@ -219,6 +225,14 @@ export default class extends Vue {
     }finally{
       this.isLoadingPieces = false;
     }
+  }
+
+  private nextPage(){
+    this.currentPage < this.pageCount ? this.currentPage++ : this.currentPage = 1;
+  }
+
+  private previousPage(){
+    this.currentPage > 1 ? this.currentPage-- : this.currentPage = this.pageCount;
   }
 
   private OpenPieceComptable(entete: EntetePieceComptable) {
@@ -251,14 +265,14 @@ export default class extends Vue {
   }
 
   private displayAddResult(piece : EntetePieceComptable){
-      (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected.typePeriodeComptable).then((numero) => {
-          if(piece.codePiece != numero){
-            piece.codePiece = numero;
-          Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);
-        }
-      }).finally(() => {
-        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-      });
+    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected.typePeriodeComptable).then((numero) => {
+        if(piece.codePiece != numero){
+          piece.codePiece = numero;
+        Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);
+      }
+    }).finally(() => {
+      this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+    });
   }
 
   private snackbar: boolean = false;

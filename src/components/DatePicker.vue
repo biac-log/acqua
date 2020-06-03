@@ -68,7 +68,10 @@ export default class extends Vue {
         dateString = `${date}${this.syncedDate.date.format("YYYY")}`;
       else if(date.length === 5)
         dateString = `${date}/${this.syncedDate.date.format("YYYY")}`;
-      return new DateTime(dateString).toString("YYYY-MM-DD")
+      const dateToSelect = new DateTime(dateString);
+      if(dateToSelect.toString("YYYY-MM-DD") == this.dateSelected)
+        this.$nextTick(() => this.dateFormatted = dateToSelect.toString());
+      return dateToSelect.toString("YYYY-MM-DD");
     }
   }
 

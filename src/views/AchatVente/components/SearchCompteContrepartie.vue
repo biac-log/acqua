@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="800" v-model="dialog" @click:outside="close()" @keydown.esc="close()">
+  <v-dialog width="800" v-model="dialog" @click:outside="close()" @keydown.esc="close()" @keydown.page-up="nextPage()" @keydown.page-down="previousPage()">
     <v-card class="mt-5">
       <v-card-title>
         Comptes {{ typeLoad ? typeLoad.libelle : "" }}
@@ -57,7 +57,7 @@ export default class extends Vue {
     { headerName: "Nom", field: "nom", filter:true, flex:1 },
     { headerName: "Solde", field: "libelleSolde", filter:true, cellStyle: { textAlign: "right" }, width: 100 },
     { headerName: "Nature", field: "libelleNature", filter:true, width: 120 },
-    { headerName: "Case TVA", field: "libelleCase", filter:true, width: 120 }
+    { headerName: "Case TVA", field: "caseTvaDisplay", filter:true, width: 120 }
   ];
 
   private resolve!: any;
@@ -178,9 +178,19 @@ export default class extends Vue {
     this.reinitGrid();
     this.sendCompte(selectedRow)
   }
+  
+  private nextPage(){
+    this?.gridOptions?.api?.paginationGoToNextPage();
+  }
+
+  private previousPage(){
+    this?.gridOptions?.api?.paginationGoToPreviousPage();
+  }
 
   private reinitGrid(){
+    (this.gridOptions.api as GridApi).resetQuickFilter();
     (this.gridOptions.api as GridApi).deselectAll();
+    (this.gridOptions.api as GridApi).setFilterModel(null);
     (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 

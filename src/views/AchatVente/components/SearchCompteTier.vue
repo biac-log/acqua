@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="1000" v-model="dialog" @click:outside="close()" @keydown.esc="close()">
+  <v-dialog width="1000" v-model="dialog" @click:outside="close()" @keydown.esc="close()" @keydown.page-up="nextPage()" @keydown.page-down="previousPage()">
     <v-card class="mt-5">
       <v-card-title>
         Comptes
@@ -171,8 +171,18 @@ export default class extends Vue {
     this.sendCompte(selectedRow)
   }
 
+  private nextPage(){
+    this?.gridOptions?.api?.paginationGoToNextPage();
+  }
+
+  private previousPage(){
+    this?.gridOptions?.api?.paginationGoToPreviousPage();
+  }
+
   private reinitGrid(){
+    (this.gridOptions.api as GridApi).resetQuickFilter();
     (this.gridOptions.api as GridApi).deselectAll();
+    (this.gridOptions.api as GridApi).setFilterModel(null);
     (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 

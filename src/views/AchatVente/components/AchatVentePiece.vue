@@ -5,8 +5,8 @@
     width="2000"
     :persistent="!piecereadonly"
     @keydown.f2="ModifierPiece"
-    @keydown.del.prevent.stop="DeletePiece"
-    @keydown.plus.prevent.stop="createContrepartie"
+    @keydown.delete.prevent.stop="DeletePiece"
+    @keydown.107.prevent.stop="createContrepartie"
     @keydown.alt.enter="savePiece()"
   >
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
@@ -50,25 +50,6 @@
           <v-row fill-height>
             <v-col cols="5">
               <v-row dense>
-                <!-- <v-col cols="4">
-                  <v-text-field
-                    label="Numéro compte tiers"
-                    ref="numeroCompteTier"
-                    v-model="numeroCompteTier"
-                    :filled="piecereadonly"
-                    :readonly="piecereadonly"
-                    :append-icon="piecereadonly ? '' : 'mdi-magnify'"
-                    :rules="numeroCompteTierRules"
-                    @keypress.enter="loadCompte"
-                    @keyup.enter="$event.target.select()"
-                    @click:append="OpenSearchCompte()"
-                    @focus="$event.target.select()"
-                    validate-on-blur
-                    @blur="loadCompte"
-                    :hide-details="piecereadonly"
-                  >
-                  </v-text-field>
-                </v-col> -->
                 <v-col cols="4">
                   <v-combobox
                     ref="numeroCompteTier"
@@ -143,10 +124,12 @@
                   <v-text-field
                     label="Montant"
                     v-model="montantDevise"
+                    validate-on-blur
                     :rules="montantRules"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
                     :hide-details="piecereadonly"
+                    @blur="montantDevise = montantDevise.toNumber().toDecimalString()"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="2">
@@ -170,6 +153,7 @@
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
                     :hide-details="piecereadonly"
+                    @blur="montantEscompte = montantEscompte.toNumber().toDecimalString()"
                     tabindex="-1"
                   ></v-text-field>
                 </v-col>
@@ -332,7 +316,7 @@
             @click="DeletePiece()"
             :loading="deleteIsLoading"
             >
-            Suprrimer</v-btn
+            Supprimer</v-btn
           >
           <v-spacer></v-spacer>
           <v-btn
@@ -498,6 +482,8 @@ export default class extends Vue {
   private numeroToForceRules: any = [(v: string) =>  !!v || "Numéro obligatoire", 
                                      (v: string) => !!v.toNumber() || "Numéro invalide"];
 
+  private ventilleBase: number = 0;
+
   public async openNew(periode: PeriodeComptable, journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
     this.dialog= true;
     this.piecereadonly = false;
@@ -555,7 +541,7 @@ export default class extends Vue {
 
     this.comptesTiersSearch= [];
     this.searchCompteDeTier = "";
-    this.numeroCompteTierSelected = {numero:'', nom:'' };
+    this.numeroCompteTierSelected = { numero: '', nom: '' };
     
     this.periodeDisplay = "";
     this.journal = new Journal();
@@ -594,6 +580,7 @@ export default class extends Vue {
   private async GetPiece() {
     this.errorMessage = "";
     try {
+      console.log(this.ventilleBase);
       let pieceComptable = await AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece);
       this.SetPiece(pieceComptable);
     } catch(err) {
@@ -838,10 +825,10 @@ export default class extends Vue {
 
   private saveLoading: boolean = false;
 
-  private savePiece() {
+  private async savePiece() {
     (this.$refs.form as any).validate();
-    this.$nextTick(() => {
-      if (this.isValid) {
+    this.$nextTick(async () => {
+      if (this.isValid && await this.confirmEquilibre()) {
         let pieceToSave = this.GetModelToSave();
         if(pieceToSave.numeroPiece == 0)
           this.addPiece(pieceToSave);
@@ -850,7 +837,17 @@ export default class extends Vue {
       }
     })
   }
-    
+
+  private async confirmEquilibre(): Promise<boolean>{
+    try {
+      if((this.$refs.gridContreparties as GridContreparties).errorInTVA()){
+        return await (this.$refs.confirmDialog as Confirm).open( "Attention", `La tva calculée est différente de la tva assignée, voulez-vous continuer ?`, "error", "Sauvegarder");
+      } 
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
 
   private addPiece(piece: PieceComptableSaveDTO) {
     this.saveLoading = true;
@@ -937,7 +934,6 @@ export default class extends Vue {
     pieceComptaSave.codeMouvement = this.journal.codeMouvement;
     pieceComptaSave.contreparties = [];
 
-
     let i = 1;
     this.contreparties.forEach(c => {
       let contr : PieceComptableContrepartieSaveDTO = new PieceComptableContrepartieSaveDTO();
@@ -955,6 +951,7 @@ export default class extends Vue {
     pieceComptaSave.hash = this.hash;
     return pieceComptaSave;
   }
+
   private GetModelForGrid(): EntetePieceComptable {
     let entete = new EntetePieceComptable();
     entete.codeJournal = this.journal.numero;
@@ -969,6 +966,7 @@ export default class extends Vue {
     entete.numeroCompte = this.numeroCompteTier.toNumber();
     entete.nomCompte = this.compteTiersNom;
     entete.devise = this.deviseSelected.libelle;
+    console.log(entete);
     return entete;
   }
 

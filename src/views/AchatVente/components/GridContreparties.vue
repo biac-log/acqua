@@ -76,9 +76,9 @@ export default class extends Vue {
   private codeTaxe!: number;
   @PropSync("TauxDevise")
   private tauxDevise!: string;
-
-  private ventilleDevise: number = 0;
+  
   private ventilleBase: number = 0;
+  private ventilleDevise: number = 0;
   private propositionLibelle : string ="";
 
   private headersContreparties = [
@@ -99,9 +99,13 @@ export default class extends Vue {
         const maxLigne = Math.max(...this.contreparties.map(i => i.numeroLigne))
         resp.numeroLigne = maxLigne + 1;
         this.contreparties.push(resp);
-      }).finally(() => {
+        this.$nextTick(() => {
+          if(this.ventilleBase != 0 || this.ventilleDevise != 0 ) 
+            this.createContrepartie();
+        })
+      })
+      .finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-        if(this.ventilleBase != 0 || this.ventilleDevise != 0) this.createContrepartie();
       });
   }
 
@@ -130,7 +134,6 @@ export default class extends Vue {
     }
     else if(this.contreparties.length == 0)
     {
-
       let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
       let tva = await AchatVenteApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
       let contrepartie = new PieceComptableContrepartie();
@@ -167,17 +170,17 @@ export default class extends Vue {
   }
 
   private getVentileBase(contrepartieToIgnore?: PieceComptableContrepartie): number{
-    if(!this.contreparties || ! this.journal)
+    if(!this.contreparties || !this.journal)
       return 0;
 
     let ventileCompta : number = this.montantBase.toNumber();
     if(this.journal.codeMouvement == "CR")
       ventileCompta = ventileCompta * -1;
 
-    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c !== contrepartieToIgnore).map(c => c.montantCreditBase.toNumber()).reduce((a,b) => a + b, 0);
-    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c !== contrepartieToIgnore).map(c => c.montantDebitBase.toNumber()).reduce((a,b) => a + b, 0);
+    let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c != contrepartieToIgnore).map(c => c.montantCreditBase.toNumber()).reduce((a,b) => a + b, 0);
+    let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c != contrepartieToIgnore).map(c => c.montantDebitBase.toNumber()).reduce((a,b) => a + b, 0);
     ventileCompta = ventileCompta + debit - credit;
-    return ventileCompta;
+    return ventileCompta.toDecimalString(2).toNumber();
   }
 
   private getVentileDevise(contrepartieToIgnore?: PieceComptableContrepartie): number{
@@ -187,6 +190,7 @@ export default class extends Vue {
     let ventileDevise : number = this.montantBase.toNumber();
     if(this.journal.codeMouvement == "CR")
       ventileDevise = ventileDevise * -1;
+
     let credit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => c.montantCredit.toNumber()).reduce((a,b) => a + b, 0);
     let debit = this.contreparties.filter(c => c.typeCompte != "Z" && c.codeDevise == this.devise.id && c != contrepartieToIgnore).map(c => c.montantDebit.toNumber()).reduce((a,b) => a + b, 0);
     ventileDevise = ventileDevise + debit - credit;
@@ -209,7 +213,7 @@ export default class extends Vue {
       }
     });
     
-    return montantsCaseTva.map(c => c.montant * c.caseTaux / 100).reduce((a,b) => a + b, 0).toDecimalString(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
+    return montantsCaseTva.map(c =>(c.montant * c.caseTaux / 100).toDecimalString(2).toNumber()).reduce((a,b) => a + b, 0).toDecimalString(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
   }
 
   private getTvaImpute(contrepartieToIgnore?: PieceComptableContrepartie): number {
@@ -219,6 +223,10 @@ export default class extends Vue {
     return this.contreparties.filter(c => (c.caseTva.typeCase == 50 || c.caseTva.typeCase == 51) && c.codeDevise == this.devise.id && c !== contrepartieToIgnore)
       .map(c => c.montantCredit.toNumber() - c.montantDebit.toNumber())
       .reduce((a,b) => a + b, 0);
+  }
+
+  public errorInTVA(): boolean{
+    return this.getTvaCalcule() != this.getTvaImpute();
   }
 
   @Watch('contreparties')

@@ -132,7 +132,7 @@
             @click="DeletePiece()"
             :loading="deleteIsLoading"
             >
-            Suprrimer</v-btn
+            Supprimer</v-btn
           >
           <v-spacer></v-spacer>
           <v-btn

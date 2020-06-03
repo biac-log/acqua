@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="800" @keydown.enter.prevent.stop="sendContrepartie" @click:outside="close()" @keydown.esc="close()">
+  <v-dialog v-model="dialog" width="800" @click:outside="close()" @keydown.esc="close()" @keydown.alt.enter="sendContrepartie()">
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
       <v-card>
         <v-card-title>
@@ -28,27 +28,41 @@
               ></v-select>
             </v-col>
             <v-col cols="3">
-              <v-text-field
-                label="N° compte"
-                v-model="numeroCompte"
-                :filled="readonly"
-                :readonly="readonly"
-                :hide-details="readonly"
-                ref="numeroCompte"
-                @keypress.enter.prevent.stop="loadCompte"
-                @blur="loadCompte"
-                autofocus
-              >
-                <template v-slot:append>
-                  <v-btn icon small :disabled="readonly" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
-                    <v-icon>mdi-magnify</v-icon>
-                  </v-btn>
-                </template>
-              </v-text-field>
+                <v-combobox
+                  ref="numeroCompte"
+                  label="N° compte"
+                  v-model="numeroCompteSelected"
+                  :items="comptesSearch"
+                  :search-input.sync="searchCompte"
+                  :rules="numeroCompteRules"
+                  @keyup.enter="$event.target.select()"
+                  @focus="$event.target.select()"
+                  @change="numeroCompteChange"
+                  :hide-details="readonly"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  hide-selected
+                  item-text="numeroNom"
+                  item-value="numero"
+                  hide-no-data
+                  autofocus
+                >
+                  <template v-slot:append>
+                    <v-btn icon small :disabled="readonly" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
+                      <v-icon>mdi-magnify</v-icon>
+                    </v-btn>
+                  </template>
+                  <template v-slot:selection="{ attr, on, item }">
+                    {{ item.numero }}
+                  </template>
+                  <template v-slot:item="{ item }">
+                    {{ item.numeroNom }}
+                  </template>
+                </v-combobox>
+              </v-col>
               <SearchCompteContrepartieVue
                 ref="compteDialog"
               ></SearchCompteContrepartieVue>
-            </v-col>
             <v-col cols="6">
               <v-text-field
                 label="Nom compte"
@@ -148,6 +162,7 @@
                 :readonly="readonly"
                 :rules="montantRules"
                 :hide-details="readonly"
+                @blur="montant = montant.toNumber().toDecimalString()"
               >
                 <template v-slot:append>
                   <v-btn icon small :disabled="readonly" @click="calculMontant()" @keydown.enter.prevent.stop="calculMontant()" tabindex="-1">
@@ -167,14 +182,14 @@
             v-if="!isNew && !readonly"
             @click="deleteContrepartie()"
             >
-            Suprrimer</v-btn
+            Supprimer</v-btn
           >
           <v-spacer></v-spacer>
           <v-btn
             color="blue darken-1"
             class="ma-2 pr-4"
             tile outlined
-            @click="dialog = false"
+            @click="close()"
             tabindex="-1"
             >
             <v-icon left>mdi-close</v-icon> Fermer</v-btn
@@ -204,6 +219,8 @@ import SearchCaseTvaVue from "@/components/search/SearchCaseTva.vue";
 import axios, { AxiosError } from "axios";
 import CompteGenerealSearch from "../../../models/Compte/CompteGeneralSearch";
 import { Devise } from '@/models/Devise/Devise'
+import CompteSearch from '@/models/Compte/CompteSearch';
+import { CompteBanque } from '../../../models/Financier';
 
 
 @Component({
@@ -227,6 +244,9 @@ export default class extends Vue {
   private compteLoading: boolean = false;
   private numeroCompte: string = "";
   private numeroCompteRules: any = [(v: string) => !!v || "Numéro obligatoire"];
+  private comptesSearch: { numero: number, numeroNom: string }[] = [];
+  private searchCompte: string = '';
+  private numeroCompteSelected: { numero: number | string, numeroNom:string } = { numero: "", numeroNom:"" };
   private nomCompte: string = "";
   private nomCompteRules: any = [(v: string) => !!v || "Nom obligatoire"];
   private devises: Devise[] = [];
@@ -319,6 +339,14 @@ export default class extends Vue {
     this.numeroJournal = numeroJournal;
     this.typesComptesSelected =this.typesComptes.find(tc => tc.id == contrepartie.typeCompte) || this.typesComptes[0];
     this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) ||this.devises[0];
+
+    if(contrepartie){
+      let compteToSelect = { numero:contrepartie.numeroCompte, numeroNom:contrepartie.compteLibelle };
+      this.comptesSearch = [];
+      this.comptesSearch.push(compteToSelect);
+      this.numeroCompteSelected = compteToSelect;
+    }
+
     this.numeroCompte = contrepartie.numeroCompte ? contrepartie.numeroCompte.toString() : "";
     this.nomCompte = contrepartie.compteLibelle;
     this.libelle = contrepartie.libelle ? contrepartie.libelle : propositionLibelle;
@@ -381,8 +409,42 @@ export default class extends Vue {
         });
     }
   }
-
+  @Watch("searchCompte")
+  private async searchCompteChanged(matchCode: string){
+    try {
+      this.compteLoading = true;
+      if(matchCode && matchCode.isInt()){
+        this.comptesSearch = await CompteApi.autocompleteCompteByNumero(this.typesComptesSelected.id, matchCode, 5);
+      }
+      else if(matchCode){
+        this.comptesSearch = await CompteApi.autocompleteCompteByMatchCode(this.typesComptesSelected.id, matchCode.toUpperCase(), 5);
+      }
+      else this.comptesSearch = [];
+    } catch (err) {
+      
+    }finally{
+      this.compteLoading = false;
+    }
+  }
+  private numeroCompteChange(value: string | CompteGenerealSearch){
+    if(typeof value === "string")
+      this.numeroCompte = value;
+    else if(value instanceof CompteGenerealSearch)
+    {
+      this.numeroCompte = value.numero.toString();
+      this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
+    }
+    else this.numeroCompte = "";
+    this.loadCompte();
+  }
   private setCompte(compte: CompteGenerealSearch) {
+    if(compte){
+      let compteToSelect = { numero:compte.numero, numeroNom:compte.nom };
+      this.comptesSearch = [];
+      this.comptesSearch.push(compteToSelect);
+      this.numeroCompteSelected = compteToSelect;
+    }
+
     this.numeroCompte = compte.numero.toString();
     this.nomCompte = compte.nom;
     if(compte.numeroCase){

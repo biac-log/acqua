@@ -124,7 +124,7 @@
             v-if="!isNew && !readonly"
             @click="deleteExtrait()"
           >
-            Suprrimer</v-btn
+            Supprimer</v-btn
           >
           <v-spacer></v-spacer>
           <v-btn

@@ -173,7 +173,9 @@ private giveFocusToRow(id: number) {
   }
 
   private reinitGrid(){
+    (this.gridOptions.api as GridApi).resetQuickFilter();
     (this.gridOptions.api as GridApi).deselectAll();
+    (this.gridOptions.api as GridApi).setFilterModel(null);
     (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 

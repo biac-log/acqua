@@ -60,4 +60,8 @@ export class EntetePieceComptable extends EntetePieceComptableDTO {
     this._dateEcheanceDate = date;
     this.dateEcheance = date.toUtc();
   }
+
+  get escompteDisplay(){
+    return this.escompte ? this.escompte : "";
+  }
 }

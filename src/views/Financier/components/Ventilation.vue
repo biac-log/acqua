@@ -165,7 +165,7 @@
             v-if="!isNew && !readonly"
             @click="deleteVentilation()"
             >
-            Suprrimer</v-btn
+            Supprimer</v-btn
           >
           <v-spacer></v-spacer>
           <v-btn

@@ -52,4 +52,14 @@ export abstract class CompteApi {
     );
     return new CompteGeneralSearch(response.data);
   }
+
+  static async autocompleteCompteByMatchCode(type: string, matchcode: string, nbrElement: number): Promise<CompteGeneralSearch[]> {
+    let response = await this.CompteAxios.get<CompteGeneralSearchDTO[]>(`${process.env.VUE_APP_ApiAcQuaCore}/Compte/GetComptesByMatchcode?typeCompte=${type}&matchcode=${matchcode}&nbrElement=${nbrElement}`);
+    return response.data.map(CompteSearchDTO => new CompteGeneralSearch(CompteSearchDTO));
+  }
+
+  static async autocompleteCompteByNumero(type: string, numero: string, nbrElement: number): Promise<CompteGeneralSearch[]> {
+    let response = await this.CompteAxios.get<CompteGeneralSearchDTO[]>(`${process.env.VUE_APP_ApiAcQuaCore}/Compte/GetComptesByNumero?typeCompte=${type}&startNumero=${numero}&nbrElement=${nbrElement}`);
+    return response.data.map(CompteSearchDTO => new CompteGeneralSearch(CompteSearchDTO));
+  }
 }

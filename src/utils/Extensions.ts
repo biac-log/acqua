@@ -35,7 +35,7 @@ String.prototype.isDecimal = function (required: boolean = false) {
   if(!this)
     return !required;   
   else {
-    let number = this.replace(/\./g, '').replace(',', '.');
+    let number = this.replace(/\./g, '').replace(/\s/g, "").replace(',', '.');
     return !isNaN(parseFloat(number)) && isFinite(+number);
   }
 }

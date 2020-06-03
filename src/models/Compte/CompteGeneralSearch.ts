@@ -30,4 +30,12 @@ export default class CompteGenerealSearch extends CompteGeneralSearchDTO {
   get libelleSolde(){
     return this.solde.toDecimalString(2);
   }
+
+  get numeroNom(){
+    return `${this.numero} ${this.nom}`;
+  }
+
+  get caseTvaDisplay(){
+    return `${this.numeroCase ? this.numeroCase : ""} ${this.libelleCase? this.libelleCase : ""}`
+  }
 }
