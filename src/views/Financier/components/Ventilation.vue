@@ -101,8 +101,9 @@
                 :rules="numeroCaseTvaRules"
                 :hide-details="readonly"
                 :loading="tvaLoading"
+                validate-on-blur
                 @keypress.enter="loadCaseTva"
-                @blur="loadCaseTva"
+                @change="loadCaseTva"
               >
               <template v-slot:append>
                 <v-btn icon small :disabled="readonly" @click="OpenSearchCaseTva()" @keydown.enter.prevent.stop="OpenSearchCaseTva()">

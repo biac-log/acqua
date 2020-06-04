@@ -257,7 +257,7 @@ export default class extends Vue {
 
   private init(extrait: Extrait) {
     this.typeCompte = extrait.typeCompte;
-    this.numeroCompte = extrait.numeroCompte.toDecimalString(2);
+    this.numeroCompte = extrait.numeroCompte.toString();
     this.nomCompte = extrait.nomCompte;
     this.ventilations = extrait.ventilations;
     this.montant = extrait.montantBaseSigned;

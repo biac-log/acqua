@@ -1,4 +1,5 @@
 import { CaseTva } from './CaseTva';
+import { Devise } from '@/models/Financier';
 
 export interface IPieceComptableContrepartie {
   numeroLigne:number;
@@ -10,8 +11,8 @@ export interface IPieceComptableContrepartie {
   montantDevise:number;
   montantBase:number;
   codeDevise:number;
-  libelleDevise: string;
   caseTva: CaseTva;
+  devise: Devise;
 }
 
 export class PieceComptableContrepartieDTO implements IPieceComptableContrepartie{
@@ -24,8 +25,8 @@ export class PieceComptableContrepartieDTO implements IPieceComptableContreparti
   public montantDevise:number=0;
   public montantBase:number=0;
   public codeDevise:number=0;
-  public libelleDevise: string="";
   public caseTva: CaseTva = new CaseTva();
+  public devise: Devise= new Devise();
 }
 
 export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
@@ -61,5 +62,9 @@ export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {
 
   get libelleCaseTva():string{
     return this.caseTva.getLibelleCase;
+  }
+
+  get libelleDevise(): string{
+    return this.devise?.libelle ? this.devise.libelle : "";
   }
 }

@@ -62,9 +62,14 @@
     <v-card class="mt-5">
       <v-card-title>
         Pièces comptables
-        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" :disabled="!searchIsValid" @click="openNewPieceComptable">
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
+        <v-tooltip top open-delay=500 open-on-hover>
+          <template v-slot:activator="{ on }">
+            <v-btn ref="btnAdd" color="warning" small fab class="ml-5" :disabled="!searchIsValid" @click="openNewPieceComptable" v-on="on">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <span>Créer une nouvelle pièce <span class="shortcutTooltip">+</span></span>
+        </v-tooltip>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -246,6 +251,8 @@ export default class extends Vue {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
           this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, "error");
         }
+      }).catch(() => {
+        //La fenêtre à été fermé manuellement
       })
       .finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
@@ -258,6 +265,8 @@ export default class extends Vue {
       .then((resp) => {
         if(!this.skipAddResult) this.displayAddResult(resp.data);
         this.piecesComptables.unshift(resp.data);
+      }).catch(() => {
+        //La fenêtre à été fermé manuellement
       })
       .finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
@@ -295,5 +304,13 @@ export default class extends Vue {
 
 #dataTable tbody tr {
   cursor: pointer;
+}
+
+.shortcutTooltip{
+  background: darkslategray;
+  border: 1px solid white;
+  padding: 2px 5px 2px 5px;
+  margin-left: 3px;
+  font-size: 12px;
 }
 </style>

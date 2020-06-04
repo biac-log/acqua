@@ -8,8 +8,21 @@
               {{ errorMessage }}
             </v-alert>
           </v-col>
-          <v-col cols="12">
-            Contrepartie
+          <v-col cols="9">
+            <span>
+              Contrepartie
+            </span>
+          </v-col>
+          <v-col cols="3">
+            <v-btn
+              class="mr-5"
+              color="success"
+              
+              @click="modifier"
+              v-if="readonly"
+            >
+              <v-icon left>mdi-pencil</v-icon>Modifier
+            </v-btn>
           </v-col>
         </v-card-title>
         <v-card-text>
@@ -117,7 +130,7 @@
                 :hide-details="readonly"
                 :loading="tvaLoading"
                 @keypress.enter="loadCaseTva"
-                @blur="loadCaseTva"
+                @change="loadCaseTva"
               >
               <template v-slot:append>
                 <v-btn  icon small :disabled="readonly" @click="OpenSearchCaseTva()" @keydown.enter.prevent.stop="OpenSearchCaseTva()">
@@ -194,9 +207,14 @@
             >
             <v-icon left>mdi-close</v-icon> Fermer</v-btn
           >
-          <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" v-if="!readonly" :disabled="!isValid" @click="sendContrepartie">
-            <v-icon left>mdi-check</v-icon> Valider
-          </v-btn>
+          <v-tooltip top open-delay=500 open-on-hover>
+            <template v-slot:activator="{ on }">
+              <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" v-if="!readonly" :disabled="!isValid" @click="sendContrepartie" v-on="on">
+                <v-icon left>mdi-check</v-icon> Valider
+              </v-btn>
+            </template>
+            <span>Valider la contrepartie <span class="shortcutTooltip">alt + enter</span></span>
+          </v-tooltip>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -246,7 +264,7 @@ export default class extends Vue {
   private numeroCompteRules: any = [(v: string) => !!v || "Numéro obligatoire"];
   private comptesSearch: { numero: number, numeroNom: string }[] = [];
   private searchCompte: string = '';
-  private numeroCompteSelected: { numero: number | string, numeroNom:string } = { numero: "", numeroNom:"" };
+  private numeroCompteSelected: { numero: number | string, numeroNom:string } = { numero: "", numeroNom: "" };
   private nomCompte: string = "";
   private nomCompteRules: any = [(v: string) => !!v || "Nom obligatoire"];
   private devises: Devise[] = [];
@@ -561,6 +579,11 @@ export default class extends Vue {
   @Watch("devisesSelected")
   private deviseChanged(val: string, oldVal: string){
     if(!this.readonly && !this.montant) this.calculMontant();
+  }
+
+  private modifier(){
+    this.readonly = false;
+    this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
   }
 
   private deleteContrepartie() {

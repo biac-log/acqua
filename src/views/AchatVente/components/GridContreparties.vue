@@ -3,23 +3,20 @@
     <v-card class="mb-3">
       <v-card-title>
         Contreparties
-        <v-btn
-          color="primary"
-          fab
-          small
-          class="ml-5"
-          ref="btnAdd"
-          :disabled="readonly"
-          @click.stop="createContrepartie"
-        >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
+        <v-tooltip top open-delay=500>
+          <template v-slot:activator="{ on }">
+            <v-btn color="primary" fab small class="ml-5" ref="btnAdd" :disabled="readonly" @click.stop="createContrepartie" v-on="on">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <span>Ajouter une contrepartie <span class="shortcutTooltip">+</span></span>
+        </v-tooltip>
         <v-spacer></v-spacer>
         <span :class="!ventilleBase || ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
           <span v-if="!devise || devise.id == 1">Montant à ventiler : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b></span>
           <span v-if="devise && devise.id != 1">
-              Ventiler base : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b>
-               - Ventiler devise : <b>{{ ventilleBase | numberToStringEvenZero }} EUR</b></span>
+              Ventiler devise : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b>
+               - Ventiler base : <b>{{ ventilleBase | numberToStringEvenZero }} EUR</b></span>
         </span>
         <EditContrepartieVue
           ref="editContrepartie"
@@ -92,6 +89,7 @@ export default class extends Vue {
   ];
 
   private addContrepartie(contrepartie?: PieceComptableContrepartie) {
+    console.log(this.contreparties);
     (this.$refs.editContrepartie as EditContrepartieVue)
       .openNew(this.journal.numero, this.devise, this.getVentileDevise(), this.getTvaCalcule(), this.getTvaImpute(), this.propositionLibelle, contrepartie)
       .then((resp: PieceComptableContrepartie) => {
@@ -227,6 +225,10 @@ export default class extends Vue {
 
   public errorInTVA(): boolean{
     return this.getTvaCalcule() != this.getTvaImpute();
+  }
+
+  public pieceIsEquilibre(): boolean{
+    return this.ventilleBase == 0 && this.ventilleDevise == 0;
   }
 
   @Watch('contreparties')

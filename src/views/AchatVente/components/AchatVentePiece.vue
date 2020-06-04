@@ -5,9 +5,11 @@
     width="2000"
     :persistent="!piecereadonly"
     @keydown.f2="ModifierPiece"
-    @keydown.delete.prevent.stop="DeletePiece"
+    @keydown.46.prevent.stop="DeletePiece"
     @keydown.107.prevent.stop="createContrepartie"
     @keydown.alt.enter="savePiece()"
+    @click:outside="closeDialog()" 
+    @keydown.esc="closeDialog()"
   >
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
       <v-card>
@@ -19,23 +21,22 @@
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
           <v-spacer></v-spacer>
-          <v-btn
-            class="mr-5"
-            color="success"
-            @click="ModifierPiece"
-            v-if="piecereadonly"
-          >
-            <v-icon left>mdi-pencil</v-icon>Modifier
-          </v-btn>
-          <v-btn
-            class="mr-10"
-            color="error"
-            v-if="piecereadonly"
-            @click="DeletePiece"
-            :loading="deleteIsLoading"
-          >
-            <v-icon left>mdi-delete</v-icon>Supprimer
-          </v-btn>
+          <v-tooltip top open-delay=500 open-on-hover>
+            <template v-slot:activator="{ on }">
+              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-if="piecereadonly" v-on="on">
+                <v-icon left>mdi-pencil</v-icon>Modifier
+              </v-btn>
+            </template>
+            <span>Modifier la pièce <span class="shortcutTooltip">f2</span></span>
+          </v-tooltip>
+          <v-tooltip top open-delay=500 open-on-hover>
+            <template v-slot:activator="{ on }">
+              <v-btn class="mr-10" color="error"  v-if="piecereadonly" @click="DeletePiece" :loading="deleteIsLoading" v-on="on" >
+                <v-icon left>mdi-delete</v-icon>Supprimer
+              </v-btn>
+            </template>
+            <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
+          </v-tooltip>
           <v-btn
             ref="buttonClose"
             class="ml-10"
@@ -139,6 +140,7 @@
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
                     :hide-details="piecereadonly"
+                    :loading="devisesLoading"
                     tabindex="-1"
                     return-object
                     item-text="libelle"
@@ -191,6 +193,7 @@
                     :items="statuts"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
+                    :loading="statutsLoading"
                     return-object
                     item-value="id"
                     item-text="libelle"
@@ -307,17 +310,23 @@
         </v-card-text>
         <v-divider v-if="!piecereadonly"></v-divider>
         <v-card-actions v-if="saveLoading || !piecereadonly" class="d-flex">
-          <v-btn
-            color="error"
-            class="ma-2 pr-4 align-self-start"
-            text
-            tabindex="-1"
-            v-if="numeroPiece"
-            @click="DeletePiece()"
-            :loading="deleteIsLoading"
+          <v-tooltip top open-delay=500 open-on-hover>
+            <template v-slot:activator="{ on }">
+            <v-btn
+              color="error"
+              class="ma-2 pr-4 align-self-start"
+              text
+              tabindex="-1"
+              v-if="numeroPiece"
+              @click="DeletePiece()"
+              :loading="deleteIsLoading"
+              v-on="on"
+              >
+              Supprimer</v-btn
             >
-            Supprimer</v-btn
-          >
+            </template>
+            <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
+          </v-tooltip>
           <v-spacer></v-spacer>
           <v-btn
             color="warning"
@@ -342,17 +351,22 @@
             outlined
             class="shrink align-self-start"
           ></v-text-field>
-          <v-btn
-            color="blue darken-1"
-            class="ma-2 mt-0 pr-4 align-self-start"
-            tile outlined
-            @click="cancelEdit()"
-            tabindex="-1"
-            >
-            <v-icon left>mdi-close</v-icon> Annuler</v-btn>
-          <v-btn ref="btnValidate" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()">
-            <v-icon left>mdi-content-save</v-icon>Sauvegarder
-          </v-btn>
+          <v-tooltip top open-delay=500 open-on-hover>
+            <template v-slot:activator="{ on }">
+              <v-btn color="blue darken-1" class="ma-2 mt-0 pr-4 align-self-start" tile outlined @click="cancelEdit()" tabindex="-1" v-on="on">
+                <v-icon left>mdi-close</v-icon> Annuler
+              </v-btn>
+            </template>
+            <span>Annuler les modifications <span class="shortcutTooltip">esc</span></span>
+          </v-tooltip>
+          <v-tooltip top open-delay=500 open-on-hover>
+            <template v-slot:activator="{ on }">
+            <v-btn ref="btnValidate" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()" v-on="on">
+              <v-icon left>mdi-content-save</v-icon>Sauvegarder
+            </v-btn>
+            </template>
+            <span>Sauvegarder la pièce <span class="shortcutTooltip">alt + enter</span></span>
+          </v-tooltip>
         </v-card-actions>
         <v-alert type="error" border="left" v-if="errorMessage"  class="ml-4 mr-4">
             {{errorMessage}}
@@ -412,7 +426,7 @@ export default class extends Vue {
 
   //Encodage
   private numeroCompteTier: string= "";
-  private numeroCompteTierSelected: { numero: number | string, nom:string } = { numero: "", nom:"" };
+  private numeroCompteTierSelected: { numero: number | string, nom: string } = { numero: "", nom:"" };
   private numeroCompteTierRules: any = [(v: { numero: number | string }) => !!v?.numero || "Numéro obligatoire"];
   private comptesTiersSearch: { numero: number, nom: string }[] = [];
   private searchCompteDeTier: string = '';
@@ -429,6 +443,7 @@ export default class extends Vue {
   private deviseSelected: Devise = new Devise();
   private statuts: Statut[] = [];
   private statutSelected: Statut = new Statut();
+  
   private datePiece: DateTime = new DateTime();
   private datePieceRules: any = [(v: string) => !!v || "Date obligatoire",
                                  (v: string) => DateTime.isValid(v) || "Date invalide",
@@ -438,6 +453,11 @@ export default class extends Vue {
   private dateEcheanceRules: any =[(v: string) => !!v || "Date obligatoire",
                                    (v: string) => DateTime.isValid(v) || "Date invalide",
                                    (v: string) => this.validateDateEcheance(v)]
+
+  mounted(){
+    this.loadDevises();
+    this.loadStatuts();
+  }
 
   private validateDatePiece(date: string) : boolean { 
     let dateTime = new DateTime(date);
@@ -487,7 +507,7 @@ export default class extends Vue {
   public async openNew(periode: PeriodeComptable, journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
     this.dialog= true;
     this.piecereadonly = false;
-    await this.loadDataForEdit();
+    //await this.loadDataForEdit();
     this.init(periode, journal);
 
     let today = DateTime.today();
@@ -527,13 +547,13 @@ export default class extends Vue {
     }
   }
   
-  private async loadDataForEdit(){
-    await this.loadCompte();
-    await this.loadDevises();
-    await this.loadStatuts();
-  }
+  // private async loadDataForEdit(){
+  //   await this.loadCompte();
+  //   //await this.loadDevises();
+  //   await this.loadStatuts();
+  // }
 
-   private resetForm(){
+  private resetForm(){
     this.errorMessage = "";
     this.libelleWarningMessage = "";
     this.forcerNumero = false;
@@ -580,7 +600,6 @@ export default class extends Vue {
   private async GetPiece() {
     this.errorMessage = "";
     try {
-      console.log(this.ventilleBase);
       let pieceComptable = await AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece);
       this.SetPiece(pieceComptable);
     } catch(err) {
@@ -720,13 +739,21 @@ export default class extends Vue {
 
   private async ModifierPiece() {
     this.piecereadonly = false;
-    await this.loadDataForEdit();
+    await this.loadCompte();
     this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
   }
 
+  private devisesLoading = false;
   private async loadDevises() {
-    if(this.devises.length <= 1){
-      this.devises = await DeviseApi.getAllDevises();
+    try {
+      if(this.devises.length <= 1){
+        this.devisesLoading = true;
+        this.devises = await DeviseApi.getAllDevises();
+      }
+    } catch (err) {
+      
+    }finally{
+      this.devisesLoading = false;
     }
   }
   private getDeviseToSelect(deviseSelected: Devise): Devise{
@@ -738,9 +765,17 @@ export default class extends Vue {
     else return deviseToSelect;
   }
 
+  private statutsLoading = false;
   private async loadStatuts(){
-    if(this.statuts.length <= 1){
-      this.statuts = await AchatVenteApi.getAllStatut();
+    try {
+      if(this.statuts.length <= 1){
+        this.statutsLoading = true;
+        this.statuts = await AchatVenteApi.getAllStatut();
+      }
+    }catch (err) {
+      
+    }finally{
+      this.statutsLoading = false;
     }
   }
   private getStatutToSelect(statutSelected: Statut): Statut {
@@ -757,7 +792,7 @@ export default class extends Vue {
   private datePieceChanged(val: DateTime, oldVal: DateTime) {
     if (!this.piecereadonly) {
       this.initDateEcheance(this.numeroCompteTier, this.typeCompte, val);
-      this.initTauxDevise(this.deviseSelected.id, val);
+      if(this.deviseSelected) this.initTauxDevise(this.deviseSelected.id, val);
     }
   }
 
@@ -824,7 +859,6 @@ export default class extends Vue {
   }
 
   private saveLoading: boolean = false;
-
   private async savePiece() {
     (this.$refs.form as any).validate();
     this.$nextTick(async () => {
@@ -840,8 +874,11 @@ export default class extends Vue {
 
   private async confirmEquilibre(): Promise<boolean>{
     try {
-      if((this.$refs.gridContreparties as GridContreparties).errorInTVA()){
-        return await (this.$refs.confirmDialog as Confirm).open( "Attention", `La tva calculée est différente de la tva assignée, voulez-vous continuer ?`, "error", "Sauvegarder");
+      if(!(this.$refs.gridContreparties as GridContreparties).pieceIsEquilibre()){
+        return await (this.$refs.confirmDialog as Confirm).open( "Attention, pièce non équilibrée", `La pièce n'est pas équilibrée, voulez vous sauvegarder ?`, "error", "Sauvegarder");
+      } 
+      else if((this.$refs.gridContreparties as GridContreparties).errorInTVA()){
+        return await (this.$refs.confirmDialog as Confirm).open( "Attention, problème de tva", `La tva calculée est différente de la tva assignée, voulez-vous continuer ?`, "error", "Sauvegarder");
       } 
       return true;
     } catch (err) {
@@ -966,15 +1003,15 @@ export default class extends Vue {
     entete.numeroCompte = this.numeroCompteTier.toNumber();
     entete.nomCompte = this.compteTiersNom;
     entete.devise = this.deviseSelected.libelle;
-    console.log(entete);
     return entete;
   }
 
   private cancelEdit(){
     this.piecereadonly = true;
-    if(this.numeroPiece.toNumber() != 0){
+    if(this.numeroPiece.toNumber() != 0) {
       this.closeDialog
-    }else this.closeDialog();
+    }
+    else this.closeDialog();
   }
 
   private closeDialog(){

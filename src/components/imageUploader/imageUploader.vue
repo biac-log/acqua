@@ -34,7 +34,6 @@ export default class extends Vue {
   private ImageInput: ImageInput | null = null;
 
   private removeImage() {
-    console.log(this.avatar)
     this.avatar = null
   }
 }
