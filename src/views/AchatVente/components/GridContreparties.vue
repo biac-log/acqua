@@ -1,40 +1,45 @@
 <template>
   <v-container class="ma-0 pa-0">
-    <v-card class="mb-3">
-      <v-card-title>
-        Contreparties
-        <v-tooltip top open-delay=500>
-          <template v-slot:activator="{ on }">
-            <v-btn color="primary" fab small class="ml-5" ref="btnAdd" :disabled="readonly" @click.stop="createContrepartie" v-on="on">
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </template>
-          <span>Ajouter une contrepartie <span class="shortcutTooltip">+</span></span>
-        </v-tooltip>
-        <v-spacer></v-spacer>
-        <span :class="!ventilleBase || ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
-          <span v-if="!devise || devise.id == 1">Montant à ventiler : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b></span>
-          <span v-if="devise && devise.id != 1">
-              Ventiler devise : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b>
-               - Ventiler base : <b>{{ ventilleBase | numberToStringEvenZero }} EUR</b></span>
-        </span>
-        <EditContrepartieVue
-          ref="editContrepartie"
-          :isReadOnly.sync="readonly"
-        ></EditContrepartieVue>
-      </v-card-title>
-      <v-data-table
-        :headers="headersContreparties"
-        :items="contreparties"
-        id="dataTable"
-        class="elevation-1"
-        :dense="contreparties.length > 8"
-        disable-pagination
-        hide-default-footer
-        @click:row="editContrepartie"
-      >
-      </v-data-table>
-    </v-card>
+      <v-card class="mb-3">
+        <v-card-title>
+          Contreparties
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn color="primary" fab small class="ml-5" ref="btnAdd" :disabled="readonly" @click.stop="createContrepartie" v-on="on">
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </template>
+            <span>Ajouter une contrepartie <span class="shortcutTooltip">+</span></span>
+          </v-tooltip>
+          <v-spacer></v-spacer>
+          <span :class="!ventilleBase || ventilleBase == 0 ? 'equilibre' : 'notEquilibre'">
+            <span v-if="!devise || devise.id == 1">Montant à ventiler : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b></span>
+            <span v-if="devise && devise.id != 1">
+                Ventiler devise : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b>
+                - Ventiler base : <b>{{ ventilleBase | numberToStringEvenZero }} EUR</b></span>
+          </span>
+          <!-- <EditContrepartieVue
+            ref="editContrepartie"
+            :isReadOnly.sync="readonly"
+          ></EditContrepartieVue> -->
+        </v-card-title>
+        <v-data-table
+          :headers="headersContreparties"
+          :items="contreparties"
+          id="dataTable"
+          class="elevation-1"
+          :dense="contreparties.length > 8"
+          disable-pagination
+          hide-default-footer
+          @click:row="editContrepartie"
+          height="350px"
+        >
+        </v-data-table>
+      </v-card>
+      <EditContrepartieVue
+        ref="editContrepartie"
+        :isReadOnly.sync="readonly"
+      ></EditContrepartieVue>
   </v-container>
 </template>
 
@@ -73,6 +78,7 @@ export default class extends Vue {
   private codeTaxe!: number;
   @PropSync("TauxDevise")
   private tauxDevise!: string;
+  private overlay = false;
   
   private ventilleBase: number = 0;
   private ventilleDevise: number = 0;
@@ -89,7 +95,7 @@ export default class extends Vue {
   ];
 
   private addContrepartie(contrepartie?: PieceComptableContrepartie) {
-    console.log(this.contreparties);
+    this.overlay = true;
     (this.$refs.editContrepartie as EditContrepartieVue)
       .openNew(this.journal.numero, this.devise, this.getVentileDevise(), this.getTvaCalcule(), this.getTvaImpute(), this.propositionLibelle, contrepartie)
       .then((resp: PieceComptableContrepartie) => {
@@ -108,6 +114,7 @@ export default class extends Vue {
   }
 
   private editContrepartie(piece: PieceComptableContrepartie) {
+    this.overlay = true;
     (this.$refs.editContrepartie as EditContrepartieVue)
       .open(piece, this.journal.numero, this.devise, this.getVentileDevise(piece), this.getTvaCalcule(piece), this.getTvaImpute(piece))
       .then((resp: PieceComptableContrepartie) => {
@@ -258,4 +265,5 @@ export default class extends Vue {
   color: green;
   margin-left: 10px;
 }
+
 </style>

@@ -62,7 +62,7 @@
     <v-card class="mt-5">
       <v-card-title>
         Pièces comptables
-        <v-tooltip top open-delay=500 open-on-hover>
+        <v-tooltip top open-delay=500 >
           <template v-slot:activator="{ on }">
             <v-btn ref="btnAdd" color="warning" small fab class="ml-5" :disabled="!searchIsValid" @click="openNewPieceComptable" v-on="on">
               <v-icon>mdi-plus</v-icon>

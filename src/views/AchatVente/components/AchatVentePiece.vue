@@ -8,8 +8,8 @@
     @keydown.46.prevent.stop="DeletePiece"
     @keydown.107.prevent.stop="createContrepartie"
     @keydown.alt.enter="savePiece()"
-    @click:outside="closeDialog()" 
-    @keydown.esc="closeDialog()"
+    @click:outside.stop="closeDialog()" 
+    @keydown.esc.stop="closeDialog()"
   >
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
       <v-card>
@@ -21,9 +21,9 @@
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
           <v-spacer></v-spacer>
-          <v-tooltip top open-delay=500 open-on-hover>
+          <v-tooltip v-if="piecereadonly" top open-delay=500>
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-if="piecereadonly" v-on="on">
+              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-on="on">
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
@@ -1008,16 +1008,14 @@ export default class extends Vue {
 
   private cancelEdit(){
     this.piecereadonly = true;
-    if(this.numeroPiece.toNumber() != 0) {
-      this.closeDialog
-    }
-    else this.closeDialog();
+    if(this.numeroPiece.toNumber() == 0)
+     this.closeDialog();
   }
 
   private closeDialog(){
-    this.dialog = false;
     this.resetForm();
     (this.$refs.form as any).resetValidation();
+    this.dialog = false;
     this.reject();
   }
 }
