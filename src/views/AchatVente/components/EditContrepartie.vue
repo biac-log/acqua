@@ -231,6 +231,22 @@
               Supprimer</v-btn
             >
             <v-spacer></v-spacer>
+            <v-menu bottom left>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  v-on="on"
+                >
+                  <v-icon>mdi-dots-vertical</v-icon>
+                </v-btn>
+              </template>
+
+              <v-list>
+                <v-list-item @click="generateTVA">
+                  <v-list-item-title>Calculer la TVA</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
             <v-btn
               color="blue darken-1"
               class="ma-2 pr-4"
@@ -296,6 +312,7 @@ import CompteGenerealSearch from "../../../models/Compte/CompteGeneralSearch";
 import { Devise } from "@/models/Devise/Devise";
 import CompteSearch from "@/models/Compte/CompteSearch";
 import { CompteBanque } from "../../../models/Financier";
+import GridContrepartiesVue from './GridContreparties.vue';
 
 @Component({
   name: "EditContrepartie",
@@ -700,6 +717,13 @@ export default class extends Vue {
   private deleteContrepartie() {
     this.dialog = false;
     this.resolve();
+  }
+
+  private async generateTVA()
+  {
+    let parent = (this.$parent as GridContrepartiesVue);
+    this.init(await parent.getContrepartieTVA(), parent.journal.numero, parent.devise, parent.getVentileDevise(), parent.getTvaCalcule(), parent.getTvaImpute(), parent.propositionLibelle);
+    this.montant =   Math.abs(parent.getVentileDevise()).toDecimalString(2);
   }
 
   private focusFirstElement(){

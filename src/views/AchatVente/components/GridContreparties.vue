@@ -18,10 +18,6 @@
                 Ventiler devise : <b>{{ ventilleDevise | numberToStringEvenZero }} {{ devise ? devise.libelle : "EUR" }}</b>
                 - Ventiler base : <b>{{ ventilleBase | numberToStringEvenZero }} EUR</b></span>
           </span>
-          <!-- <EditContrepartieVue
-            ref="editContrepartie"
-            :isReadOnly.sync="readonly"
-          ></EditContrepartieVue> -->
         </v-card-title>
         <v-data-table
           :headers="headersContreparties"
@@ -63,9 +59,9 @@ export default class extends Vue {
   @PropSync("Contreparties")
   private contreparties!: PieceComptableContrepartie[];
   @PropSync("Journal")
-  private journal!: Journal;
+  public journal!: Journal;
   @PropSync("DeviseEntete")
-  private devise!: Devise;
+  public devise!: Devise;
   @PropSync("CompteAchatVente")
   private numeroCompteAchatVente!: string;
   @PropSync("MontantDevise")
@@ -82,7 +78,7 @@ export default class extends Vue {
   
   private ventilleBase: number = 0;
   private ventilleDevise: number = 0;
-  private propositionLibelle : string ="";
+  public propositionLibelle : string ="";
 
   private headersContreparties = [
     { text: "N° Compte", value: "libelleNumero" },
@@ -157,21 +153,28 @@ export default class extends Vue {
       let tvaCalcule = this.getTvaCalcule();
       let tvaImpute = this.getTvaImpute();
       if(ventileDevise == (tvaCalcule - tvaImpute)){
-        let codepays = this.contreparties.find(ctr => ['BX', 'VX', 'FX', 'IX'].indexOf(ctr.caseTva.natureCase))?.caseTva.codePays;
-        let compteTva = await AchatVenteApi.getCompteTva(this.journal.numero, this.codeTaxe, codepays);
-        let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.journal.numero);
-        let contrepartie = new PieceComptableContrepartie();
-        contrepartie.numeroCompte = compteTva.numero;
-        contrepartie.compteLibelle = compteTva.nom;
-        contrepartie.libelle = this.nomCompteDeTier;
-        contrepartie.codeMouvement = this.journal.codeMouvement == "DB" ? "CR" : "DB";
-        contrepartie.montantDevise = Math.abs(tvaCalcule- tvaImpute);
-        contrepartie.montantBase = Math.abs((tvaCalcule - tvaImpute) * + this.tauxDevise);
-        contrepartie.caseTva = tva;
+        let contrepartie = await this.getContrepartieTVA(tvaCalcule, tvaImpute);
         this.addContrepartie(contrepartie);
       }
       else this.addContrepartie();
     }
+  }
+
+  public async getContrepartieTVA(tvaCalcule?:number, tvaImpute?:number): Promise<PieceComptableContrepartie> {
+    if(!tvaCalcule) tvaCalcule = this.getTvaCalcule();
+    if(!tvaImpute) tvaImpute = this.getTvaImpute();
+    let codepays = this.contreparties.find(ctr => ['BX', 'VX', 'FX', 'IX'].indexOf(ctr.caseTva.natureCase))?.caseTva.codePays;
+    let compteTva = await AchatVenteApi.getCompteTva(this.journal.numero, this.codeTaxe, codepays);
+    let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.journal.numero);
+    let contrepartie = new PieceComptableContrepartie();
+    contrepartie.numeroCompte = compteTva.numero;
+    contrepartie.compteLibelle = compteTva.nom;
+    contrepartie.libelle = this.nomCompteDeTier;
+    contrepartie.codeMouvement = this.journal.codeMouvement == "DB" ? "CR" : "DB";
+    contrepartie.montantDevise = Math.abs(tvaCalcule- tvaImpute);
+    contrepartie.montantBase = Math.abs((tvaCalcule - tvaImpute) * + this.tauxDevise);
+    contrepartie.caseTva = tva;
+    return contrepartie;
   }
 
   private getVentileBase(contrepartieToIgnore?: PieceComptableContrepartie): number{
@@ -188,7 +191,7 @@ export default class extends Vue {
     return ventileCompta.toDecimalString(2).toNumber();
   }
 
-  private getVentileDevise(contrepartieToIgnore?: PieceComptableContrepartie): number{
+  public getVentileDevise(contrepartieToIgnore?: PieceComptableContrepartie): number{
     if(!this.devise || !this.journal || !this.contreparties)
       return 0;
 
@@ -202,7 +205,7 @@ export default class extends Vue {
     return ventileDevise.toDecimalString(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
   }
 
-  private getTvaCalcule(contrepartieToIgnore?: PieceComptableContrepartie): number {
+  public getTvaCalcule(contrepartieToIgnore?: PieceComptableContrepartie): number {
     if(!this.contreparties)
       return 0;
 
@@ -221,7 +224,7 @@ export default class extends Vue {
     return montantsCaseTva.map(c =>(c.montant * c.caseTaux / 100).toDecimalString(2).toNumber()).reduce((a,b) => a + b, 0).toDecimalString(this.devise.typeDevise == "E" ? 0 : 2).toNumber();
   }
 
-  private getTvaImpute(contrepartieToIgnore?: PieceComptableContrepartie): number {
+  public getTvaImpute(contrepartieToIgnore?: PieceComptableContrepartie): number {
     if(!this.contreparties)
       return 0;
 
