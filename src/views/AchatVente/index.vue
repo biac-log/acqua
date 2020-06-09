@@ -225,8 +225,8 @@ export default class extends Vue {
 
         let pagination = new Pagination();
         pagination.terms = this.search;
-        pagination.sortBy = sortBy;
-        pagination.sortDesc = sortDesc;
+        pagination.sortBy = sortBy.length ? this.getSortColumnName(sortBy[0]) : "";
+        pagination.sortDesc = sortDesc.length ? sortDesc : false;
         pagination.page = page;
         pagination.limit = itemsPerPage;
 
@@ -238,6 +238,19 @@ export default class extends Vue {
       
     }finally{
       this.isLoadingPieces = false;
+    }
+  }
+
+  private getSortColumnName(column: string): string{
+    if(!column) return "";
+
+    switch (column){
+      case "codePieceDisplay": return "CodePiece"
+      case "datePieceDate": return "DatePiece"
+      case "dateEcheanceDate": return "DateEcheance"
+      case "dateEcheanceDate": return "DateEcheance"
+      case "escompteDisplay": return "Escompte"
+      default: return column.charAt(0).toUpperCase() + column.slice(1);
     }
   }
 

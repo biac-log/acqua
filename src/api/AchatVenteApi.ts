@@ -45,7 +45,7 @@ export abstract class AchatVenteApi {
   }
 
   static async GetEntetePiecesComptables(numeroJournal: number, periode: string, pagination: Pagination): Promise<PaginationResult<EntetePieceComptable>>{
-    let response = await this.achatVenteAxios.get<PaginationResult<EntetePieceComptable>>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetEntetePiecesComptables?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}&SortBy=${pagination.sortBy}&NumeroJournal=${numeroJournal}&Periode=${periode}`);
+    let response = await this.achatVenteAxios.get<PaginationResult<EntetePieceComptable>>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetEntetePiecesComptables?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}&SortBy=${pagination.sortBy}&SortByAsc=${pagination.sortDesc}&NumeroJournal=${numeroJournal}&Periode=${periode}`);
     return response.data;
   }
 
