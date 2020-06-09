@@ -29,9 +29,8 @@ export default class extends Vue {
     document.addEventListener('swUpdated', this.showRefreshUI, { once: true })
     // Refresh all open app tabs when a new service worker is installed.
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (this.refreshing) return
-      this.refreshing = true
-      window.location.reload()
+      if (this.refreshing) return;
+      this.refreshing = true;
     })
   }
 
@@ -51,8 +50,8 @@ export default class extends Vue {
 
   private refreshApp() {
     // Protect against missing registration.waiting.
-    if (!this.registration || !this.registration.waiting) return
-    this.registration.waiting.postMessage('skipWaiting')
+    if (!this.registration || !this.registration.waiting) return;
+    this.registration.waiting.postMessage('skipWaiting');
   }
 }
 </script>

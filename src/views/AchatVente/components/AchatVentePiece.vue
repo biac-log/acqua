@@ -442,7 +442,7 @@ export default class extends Vue {
   private compteAssocieNom:string = "";
   private montantDevise: string = "";
   private montantRules: any = [(v: string) => v.isDecimal(true) || "Montant invalide"];
-  private montantEscompte: string = "0";
+  private montantEscompte: string = "";
   private montantEscompteRules: any = [(v: string) => v.isDecimal(false) || "Montant invalide"];
   private devises: Devise[] = [];
   private deviseSelected: Devise = new Devise();

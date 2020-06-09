@@ -1,13 +1,16 @@
-// This is the code piece that GenerateSW mode can't provide for us.
-// This code listens for the user's confirmation to update the app.
-self.addEventListener('message', (e) => {
-  if (e.data) {
-    if (e.data === 'skipWaiting') {
-      self.skipWaiting()
-    }
-  }
-})
+workbox.core.setCacheNameDetails({prefix: "acqua"});
 
-/* eslint-disable no-undef */
-workbox.core.clientsClaim()
-workbox.precaching.precacheAndRoute(self.__precacheManifest || [])
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
+
+/**
+ * The workboxSW.precacheAndRoute() method efficiently caches and responds to
+ * requests for URLs in the manifest.
+ * See https://goo.gl/S9QRab
+ */
+self.__precacheManifest = [].concat(self.__precacheManifest || []);
+workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
+
