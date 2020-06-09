@@ -92,6 +92,14 @@
         :page.sync="currentPage"
         @page-count="pageCount = $event"
       >
+        <template v-slot:item.isEquilibre="{ item }">
+          <v-tooltip top open-delay=500 >
+            <template v-slot:activator="{ on }">
+              <v-icon v-if="!item.isEquilibre" color="red" v-on="on">mdi-alert</v-icon>
+            </template>
+            <span>La pièce n'est pas équilibrée</span>
+          </v-tooltip>
+        </template>
         <template v-slot:item.datePieceDate="{ item }">
           <span>{{ item.datePieceDate.toString() }}</span>
         </template>
@@ -159,6 +167,7 @@ export default class extends Vue {
 
   private selectedPiece!: EntetePieceComptable;
    private headers = [
+    { text: "", value: "isEquilibre" },
     { text: "Numéro pièce", value: "codePieceDisplay" },
     { text: "Date pièce", value: "datePieceDate" },
     { text: "Date échéance", value: "dateEcheanceDate" },

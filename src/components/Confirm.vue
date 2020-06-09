@@ -8,10 +8,10 @@
       <v-card-text class="mt-5">{{ message }}</v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn :color="color" text @click="sendResponse(true)">{{
+        <v-btn ref="btnOk" :color="color" text @click="sendResponse(true)">{{
           this.btnLabel
         }}</v-btn>
-        <v-btn ref="btnAnnuler" text @click="sendResponse(false)"
+        <v-btn ref="btnAnnuler" v-if="displayButtonCancel" text @click="sendResponse(false)"
           >Annuler</v-btn
         >
       </v-card-actions>
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Emit } from "vue-property-decorator";
+import { Component, Vue, PropSync, Emit, Prop } from "vue-property-decorator";
 
 @Component({
   name: "Confirm"
@@ -33,15 +33,22 @@ export default class extends Vue {
   private resolve: any;
   private reject: any;
   private btnLabel: string = "Oui";
+  @Prop()
+  private displayButtonCancel: boolean = true;
+  @Prop()
+  private focusOk: boolean = true;
 
   public open(
     windowTitle: string,
     message: string,
     color?: string,
-    btnLabel?: string
+    btnLabel?: string,
   ): Promise<boolean> {
     setTimeout(() => {
-      (this.$refs.btnAnnuler as any).$el.focus();
+      if(this.displayButtonCancel)
+        (this.$refs.btnAnnuler as any)?.$el?.focus();
+      else if (this.focusOk)
+        (this.$refs.btnOk as any)?.$el?.focus();
     });
     this.windowTitle = windowTitle;
     this.message = message;

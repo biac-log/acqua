@@ -4,6 +4,7 @@
     scrollable
     width="2000"
     :persistent="!piecereadonly"
+    eager
     @keydown.f2="ModifierPiece"
     @keydown.46.prevent.stop="DeletePiece"
     @keydown.107.prevent.stop="createContrepartie"
@@ -23,7 +24,7 @@
           <v-spacer></v-spacer>
           <v-tooltip v-if="piecereadonly" top open-delay=500>
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-on="on">
+              <v-btn class="mr-5" color="success" :disabled="saveLoading" @click="ModifierPiece" v-on="on">
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
@@ -31,7 +32,7 @@
           </v-tooltip>
           <v-tooltip top open-delay=500 open-on-hover>
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-10" color="error"  v-if="piecereadonly" @click="DeletePiece" :loading="deleteIsLoading" v-on="on" >
+              <v-btn class="mr-10" color="error" :disabled="saveLoading" v-if="piecereadonly" @click="DeletePiece" :loading="deleteIsLoading" v-on="on" >
                 <v-icon left>mdi-delete</v-icon>Supprimer
               </v-btn>
             </template>
@@ -72,7 +73,7 @@
                     hide-no-data
                   >
                     <template v-slot:append>
-                      <v-btn icon small :disabled="piecereadonly" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
+                      <v-btn icon small :disabled="piecereadonly || saveLoading" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
                         <v-icon>mdi-magnify</v-icon>
                       </v-btn>
                     </template>
@@ -123,6 +124,7 @@
               <v-row dense>
                 <v-col cols="4">
                   <v-text-field
+                    ref="montant"
                     label="Montant"
                     v-model="montantDevise"
                     validate-on-blur
@@ -317,6 +319,7 @@
               class="ma-2 pr-4 align-self-start"
               text
               tabindex="-1"
+              :disabled="saveLoading"
               v-if="numeroPiece"
               @click="DeletePiece()"
               :loading="deleteIsLoading"
@@ -334,6 +337,7 @@
             text
             tabindex="-1"
             v-if="!numeroPiece && !forcerNumero"
+            :disabled="saveLoading"
             @click="forcerNumero = true"
             >
             Forcer le numéro de pièce</v-btn
@@ -353,7 +357,7 @@
           ></v-text-field>
           <v-tooltip top open-delay=500 open-on-hover>
             <template v-slot:activator="{ on }">
-              <v-btn color="blue darken-1" class="ma-2 mt-0 pr-4 align-self-start" tile outlined @click="cancelEdit()" tabindex="-1" v-on="on">
+              <v-btn color="blue darken-1" class="ma-2 mt-0 pr-4 align-self-start" :disabled="saveLoading" tile outlined @click="cancelEdit()" tabindex="-1" v-on="on">
                 <v-icon left>mdi-close</v-icon> Annuler
               </v-btn>
             </template>
@@ -372,6 +376,7 @@
             {{errorMessage}}
         </v-alert>
         <Confirm ref="confirmDialog"></Confirm>
+        <Confirm ref="confirmLabelDialog" displayButtonCancel="false" focusOk="false"></Confirm>
       </v-card>
     </v-form>
   </v-dialog>
@@ -516,7 +521,10 @@ export default class extends Vue {
     else if(today.isAfter(this.periode.dateFin)) 
       this.datePiece = this.periode.dateFin;
     else this.datePiece = today;
-    this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
+    this.$nextTick(() => {
+      (this.$refs.form as any).resetValidation();
+      (this.$refs.numeroCompteTier as any)?.focus();
+    });
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -529,7 +537,10 @@ export default class extends Vue {
     this.dialog=true;
     this.piecereadonly=true;
     this.init(periode, journal, entete);
-    this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
+    this.$nextTick(() => {
+      (this.$refs.form as any).resetValidation();
+      (this.$refs.numeroCompteTier as any)?.focus();
+    });
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -546,12 +557,6 @@ export default class extends Vue {
       this.GetPiece();
     }
   }
-  
-  // private async loadDataForEdit(){
-  //   await this.loadCompte();
-  //   //await this.loadDevises();
-  //   await this.loadStatuts();
-  // }
 
   private resetForm(){
     this.errorMessage = "";
@@ -595,6 +600,7 @@ export default class extends Vue {
     this.compteAssocieNumero = "";
     this.compteAssocieNom = "";
     this.hash = "";
+    (this.$refs.form as any).resetValidation();
   }
 
   private async GetPiece() {
@@ -635,6 +641,7 @@ export default class extends Vue {
     this.delaiPaiementLibelle = pieceComptable.delaiPaiementLibelle;
     this.compteTiersEscomptePourcentage = pieceComptable.compteTiersEscomptePourcentage;
     this.compteTiersEscompteNombreJours = pieceComptable.compteTiersEscompteNombreJours;
+    this.codeTaxe = pieceComptable.compteTiersCodeTaxe;
     this.libelleCompteAssocie = pieceComptable.libelleCompteAssocie;
     this.numeroCompteAchatVente = pieceComptable.compteVenteAchatNumero.toDecimalString(2);
     this.libelleCompteVenteAchat = pieceComptable.libelleCompteVenteAchat;
@@ -731,7 +738,14 @@ export default class extends Vue {
   private validateLibelle(){
     if(!this.piecereadonly && this.libelle){
       AchatVenteApi.ValidateLibelle(this.libelle,this.typeCompte,this.numeroCompteTier).then((isUsed) => {
-        if(isUsed) this.libelleWarningMessage = "Attention, ce libellé est déjà utilisé par une autre pièce";
+        if(isUsed){
+          this.libelleWarningMessage = "Attention, ce libellé est déjà utilisé par une autre pièce";
+          (this.$refs.confirmDialog as Confirm).open("Attention",
+            `Attention, ce libellé est déjà utilisé par une autre pièce`,
+            "error",
+            "J'ai compris"
+          ).then(() => { this.$nextTick(() => (this.$refs.montant as any)?.focus()); });
+        } 
         else this.libelleWarningMessage = "";
      });
     } else this.libelleWarningMessage = "";
@@ -911,7 +925,6 @@ export default class extends Vue {
     this.piecereadonly = true;
     AchatVenteApi.UpdatePiece(pieceComptaToSave).then(() => {
       this.resolve({ action: "UPDATE", data: this.GetModelForGrid()});
-      (this.$refs.form as any).resetValidation();
       this.dialog = false;
       this.resetForm();
     }).catch((err) => {
@@ -1003,6 +1016,7 @@ export default class extends Vue {
     entete.numeroCompte = this.numeroCompteTier.toNumber();
     entete.nomCompte = this.compteTiersNom;
     entete.devise = this.deviseSelected.libelle;
+    entete.isEquilibre = (this.$refs.gridContreparties as GridContreparties).pieceIsEquilibre();
     return entete;
   }
 
@@ -1014,7 +1028,6 @@ export default class extends Vue {
 
   private closeDialog(){
     this.resetForm();
-    (this.$refs.form as any).resetValidation();
     this.dialog = false;
     this.reject();
   }

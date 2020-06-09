@@ -57,6 +57,7 @@ export class PieceComptableDTO implements IPieceComptable {
   public compteTiersNumero: number = 0;
   public compteTiersNom: string = "";
   public compteTiersSoldeComptable: number = 0;
+  public compteTiersCodeTaxe: number = 0;
   public delaiPaiementLibelle: string = "";
   public compteTiersEscomptePourcentage: string = "";
   public compteTiersEscompteNombreJours: string = "";

@@ -77,7 +77,7 @@ export default class extends Vue {
   private overlay = false;
   
   private ventilleBase: number = 0;
-  private ventilleDevise: number = 0;
+  public ventilleDevise: number = 0;
   public propositionLibelle : string ="";
 
   private headersContreparties = [

@@ -14,6 +14,7 @@ export interface IEntetePieceComptable {
   numeroCompte: number;
   nomCompte: string;
   devise: string;
+  isEquilibre: boolean;
 }
 
 export class EntetePieceComptableDTO implements IEntetePieceComptable{
@@ -29,6 +30,7 @@ export class EntetePieceComptableDTO implements IEntetePieceComptable{
   numeroCompte: number = 0;
   nomCompte: string = "";
   devise: string = "";
+  isEquilibre: boolean = true;
 }
 
 export class EntetePieceComptable extends EntetePieceComptableDTO {

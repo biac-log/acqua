@@ -335,10 +335,10 @@ export default class extends Vue {
   private compteLoading: boolean = false;
   private numeroCompte: string = "";
   private numeroCompteRules: any = [(v: string) => !!v || "Numéro obligatoire"];
-  private comptesSearch: { numero: number; numeroNom: string }[] = [];
+  private comptesSearch: { numero: string | number; numeroNom: string }[] = [];
   private searchCompte: string = "";
   private numeroCompteSelected: {
-    numero: number | string;
+    numero: string | number;
     numeroNom: string;
   } = { numero: "", numeroNom: "" };
   private nomCompte: string = "";
@@ -456,7 +456,7 @@ export default class extends Vue {
 
     if (contrepartie) {
       let compteToSelect = {
-        numero: contrepartie.numeroCompte,
+        numero: contrepartie.numeroCompte ? contrepartie.numeroCompte : "",
         numeroNom: contrepartie.compteLibelle
       };
       this.comptesSearch = [];
