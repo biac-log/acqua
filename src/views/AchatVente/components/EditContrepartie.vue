@@ -122,7 +122,7 @@
               </v-col>
             </v-row>
             <v-row dense>
-              <v-col cols="1">
+              <v-col cols="2">
                 <v-select
                   :items="devises"
                   v-model="devisesSelected"
@@ -192,7 +192,7 @@
                   tabindex="-1"
                 ></v-select>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   v-model="montant"
                   label="Montant"
@@ -231,7 +231,7 @@
               Supprimer</v-btn
             >
             <v-spacer></v-spacer>
-            <v-menu bottom left>
+            <v-menu bottom left v-if="!readonly">
               <template v-slot:activator="{ on }">
                 <v-btn
                   icon

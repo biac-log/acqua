@@ -3,7 +3,7 @@
       <v-card class="mb-3">
         <v-card-title>
           Contreparties
-          <v-tooltip top open-delay=500>
+          <v-tooltip open-delay=500 top>
             <template v-slot:activator="{ on }">
               <v-btn color="primary" fab small class="ml-5" ref="btnAdd" :disabled="readonly" @click.stop="createContrepartie" v-on="on">
                 <v-icon>mdi-plus</v-icon>

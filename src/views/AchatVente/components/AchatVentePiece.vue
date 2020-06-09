@@ -28,11 +28,11 @@
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
-            <span>Modifier la pièce <span class="shortcutTooltip">f2</span></span>
+            <span>Modifier la pièce <span class="shortcutTooltip">F2</span></span>
           </v-tooltip>
           <v-tooltip top open-delay=500 open-on-hover>
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-10" color="error" :disabled="saveLoading" v-if="piecereadonly" @click="DeletePiece" :loading="deleteIsLoading" v-on="on" >
+              <v-btn class="mr-10" color="error" :disabled="saveLoading" v-show="piecereadonly" @click="DeletePiece" :loading="deleteIsLoading" v-on="on" >
                 <v-icon left>mdi-delete</v-icon>Supprimer
               </v-btn>
             </template>
@@ -785,6 +785,7 @@ export default class extends Vue {
       if(this.statuts.length <= 1){
         this.statutsLoading = true;
         this.statuts = await AchatVenteApi.getAllStatut();
+        this.statutSelected = this.statuts[0];
       }
     }catch (err) {
       

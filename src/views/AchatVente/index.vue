@@ -95,7 +95,7 @@
         <template v-slot:item.isEquilibre="{ item }">
           <v-tooltip top open-delay=500 >
             <template v-slot:activator="{ on }">
-              <v-icon v-if="!item.isEquilibre" color="red" v-on="on">mdi-alert</v-icon>
+              <v-icon v-show="!item.isEquilibre" color="red" v-on="on">mdi-alert</v-icon>
             </template>
             <span>La pièce n'est pas équilibrée</span>
           </v-tooltip>
