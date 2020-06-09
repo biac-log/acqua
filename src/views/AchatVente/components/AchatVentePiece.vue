@@ -376,7 +376,7 @@
             {{errorMessage}}
         </v-alert>
         <Confirm ref="confirmDialog"></Confirm>
-        <Confirm ref="confirmLabelDialog" displayButtonCancel="false" focusOk="false"></Confirm>
+        <Confirm ref="confirmLibellelDialog" :displayButtonCancel="false" :focusOk="false"></Confirm>
       </v-card>
     </v-form>
   </v-dialog>
@@ -740,7 +740,7 @@ export default class extends Vue {
       AchatVenteApi.ValidateLibelle(this.libelle,this.typeCompte,this.numeroCompteTier).then((isUsed) => {
         if(isUsed){
           this.libelleWarningMessage = "Attention, ce libellé est déjà utilisé par une autre pièce";
-          (this.$refs.confirmDialog as Confirm).open("Attention",
+          (this.$refs.confirmLibellelDialog as Confirm).open("Attention",
             `Attention, ce libellé est déjà utilisé par une autre pièce`,
             "error",
             "J'ai compris"

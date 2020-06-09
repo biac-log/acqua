@@ -33,10 +33,10 @@ export default class extends Vue {
   private resolve: any;
   private reject: any;
   private btnLabel: string = "Oui";
-  @Prop()
-  private displayButtonCancel: boolean = true;
-  @Prop()
-  private focusOk: boolean = true;
+  @Prop({ default: true })
+  readonly displayButtonCancel!: boolean ;
+  @Prop({ default: false })
+  readonly focusOk!: boolean;
 
   public open(
     windowTitle: string,
@@ -45,7 +45,7 @@ export default class extends Vue {
     btnLabel?: string,
   ): Promise<boolean> {
     setTimeout(() => {
-      if(this.displayButtonCancel)
+      if(this.displayButtonCancel && !this.focusOk)
         (this.$refs.btnAnnuler as any)?.$el?.focus();
       else if (this.focusOk)
         (this.$refs.btnOk as any)?.$el?.focus();
