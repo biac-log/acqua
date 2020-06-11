@@ -31,4 +31,9 @@ export abstract class GestionUtilisateurApi {
     let response = await this.GestionUtilisateurAxios.post<UtilisateurDTO>(`${process.env.VUE_APP_ApiGestionUser}/User/Save`, user);
     return new Utilisateur(response.data);
   }  
+
+  static async idExist(id: string):Promise<boolean>{
+    let response = await this.GestionUtilisateurAxios.get<boolean>(`${process.env.VUE_APP_ApiGestionUser}/User/IdExist/${id}`);
+    return response.data;
+  }
 }

@@ -34,16 +34,28 @@
               <v-row class="mt-5">
                 <v-col>
                   <v-text-field
-                    v-if="utilisateur.ID"
+                    label="Id"
+                    ref="code"
+                    v-model="code"
+                    :value="code"
+                    :filled="utilisateurReadonly"
+                    :readonly="utilisateurReadonly"
+                    :rules="codeRules"
+                    :error-messages="codeErrorMessage"
+                    autofocus
+                    validate-on-blur
+                  ></v-text-field>
+                  <v-text-field
                     label="Nom prénom"
                     ref="nomPrenom"
                     v-model="nomPrenom"
                     :filled="utilisateurReadonly"
-                    readonly
+                    :readonly="utilisateurReadonly"
+                    :rules="nomRules"
                     validate-on-blur
-                    prepend-inner-icon="mdi-account-box"
+                    prepend-inner-icon="mdi-account"
                   ></v-text-field>
-                  <v-text-field
+                  <!-- <v-text-field
                     v-else
                     label="Nom prénom"
                     ref="nomPrenom"
@@ -53,19 +65,8 @@
                     validate-on-blur
                     autofocus
                     prepend-inner-icon="mdi-account-box"
-                  ></v-text-field>
-                  <v-text-field
-                    v-if="utilisateur.ID"
-                    label="Code"
-                    ref="code"
-                    v-model="code"
-                    :value="code"
-                    :filled="utilisateurReadonly"
-                    readonly
-                    validate-on-blur
-                    prepend-inner-icon="mdi-account"
-                  ></v-text-field>
-                  <v-text-field
+                  ></v-text-field> -->
+                  <!-- <v-text-field
                     v-else
                     label="Code"
                     ref="code"
@@ -75,21 +76,21 @@
                     tabindex="-1"
                     validate-on-blur
                     prepend-inner-icon="mdi-account"
-                  ></v-text-field>
+                  ></v-text-field> -->
                   <v-text-field
-                    v-if="utilisateur.ID"
                     label="Mot de passe"
                     ref="motDePasse"
                     v-model="motDePasse"
                     type="password"
                     :value="motDePasse"
-                    readonly
+                    :readonly="utilisateurReadonly"
                     :filled="utilisateurReadonly"
+                    :rules="nomRules"
                     validate-on-blur
                     prepend-inner-icon="mdi-lock"
                     autocomplete="off"
                   ></v-text-field>
-                  <v-text-field
+                  <!-- <v-text-field
                     v-else
                     label="Mot de passe"
                     ref="motDePasse"
@@ -100,7 +101,7 @@
                     validate-on-blur
                     prepend-inner-icon="mdi-lock"
                     autocomplete="off"
-                  ></v-text-field>
+                  ></v-text-field> -->
                   <v-text-field
                     label="ID active directory"
                     ref="idActiveDirectory"
@@ -109,7 +110,6 @@
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
                     validate-on-blur
-                    prepend-inner-icon="mdi-card-account-details"
                   ></v-text-field>
                   <v-text-field
                     label="Fonction"
@@ -188,7 +188,7 @@
                     :value="numeroInterne"
                     :filled="utilisateurReadonly"
                     :readonly="utilisateurReadonly"
-                    prepend-inner-icon="mdi-phone-in-talk"
+                    prepend-inner-icon="mdi-phone"
                     validate-on-blur
                   ></v-text-field>
                   <v-text-field
@@ -286,7 +286,7 @@ export default class extends Vue {
   private isValid: boolean = true;
 
   private Avatar: any = null;
-  private nomRules: any = [(v: string) => !!v || "Valeur obligatoire"];
+  private nomRules: any = [(v: string) => (!!v || !this.utilisateurReadonly) || "Valeur obligatoire"];
 
   //Statiques
   private departements: string[] = [];
@@ -303,6 +303,9 @@ export default class extends Vue {
   //Encodage
   private nomPrenom = "";
   private code = "";
+  private codeRules: any = [(v: string) => (!!v || !this.utilisateurReadonly) || "Valeur obligatoire"];
+  private codeErrorMessage = "";
+
   private motDePasse = "";
   private idActiveDirectory = "";
   private fonction = "";
@@ -372,6 +375,13 @@ export default class extends Vue {
     this.email = utilisateur?.Email;
   }
 
+  @Watch("code")
+  private async validateId(){
+    if(this.utilisateur.ID !== this.code && await GestionUtilisateurApi.idExist(this.code))
+      this.codeErrorMessage = "L'id est déjà utilisé";
+    else this.codeErrorMessage = "";
+  }
+
   private async ModifierUtilisateur() {
     this.utilisateurReadonly = false;
     this.$nextTick(() => (this.$refs.nomPrenom as any)?.focus());
@@ -407,9 +417,10 @@ export default class extends Vue {
   }
 
   private GetModelToSave(): Utilisateur {
+    this.utilisateur.ID = this.code;
     this.utilisateur.NomPrenom = this.nomPrenom;
     this.utilisateur.MotDePasseApollo =
-      this.motDePasse !== "xxxxxxx" ? this.motDePasse : "";
+    this.motDePasse !== "xxxxxxx" ? this.motDePasse : "";
     this.utilisateur.IdActiveDirectory = this.idActiveDirectory;
     this.utilisateur.Fonction = this.fonction;
     this.utilisateur.Departement = this.departement;
