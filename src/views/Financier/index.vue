@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid @keydown.plus.prevent="create">
+  <v-container fluid @keydown.107.prevent="create">
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
@@ -17,6 +17,7 @@
               :loading="periodeIsLoading"
               :hint="periodeSelected.libellePeriode"
               :rules="periodesRules"
+              @change="LoadPiecesComptables"
             ></v-select>
           </v-col>
           <v-col cols="12" xs="12" md="6" lg="3">
@@ -31,13 +32,13 @@
               :hint="journalSelected.description"
               return-object
               persistent-hint
-              @focus="LoadJournaux"
               :rules="journalRules"
+              @change="LoadPiecesComptables"
               required
             >
             </v-select>
           </v-col>
-          <v-col cols="12" xs="12" md="3" lg="3">
+          <!-- <v-col cols="12" xs="12" md="3" lg="3">
             <v-btn
               color="primary"
               id="btn-acqua"
@@ -48,7 +49,7 @@
               <v-icon>mdi-magnify</v-icon>
               Charger
             </v-btn>
-          </v-col>
+          </v-col> -->
         </v-row>
       </v-form>
     </v-card>
