@@ -98,6 +98,8 @@ class User extends VuexModule implements IUserState {
   @Action
   public Logout() {
     this.RESET_TOKEN();
+    //Pas top mais force le refresh des static (Axios) lors de la déconnexion
+    location.reload();
   }
 }
 

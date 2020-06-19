@@ -1,14 +1,14 @@
 <template>
-  <v-dialog width="600" v-model="dialog" @click:outside="close" @keydown.esc="close()">
+  <v-dialog width="800" v-model="dialog" @click:outside="close()" @keydown.esc="close()" @keydown.page-up="nextPage()" @keydown.page-down="previousPage()">
     <v-card class="mt-5">
       <v-card-title>
-        Case Tva
-        <v-btn color="primary" fab class="ml-5" small @click="refreshcasesTva">
+        Comptes {{ typeLoad ? typeLoad.libelle : "" }}
+        <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">
           <v-icon>mdi-refresh</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
         <v-text-field
-          v-model="filtreCaseTva"
+          v-model="filtreCompte"
           append-icon="mdi-magnify"
           label="Filtrer"
           single-line
@@ -22,8 +22,8 @@
         style="height: 561px;"
         id="dataTable"
         class="ag-theme-alpine"
-        :columnDefs="headersCasesTva"
-        :rowData="casesTva"
+        :columnDefs="headersComptes"
+        :rowData="comptes"
         rowSelection="single"
         :gridOptions="gridOptions">
       </AgGridVue>
@@ -32,33 +32,32 @@
 </template>
 
 <script lang="ts">
-import { AgGridVue } from "ag-grid-vue";
 import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
-import { CaseTva } from "@/models/CaseTva";
+import {TypeCompte} from "@/models/AchatVente";
+import CompteGeneralSearch from "@/models/Compte/CompteGeneralSearch";
+import { AchatVenteApi } from "@/api/AchatVenteApi";
 import { CompteApi } from "@/api/CompteApi";
 import axios from "axios";
-import { AchatVenteApi } from '@/api/AchatVenteApi';
-import { GridOptions, ICellRenderer, GridApi } from 'ag-grid-community';
-import { CaseTvaApi } from '../../api/CaseTvaApi';
-
+import { ICellRenderer, GridOptions, GridApi } from 'ag-grid-community';
+import { AgGridVue } from "ag-grid-vue";
 
 @Component({
-  name: "SearchCaseTva",
+  name: "SearchCompteGeneral",
   components: { AgGridVue }
 })
 export default class extends Vue {
   private dialog: boolean = false;
-
-  private numeroJournalLoad!: number;
-  private filtreCaseTva: string = "";
+  private typeLoad: TypeCompte = new TypeCompte();
+  private filtreCompte: string = "";
   private isLoading: boolean = false;
-  private casesTva: CaseTva[] = [];
-  private headersCasesTva = [
-    { headerName: "Numéro case", field: "numeroCase" , cellStyle: { textAlign: "right" }, width: 120},
-    { headerName: "Libellé", field: "libelleCase", flex:1 },
-    { headerName: "Type", field: "libelleTypeCase", width: 120 },
-    { headerName: "Nature", field: "natureCase", width: 120 },
-    { headerName: "Taux", field: "tauxTvaCase", cellStyle: { textAlign: "right" }, width: 120}
+  private comptes: CompteGeneralSearch[] = [];
+  private displayComptes: CompteGeneralSearch[] = [];
+  private headersComptes = [
+    { headerName: "Numéro", field: "numero", filter:true, width: 120 },
+    { headerName: "Nom", field: "nom", filter:true, flex:1 },
+    { headerName: "Solde", field: "libelleSolde", filter:true, cellStyle: { textAlign: "right" }, width: 100 },
+    { headerName: "Nature", field: "libelleNature", filter:true, width: 120 },
+    { headerName: "Case TVA", field: "caseTvaDisplay", filter:true, width: 120 }
   ];
 
   private resolve!: any;
@@ -67,19 +66,21 @@ export default class extends Vue {
   private loadingCellRenderer: string | undefined | (new () => ICellRenderer) = undefined;
   private loadingCellRendererParams = null;
   private gridOptions: GridOptions = {
-    columnDefs: this.headersCasesTva,
+    columnDefs: this.headersComptes,
     rowSelection: "single",
-    rowData: this.casesTva,
+    rowData: this.comptes,
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
-    overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des cases de tva</span>',
+    overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
+    pagination: true,
+    paginationAutoPageSize:true,
     onRowDoubleClicked: this.rowDoubleClick
   };
 
-  public open(numeroJournal: number): Promise<CaseTva> {
+  public open(typeToLoad: TypeCompte): Promise<CompteGeneralSearch> {
     this.dialog = true;
-    this.loadcasesTva(numeroJournal);
+    this.loadComptes(typeToLoad);
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -87,27 +88,31 @@ export default class extends Vue {
     });
   }
 
-  private loadcasesTva(numeroJournalLoad: number) {
-    if (this.numeroJournalLoad != numeroJournalLoad) {
-      this.numeroJournalLoad = numeroJournalLoad;
-      this.refreshcasesTva();
+  private setFilteredItems(e : CompteGeneralSearch[]){
+    this.displayComptes = e;
+  }
+
+  private loadComptes(typeToLoad: TypeCompte) {
+    if (this.typeLoad.id != typeToLoad.id) {
+      this.typeLoad = typeToLoad;
+      this.refreshComptes();
     }
   }
 
-  private refreshcasesTva() {
-    if (this.numeroJournalLoad) {
-      (this.gridOptions.api as GridApi)?.showLoadingOverlay();
-      CaseTvaApi.getCasesTVADisponibles(this.numeroJournalLoad)
+  private refreshComptes() {
+    if (this.typeLoad.id) {
+      this.isLoading = true;
+      CompteApi.getComptesGeneraux(this.typeLoad.id)
         .then(resp => {
-          this.casesTva = resp;
+          this.comptes = resp;
         })
         .finally(() => {
-         (this.gridOptions.api as GridApi)?.hideOverlay();
+          this.isLoading = false;
         });
     }
   }
 
-private giveFocusToRow(id: number) {
+  private giveFocusToRow(id: number) {
     let ds = 0;
     this.gridOptions?.api?.forEachNode(function(node) {
       if (node.rowIndex === id) {
@@ -115,12 +120,12 @@ private giveFocusToRow(id: number) {
         ds = node.rowIndex;
       }
     });
-    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, "numeroCase"));
+    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, "numero"));
   }
 
-  @Watch("filtreCaseTva")
+  @Watch("filtreCompte")
   private filterGrid(){
-    this.gridOptions?.api?.setQuickFilter(this.filtreCaseTva);
+    this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
   }
 
   private navigateToNextCell(params: any) {
@@ -163,14 +168,23 @@ private giveFocusToRow(id: number) {
 
   private keypress(event: any) {
     if(event?.event.key === "Enter"){
-      var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CaseTva;
-      this.sendCaseTva(selectedRow)
+      var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
+      this.sendCompte(selectedRow)
     }
   } 
 
   private rowDoubleClick(vlaue : any){
-    var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CaseTva;
-    this.sendCaseTva(selectedRow)
+    var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
+    this.reinitGrid();
+    this.sendCompte(selectedRow)
+  }
+  
+  private nextPage(){
+    this?.gridOptions?.api?.paginationGoToNextPage();
+  }
+
+  private previousPage(){
+    this?.gridOptions?.api?.paginationGoToPreviousPage();
   }
 
   private reinitGrid(){
@@ -180,15 +194,17 @@ private giveFocusToRow(id: number) {
     (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 
-  private sendCaseTva(caseTva: CaseTva) {
-    this.filtreCaseTva = "";
+  private sendCompte(compte: CompteGeneralSearch) {
+    this.filtreCompte = "";
     this.dialog = false;
-    this.resolve(caseTva);
+    this.reinitGrid();
+    this.resolve(compte);
   }
 
   private close(){
-    this.filtreCaseTva = "";
+    this.filtreCompte = "";
     this.dialog = false;
+    this.reinitGrid();
     this.reject();
   }
 }

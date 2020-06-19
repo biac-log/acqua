@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" width="800" @keydown.enter.prevent.stop="sendVentilation" @click:outside="close()" @keydown.esc="close()">
+  <v-dialog v-model="dialog" width="900" @keydown.enter.prevent.stop="sendVentilation" @click:outside="close()" @keydown.esc="close()">
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
         <v-card-title>
@@ -28,26 +28,48 @@
               ></v-select>
             </v-col>
             <v-col cols="3">
-              <v-text-field
-                label="N° compte"
-                v-model="numeroCompte"
-                :filled="readonly"
-                :readonly="readonly"
-                :hide-details="readonly"
-                ref="numeroCompte"
-                @keypress.enter.prevent.stop="loadCompte"
-                @blur="loadCompte"
-                autofocus
-              >
-                <template v-slot:append>
-                  <v-btn icon small :disabled="readonly" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
-                    <v-icon>mdi-magnify</v-icon>
-                  </v-btn>
-                </template>
-              </v-text-field>
-              <!-- <SearchCompteVentilationVue
-                ref="compteDialog"
-              ></SearchCompteVentilationVue> -->
+              <v-combobox
+                  ref="numeroCompte"
+                  label="N° compte"
+                  v-model="numeroCompteSelected"
+                  :items="comptesSearch"
+                  :search-input.sync="searchCompte"
+                  :rules="numeroCompteRules"
+                  @keyup.enter="$event.target.select()"
+                  @focus="$event.target.select()"
+                  @change="numeroCompteChange"
+                  :hide-details="readonly"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  validate-on-blur
+                  hide-selected
+                  item-text="numeroNom"
+                  item-value="numero"
+                  hide-no-data
+                  autofocus
+                >
+                  <template v-slot:append>
+                    <v-btn
+                      icon
+                      small
+                      v-show="!readonly"
+                      :disabled="readonly"
+                      @click="OpenSearchCompte()"
+                      @keydown.enter.prevent.stop="OpenSearchCompte()"
+                      tabindex="4"
+                    >
+                      <v-icon>mdi-magnify</v-icon>
+                    </v-btn>
+                  </template>
+                  <template v-slot:selection="{ attr, on, item }">
+                    {{ item.numero }}
+                  </template>
+                  <template v-slot:item="{ item }">
+                    {{ item.numeroNom }}
+                  </template>
+                </v-combobox>
+                <SearchCompteTierVue ref="searchCompteTierDialog"></SearchCompteTierVue>
+                <SearchCompteGeneralVue ref="searchCompteGeneralDialog"></SearchCompteGeneralVue>
             </v-col>  
             <v-col cols="6">
               <v-text-field
@@ -101,7 +123,6 @@
                 :rules="numeroCaseTvaRules"
                 :hide-details="readonly"
                 :loading="tvaLoading"
-                validate-on-blur
                 @keypress.enter="loadCaseTva"
                 @change="loadCaseTva"
               >
@@ -194,19 +215,25 @@ import {
   Devise,
   TypeMouvement,
   getTypesMouvements,
-	CaseTva
+	CompteContrepartieSearch
 } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import { CompteApi } from "@/api/CompteApi";
-//import SearchCompteVentilationVue from "./SearchCompteVentilation.vue";
+import SearchCompteTierVue from "./SearchCompteTier.vue";
+import SearchCompteGeneralVue from "./SearchCompteGeneral.vue";
 import SearchCaseTvaVue from "@/components/search/SearchCaseTva.vue";
 import axios, { AxiosError } from "axios";
-import CompteGenerealSearch from "../../../models/Compte/CompteGeneralSearch";
+import CompteGeneralSearch from "../../../models/Compte/CompteGeneralSearch";
 import { Ventilation } from '../../../models/Financier';
+import { FinancierApi } from '../../../api/FinancierApi';
+import { CaseTvaApi } from "@/api/CaseTvaApi";
+import { CaseTva } from "@/models/CaseTva";
+import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
+import CompteSearch from '../../../models/Compte/CompteSearch';
 
 @Component({
   name: "Ventilation",
-  components: { SearchCaseTvaVue }
+  components: { SearchCaseTvaVue, SearchCompteGeneralVue, SearchCompteTierVue }
 })
 export default class extends Vue {
   private dialog: boolean = false;
@@ -225,6 +252,9 @@ export default class extends Vue {
   private compteLoading: boolean = false;
   private numeroCompte: string = "";
   private numeroCompteRules: any = [(v: string) => !!v || "Numéro obligatoire"];
+  private comptesSearch: { numero: string | number; numeroNom: string }[] = [];
+  private searchCompte: string = "";
+  private numeroCompteSelected: { numero: string | number, nom: string, numeroNom: string } = { numero: "", nom: "", numeroNom: "" };
   private nomCompte: string = "";
   private nomCompteRules: any = [(v: string) => !!v || "Nom obligatoire"];
   private devises: Devise[] = [];
@@ -241,14 +271,14 @@ export default class extends Vue {
   private montantRules: any = [(v: string) => !!v || "Montant obligatoire"];
   private numeroCaseTva: string = "";
   private numeroCaseTvaRules: any = [
-    (v: string) => !!v || "Case tva obligatoire",
-    (v: string) => (Number.isInteger(v.toNumber()) && v.toNumber() != 0) || "Numero invalide"
+    (v: string) => (v.isInt() && v.toNumber() != 0) || "Numero invalide"
   ];
   private caseTva: CaseTva = new CaseTva();
 
   private libelleCaseTva: string = "";
-  private tauxCase: number= 0;
+  private tauxCase: number = 0;
   private tvaLoading = false;
+
   private reference: string = "";
   private referenceRules: any = [(v: string) => !!v || "Référence obligatoire"];
 
@@ -257,7 +287,7 @@ export default class extends Vue {
   private ventileDevise: number = 0;
 
   mounted() {
-    AchatVenteApi.getTypesComptes().then(resp => {
+    FinancierApi.getTypesComptes().then(resp => {
       this.typesComptes = resp;
     });
   }
@@ -311,13 +341,32 @@ export default class extends Vue {
     this.typesComptesSelected =this.typesComptes.find(tc => tc.id == ventilation.typeCompte) || this.typesComptes[0];
     this.devisesSelected = this.devises.find(d => d.id == ventilation.codeDevise) ||this.devises[0];
     this.numeroCompte = ventilation.numeroCompte ? ventilation.numeroCompte.toString() : "";
+    
+    if(ventilation){
+      let compteToSelect = {
+        numero: ventilation.numeroCompte ? ventilation.numeroCompte : "",
+        nom: ventilation.nomCompte,
+        numeroNom: `${ventilation.numeroCompte} ${ventilation.nomCompte}`
+      };
+      this.comptesSearch = [];
+      this.comptesSearch.push(compteToSelect);
+      this.numeroCompteSelected = compteToSelect;
+    }
+
     this.nomCompte = ventilation.nomCompte;
     this.libelle = ventilation.libelle;
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == ventilation.codeMouvement) || this.typesMouvements[0];
     this.montant = ventilation.montantBase && this.devisesSelected ? ventilation.montantBase.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
     this.numeroCaseTva = ventilation.codeCaseTVA ? ventilation.codeCaseTVA.toString() : "";
-    //this.caseTva.Refresh(ventilation.caseTva);
     this.libelleCaseTva = ventilation.libelleCaseTVA;
+    
+    if(this.numeroCaseTva){
+      let caseTva = new CaseTva();
+      caseTva.libelleCase = ventilation.libelleCaseTVA;
+      caseTva.numeroCase = ventilation.codeCaseTVA;
+      //TODO Remplacer par l'objet dans ventilation
+      this.caseTva.Refresh(caseTva);
+    }
 
     // this.ventileDevise = ventileDevise;
     // this.tvaCalcule = tvaCalcule;
@@ -346,38 +395,94 @@ export default class extends Vue {
     }
   }
 
-  private loadCompte() {
+  private numeroCompteChange(value: string | { numero: string | number, nom: string, numeroNom: string } | undefined) {
+    console.log(value);
+    if(!value) //Si vide
+    {
+      this.numeroCompte = "";
+      this.nomCompte = "";
+    }
+    else if(typeof value === "string") //Si on tappe un numéro sans passer pour l'aucomplete
+      this.loadCompteByString(value);
+    else //Si on sélectionne via autocomplete
+    {
+      if(this.typesComptesSelected.id == "F" || this.typesComptesSelected.id == "C")
+        this.setCompte(value);
+      else{
+        CompteApi.getCompteGeneral(this.typesComptesSelected.id, this.numeroCompteSelected.numero.toString())
+          .then(compte => { 
+            this.setCompte(compte); 
+            this.setCompteGeneralCaseTva(compte);
+          })
+          .finally(() => { this.compteLoading = false; });
+      }
+    }
+  }
+
+  private loadCompteByString(value: string) {
     this.compteLoading = true;
-    if (this.typesComptesSelected && this.numeroCompte) {
-      CompteApi.getCompteGeneral(
-        this.typesComptesSelected.id,
-        this.numeroCompte.toString()
-      ).then(compte => {
-        this.setCompte(compte);
-      })
-      .finally(() => {
-        this.compteLoading = false;
-      });
+    if (value) {
+      if(this.typesComptesSelected.id == "F" || this.typesComptesSelected.id == "C")
+      {
+        CompteApi.getCompteDeTier(this.typesComptesSelected.id, value)
+          .then(compte => {  this.setCompte(compte); })
+          .finally(() => { this.compteLoading = false; });
+      }else{
+        CompteApi.getCompteGeneral(this.typesComptesSelected.id, value)
+          .then(compte => { 
+            this.setCompte(compte); 
+            this.setCompteGeneralCaseTva(compte);
+          })
+          .finally(() => { this.compteLoading = false; });
+      }
+    }else{
+      this.numeroCompte = "";
+      this.nomCompte = "";
+    }
+  }
+  
+  @Watch("searchCompte")
+  private async autocompleteComptes(matchCode: string) {
+    try {
+      this.compteLoading = true;
+      if (matchCode && matchCode.isInt() && this.typesComptesSelected.id == "G") {
+        this.comptesSearch = await CompteApi.autocompleteCompteByNumero(this.typesComptesSelected.id, matchCode, 5);
+      } else if (matchCode) {
+        if(this.typesComptesSelected.id == "F" || this.typesComptesSelected.id == "C")
+          this.comptesSearch = await CompteApi.searchCompteDeTier(this.typesComptesSelected.id, matchCode.toUpperCase(), 5);
+        else
+          this.comptesSearch = await CompteApi.autocompleteCompteByMatchCode( this.typesComptesSelected.id, matchCode.toUpperCase(), 5);
+      } else this.comptesSearch = [];
+    } catch (err) {
+      console.log(err);
+    } finally {
+      this.compteLoading = false;
     }
   }
   private OpenSearchCompte(): void {
-    // if (this.typesComptesSelected) {
-    //   (this.$refs.compteDialog as SearchCompteVentilationVue)
-    //     .open(this.typesComptesSelected)
-    //     .then(compte => {
-    //       this.setCompte(compte);
-    //       this.$nextTick(() => (this.$refs.libelle as any)?.focus());
-    //     }).catch(() => {
-    //       this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
-    //     });
-    // }
+    if (this.typesComptesSelected) {
+      if(this.typesComptesSelected.id == "G" || this.typesComptesSelected.id == "Z")
+        this.OpenSearchCompteGeneral();
+      else  this.OpenSearchCompteTier();
+    }
   }
 
-  private setCompte(compte: CompteGenerealSearch) {
-    this.numeroCompte = compte.numero.toString();
-    this.nomCompte = compte.nom;
+  private OpenSearchCompteGeneral(): void {
+    if (this.typesComptesSelected) {
+      (this.$refs.searchCompteGeneralDialog as SearchCompteGeneralVue)
+        .open(this.typesComptesSelected)
+        .then(compte => {
+          this.setCompte(compte);
+          this.setCompteGeneralCaseTva(compte);
+          this.$nextTick(() => (this.$refs.libelle as any)?.focus());
+        }).catch(() => {
+          this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+        });
+    }
+  }
+  private setCompteGeneralCaseTva(compte: CompteGeneralSearch) {
     if(compte.numeroCase){
-      AchatVenteApi.getCaseTVA(compte.numeroCase, this.numeroJournal).then((resp) => {
+      CaseTvaApi.getCaseTVA(compte.numeroCase, this.numeroJournal).then((resp) => {
         if(resp)
         {
           this.caseTva = resp;
@@ -387,6 +492,29 @@ export default class extends Vue {
         this.calculMontant();
       });
     }
+  }
+
+  private OpenSearchCompteTier(): void {
+    if (this.typesComptesSelected) {
+      (this.$refs.searchCompteTierDialog as SearchCompteTierVue)
+        .open(this.typesComptesSelected.id)
+        .then(compte => {
+          this.setCompte(compte);
+          this.$nextTick(() => (this.$refs.libelle as any)?.focus());
+        }).catch(() => {
+          this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+        });
+    }
+  }
+  private setCompte(compte: { numero:number | string, nom: string, numeroNom: string}) {
+     if (compte) {
+      this.comptesSearch = [];
+      this.comptesSearch.push(compte);
+      this.numeroCompteSelected = compte;
+    }
+
+    this.numeroCompte = compte.numero.toString();
+    this.nomCompte = compte.nom;
   }
 
   private calculMontant(){
@@ -417,13 +545,16 @@ export default class extends Vue {
   }
 
   private loadCaseTva() {
-    if (+this.numeroCaseTva) {
+    if (this.readonly) return;
+
+    if (this.numeroCaseTva) {
       this.tvaLoading = true;
-      AchatVenteApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
+      this.errorMessage = "";
+      CaseTvaApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
         .then(caseTva => {
           this.numeroCaseTva = caseTva.numeroCase.toString();
           this.caseTva = caseTva;
-          this.errorMessage = "";
+          this.calculMontant();
         })
         .catch((err: AxiosError) => {
           this.numeroCaseTva = "";
@@ -439,15 +570,16 @@ export default class extends Vue {
       this.caseTva = new CaseTva();
     }
   }
-  private OpenSearchCaseTva(): void { (this.$refs.caseTvaDialog as SearchCaseTvaVue)
-      // .open(this.numeroJournal)
-      // .then(caseTva => {
-      //   this.numeroCaseTva = caseTva.numeroCase.toString();
-      //   this.caseTva = caseTva;
-      //   this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
-      // }).catch(() => {
-      //   this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus())
-      // });
+
+  private OpenSearchCaseTva(): void { 
+    (this.$refs.caseTvaDialog as SearchCaseTvaVue).open(this.numeroJournal)
+      .then(caseTva => {
+        this.numeroCaseTva = caseTva.numeroCase.toString();
+        this.caseTva = caseTva;
+        this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
+      }).catch(() => {
+        this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus())
+      });
   }
 
   private GetModel(): Ventilation {

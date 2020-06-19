@@ -22,4 +22,8 @@ export default class CompteSearch extends CompteSearchDTO {
   get fullName(): string {
     return `${this.numero} - ${this.nom}`;
   }
+
+  get numeroNom(): string{
+    return `${this.numero ? this.numero : ""} ${this.nom}`.trim();
+  }
 }

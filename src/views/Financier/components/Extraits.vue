@@ -84,6 +84,8 @@ export default class extends Vue {
   public readonly!: boolean;
   @PropSync('Extraits')
   private extraits!: Extrait[];
+  @PropSync('Journal')
+  private journal!: Journal;
 
   private headersExtraits = [
     { text: "Ex", value: "numeroExtrait", width:50 },
@@ -99,7 +101,7 @@ export default class extends Vue {
   ];
 
   private createExtrait(extrait?: Extrait) {
-    (this.$refs.refExtraitVue as ExtraitVue).openNew();
+    (this.$refs.refExtraitVue as ExtraitVue).openNew(this.journal);
       // .then((resp: PieceComptableContrepartie) => {
       //   const maxLigne = Math.max(...this.contreparties.map(i => i.numeroLigne))
       //   resp.numeroLigne = maxLigne + 1;
@@ -110,7 +112,7 @@ export default class extends Vue {
   }
 
   private editExtrait(piece: Extrait) {
-    (this.$refs.refExtraitVue as ExtraitVue).open(piece);
+    (this.$refs.refExtraitVue as ExtraitVue).open(this.journal, piece);
     // (this.$refs.editContrepartie as EditContrepartieVue)
     //   .open(piece, this.journal.numero, this.devise, this.getVentileDevise(piece), this.getTvaCalcule(piece), this.getTvaImpute(piece))
     //   .then((resp: PieceComptableContrepartie) => {

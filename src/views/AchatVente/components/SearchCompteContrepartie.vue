@@ -71,7 +71,7 @@ export default class extends Vue {
     rowData: this.comptes,
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
-    onCellKeyPress: this.keypress,
+    onCellKeyDown: this.keypress,
     overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
     pagination: true,
     paginationAutoPageSize:true,

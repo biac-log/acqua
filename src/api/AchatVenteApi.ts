@@ -9,8 +9,6 @@ import {
   TypeCompteDTO,
   CompteContrepartieSearchDTO,
   CompteContrepartieSearch,
-  CaseTva,
-  CaseTvaDTO,
   PeriodeComptableDTO,
   PeriodeComptable,
   EntetePieceComptableDTO,
@@ -20,7 +18,7 @@ import {
   Journal,
   JournalDTO
 } from "@/models/AchatVente";
-import CompteGenerealSearch from '@/models/Compte/CompteGeneralSearch';
+import CompteGeneralSearch from '@/models/Compte/CompteGeneralSearch';
 import { PieceComptableSaveDTO } from '@/models/AchatVente';
 import * as DateMethods from '@/utils/DateMethods'
 import { DateTime } from '@/models/DateTime';
@@ -88,29 +86,13 @@ export abstract class AchatVenteApi {
     );
   }
 
-  static async getCasesTVADisponibles(journal: number | string): Promise<CaseTva[]> {
-    let response = await this.achatVenteAxios.get<
-    CaseTva[]
-    >(
-      `${process.env.VUE_APP_ApiAcQuaCore}/CaseTVA/GetCasesTVADisponibles?numeroJournal=${journal}`
-    );
-    return response.data.map(
-      caseTvaDTO => new CaseTva(caseTvaDTO)
-    );
-  }
-
-  static async getCaseTVA(numeroCase: number | string, numeroJournal : number | string): Promise<CaseTva> {
-    let response = await this.achatVenteAxios.get<CaseTvaDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/CaseTVA/GetCaseTVA?numeroCase=${numeroCase}&numeroJournal=${numeroJournal}`);
-    return new CaseTva(response.data);
-  }
-
   static async getAllStatut(): Promise<Statut[]> {
     let response = await this.achatVenteAxios.get<Statut[]>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetStatuts`);
     return response.data;
   }
 
-  static async getCompteTva(numeroJournal: number | string, codeTaxe: string | number, codePays?: string): Promise<CompteGenerealSearch> {
-    let response = await this.achatVenteAxios.get<CompteGenerealSearch>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetCompteTVA?numeroJournal=${numeroJournal}&codePays=${codePays}&codeTaxeCompteTiers=${codeTaxe}`);
+  static async getCompteTva(numeroJournal: number | string, codeTaxe: string | number, codePays?: string): Promise<CompteGeneralSearch> {
+    let response = await this.achatVenteAxios.get<CompteGeneralSearch>(`${process.env.VUE_APP_ApiAcQuaCore}/AchatVente/GetCompteTVA?numeroJournal=${numeroJournal}&codePays=${codePays}&codeTaxeCompteTiers=${codeTaxe}`);
     return response.data;
   }
 

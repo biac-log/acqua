@@ -1,6 +1,5 @@
 import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { UserModule } from "@/store/modules/user";
-import { CaseTva, CaseTvaDTO } from '@/models/AchatVente';
 import { DateTime } from '@/models/DateTime';
 import { Devise, DeviseDTO } from "@/models/Devise/Devise";
 

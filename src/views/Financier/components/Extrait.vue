@@ -163,11 +163,11 @@ import {
   Prop,
   Watch
 } from "vue-property-decorator";
-import { Devise, Extrait, Ventilation } from "@/models/Financier";
+import { Devise, Extrait, Ventilation, Journal } from "@/models/Financier";
 import { FinancierApi } from "@/api/FinancierApi";
 import { CompteApi } from "@/api/CompteApi";
 import axios, { AxiosError } from "axios";
-import CompteGenerealSearch from "@/models/Compte/CompteGeneralSearch";
+import CompteGeneralSearch from "@/models/Compte/CompteGeneralSearch";
 import { TypeCompte } from "@/models/AchatVente";
 import VentilationVue from "./Ventilation.vue";
 import { Reglement } from '@/models/Financier/Get/Reglement';
@@ -185,7 +185,7 @@ export default class extends Vue {
   private isValid: boolean = true;
   private resolve!: any;
   private reject!: any;
-  private numeroJournal: number = 0;
+  private journal!: Journal;
 
   private typeCompte: string = "";
   private compteLoading: boolean = false;
@@ -218,9 +218,10 @@ export default class extends Vue {
     this.loadReglements();
   }
 
-  public open(extrait: Extrait): Promise<Extrait> {
+  public open(journal: Journal, extrait: Extrait): Promise<Extrait> {
     this.dialog = true;
     this.isNew = false;
+    this.journal = journal;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
       this.init(extrait);
@@ -231,9 +232,10 @@ export default class extends Vue {
       this.reject = reject;
     });
   }
-  public openNew(): Promise<Extrait> {
+  public openNew(journal: Journal): Promise<Extrait> {
     this.dialog = true;
     this.isNew = true;
+    this.journal = journal;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
       //this.init(contrepartie || new PieceComptableContrepartie(), numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
@@ -247,7 +249,7 @@ export default class extends Vue {
 
   private editVentilation(ventilation: Ventilation) {
     let devise = new Devise({id: ventilation.codeDevise, libelle: ventilation.libelleDevise, typeDevise: "D"});
-    (this.$refs.refVentilationVue as VentilationVue).open(ventilation, this.numeroJournal, devise)
+    (this.$refs.refVentilationVue as VentilationVue).open(ventilation, this.journal.numero, devise)
     .then(() => {
 
     }).catch(() => {

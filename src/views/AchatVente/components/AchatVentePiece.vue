@@ -73,7 +73,7 @@
                     hide-no-data
                   >
                     <template v-slot:append>
-                      <v-btn icon small :disabled="piecereadonly || saveLoading" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
+                      <v-btn icon small v-show="!piecereadonly" :disabled="piecereadonly || saveLoading" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
                         <v-icon>mdi-magnify</v-icon>
                       </v-btn>
                     </template>
@@ -406,7 +406,7 @@ import { AchatVenteApi } from "@/api/AchatVenteApi";
 import GridContreparties from "./GridContreparties.vue";
 import GridContrepartiesVue from './GridContreparties.vue';
 import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
-import CompteGenerealSearch from '../../../models/Compte/CompteGeneralSearch';
+import CompteGeneralSearch from '../../../models/Compte/CompteGeneralSearch';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import * as DateMethods from '@/utils/DateMethods'
 import { DateTime } from '../../../models/DateTime';

@@ -5,8 +5,8 @@
     width="2000"
     eager
     @keydown.f2="ModifierPiece"
-    @keydown.del.prevent.stop="DeletePiece"
-    @keydown.plus.prevent.stop="CreateExtrait"
+    @keydown.46.prevent.stop="DeletePiece"
+    @keydown.107.prevent.stop="CreateExtrait"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card>
@@ -114,6 +114,7 @@
             <v-col cols="12" x-lg="7" lg="12">
               <ExtraitsVue
                 ref="gridExtraits"
+                :Journal.sync="journal"
                 :Extraits.sync="extraits"
                 :IsReadOnly.sync="readonly"
               ></ExtraitsVue>

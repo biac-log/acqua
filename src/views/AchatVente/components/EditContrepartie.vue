@@ -51,7 +51,7 @@
                   tabindex="2"
                 ></v-select>
               </v-col>
-              <v-col cols="2">
+              <v-col cols="3">
                 <v-combobox
                   ref="numeroCompte"
                   label="N° compte"
@@ -76,6 +76,7 @@
                     <v-btn
                       icon
                       small
+                      v-show="!readonly"
                       :disabled="readonly"
                       @click="OpenSearchCompte()"
                       @keydown.enter.prevent.stop="OpenSearchCompte()"
@@ -95,7 +96,7 @@
               <SearchCompteContrepartieVue
                 ref="compteDialog"
               ></SearchCompteContrepartieVue>
-              <v-col cols="4">
+              <v-col cols="3">
                 <v-text-field
                   label="Nom compte"
                   v-model="nomCompte"
@@ -300,19 +301,20 @@ import {
   PieceComptableContrepartie,
   TypeCompte,
   TypeMouvement,
-  getTypesMouvements,
-  CaseTva
+  getTypesMouvements
 } from "@/models/AchatVente";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import { CompteApi } from "@/api/CompteApi";
 import SearchCompteContrepartieVue from "./SearchCompteContrepartie.vue";
 import SearchCaseTvaVue from "@/components/search/SearchCaseTva.vue";
 import axios, { AxiosError } from "axios";
-import CompteGenerealSearch from "../../../models/Compte/CompteGeneralSearch";
+import CompteGeneralSearch from "../../../models/Compte/CompteGeneralSearch";
 import { Devise } from "@/models/Devise/Devise";
 import CompteSearch from "@/models/Compte/CompteSearch";
 import { CompteBanque } from "../../../models/Financier";
 import GridContrepartiesVue from './GridContreparties.vue';
+import { CaseTvaApi } from '../../../api/CaseTvaApi';
+import { CaseTva } from "@/models/CaseTva";
 
 @Component({
   name: "EditContrepartie",
@@ -565,15 +567,15 @@ export default class extends Vue {
       this.compteLoading = false;
     }
   }
-  private numeroCompteChange(value: string | CompteGenerealSearch) {
+  private numeroCompteChange(value: string | CompteGeneralSearch) {
     if (typeof value === "string") this.numeroCompte = value;
-    else if (value instanceof CompteGenerealSearch) {
+    else if (value instanceof CompteGeneralSearch) {
       this.numeroCompte = value.numero.toString();
       this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
     } else this.numeroCompte = "";
     this.loadCompte();
   }
-  private setCompte(compte: CompteGenerealSearch) {
+  private setCompte(compte: CompteGeneralSearch) {
     if (compte) {
       let compteToSelect = { numero: compte.numero, numeroNom: compte.nom };
       this.comptesSearch = [];
@@ -584,7 +586,7 @@ export default class extends Vue {
     this.numeroCompte = compte.numero.toString();
     this.nomCompte = compte.nom;
     if (compte.numeroCase) {
-      AchatVenteApi.getCaseTVA(compte.numeroCase, this.numeroJournal).then(
+      CaseTvaApi.getCaseTVA(compte.numeroCase, this.numeroJournal).then(
         resp => {
           if (resp) {
             this.caseTva = resp;
@@ -633,7 +635,7 @@ export default class extends Vue {
     if (this.numeroCaseTva) {
       this.tvaLoading = true;
       this.errorMessage = "";
-      AchatVenteApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
+      CaseTvaApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
         .then(caseTva => {
           this.numeroCaseTva = caseTva.numeroCase.toString();
           this.caseTva = caseTva;

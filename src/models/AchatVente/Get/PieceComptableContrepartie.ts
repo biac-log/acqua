@@ -1,4 +1,4 @@
-import { CaseTva } from './CaseTva';
+import { CaseTva } from '@/models/CaseTva';
 import { Devise } from '@/models/Financier';
 
 export interface IPieceComptableContrepartie {

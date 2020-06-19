@@ -51,4 +51,8 @@ export class CompteDeTier extends CompteDeTierDTO {
   get libelleSoldeCompteTiers(): string{
     return `${this.soldeComptable.toDecimalString(2)} ${this.libelleDevise}`;
   }
+
+  get numeroNom(): string{
+    return `${this.numero ? this.numero : ""} ${this.nom}`.trim();
+  }
 }

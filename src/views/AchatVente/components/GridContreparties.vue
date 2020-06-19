@@ -48,6 +48,7 @@ import EditContrepartieVue from "./EditContrepartie.vue";
 import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
 import { CompteApi } from '@/api/CompteApi';
 import { Devise } from '@/models/Devise/Devise';
+import { CaseTvaApi } from "@/api/CaseTvaApi";
 
 @Component({
   name: "GridContreparties",
@@ -136,7 +137,7 @@ export default class extends Vue {
     else if(this.contreparties.length == 0)
     {
       let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
-      let tva = await AchatVenteApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
+      let tva = await CaseTvaApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
       let contrepartie = new PieceComptableContrepartie();
       contrepartie.numeroCompte = compteAchatVente.numero;
       contrepartie.compteLibelle = compteAchatVente.nom;
@@ -165,7 +166,7 @@ export default class extends Vue {
     if(!tvaImpute) tvaImpute = this.getTvaImpute();
     let codepays = this.contreparties.find(ctr => ['BX', 'VX', 'FX', 'IX'].indexOf(ctr.caseTva.natureCase))?.caseTva.codePays;
     let compteTva = await AchatVenteApi.getCompteTva(this.journal.numero, this.codeTaxe, codepays);
-    let tva = await AchatVenteApi.getCaseTVA(compteTva.numeroCase, this.journal.numero);
+    let tva = await CaseTvaApi.getCaseTVA(compteTva.numeroCase, this.journal.numero);
     let contrepartie = new PieceComptableContrepartie();
     contrepartie.numeroCompte = compteTva.numero;
     contrepartie.compteLibelle = compteTva.nom;
