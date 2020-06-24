@@ -25,6 +25,7 @@
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
+                @change="typeCompteChange"
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -84,10 +85,10 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col cols="6">
               <v-text-field
                 ref="libelle"
-                label="Libelle"
+                label="Libellé"
                 v-model="libelle"
                 counter
                 maxlength="23"
@@ -95,6 +96,30 @@
                 :readonly="readonly"
                 :rules="libelleRules"
                 :hide-details="readonly"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="2">
+              <v-text-field
+                ref="reference"
+                label="Réf.Journal"
+                v-model="referenceJournal"
+                :filled="readonly"
+                :readonly="readonly"
+                :disabled="typesComptesSelected.id == 'G'"
+                :rules="referenceRules"
+                :hide-details="readonly"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                ref="reference"
+                label="Réf.Pièce"
+                v-model="referencePiece"
+                :filled="readonly"
+                :readonly="readonly"
+                :rules="referenceRules"
+                :hide-details="readonly"
+                :disabled="typesComptesSelected.id == 'G'"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -123,6 +148,7 @@
                 :rules="numeroCaseTvaRules"
                 :hide-details="readonly"
                 :loading="tvaLoading"
+                :disabled="typesComptesSelected.id != 'G'"
                 @keypress.enter="loadCaseTva"
                 @change="loadCaseTva"
               >
@@ -139,6 +165,7 @@
                 v-model="caseTva.libelleCase"
                 :filled="readonly"
                 :hide-details="readonly"
+                :disabled="typesComptesSelected.id != 'G'"
                 tabindex="-1"
                 readonly
               ></v-text-field>
@@ -279,8 +306,11 @@ export default class extends Vue {
   private tauxCase: number = 0;
   private tvaLoading = false;
 
-  private reference: string = "";
-  private referenceRules: any = [(v: string) => !!v || "Référence obligatoire"];
+  private referenceJournal: string = "";
+  private referenceJournalRules: any = [(v: string) => !!v || "Référence obligatoire"];
+
+  private referencePiece: string = "";
+  private referencePieceRules: any = [(v: string) => !!v || "Référence obligatoire"];
 
   private tvaCalcule : number = 0;
   private tvaImpute : number = 0;
@@ -353,6 +383,8 @@ export default class extends Vue {
       this.numeroCompteSelected = compteToSelect;
     }
 
+    this.referenceJournal = ventilation.referenceJournal ? ventilation.referenceJournal.toString() : "";
+    this.referencePiece = ventilation.referencePiece ? ventilation.referencePiece.toString() : "";
     this.nomCompte = ventilation.nomCompte;
     this.libelle = ventilation.libelle;
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == ventilation.codeMouvement) || this.typesMouvements[0];
@@ -371,6 +403,10 @@ export default class extends Vue {
     // this.ventileDevise = ventileDevise;
     // this.tvaCalcule = tvaCalcule;
     // this.tvaImpute = tvaImpute;
+  }
+  private typeCompteChange(){
+    this.numeroCompte = "";
+    this.nomCompte = "";
   }
 
   private initDevises(

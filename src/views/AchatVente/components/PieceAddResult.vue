@@ -18,7 +18,7 @@
           <h1>Ajout réussi !</h1>
         </v-row>
         <v-row justify="center">
-          <h3>Le numéro de pièce créée est le <b>{{ numero }}</b></h3>
+          <h3>Le numéro de pièce créée est le <b>{{ journal }}.{{ numero }}</b></h3>
         </v-row>
       </v-card-text>
       <v-card-actions class="mt-4 pa-0">

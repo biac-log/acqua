@@ -12,29 +12,6 @@
       >
         <span tabindex="1" @focus="focusLastElement"/>
         <v-card id="editContrepartie">
-          <!-- <v-card-title>
-          <v-col cols="12" v-if="errorMessage">
-            <v-alert dense outlined type="error" class="ma-0">
-              {{ errorMessage }}
-            </v-alert>
-          </v-col>
-          <v-col cols="9">
-            <span>
-              Contrepartie
-            </span>
-          </v-col>
-          <v-col cols="3">
-            <v-btn
-              class="mr-5"
-              color="success"
-              
-              @click="modifier"
-              v-if="readonly"
-            >
-              <v-icon left>mdi-pencil</v-icon>Modifier
-            </v-btn>
-          </v-col>
-        </v-card-title> -->
           <v-card-text class="mb-0 pb-0">
             <v-row dense>
               <v-col cols="2">
@@ -62,6 +39,7 @@
                   @keyup.enter="$event.target.select()"
                   @focus="$event.target.select()"
                   @change="numeroCompteChange"
+                  @keydown.ctrl.f.prevent="OpenSearchCompte()"
                   :hide-details="readonly"
                   :filled="readonly"
                   :readonly="readonly"
@@ -73,17 +51,23 @@
                   tabindex="3"
                 >
                   <template v-slot:append>
-                    <v-btn
-                      icon
-                      small
-                      v-show="!readonly"
-                      :disabled="readonly"
-                      @click="OpenSearchCompte()"
-                      @keydown.enter.prevent.stop="OpenSearchCompte()"
-                      tabindex="4"
-                    >
-                      <v-icon>mdi-magnify</v-icon>
-                    </v-btn>
+                    <v-tooltip top open-delay="500" open-on-hover>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          icon
+                          small
+                          v-show="!readonly"
+                          :disabled="readonly"
+                          @click="OpenSearchCompte()"
+                          @keydown.enter.prevent.stop="OpenSearchCompte()"
+                          v-on="on"
+                          tabindex="-1"
+                        >
+                          <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
+                    </v-tooltip>
                   </template>
                   <template v-slot:selection="{ attr, on, item }">
                     {{ item.numero }}
@@ -150,19 +134,26 @@
                   :loading="tvaLoading"
                   @keypress.enter="loadCaseTva"
                   @change="loadCaseTva"
+                  @keydown.ctrl.f.prevent="OpenSearchCaseTva()"
                   tabindex="6"
                 >
                   <template v-slot:append>
-                    <v-btn
-                      icon
-                      small
-                      :disabled="readonly"
-                      @click="OpenSearchCaseTva()"
-                      @keydown.enter.prevent.stop="OpenSearchCaseTva()"
-                      tabindex="7"
-                    >
-                      <v-icon>mdi-magnify</v-icon>
-                    </v-btn>
+                    <v-tooltip top open-delay="500" open-on-hover>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          icon
+                          small
+                          :disabled="readonly"
+                          @click="OpenSearchCaseTva()"
+                          v-on="on"
+                          @keydown.enter.prevent.stop="OpenSearchCaseTva()"
+                          tabindex="-1"
+                        >
+                          <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Rechercher une case TVA <span class="shortcutTooltip">CTRL+F</span></span>
+                    </v-tooltip>
                   </template>
                 </v-text-field>
               </v-col>
@@ -454,7 +445,7 @@ export default class extends Vue {
       this.typesComptes[0];
     this.devisesSelected =
       this.devises.find(d => d.id == contrepartie.codeDevise) ||
-      this.devises[0];
+      deviseEntete;
 
     if (contrepartie) {
       let compteToSelect = {
@@ -510,10 +501,7 @@ export default class extends Vue {
             typeDevise: this.devisesSelected.typeDevise
           })
         );
-        this.devisesSelected =
-          this.devises.find(d => d.id == contrepartie.codeDevise) ||
-          this.devises[0];
-      } else this.devisesSelected = this.devises[0];
+      }
     }
   }
 
@@ -571,7 +559,8 @@ export default class extends Vue {
     if (typeof value === "string") this.numeroCompte = value;
     else if (value instanceof CompteGeneralSearch) {
       this.numeroCompte = value.numero.toString();
-      this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
+      this.$nextTick(() => (this.$refs.numeroCompte as any)?.blur());
+      this.$nextTick(() => (this.$refs.libelle as any)?.focus());
     } else this.numeroCompte = "";
     this.loadCompte();
   }

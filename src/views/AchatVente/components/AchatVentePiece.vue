@@ -64,6 +64,7 @@
                     @keyup.enter="$event.target.select()"
                     @focus="$event.target.select()"
                     @change="numeroCompteTierChange"
+                    @keydown.ctrl.f.prevent="OpenSearchCompte()"
                     :hide-details="piecereadonly"
                     :filled="piecereadonly"
                     :readonly="piecereadonly"
@@ -73,9 +74,14 @@
                     hide-no-data
                   >
                     <template v-slot:append>
-                      <v-btn icon small v-show="!piecereadonly" :disabled="piecereadonly || saveLoading" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()">
-                        <v-icon>mdi-magnify</v-icon>
-                      </v-btn>
+                      <v-tooltip top open-delay="500" open-on-hover>
+                        <template v-slot:activator="{ on }">
+                            <v-btn icon small v-show="!piecereadonly" v-on="on" :disabled="piecereadonly || saveLoading" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()" tabindex="-1">
+                              <v-icon>mdi-magnify</v-icon>
+                            </v-btn>
+                        </template>
+                        <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
+                      </v-tooltip>
                     </template>
                     <template v-slot:selection="{ attr, on, item }">
                       {{ item.numero }}
@@ -705,6 +711,7 @@ export default class extends Vue {
     else if(value instanceof CompteSearch)
     {
       this.numeroCompteTier = value.numero.toString();
+      this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.blur());
       this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
     }
     else this.numeroCompteTier = "";
@@ -861,7 +868,7 @@ export default class extends Vue {
 
     if(this.taux.isDecimal(true) && this.montantDevise.isDecimal(true)){
       this.montantBase = (this.montantDevise.toNumber() * this.taux.toNumber()).toDecimalString(2);
-      this.libelleMontantBase = `${this.montantBase} ${this.deviseSelected?.libelle}`;
+      this.libelleMontantBase = `${this.montantBase} EUR`;
     }
     else{
       this.montantBase = "";
