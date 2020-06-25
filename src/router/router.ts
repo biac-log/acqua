@@ -83,6 +83,44 @@ export const asyncRoutes: RouteConfig[] = [
     ]
   },
   {
+    path: "/maintenance",
+    component: Layout,
+    redirect: "maintenance/fournisseurs",
+    meta: { 
+      roles: ["admin", "ACQUAGESTIONUTILISATEUR"], 
+      title: "Maintenance",
+      icon: "mdi-tools",
+    },
+    children: [
+      {
+        path: "fournisseurs",
+        component: () =>
+          import(
+            /* webpackChunkName: "achatvente" */ "@/views/Maintenance/Fournisseurs/Fournisseurs.vue"
+          ),
+        name: "Fournisseurs",
+        meta: {
+          title: "Fournisseurs",
+          icon: "mdi-truck",
+          affix: true
+        }
+      },
+      {
+        path: "clients",
+        component: () =>
+          import(
+            /* webpackChunkName: "achatvente" */ "@/views/Maintenance/Fournisseurs/Fournisseurs.vue"
+          ),
+        name: "Clients",
+        meta: {
+          title: "Clients",
+          icon: "mdi-account-supervisor-circle",
+          affix: true
+        }
+      }
+    ]
+  },
+  {
     path: "/utilisateurs",
     component: Layout,
     redirect: "utilisateurs/index",
