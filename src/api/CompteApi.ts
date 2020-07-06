@@ -16,7 +16,7 @@ export abstract class CompteApi {
       CompteSearchDTO => new CompteSearch(CompteSearchDTO)
     );
   }
-
+  
   static async getCompteDeTier(
     type: string,
     numero: string
