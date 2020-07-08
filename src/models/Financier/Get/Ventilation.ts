@@ -1,3 +1,5 @@
+import { CaseTva } from '@/models/CaseTva';
+
 export class VentilationDTO{
   numeroVentilation = 0;
   typeCompte = "";
@@ -13,12 +15,14 @@ export class VentilationDTO{
   libelleDevise = "";
   codeCaseTVA = 0;
   libelleCaseTVA = "";
+  caseTva = new CaseTva();
 }
 
 export class Ventilation extends VentilationDTO {
   constructor(dto?: VentilationDTO){
     super();
     Object.assign(this, dto || new VentilationDTO());
+    this.caseTva = new CaseTva(dto?.caseTva);
   }
 
   get montantDebit(): string{

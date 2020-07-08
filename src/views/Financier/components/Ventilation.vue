@@ -392,12 +392,8 @@ export default class extends Vue {
     this.numeroCaseTva = ventilation.codeCaseTVA ? ventilation.codeCaseTVA.toString() : "";
     this.libelleCaseTva = ventilation.libelleCaseTVA;
     
-    if(this.numeroCaseTva){
-      let caseTva = new CaseTva();
-      caseTva.libelleCase = ventilation.libelleCaseTVA;
-      caseTva.numeroCase = ventilation.codeCaseTVA;
-      //TODO Remplacer par l'objet dans ventilation
-      this.caseTva.Refresh(caseTva);
+    if(this.caseTva){
+      this.caseTva.Refresh(ventilation.caseTva);
     }
 
     // this.ventileDevise = ventileDevise;
