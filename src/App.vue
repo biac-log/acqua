@@ -33,4 +33,8 @@ export default class App extends Vue {
     border-style: dotted;
     border-width: 2.5px;
 }
+
+.theme--light.v-select .v-select__selection--disabled {
+    color: rgba(0, 0, 0, 0.87);
+}
 </style>
