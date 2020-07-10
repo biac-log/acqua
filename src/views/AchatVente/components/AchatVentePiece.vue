@@ -836,13 +836,15 @@ export default class extends Vue {
     if(!numeroDevise || numeroDevise == 1)
       this.taux = "1";
     else if(this.datePiece.isValid() && numeroDevise) {
-      DeviseApi.getTaux(numeroDevise, datePiece)
-      .then((resp) => {
-        this.taux = resp.toDecimalString(2);
-      }).catch((err) => {
-        this.errorMessage = displayAxiosError(err);
-      });
+      this.taux = "0.89";
+      // DeviseApi.getTaux(numeroDevise, datePiece)
+      // .then((resp) => {
+      //   this.taux = resp.toDecimalString(2);
+      // }).catch((err) => {
+      //   this.errorMessage = displayAxiosError(err);
+      // });
     }
+    this.recalculmontantBase();
   }
 
   @Watch("montantDevise")
@@ -854,12 +856,8 @@ export default class extends Vue {
   @Watch("deviseSelected")
   private deviseSelectedChanged(val: Devise, oldVal: Devise){
     if(!this.piecereadonly && val && this.datePiece.isValid()){
-      DeviseApi.getTaux(this.deviseSelected.id, this.datePiece)
-      .then((resp) => {
-        this.taux = resp.toDecimalString(2);
-      }).catch((err) => {
-        this.errorMessage = displayAxiosError(err);
-      });
+      this.initTauxDevise(this.deviseSelected.id, this.datePiece);
+
     }
   }
 

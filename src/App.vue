@@ -35,6 +35,7 @@ export default class App extends Vue {
 }
 
 .theme--light.v-select .v-select__selection--disabled {
-    color: rgba(0, 0, 0, 0.87);
+    color: rgba(0, 0, 0, 0.87) !important;
 }
+
 </style>

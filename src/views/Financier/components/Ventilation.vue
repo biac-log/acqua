@@ -100,24 +100,22 @@
             </v-col>
             <v-col cols="2">
               <v-text-field
-                ref="reference"
+                ref="referenceJournal"
                 label="Réf.Journal"
                 v-model="referenceJournal"
                 :filled="readonly"
                 :readonly="readonly"
                 :disabled="typesComptesSelected.id == 'G'"
-                :rules="referenceRules"
                 :hide-details="readonly"
               ></v-text-field>
             </v-col>
             <v-col cols="4">
               <v-text-field
-                ref="reference"
+                ref="referencePiece"
                 label="Réf.Pièce"
                 v-model="referencePiece"
                 :filled="readonly"
                 :readonly="readonly"
-                :rules="referenceRules"
                 :hide-details="readonly"
                 :disabled="typesComptesSelected.id == 'G'"
               ></v-text-field>
@@ -389,8 +387,8 @@ export default class extends Vue {
     this.libelle = ventilation.libelle;
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == ventilation.codeMouvement) || this.typesMouvements[0];
     this.montant = ventilation.montantBase && this.devisesSelected ? ventilation.montantBase.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
-    this.numeroCaseTva = ventilation.codeCaseTVA ? ventilation.codeCaseTVA.toString() : "";
-    this.libelleCaseTva = ventilation.libelleCaseTVA;
+    this.numeroCaseTva = ventilation.caseTva?.numeroCase ? ventilation.caseTva?.numeroCase.toString() : "";
+    this.libelleCaseTva = ventilation.caseTva?.libelleCase ? ventilation.libelleCaseTVA : "" ;
     
     if(this.caseTva){
       this.caseTva.Refresh(ventilation.caseTva);
@@ -519,6 +517,7 @@ export default class extends Vue {
         {
           this.caseTva = resp;
           this.numeroCaseTva = compte.numeroCase.toString();
+          this.libelleCaseTva = this.caseTva.libelleCase;
         }
         else this.caseTva = new CaseTva();
         this.calculMontant();
@@ -585,11 +584,13 @@ export default class extends Vue {
       CaseTvaApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
         .then(caseTva => {
           this.numeroCaseTva = caseTva.numeroCase.toString();
+          this.libelleCaseTva = caseTva.libelleCase.toString();
           this.caseTva = caseTva;
           this.calculMontant();
         })
         .catch((err: AxiosError) => {
           this.numeroCaseTva = "";
+          this.libelleCaseTva = "";
           this.caseTva = new CaseTva();
           if (err.request.status != 505)
             this.errorMessage = err.request.response;

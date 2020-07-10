@@ -150,17 +150,19 @@ export default class extends Vue {
     }
     else if(this.ventilleDevise == 0 && this.ventilleBase != 0)
     {
-      let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
-      let tva = await CaseTvaApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
       let contrepartie = new PieceComptableContrepartie();
-      contrepartie.numeroCompte = compteAchatVente.numero;
-      contrepartie.compteLibelle = compteAchatVente.nom;
       contrepartie.libelle = this.nomCompteDeTier;
       contrepartie.codeMouvement = this.journal.codeMouvement == "DB" ? "DB" : "CR";
       contrepartie.montantDevise = 0;
       contrepartie.montantBase = this.ventilleBase;
       contrepartie.codeDevise = 1;
-      contrepartie.caseTva = tva;
+      if(+this.numeroCompteAchatVente){
+        let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
+        let tva = await CaseTvaApi.getCaseTVA(compteAchatVente?.numeroCase, this.journal.numero);
+        contrepartie.numeroCompte = compteAchatVente.numero;
+        contrepartie.compteLibelle = compteAchatVente.nom;
+        contrepartie.caseTva = tva;
+      } 
       this.addContrepartie(contrepartie);
     }
     else

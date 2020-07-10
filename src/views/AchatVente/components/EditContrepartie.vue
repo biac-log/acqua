@@ -575,6 +575,7 @@ export default class extends Vue {
     this.numeroCompte = compte.numero.toString();
     this.nomCompte = compte.nom;
     if (compte.numeroCase) {
+      console.log("setCompte");
       CaseTvaApi.getCaseTVA(compte.numeroCase, this.numeroJournal).then(
         resp => {
           if (resp) {
@@ -622,6 +623,7 @@ export default class extends Vue {
     if (this.readonly) return;
 
     if (this.numeroCaseTva) {
+      console.log("loadCaseTva");
       this.tvaLoading = true;
       this.errorMessage = "";
       CaseTvaApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
