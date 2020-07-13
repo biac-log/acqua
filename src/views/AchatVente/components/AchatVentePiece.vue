@@ -668,7 +668,7 @@ export default class extends Vue {
       .then(compte => {
         this.setCompteDeTier(compte);
       }).catch((err) => {
-        this.setCompteDeTier()
+        this.setCompteDeTier();
         this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
       })
       .finally(() => {
@@ -706,15 +706,20 @@ export default class extends Vue {
     }
   }
   private numeroCompteTierChange(value: string | CompteSearch){
-    if(typeof value === "string")
+    
+    if(typeof value === "string"){
       this.numeroCompteTier = value;
+    }
     else if(value instanceof CompteSearch)
     {
       this.numeroCompteTier = value.numero.toString();
       this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.blur());
       this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
     }
-    else this.numeroCompteTier = "";
+    else {
+      this.numeroCompteTier = "";
+      this.compteTiersNom = "";
+    }
     this.loadCompte();
   }
 
@@ -836,13 +841,12 @@ export default class extends Vue {
     if(!numeroDevise || numeroDevise == 1)
       this.taux = "1";
     else if(this.datePiece.isValid() && numeroDevise) {
-      this.taux = "0.89";
-      // DeviseApi.getTaux(numeroDevise, datePiece)
-      // .then((resp) => {
-      //   this.taux = resp.toDecimalString(2);
-      // }).catch((err) => {
-      //   this.errorMessage = displayAxiosError(err);
-      // });
+      DeviseApi.getTaux(numeroDevise, datePiece)
+      .then((resp) => {
+        this.taux = resp.toDecimalString(2);
+      }).catch((err) => {
+        this.errorMessage = displayAxiosError(err);
+      });
     }
     this.recalculmontantBase();
   }
@@ -875,7 +879,8 @@ export default class extends Vue {
   }
 
   private createContrepartie(){
-    (this.$refs.gridContreparties as GridContrepartiesVue).createContrepartie();
+    if(this.compteTiersNom)
+      (this.$refs.gridContreparties as GridContrepartiesVue).createContrepartie();
   }
 
   private saveLoading: boolean = false;
@@ -898,7 +903,7 @@ export default class extends Vue {
         return await (this.$refs.confirmDialog as Confirm).open( "Attention, pièce non équilibrée", `La pièce n'est pas équilibrée, voulez vous sauvegarder ?`, "error", "Sauvegarder");
       } 
       else if((this.$refs.gridContreparties as GridContreparties).errorInTVA()){
-        return await (this.$refs.confirmDialog as Confirm).open( "Attention, problème de tva", `La tva calculée est différente de la tva assignée, voulez-vous continuer ?`, "error", "Sauvegarder");
+        return await (this.$refs.confirmDialog as Confirm).open( "Attention, contrôle de tva", `La tva calculée est différente de la tva assignée, voulez-vous continuer ?`, "error", "Sauvegarder");
       } 
       return true;
     } catch (err) {
