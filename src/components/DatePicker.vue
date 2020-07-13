@@ -68,6 +68,12 @@ export default class extends Vue {
         dateString = `${date}${this.syncedDate.date.format("YYYY")}`;
       else if(date.length === 5)
         dateString = `${date}/${this.syncedDate.date.format("YYYY")}`;
+      else if(date.length === 6){
+        let annee = date.slice(-2).toNumber();
+        if(annee >= 80) annee+= 1900;
+        else annee += 2000;
+        dateString = `${date.substring(0,4)}${annee}`
+      }
       const dateToSelect = new DateTime(dateString);
       if(dateToSelect.toString("YYYY-MM-DD") == this.dateSelected)
         this.$nextTick(() => this.dateFormatted = dateToSelect.toString());
