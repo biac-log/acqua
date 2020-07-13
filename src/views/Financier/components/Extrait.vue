@@ -20,45 +20,27 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="3">
+            <v-col cols="5">
               <v-text-field
-                v-model="typeCompte"
-                label="Type compte"
-                filled
+                v-model="libelleCompte"
+                label="Compte"
+                :filled="readonly"
                 readonly
                 tabindex="-1"
-              ></v-text-field>
+              >
+              </v-text-field>
             </v-col>
-            <v-col cols="3">
-              <v-text-field
-                label="N° compte"
-                v-model="numeroCompte"
-                tabindex="-1"
-                filled
-                readonly
-              ></v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field
-                label="Nom compte"
-                v-model="nomCompte"
-                tabindex="-1"
-                filled
-                readonly
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
             <v-col cols="3">
               <v-text-field
                 label="Montant"
                 v-model="montant"
                 :filled="readonly"
                 :readonly="readonly"
+                @blur="montant = montant.toNumber().toDecimalString()"
                 autofocus
               ></v-text-field>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="4">
               <v-select
                 :items="reglements"
                 v-model="reglementSelected"
@@ -71,14 +53,14 @@
                 :rules="reglementsRules"
               ></v-select>
             </v-col>
-            <v-col cols="6">
+            <!-- <v-col cols="2">
               <v-text-field
                 label="Différence change"
                 v-model="differenceChange"
                 :filled="readonly"
                 :readonly="readonly"
               ></v-text-field>
-            </v-col>
+            </v-col> -->
           </v-row>
           <v-row>
             <v-card class="ma-5">
@@ -191,6 +173,7 @@ export default class extends Vue {
   private compteLoading: boolean = false;
   private numeroCompte: string = "";
   private nomCompte: string = "";
+  private libelleCompte = "";
 
   private reglementsLoading = false;
   private reglements: Reglement[] = [];
@@ -199,15 +182,15 @@ export default class extends Vue {
 
   private montant = "";
   private reglement = "";
-  private differenceChange = "";
+  // private differenceChange = "";
 
   private ventilations: Ventilation[] = [];
   private headersVentilation = [
-    { text: "Ven", value: "", width: 50 },
+    // { text: "Ven", value: "", width: 50 },
     { text: "Compte", value: "libelleCompte", width: 300 },
     { text: "Intitulé", value: "nomCompte", width: 300 },
-    { text: "Pièce", value: "", width: 100 },
-    { text: "Libellé d'écriture", value: "", width: 300 },
+    { text: "Pièce", value: "libellePiece", width: 100 },
+    { text: "Libellé d'écriture", value: "libelle", width: 300 },
     { text: "Débit", value: "montantDebit", width: 100 },
     { text: "Crédit", value: "montantCredit", width: 100 },
     { text: "", value: "libelleDevise", width: 80 },
@@ -219,12 +202,13 @@ export default class extends Vue {
   }
 
   public open(journal: Journal, extrait: Extrait): Promise<Extrait> {
+    this.reset();
     this.dialog = true;
     this.isNew = false;
-    this.journal = journal;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.init(extrait);
+      this.initJournal(journal);
+      this.initExtrait(extrait);
     });
 
     return new Promise((resolve, reject) => {
@@ -233,12 +217,12 @@ export default class extends Vue {
     });
   }
   public openNew(journal: Journal): Promise<Extrait> {
+    this.reset();
     this.dialog = true;
     this.isNew = true;
-    this.journal = journal;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      //this.init(contrepartie || new PieceComptableContrepartie(), numeroJournal, deviseEntete, ventileDevise, tvaCalcule, tvaImpute);
+      this.initJournal(journal);
     });
 
     return new Promise((resolve, reject) => {
@@ -256,8 +240,12 @@ export default class extends Vue {
 
     });
   }
+  private initJournal(journal: Journal){
+    this.journal = journal;
+    this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`;
+  }
 
-  private init(extrait: Extrait) {
+  private initExtrait(extrait: Extrait) {
     this.typeCompte = extrait.typeCompte;
     this.numeroCompte = extrait.numeroCompte.toString();
     this.nomCompte = extrait.nomCompte;
@@ -286,6 +274,12 @@ export default class extends Vue {
     }finally{
       this.reglementsLoading = false;
     }
+  }
+
+  private reset(){
+    this.ventilations = [];
+    this.libelleCompte = "";
+    this.montant = "";
   }
 
   private initDevises(deviseEntete: Devise, extrait?: Extrait) {

@@ -25,6 +25,14 @@ export class Ventilation extends VentilationDTO {
     this.caseTva = new CaseTva(dto?.caseTva);
   }
 
+  get libelleCompte(): string{
+    return `${this.typeCompte} ${this.numeroCompte} ${this.nomCompte}`;
+  }
+
+  get libellePiece(): string{
+    return this.referencePiece ? `${this.referenceJournal}.${this.referencePiece}` : "";
+  }
+
   get montantDebit(): string{
     return this.codeMouvement == "DB" ? this.montantDevise.toDecimalString(2) : "";
   }

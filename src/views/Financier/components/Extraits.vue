@@ -96,23 +96,24 @@ export default class extends Vue {
     { text: "Libellé d'écriture", value: "", width:200 },
     { text: "Débit", value: "montantDebit", width:100  },
     { text: "Crédit", value: "montantCredit", width:100  },
-    { text: "", value: "libelleDevise", width:80  },
+    { text: "Devise", value: "libelleDevise", width:80  },
     { text: "TVA", value: "tva", width:50  },
   ];
 
-  private createExtrait(extrait?: Extrait) {
-    (this.$refs.refExtraitVue as ExtraitVue).openNew(this.journal);
-      // .then((resp: PieceComptableContrepartie) => {
-      //   const maxLigne = Math.max(...this.contreparties.map(i => i.numeroLigne))
-      //   resp.numeroLigne = maxLigne + 1;
-      //   this.contreparties.push(resp);
-      // }).finally(() => {
-      //   this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-      // });
+  public createExtrait(extrait?: Extrait) {
+    (this.$refs.refExtraitVue as ExtraitVue).openNew(this.journal)
+    // .then((resp: PieceComptableContrepartie) => {
+    //   const maxLigne = Math.max(...this.contreparties.map(i => i.numeroLigne))
+    //   resp.numeroLigne = maxLigne + 1;
+    //   this.contreparties.push(resp);
+    // })
+    .finally(() => {
+      this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+    });
   }
 
-  private editExtrait(piece: Extrait) {
-    (this.$refs.refExtraitVue as ExtraitVue).open(this.journal, piece);
+  private editExtrait(extrait: Extrait) {
+    (this.$refs.refExtraitVue as ExtraitVue).open(this.journal, extrait);
     // (this.$refs.editContrepartie as EditContrepartieVue)
     //   .open(piece, this.journal.numero, this.devise, this.getVentileDevise(piece), this.getTvaCalcule(piece), this.getTvaImpute(piece))
     //   .then((resp: PieceComptableContrepartie) => {

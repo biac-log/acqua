@@ -34,13 +34,13 @@ export class Extrait extends ExtraitDTO {
   }
 
   get montantBaseSigned(): string {
-    return this.codeMouvement == "DB"
+    return this.codeMouvement == "CR"
       ? (this.montantBase * -1).toDecimalString(2)
       : this.montantBase.toDecimalString(2);
   }
 
   get montantDeviseSigned(): string {
-    return this.codeMouvement != "DB"
+    return this.codeMouvement != "CR"
       ? (this.montantDevise * -1).toDecimalString(2)
       : this.montantDevise.toDecimalString(2);
   }
