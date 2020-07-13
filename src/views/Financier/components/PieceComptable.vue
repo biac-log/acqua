@@ -49,28 +49,34 @@
           <v-row fill-height>
             <v-col cols="12" x-lg="5" lg="12">
               <v-row dense>
-                <v-col cols="1">
+                <v-col cols="4">
                   <v-text-field
-                    label="Numéro compte"
-                    ref="numeroCompte"
-                    v-model="numeroCompte"
+                    v-model="libelleCompte"
+                    label="Compte"
                     filled
                     readonly
                     tabindex="-1"
                   >
                   </v-text-field>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="3">
                   <v-text-field
-                    label="Nom compte"
-                    :value="nomCompte"
-                    filled
-                    tabindex="-1"
+                    label="Solde initial"
+                    v-model="soldeInitial"
+                    :rules="numberRules"
+                     filled
                     readonly
                   ></v-text-field>
                 </v-col>
-              </v-row>
-              <v-row dense>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Solde actuel"
+                    v-model="soldeActuel"
+                    :rules="numberRules"
+                    filled
+                    readonly
+                  ></v-text-field>
+                </v-col>
                 <v-col cols="2">
                   <DatePicker
                     ref="refDatePiece"
@@ -82,33 +88,6 @@
                     :rules.sync="datePieceRules"
                   ></DatePicker>
                 </v-col>
-                <v-col cols="2">
-                  <v-text-field
-                    label="Solde initial"
-                    v-model="soldeInitial"
-                    :rules="numberRules"
-                     filled
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="2">
-                  <v-text-field
-                    label="Solde actuel"
-                    v-model="soldeActuel"
-                    :rules="numberRules"
-                    filled
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="2">
-                  <v-text-field
-                    label="A Ventille"
-                    v-model="soldeActuel"
-                    :rules="numberRules"
-                    filled
-                    readonly
-                  ></v-text-field>
-                </v-col>
               </v-row>
             </v-col>
             <v-col cols="12" x-lg="7" lg="12">
@@ -118,7 +97,6 @@
                 :Extraits.sync="extraits"
                 :IsReadOnly.sync="readonly"
               ></ExtraitsVue>
-              <!-- <SearchCompteTier ref="compteDialog"></SearchCompteTier> -->
             </v-col>
           </v-row>
         </v-card-text>
@@ -198,6 +176,7 @@ import { DateTime } from '@/models/DateTime';
 import DatePicker from '@/components/DatePicker.vue';
 import ExtraitsVue from "./Extraits.vue";
 import { DeviseApi } from "@/api/DeviseApi";
+import { FinancierApi } from '../../../api/FinancierApi';
 
 @Component({
   name: "PieceComptableVue",
@@ -214,15 +193,8 @@ export default class extends Vue {
 
   private periode = new PeriodeComptable();
   private journal = new Journal();
-
   private numeroPiece = "";
-
-  private numeroCompte: string = "";
-  private nomCompte: string = "";
-
-  private devises: Devise[] = [];
-  private deviseSelected: Devise = new Devise();
-  private devisesIsLoading = false;
+  private libelleCompte = "";
 
   private datePiece: DateTime = new DateTime();
   private datePieceRules: any = [(v: string) => !!v || "Date obligatoire",
@@ -240,14 +212,14 @@ export default class extends Vue {
   }
 
   private hash = "";
-  public OpenNew(periode: PeriodeComptable, journal: Journal) : Promise<EntetePieceComptable>{
+  public async OpenNew(periode: PeriodeComptable, journal: Journal) : Promise<EntetePieceComptable>{
     this.dialog = true;
     this.readonly = false;
     this.periode = periode;
     this.journal = journal;
-    this.numeroCompte = journal.compteBanque.numero.toString();
-    this.nomCompte = journal.compteBanque.nom;
-    this.loadDataForEdit();
+    this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`; 
+    let solde = await FinancierApi.getSoldeCompte(journal.numeroCompteBanque);
+    this.soldeInitial = solde.toDecimalString();
 
     let today = DateTime.today();
     if(today.isBefore(this.periode.dateDebut))
@@ -278,63 +250,22 @@ export default class extends Vue {
 
   private init(piece: Piece){
     this.numeroPiece = piece.numeroPiece.toString();
-    this.numeroCompte = piece.numeroCompteFinancier.toString();
+    this.libelleCompte = `${piece.numeroCompteFinancier.toString()} ${piece.nomCompteFinancier}`; 
     this.datePiece = new DateTime(piece.datePiece);
-    this.nomCompte = piece.nomCompteFinancier;
-    this.deviseSelected = piece ? this.getDeviseToSelect(new Devise({id: piece.codeDeviseJournal, libelle: piece.libelleDeviseJournal, typeDevise: "D"})) : this.devises[0];
     this.soldeInitial = piece.soldeInitial.toDecimalString(2);
     this.extraits = piece.extraits;
     this.hash = piece.hash;
   }
 
-  private async loadDataForEdit(){
-    try {
-      this.devisesIsLoading = true;
-      if(this.devises.length <= 1){
-        this.devises = await DeviseApi.getAllDevises();
-      }
-    } catch (err) {
-      this.errorMessage = "Erreur lors du chargement des devises.";
-    }finally{
-      this.devisesIsLoading = false;
-    }
-  }
-
-  private getDeviseToSelect(deviseSelected: Devise): Devise{
-    let deviseToSelect = this.devises.find(d => d.id == deviseSelected.id);
-    if(!deviseToSelect){
-      this.devises.push(deviseSelected);
-      return deviseSelected;
-    }
-    else return deviseToSelect;
-  }
-
-  private OpenSearchCompte(): void {
-    // if(this.piecereadonly) return;
-
-    // (this.$refs.compteDialog as SearchCompteTier)
-    //   .open(this.typeCompte)
-    //   .then(compte => {
-    //     this.numeroCompteTier = compte.numero.toString();
-    //     this.loadCompte();
-    //     this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
-    //   }).catch(() => {
-    //     this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
-    //   });
-  }
-  private async setCompte(compte?: CompteBanque) {
-    this.numeroCompte = compte ? compte.numero.toString() : "";
-    this.nomCompte = compte ?  compte.nom : "";
-    // this.deviseSelected = compte ? this.getDeviseToSelect(new Devise({id: compte.codeDevise, libelle: compte.libelleDevise, typeDevise: "D"})) : this.devises[0];
-    // this.libelleSoldeCompteTiers = compte ? compte.libelleSoldeCompteTiers: "";
-    // this.compteTiersEscomptePourcentage = compte ? compte.escomptePourcentage.toString(): "";
-    // this.compteTiersEscompteNombreJours = compte ? compte.escompteNombreJours.toString(): "";
-    // this.libelleCompteAssocie = compte ? compte.libelleCompteAssocie: "";
-    // this.numeroCompteAchatVente = compte ? compte.compteVenteAchatNumero.toString(): "";
-    // this.libelleCompteVenteAchat = compte ? compte.libelleCompteVenteAchat : "";
-    // this.delaiPaiementLibelle = compte ? compte.delaiPaiementLibelle : "";
-    // this.codeTaxe = compte ? compte.codeTaxe : 0;
-    // this.initDateEcheance(this.numeroCompteTier, this.typeCompte, this.datePiece);
+  private resetForm(){
+    this.errorMessage = "";
+    this.periode = new PeriodeComptable();
+    this.journal = new Journal();
+    this.libelleCompte = "";
+    this.datePiece = new DateTime();
+    this.extraits = [];
+    this.soldeInitial = "";
+    this.soldeActuel = "";
   }
 
   private loadCompte(){
@@ -346,7 +277,7 @@ export default class extends Vue {
   }
 
   private CreateExtrait(){
-
+    (this.$refs.gridExtraits as ExtraitsVue).createExtrait();
   }
 
   private ModifierPiece(){
@@ -355,6 +286,7 @@ export default class extends Vue {
   }
 
   private closeDialog(){
+    this.resetForm();
     this.dialog = false;
     this.reject();
   }

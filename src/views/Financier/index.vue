@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid @keydown.107.prevent="create">
+  <v-container fluid @keydown.107.prevent="createNewPieceComptable">
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
@@ -38,18 +38,6 @@
             >
             </v-select>
           </v-col>
-          <!-- <v-col cols="12" xs="12" md="3" lg="3">
-            <v-btn
-              color="primary"
-              id="btn-acqua"
-              x-large
-              :disabled="!searchIsValid"
-              @click="LoadPiecesComptables"
-            >
-              <v-icon>mdi-magnify</v-icon>
-              Charger
-            </v-btn>
-          </v-col> -->
         </v-row>
       </v-form>
     </v-card>
@@ -63,7 +51,7 @@
           fab
           class="ml-5"
           :disabled="!searchIsValid"
-          @click.stop="openNewPieceComptable"
+          @click.stop="createNewPieceComptable"
         >
           <v-icon>mdi-plus</v-icon>
         </v-btn>
@@ -86,6 +74,9 @@
         @click:row="OpenPieceComptable"
         :server-items-length="totalItems"
       >
+        <template v-slot:item.numeroPiece="{ item }">
+          <span>{{ item.numeroJournal}}.{{ item.numeroPiece }}</span>
+        </template>
         <template v-slot:item.datePieceDate="{ item }">
           <span>{{ item.datePieceDate.toString() }}</span>
         </template>
@@ -239,7 +230,7 @@ export default class extends Vue {
       });
   }
 
-  private openNewPieceComptable() {
+  private createNewPieceComptable() {
     (this.$refs.refDialogPiece as PieceComptableVue)
       .OpenNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {

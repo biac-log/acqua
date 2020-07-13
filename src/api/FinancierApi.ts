@@ -41,4 +41,9 @@ export abstract class FinancierApi {
     let response = await this.axios.get<TypeCompteDTO[]>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetTypesCompteVentilation`);
     return response.data.map(TypeCompteDTO => new TypeCompte(TypeCompteDTO));
   }
+
+  static async getSoldeCompte(numeroCompte: number): Promise<number> {
+    let response = await this.axios.get<number>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetSolde?numeroCompte=${numeroCompte}`);
+    return response.data;
+  }
 }
