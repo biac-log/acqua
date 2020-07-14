@@ -90,7 +90,7 @@
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="12" x-lg="7" lg="12">
+            <v-col cols="12">
               <ExtraitsVue
                 ref="gridExtraits"
                 :Journal.sync="journal"
