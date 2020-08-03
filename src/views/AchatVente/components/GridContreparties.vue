@@ -137,15 +137,19 @@ export default class extends Vue {
     else if(this.contreparties.length == 0)
     {
       let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
-      let tva = await CaseTvaApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
       let contrepartie = new PieceComptableContrepartie();
       contrepartie.numeroCompte = compteAchatVente.numero;
       contrepartie.compteLibelle = compteAchatVente.nom;
       contrepartie.libelle = this.nomCompteDeTier;
       contrepartie.codeMouvement = this.journal.codeMouvement == "DB" ? "CR" : "DB";
-      contrepartie.montantDevise = this.montantDevise.toNumber() / ( 1 + (tva.tauxTvaCase/100));
-      contrepartie.montantBase = this.montantDevise.toNumber() / ( 1 + (tva.tauxTvaCase/100));
-      contrepartie.caseTva = tva;
+      if(compteAchatVente.numeroCase){
+        let tva = await CaseTvaApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
+        if(tva){
+          contrepartie.montantDevise = this.montantDevise.toNumber() / ( 1 + (tva.tauxTvaCase/100));
+          contrepartie.montantBase = this.montantDevise.toNumber() / ( 1 + (tva.tauxTvaCase/100));
+          contrepartie.caseTva = tva;
+        }
+      }
       this.addContrepartie(contrepartie);
     }
     else if(this.ventilleDevise == 0 && this.ventilleBase != 0)
@@ -158,11 +162,13 @@ export default class extends Vue {
       contrepartie.codeDevise = 1;
       if(+this.numeroCompteAchatVente){
         let compteAchatVente = await CompteApi.getCompteGeneral("G", this.numeroCompteAchatVente);
-        let tva = await CaseTvaApi.getCaseTVA(compteAchatVente?.numeroCase, this.journal.numero);
-        contrepartie.numeroCompte = compteAchatVente.numero;
-        contrepartie.compteLibelle = compteAchatVente.nom;
-        contrepartie.caseTva = tva;
-      } 
+        if(compteAchatVente.numeroCase){
+          let tva = await CaseTvaApi.getCaseTVA(compteAchatVente?.numeroCase, this.journal.numero);
+          contrepartie.numeroCompte = compteAchatVente.numero;
+          contrepartie.compteLibelle = compteAchatVente.nom;
+          contrepartie.caseTva = tva;
+        }
+      }
       this.addContrepartie(contrepartie);
     }
     else
@@ -268,7 +274,7 @@ export default class extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 #btn-acqua {
   height: 56px;
 }
@@ -286,5 +292,4 @@ export default class extends Vue {
   color: green;
   margin-left: 10px;
 }
-
 </style>

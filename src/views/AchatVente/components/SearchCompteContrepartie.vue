@@ -1,5 +1,11 @@
 <template>
-  <v-dialog width="800" v-model="dialog" @click:outside="close()" @keydown.esc="close()" @keydown.page-up="nextPage()" @keydown.page-down="previousPage()">
+  <v-dialog width="800" 
+            v-model="dialog" 
+            @click:outside="close()" 
+            @keydown.esc="close()" 
+            @keydown.page-up="nextPage()" 
+            @keydown.page-down="previousPage()"
+            @keydown.ctrl.f.prevent="focusSearch()">
     <v-card class="mt-5">
       <v-card-title>
         Comptes {{ typeLoad ? typeLoad.libelle : "" }}
@@ -9,12 +15,13 @@
         <v-spacer></v-spacer>
         <v-text-field
           v-model="filtreCompte"
+          ref="filterField"
           append-icon="mdi-magnify"
           label="Filtrer"
           single-line
           hide-details
           autofocus
-          @keydown.down="giveFocusToRow(0)"
+          @keydown.down.prevent="giveFocusToRow(0)"
           autocomplete="off"
         ></v-text-field>
       </v-card-title>
@@ -53,7 +60,7 @@ export default class extends Vue {
   private comptes: CompteGeneralSearch[] = [];
   private displayComptes: CompteGeneralSearch[] = [];
   private headersComptes = [
-    { headerName: "Numéro", field: "numero", filter:true, width: 120 },
+    { headerName: "Numéro", field: "numero", filter:true, width: 120},
     { headerName: "Nom", field: "nom", filter:true, flex:1 },
     { headerName: "Solde", field: "libelleSolde", filter:true, cellStyle: { textAlign: "right" }, width: 100 },
     { headerName: "Nature", field: "libelleNature", filter:true, width: 120 },
@@ -78,8 +85,12 @@ export default class extends Vue {
     onRowDoubleClicked: this.rowDoubleClick
   };
 
-  public open(typeToLoad: TypeCompte): Promise<CompteGeneralSearch> {
+  public open(typeToLoad: TypeCompte, filtre: string): Promise<CompteGeneralSearch> {
     this.dialog = true;
+    if(filtre){
+      this.filtreCompte = filtre;
+      this.filterGrid(filtre);
+    }
     this.loadComptes(typeToLoad);
 
     return new Promise((resolve, reject) => {
@@ -124,7 +135,13 @@ export default class extends Vue {
   }
 
   @Watch("filtreCompte")
-  private filterGrid(){
+  private filterGrid(newValue: string){
+    var numeroFilterComponent = this.gridOptions?.api?.getFilterInstance('numero');
+    if(newValue && newValue.isInt()){
+      numeroFilterComponent?.setModel({type: 'startsWith', filter: newValue});
+    } else{
+      numeroFilterComponent?.setModel({type: 'startsWith', filter: ""});
+    }
     this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
   }
 
@@ -164,6 +181,11 @@ export default class extends Vue {
           "this will never happen, navigation is always one of the 4 keys above"
         );
     }
+  }
+
+  private focusSearch(){
+    (this.gridOptions.api as GridApi).deselectAll();
+    this.$nextTick(() => (this.$refs.filterField as any).focus());
   }
 
   private keypress(event: any) {

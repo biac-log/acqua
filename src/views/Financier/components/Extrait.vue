@@ -1,100 +1,122 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    width="1450"
-    @keydown.enter.prevent.stop="sendContrepartie"
-    @click:outside="close()"
-    @keydown.esc="close()"
-  >
+  <v-dialog v-model="dialog"
+            @keydown.alt.enter.stop="sendExtrait()"
+            @click:outside="close()"
+            @keydown.esc.stop="close()"
+            @keydown.107.prevent.stop="createVentilation">
     <v-form ref="form" v-model="isValid" lazy-validation>
-      <v-card>
-        <v-card-title>
-          <v-col cols="12" v-if="errorMessage">
-            <v-alert dense outlined type="error" class="ma-0">
-              {{ errorMessage }}
-            </v-alert>
-          </v-col>
-          <v-col cols="12">
-            Extrait
-          </v-col>
+      <v-card min-height="710px">
+        <v-toolbar color="primary" dark flat>
+          <v-card-title class="pa-2">
+            <span v-if="numeroExtrait">Extrait {{ numeroExtrait }} </span>
+              <span v-else>Nouvel extrait</span>
+          </v-card-title>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="close()">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-title class="pa-0 ma-0">
+          <v-row>
+            <v-col cols="12" v-if="errorMessage">
+              <v-alert dense outlined type="error" class="ma-0">
+                {{ errorMessage }}
+              </v-alert>
+            </v-col>
+          </v-row>
         </v-card-title>
         <v-card-text>
-          <v-row>
+          <v-row >
+            <v-col cols="7">
+              <v-row dense>
+                <v-col cols="5">
+                  <v-text-field
+                    v-model="libelleCompte"
+                    label="Compte"
+                    :filled="readonly"
+                    readonly
+                    tabindex="-1"
+                  >
+                  </v-text-field>
+                </v-col>
+                <v-col cols="3">
+                  <v-text-field
+                    label="Montant"
+                    v-model="montant"
+                    :filled="readonly"
+                    :readonly="readonly"
+                    :suffix="journal.devise.libelle"
+                    @blur="montant = montant.toNumber().toDecimalString()"
+                    :rules="montantRules"
+                    autofocus
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="4">
+                  <v-select
+                    :items="reglements"
+                    v-model="reglementSelected"
+                    label="Règlement"
+                    item-text="libelle"
+                    item-value="numero"
+                    return-object
+                    :filled="readonly"
+                    :readonly="readonly"
+                    :hide-details="readonly"
+                    :rules="reglementsRules"
+                    required
+                  ></v-select>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" class="pt-0">
+                  <v-card outlined >
+                    <v-toolbar color="#EEEEEE" flat dense>
+                      <h2>Ventilations</h2>
+                      <v-btn
+                        color="primary"
+                        fab
+                        x-small
+                        class="ml-5"
+                        ref="btnAdd"
+                        :disabled="readonly || !montant"
+                        @click.stop="createVentilation"
+                      >
+                        <v-icon>mdi-plus</v-icon>
+                      </v-btn>
+                      <v-spacer></v-spacer>
+                      <v-card-title :class="!ventileBase || ventileBase == 0 ? 'equilibre' : 'notEquilibre'">
+                          <span v-if="!journal.devise || journal.devise.id == 1">Montant à ventiler : <b>{{ ventileDevise | numberToStringEvenZero }} {{ journal.devise ? journal.devise.libelle : "EUR" }}</b></span>
+                          <span v-if="journal.devise && journal.devise.id != 1">
+                              Ventiler devise : <b>{{ ventileDevise | numberToStringEvenZero }} {{ journal.devise ? journal.devise.libelle : "EUR" }}</b>
+                              - Ventiler base : <b>{{ ventileBase | numberToStringEvenZero }} EUR</b></span>
+                      </v-card-title>
+                    </v-toolbar>
+                    <v-data-table
+                      :headers="headersVentilation"
+                      :items="ventilations"
+                      id="dataTable"
+                      class="elevation-1"
+                      disable-pagination
+                      hide-default-footer
+                      @click:row="editVentilation"
+                      disable-sort
+                      dense
+                      height="400"
+                    >
+                    </v-data-table>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-col>
             <v-col cols="5">
-              <v-text-field
-                v-model="libelleCompte"
-                label="Compte"
-                :filled="readonly"
-                readonly
-                tabindex="-1"
-              >
-              </v-text-field>
+              <VentilationVue
+                ref="refVentilationVue"
+                :Ventilations.sync="ventilations"
+                :isReadOnly.sync="readonly"
+                :DatePiece.sync="datePiece"
+                :Reglement.sync="reglementSelected"
+              ></VentilationVue>
             </v-col>
-            <v-col cols="3">
-              <v-text-field
-                label="Montant"
-                v-model="montant"
-                :filled="readonly"
-                :readonly="readonly"
-                @blur="montant = montant.toNumber().toDecimalString()"
-                autofocus
-              ></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-select
-                :items="reglements"
-                v-model="reglementSelected"
-                label="Règlement"
-                item-text="libelle"
-                return-object
-                :filled="readonly"
-                :readonly="readonly"
-                :hide-details="readonly"
-                :rules="reglementsRules"
-              ></v-select>
-            </v-col>
-            <!-- <v-col cols="2">
-              <v-text-field
-                label="Différence change"
-                v-model="differenceChange"
-                :filled="readonly"
-                :readonly="readonly"
-              ></v-text-field>
-            </v-col> -->
-          </v-row>
-          <v-row>
-            <v-card class="ma-5">
-              <v-card-title>
-                Ventilations
-                <v-btn
-                  color="primary"
-                  fab
-                  small
-                  class="ml-5"
-                  ref="btnAdd"
-                  :disabled="readonly"
-                  @click.stop="createExtrait"
-                >
-                  <v-icon>mdi-plus</v-icon>
-                </v-btn>
-                <VentilationVue
-                  ref="refVentilationVue"
-                  :isReadOnly.sync="readonly"
-                ></VentilationVue>
-              </v-card-title>
-              <v-data-table
-                :headers="headersVentilation"
-                :items="ventilations"
-                id="dataTable"
-                class="elevation-1"
-                disable-pagination
-                hide-default-footer
-                @click:row="editVentilation"
-                disable-sort
-                dense
-              >
-              </v-data-table>
-            </v-card>
           </v-row>
         </v-card-text>
         <v-card-actions class="text-center">
@@ -109,16 +131,6 @@
             Supprimer</v-btn
           >
           <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            class="ma-2 pr-4"
-            tile
-            outlined
-            @click="dialog = false"
-            tabindex="-1"
-          >
-            <v-icon left>mdi-close</v-icon> Fermer</v-btn
-          >
           <v-btn
             ref="btnValidate"
             class="ma-2 pr-4"
@@ -153,22 +165,27 @@ import CompteGeneralSearch from "@/models/Compte/CompteGeneralSearch";
 import { TypeCompte } from "@/models/AchatVente";
 import VentilationVue from "./Ventilation.vue";
 import { Reglement } from '@/models/Financier/Get/Reglement';
+import { DateTime } from '@/models/DateTime';
+import { DeviseApi } from '@/api/DeviseApi';
 
 @Component({
   name: "Extrait",
   components: { VentilationVue }
 })
 export default class extends Vue {
-  private dialog: boolean = false;
+  private dialog = false;
   @PropSync("isReadOnly")
   public readonly!: boolean;
+  @PropSync("DatePiece")
+  public datePiece !: DateTime;
   private isNew: boolean = true;
   private errorMessage: string = "";
   private isValid: boolean = true;
   private resolve!: any;
   private reject!: any;
-  private journal!: Journal;
+  private journal: Journal = new Journal();
 
+  private numeroExtrait = 0;
   private typeCompte: string = "";
   private compteLoading: boolean = false;
   private numeroCompte: string = "";
@@ -178,24 +195,28 @@ export default class extends Vue {
   private reglementsLoading = false;
   private reglements: Reglement[] = [];
   private reglementSelected: Reglement = new Reglement();
-  private reglementsRules = [(v: string) => !!v || "Règlement obligatoire"];
+  private reglementsRules = [(v: Reglement) => !!v || "Règlement obligatoire",
+                             (v: Reglement) => v.numero != 0 || "Règlement obligatoire"];
 
   private montant = "";
-  private reglement = "";
-  // private differenceChange = "";
+  private montantRules: any = [(v: string) => !!v || "Montant obligatoire",
+                               (v:string) => v.isDecimal() || "Montant invalide"];
 
   private ventilations: Ventilation[] = [];
   private headersVentilation = [
-    // { text: "Ven", value: "", width: 50 },
-    { text: "Compte", value: "libelleCompte", width: 300 },
-    { text: "Intitulé", value: "nomCompte", width: 300 },
-    { text: "Pièce", value: "libellePiece", width: 100 },
-    { text: "Libellé d'écriture", value: "libelle", width: 300 },
+    { text: "Vent.", value: "numeroVentilation", width: 40 },
+    { text: "Compte", value: "libelleCompte", width: 110 },
+    { text: "Intitulé", value: "nomCompte", width: 180 },
+    { text: "Pièce", value: "libellePiece", width: 80 },
+    { text: "Libellé d'écriture", value: "libelle", width: 180 },
     { text: "Débit", value: "montantDebit", width: 100 },
     { text: "Crédit", value: "montantCredit", width: 100 },
-    { text: "", value: "libelleDevise", width: 80 },
-    { text: "TVA", value: "tva", width: 50 }
+    { text: "Devise", value: "libelleDevise", width: 70 },
+    { text: "TVA", value: "libelleTva", width: 100 }
   ];
+
+  private ventileBase: number = 0;
+  private ventileDevise: number = 0;
 
   mounted(){
     this.loadReglements();
@@ -216,6 +237,7 @@ export default class extends Vue {
       this.reject = reject;
     });
   }
+
   public openNew(journal: Journal): Promise<Extrait> {
     this.reset();
     this.dialog = true;
@@ -231,29 +253,89 @@ export default class extends Vue {
     });
   }
 
-  private editVentilation(ventilation: Ventilation) {
-    let devise = new Devise({id: ventilation.codeDevise, libelle: ventilation.libelleDevise, typeDevise: "D"});
-    (this.$refs.refVentilationVue as VentilationVue).open(ventilation, this.journal.numero, devise)
-    .then(() => {
+  get typeMouvement(): string {
+    return this.montant?.toNumber() > 0 ? "DB" : "CR";
+  }
 
-    }).catch(() => {
+  private createVentilation() {
+    (this.$refs.form as any).validate();
+    this.$nextTick(() => {
+      if(this.montant && this.isValid){  
+        (this.$refs.refVentilationVue as VentilationVue).openNew(this.getVentilationToAdd(), this.journal)
+        .then((ventil) => {
+          const maxLigne = this.ventilations?.length ?  Math.max(...this.ventilations.map(i => i.numeroVentilation)) : 0;
+          ventil.numeroVentilation = maxLigne + 1;
+          this.ventilations.push(ventil);
+        }).catch(() => {
 
+        }).finally(() => {
+          this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+        });
+      }
     });
   }
+
+  private editVentilation(ventilation: Ventilation) {
+    (this.$refs.refVentilationVue as VentilationVue).open(ventilation, this.journal)
+    .then((resp) => {
+      if(resp)
+        Vue.set(this.ventilations, this.ventilations.findIndex(d => d == ventilation), resp);
+      else 
+        this.ventilations.splice(this.ventilations.indexOf(ventilation), 1);
+    }).catch(() => {
+
+    }).finally(() => {
+      this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+    });
+  }
+
   private initJournal(journal: Journal){
     this.journal = journal;
     this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`;
   }
 
+  private taux: number = 0;
+  @Watch('dateExtrait')
+  private dateExtraitChange(){
+    if(!this.journal.devise || this.journal.devise.id == 1)
+      this.taux = 1;
+    else if(this.datePiece.isValid() && this.journal?.devise?.id) {
+      DeviseApi.getTaux(this.journal?.devise?.id, this.datePiece)
+      .then((taux) => {
+        this.taux = taux;
+      }).catch((err) => {
+        //this.errorMessage = displayAxiosError(err);
+      });
+    }
+    this.refreshMontantAVentille();
+  }
+
   private initExtrait(extrait: Extrait) {
+    this.numeroExtrait = extrait.numeroExtrait;
     this.typeCompte = extrait.typeCompte;
     this.numeroCompte = extrait.numeroCompte.toString();
     this.nomCompte = extrait.nomCompte;
     this.ventilations = extrait.ventilations;
-    this.montant = extrait.montantBaseSigned;
+    console.log(extrait);
+    this.montant = extrait.montantDeviseSigned;
     this.setReglement(extrait.libelleReglement);
-    // this.initDevises(deviseEntete, contrepartie);
-    // this.numeroJournal = numeroJournal;
+  }
+
+  public getVentilationToAdd(): Ventilation{
+    let ventilation = new Ventilation();
+    ventilation.libelle = this.reglementSelected.libelle;
+    ventilation.codeDevise = this.journal.devise.id;
+    ventilation.libelleDevise = this.journal.devise.libelle;
+    ventilation.montantDevise = Math.abs(this.ventileDevise);
+    ventilation.montantBase = Math.abs(this.ventileDevise * (this.taux | 1));
+    if(this.montant.toNumber() > 0){
+      ventilation.codeMouvement = "CR";
+      ventilation.typeCompte = "C";
+    }else{
+      ventilation.codeMouvement = "DB";
+      ventilation.typeCompte = "F";
+    }
+    return ventilation;
   }
 
   private async setReglement(libelleReglement: string){
@@ -277,108 +359,60 @@ export default class extends Vue {
   }
 
   private reset(){
+    this.numeroExtrait = 0;
     this.ventilations = [];
     this.libelleCompte = "";
     this.montant = "";
+    this.reglementSelected = new Reglement();
   }
 
-  private initDevises(deviseEntete: Devise, extrait?: Extrait) {
-    // this.devises = [];
-    // this.devises.push(new Devise({ id: 1, libelle: "EUR", typeDevise: "D" }));
-    // if (deviseEntete && !this.devises.find(d => d.id == deviseEntete.id))
-    //   this.devises.push(deviseEntete);
-    // if (contrepartie && contrepartie.codeDevise != 0) {
-    //   if(!this.devises.find(d => d.id == contrepartie.codeDevise)){
-    //     this.devises.push(
-    //       new Devise({
-    //         id: contrepartie.codeDevise,
-    //         libelle: contrepartie.libelleDevise,
-    //         typeDevise: this.devisesSelected.typeDevise
-    //       })
-    //     );
-    //     this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) || this.devises[0];
-    //   } else this.devisesSelected = this.devises[0];
-    // }
+  @Watch('ventilations')
+  @Watch("montant")
+  private refreshMontantAVentille(){
+    this.ventileBase = Math.abs(this.getVentileBase());
+    this.ventileDevise = Math.abs(this.getVentileDevise());
   }
 
-  private calculMontant() {
-    // if(this.caseTva.typeCase == 50)
-    //   this.montant = this.calculMontantTva().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
-    // else if(this.caseTva.typeCase == 1)
-    //   this.montant = this.calculMontantTaxable().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
-  }
-  private calculMontantTva(): number {
-    // let montantTva = this.tvaCalcule - this.tvaImpute;
-    // if(this.typesMouvementsSelected.id == "DB") montantTva = this.tvaImpute -  this.tvaCalcule;
-    // if(montantTva < 0)montantTva = 0;
-    // return montantTva;
-    return 0;
-  }
+  private getVentileBase(ventilationToIgnore?: Ventilation): number {
+    if(!this.ventilations || !this.journal)
+      return 0;
 
-  private calculMontantTaxable(): number {
-    // let montantTaxable = this.tvaCalcule - this.tvaImpute;
-    // if(this.typesMouvementsSelected.id == "CR")
-    //   montantTaxable = this.ventileDevise - montantTaxable;
-    // else montantTaxable = montantTaxable - this.ventileDevise;
+    let ventileCompta = 0;
+    if(this.journal.devise.id == 1) ventileCompta = this.montant.toNumber();
+    else ventileCompta = this.montant.toNumber() * (this.taux | 0);
 
-    // if(montantTaxable < 0)
-    //   montantTaxable = 0;
-    // else if(this.caseTva.tauxTvaCase)
-    //   montantTaxable = (montantTaxable / (1+ (this.caseTva.tauxTvaCase / 100)));
-
-    // return montantTaxable;
-    return 0;
+    let credit = this.ventilations.filter(c => c.typeCompte != "Z" && c != ventilationToIgnore).map(c => c.montantCredit.toNumber()).reduce((a,b) => a + b, 0);
+    let debit = this.ventilations.filter(c => c.typeCompte != "Z" && c != ventilationToIgnore).map(c => c.montantDebit.toNumber()).reduce((a,b) => a + b, 0);
+    ventileCompta = ventileCompta + debit - credit;
+    return ventileCompta.toDecimalString(2).toNumber();
   }
 
-  private loadCaseTva() {
-    // if (+this.numeroCaseTva) {
-    //   this.tvaLoading = true;
-    //   AchatVenteApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
-    //     .then(caseTva => {
-    //       this.numeroCaseTva = caseTva.numeroCase.toString();
-    //       this.caseTva = caseTva;
-    //       this.errorMessage = "";
-    //     })
-    //     .catch((err: AxiosError) => {
-    //       this.numeroCaseTva = "";
-    //       this.caseTva = new CaseTva();
-    //       if (err.request.status != 505)
-    //         this.errorMessage = err.request.response;
-    //     })
-    //     .finally(() => {
-    //       this.tvaLoading = false;
-    //     });
-    // } else {
-    //   this.caseTva.Refresh();
-    //   this.caseTva = new CaseTva();
-    // }
-  }
-  private OpenSearchCaseTva(): void {
-    //(this.$refs.caseTvaDialog as SearchCaseTvaVue)
-    // .open(this.numeroJournal)
-    // .then(caseTva => {
-    //   this.numeroCaseTva = caseTva.numeroCase.toString();
-    //   this.caseTva = caseTva;
-    //   this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
-    // }).catch(() => {
-    //   this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus())
-    // });
-  }
+  public getVentileDevise(ventilationToIgnore?: Ventilation): number{
+    if(!this.journal?.devise || !this.ventilations)
+      return 0;
 
+    let ventileDevise : number = this.montant.toNumber();
+    let credit = this.ventilations.filter(c => c.typeCompte != "Z" && c.codeDevise == this.journal.devise.id && c != ventilationToIgnore).map(c => c.montantCredit.toNumber()).reduce((a,b) => a + b, 0);
+    let debit = this.ventilations.filter(c => c.typeCompte != "Z" && c.codeDevise == this.journal.devise.id && c != ventilationToIgnore).map(c => c.montantDebit.toNumber()).reduce((a,b) => a + b, 0);
+    
+    ventileDevise = ventileDevise + debit - credit;
+    return ventileDevise.toDecimalString(this.journal.devise.typeDevise == "E" ? 0 : 2).toNumber();
+  }
+ 
   private GetModel(): Extrait {
-    // let contrepartie = new PieceComptableContrepartie();
-    // contrepartie.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : "";
-    // contrepartie.numeroCompte = parseInt(this.numeroCompte);
-    // contrepartie.compteLibelle = this.nomCompte;
-    // contrepartie.libelle = this.libelle;
-    // contrepartie.codeMouvement = this.typesMouvementsSelected ? this.typesMouvementsSelected.id : "";
-    // contrepartie.montantDevise = parseFloat(this.montant);
-    // contrepartie.montantBase = parseFloat(this.montant);
-    // contrepartie.codeDevise = this.devisesSelected ? this.devisesSelected.id : 0;
-    // contrepartie.libelleDevise = this.devisesSelected ? this.devisesSelected.libelle : "";
-    // contrepartie.caseTva = new CaseTva(this.caseTva);
-    // return contrepartie;
-    return new Extrait();
+    let extrait = new Extrait();
+    extrait.numeroExtrait = this.numeroExtrait;
+    extrait.typeCompte = "G";
+    extrait.numeroCompte = this.journal.compteBanque.numero;
+    extrait.nomCompte = this.journal.compteBanque.nom;
+    extrait.montantBase = this.montant.toNumber() * (this.taux | 1);
+    extrait.montantDevise = this.montant.toNumber();
+    extrait.codeMouvement = this.montant.toNumber() > 0 ? "DB" : "CR";
+    extrait.codeDevise = this.journal.devise.id;
+    extrait.libelleDevise = this.journal.devise.libelle;
+    extrait.libelleReglement = this.reglementSelected.libelle;
+    extrait.ventilations = this.ventilations.map(v => new Ventilation(v));
+    return extrait;
   }
 
   private sendExtrait() {
@@ -391,30 +425,60 @@ export default class extends Vue {
     });
   }
 
-  @Watch("caseTva")
-  private caseTvaChanged(val: string, oldVal: string) {
-    //if(!this.readonly && !this.montant) this.calculMontant();
-  }
-
-  @Watch("devisesSelected")
-  private deviseChanged(val: string, oldVal: string) {
-    //if(!this.readonly && !this.montant) this.calculMontant();
-  }
-
-  private deleteContrepartie() {
+  private deleteExtrait() {
     this.dialog = false;
     this.resolve();
   }
 
   private close() {
+    (this.$refs.refVentilationVue as VentilationVue).close();
+    (this.$refs.form as any).validate();
     this.dialog = false;
     this.reject();
   }
 }
 </script>
 
-<style>
+<style scoped>
 .v-text-field.v-text-field--enclosed .v-text-field__details {
   margin-bottom: 0px;
 }
+
+.notEquilibre{
+  color: red;
+  margin-left: 10px;
+}
+
+.equilibre{
+  color: green;
+  margin-left: 10px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+.overlay {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#editContrepartie {
+  z-index: 999;
+}
+
 </style>

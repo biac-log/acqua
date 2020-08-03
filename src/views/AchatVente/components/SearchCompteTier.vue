@@ -14,7 +14,7 @@
           single-line
           hide-details
           autofocus
-          @keydown.down="giveFocusToRow(0)"
+          @keydown.down.prevent="giveFocusToRow(0)"
           autocomplete="off"
         ></v-text-field>
       </v-card-title>

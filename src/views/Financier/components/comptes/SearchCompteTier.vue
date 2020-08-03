@@ -1,6 +1,12 @@
 <template>
-  <v-dialog width="1000" v-model="dialog" @click:outside="close()" @keydown.esc="close()" @keydown.page-up="nextPage()" @keydown.page-down="previousPage()">
-    <v-card class="mt-5">
+  <v-dialog width="1000" 
+            v-model="dialog" 
+            @click:outside="close()" 
+            @keydown.esc="close()" 
+            @keydown.page-up="nextPage()" 
+            @keydown.page-down="previousPage()"
+            @keydown.ctrl.f.prevent="focusSearch()">
+    <v-card :loading="isLoading">
       <v-card-title>
         Comptes
         <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">
@@ -8,13 +14,14 @@
         </v-btn>
         <v-spacer></v-spacer>
         <v-text-field
+          ref="filterField"
           v-model="filtreCompte"
           append-icon="mdi-magnify"
           label="Filtrer"
           single-line
           hide-details
           autofocus
-          @keydown.down="giveFocusToRow(0)"
+          @keydown.down.prevent="giveFocusToFirstDisplayRow()"
           autocomplete="off"
         ></v-text-field>
       </v-card-title>
@@ -60,8 +67,6 @@ export default class extends Vue {
   private resolve!: any;
   private reject!: any;
 
-  private loadingCellRenderer: string | undefined | (new () => ICellRenderer) = undefined;
-  private loadingCellRendererParams = null;
   private gridOptions: GridOptions = {
     columnDefs: this.headersComptes,
     rowSelection: "single",
@@ -105,17 +110,6 @@ export default class extends Vue {
     }
   }
 
-  private giveFocusToRow(id: number) {
-    let ds = 0;
-    this.gridOptions?.api?.forEachNode(function(node) {
-      if (node.rowIndex === id) {
-        node.setSelected(true);
-        ds = node.rowIndex;
-      }
-    });
-    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, "numero"));
-  }
-
   @Watch("filtreCompte")
   private filterGrid(){
     this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
@@ -141,14 +135,18 @@ export default class extends Vue {
         });
         return suggestedNextCell;
       case KEY_UP:
-        previousCell = params.previousCellPosition;
-        // set selected cell on current cell - 1
-        this.gridOptions?.api?.forEachNode(function(node) {
-          if (previousCell.rowIndex - 1 === node.rowIndex) {
-            node.setSelected(true);
-          }
-        });
-        return suggestedNextCell;
+        if(previousCell.rowIndex == 0)
+          this.focusSearch();
+        else{
+          previousCell = params.previousCellPosition;
+          // set selected cell on current cell - 1
+          this.gridOptions?.api?.forEachNode(function(node) {
+            if (previousCell.rowIndex - 1 === node.rowIndex) {
+              node.setSelected(true);
+            }
+          });
+          return suggestedNextCell;
+        }
       case KEY_LEFT:
       case KEY_RIGHT:
         return suggestedNextCell;
@@ -171,12 +169,45 @@ export default class extends Vue {
     this.sendCompte(selectedRow)
   }
 
+  private focusSearch(){
+    (this.gridOptions.api as GridApi).deselectAll();
+    this.$nextTick(() => (this.$refs.filterField as any).focus());
+  }
+
+  private giveFocusToFirstDisplayRow(){
+    let rowToFocus = this?.gridOptions?.api?.getFirstDisplayedRow() || 0;
+    this.giveFocusToRow(rowToFocus);
+  }
+
+  private giveFocusToRow(id: number) {
+    if (id < (this?.gridOptions?.api?.getFirstDisplayedRow() || 0)) id = 0;  
+    else if (id > (this?.gridOptions?.api?.getLastDisplayedRow() || 0))
+      id = this?.gridOptions?.api?.getLastDisplayedRow() || 0; 
+
+    let ds = 0;
+    this.gridOptions?.api?.forEachNode(function(node) {
+      if (node.rowIndex === id) {
+        node.setSelected(true);
+        ds = node.rowIndex;
+      }
+    });
+
+    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, "numero"));
+  }
+
   private nextPage(){
     this?.gridOptions?.api?.paginationGoToNextPage();
+    let selectedCell = this?.gridOptions?.api?.getSelectedNodes()[0];
+    let pageSize = this?.gridOptions?.api?.paginationGetPageSize();
+    this?.gridOptions?.api?.getFirstDisplayedRow();
+    if(selectedCell && pageSize) this.giveFocusToRow(selectedCell.rowIndex + pageSize);
   }
 
   private previousPage(){
     this?.gridOptions?.api?.paginationGoToPreviousPage();
+    let selectedCell = this?.gridOptions?.api?.getSelectedNodes()[0];
+    let pageSize = this?.gridOptions?.api?.paginationGetPageSize();
+    if(selectedCell && pageSize) this.giveFocusToRow(selectedCell.rowIndex - pageSize);
   }
 
   private reinitGrid(){

@@ -5,6 +5,7 @@ export class VentilationDTO{
   typeCompte = "";
   numeroCompte = 0;
   nomCompte = "";
+  natureCompte = "";
   referenceJournal = 0;
   referencePiece = 0;
   libelle = "";
@@ -15,6 +16,8 @@ export class VentilationDTO{
   libelleDevise = "";
   codeCaseTVA = 0;
   libelleCaseTVA = "";
+  dossier = "";
+  dossierNom = "";
   caseTva = new CaseTva();
 }
 
@@ -26,7 +29,7 @@ export class Ventilation extends VentilationDTO {
   }
 
   get libelleCompte(): string{
-    return `${this.typeCompte} ${this.numeroCompte} ${this.nomCompte}`;
+    return `${this.typeCompte} ${this.numeroCompte}`;
   }
 
   get libellePiece(): string{
@@ -38,6 +41,10 @@ export class Ventilation extends VentilationDTO {
   }
 
   get montantCredit(): string{
-    return this.codeMouvement != "DB" ? this.montantDevise.toDecimalString(2) : "";
+    return this.codeMouvement == "CR" ? this.montantDevise.toDecimalString(2) : "";
+  }
+
+  get libelleTva(): string{
+    return this.codeCaseTVA ? `${this.codeCaseTVA} ${this.libelleCaseTVA}` : "";
   }
 }

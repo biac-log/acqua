@@ -13,7 +13,7 @@
         v-model="dateFormatted"
         ref="refDate"
         :label="label"
-        :filled="isReadonly"
+        :filled="isFilled"
         :readonly="isReadonly"
         :rules="dateRules"
         @blur.prevent="dateSelected = parseDate(dateFormatted)"
@@ -21,7 +21,7 @@
         :hide-details="isReadonly"
         validate-on-blur
       >
-        <template v-slot:prepend>
+        <template v-slot:prepend-inner>
           <v-btn icon small :disabled="isReadonly" @click="menuDate = true" @keydown.enter.prevent.stop="menuDate = true" tabindex="-1">
             <v-icon>mdi-calendar</v-icon>
           </v-btn>
@@ -57,6 +57,8 @@ export default class extends Vue {
   public syncedDate!: DateTime;
   @PropSync("rules")
   public dateRules!: any;
+  @PropSync("filled")
+  public isFilled?: boolean;
 
   private parseDate(date: string): string {
     if (!date) return "";

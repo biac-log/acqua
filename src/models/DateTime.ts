@@ -31,7 +31,10 @@ export class DateTime {
   }
 
   public toString(format= "DD/MM/YYYY") : string{
-    return this.date.format(format);
+    if(this.date.isSame(DateTime.minValue()))
+      return "";
+    else
+      return this.date.format(format);
   }
 
   public toUtc(format= "YYYY-MM-DD") : string{
@@ -84,6 +87,10 @@ export class DateTime {
   }
   static isValid(date: string | Date | Moment) : boolean{
     return new DateTime(date).isValid();
+  }
+
+  static minValue(){
+    return moment("0001-01-01");
   }
 }
 

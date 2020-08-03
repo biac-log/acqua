@@ -1,9 +1,11 @@
 import Axios from "axios";
-import {JournalDTO, Journal, PeriodeComptable, PeriodeComptableDTO, EntetePieceComptable, EntetePieceComptableDTO, Piece, PieceDTO, TypeCompte, TypeCompteDTO} from "@/models/Financier";
+import {JournalDTO, Journal, PeriodeComptable, PeriodeComptableDTO, EntetePieceComptable, EntetePieceComptableDTO, Piece, PieceDTO, TypeCompte, TypeCompteDTO, PieceAchatVente} from "@/models/Financier";
 import { UserModule } from "@/store/modules/user";
 import { Pagination } from '@/models/Pagination';
 import { PaginationResult } from '@/models/PaginationResult';
 import { Reglement, ReglementDTO } from '@/models/Financier/Get/Reglement';
+import { PieceComptable, PieceComptableDTO } from '@/models/AchatVente';
+import { PieceSaveDTO } from '@/models/Financier/Save/PieceSave';
 
 export abstract class FinancierApi {
   private static axios = Axios.create({headers: { Authorization: `Bearer ${UserModule.token}` }});
@@ -27,7 +29,7 @@ export abstract class FinancierApi {
     return response.data;
   }
 
-  static async getPieceComptable( numeroJournal: string | number, numeroPiece: string | number): Promise<Piece> {
+  static async getPieceComptable(numeroJournal: string | number, numeroPiece: string | number): Promise<Piece> {
     let response = await this.axios.get<PieceDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetPieceComptable?journal=${numeroJournal}&piece=${numeroPiece}`);
     return new Piece(response.data);
   }
@@ -45,5 +47,30 @@ export abstract class FinancierApi {
   static async getSoldeCompte(numeroCompte: number): Promise<number> {
     let response = await this.axios.get<number>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetSolde?numeroCompte=${numeroCompte}`);
     return response.data;
+  }
+
+  static async getPieceAchatVente(numeroJournal: number, numeroPiece: number): Promise<PieceAchatVente> {
+    let response = await this.axios.get<PieceAchatVente>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetPieceComptableAchatVente?journal=${numeroJournal}&numeroPiece=${numeroPiece}`);
+    return response.data;
+  }
+
+  static async deletePieceComptable(periode:string, numeroJournal: number, numeroPiece: number): Promise<boolean> {
+    await this.axios.delete<any>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/DeletePieceComptable?periode=${periode}&journal=${numeroJournal}&piece=${numeroPiece}`);
+    return true;
+  }
+
+  static async AddPieceComptable(piece: PieceSaveDTO): Promise<number> {
+    let response = await this.axios.post<number>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/AddPieceComptable`, piece);
+    return response.data;
+  }
+
+  static async UpdatePieceComptable(piece: PieceSaveDTO): Promise<number> {
+    let response = await this.axios.put<number>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/UpdatePieceComptable`, piece);
+    return response.data;
+  }
+
+  static async ChangeNumero(periode: string, journal: number, oldNumero: number, newNumero: number): Promise<boolean>{
+    await this.axios.put(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/ChangementNumero?periode=${periode}&numeroJournal=${journal}&ancienNumeroPiece=${oldNumero}&nouveauNumeroPiece=${newNumero}`);
+    return true;
   }
 }

@@ -440,12 +440,8 @@ export default class extends Vue {
   ) {
     this.initDevises(deviseEntete, contrepartie);
     this.numeroJournal = numeroJournal;
-    this.typesComptesSelected =
-      this.typesComptes.find(tc => tc.id == contrepartie.typeCompte) ||
-      this.typesComptes[0];
-    this.devisesSelected =
-      this.devises.find(d => d.id == contrepartie.codeDevise) ||
-      deviseEntete;
+    this.typesComptesSelected = this.typesComptes.find(tc => tc.id == contrepartie.typeCompte) || this.typesComptes[0];
+    this.devisesSelected = this.devises.find(d => d.id == contrepartie.codeDevise) || deviseEntete;
 
     if (contrepartie) {
       let compteToSelect = {
@@ -457,25 +453,12 @@ export default class extends Vue {
       this.numeroCompteSelected = compteToSelect;
     }
 
-    this.numeroCompte = contrepartie.numeroCompte
-      ? contrepartie.numeroCompte.toString()
-      : "";
+    this.numeroCompte = contrepartie.numeroCompte ? contrepartie.numeroCompte.toString() : "";
     this.nomCompte = contrepartie.compteLibelle;
-    this.libelle = contrepartie.libelle
-      ? contrepartie.libelle
-      : propositionLibelle;
-    this.typesMouvementsSelected =
-      this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) ||
-      this.typesMouvements[0];
-    this.montant =
-      contrepartie.montantBase && this.devisesSelected
-        ? contrepartie.montantBase.toDecimalString(
-            this.devisesSelected.typeDevise == "E" ? 0 : 2
-          )
-        : "";
-    this.numeroCaseTva = contrepartie.caseTva.numeroCase
-      ? contrepartie.caseTva.numeroCase.toString()
-      : "";
+    this.libelle = contrepartie.libelle ? contrepartie.libelle : propositionLibelle;
+    this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
+    this.montant = contrepartie.montantBase && this.devisesSelected ? contrepartie.montantBase.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2): "";
+    this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : "";
     this.caseTva.Refresh(contrepartie.caseTva);
     this.libelleCaseTva = contrepartie.caseTva.libelleCase;
 
@@ -523,7 +506,7 @@ export default class extends Vue {
   private OpenSearchCompte(): void {
     if (this.typesComptesSelected) {
       (this.$refs.compteDialog as SearchCompteContrepartieVue)
-        .open(this.typesComptesSelected)
+        .open(this.typesComptesSelected, this.searchCompte)
         .then(compte => {
           this.setCompte(compte);
           this.$nextTick(() => (this.$refs.libelle as any)?.focus());
@@ -575,7 +558,6 @@ export default class extends Vue {
     this.numeroCompte = compte.numero.toString();
     this.nomCompte = compte.nom;
     if (compte.numeroCase) {
-      console.log("setCompte");
       CaseTvaApi.getCaseTVA(compte.numeroCase, this.numeroJournal).then(
         resp => {
           if (resp) {
@@ -623,7 +605,6 @@ export default class extends Vue {
     if (this.readonly) return;
 
     if (this.numeroCaseTva) {
-      console.log("loadCaseTva");
       this.tvaLoading = true;
       this.errorMessage = "";
       CaseTvaApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal)
@@ -663,20 +644,14 @@ export default class extends Vue {
 
   private GetModel(): PieceComptableContrepartie {
     let contrepartie = new PieceComptableContrepartie();
-    contrepartie.typeCompte = this.typesComptesSelected
-      ? this.typesComptesSelected.id
-      : "";
+    contrepartie.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : "";
     contrepartie.numeroCompte = +this.numeroCompte;
     contrepartie.compteLibelle = this.nomCompte;
     contrepartie.libelle = this.libelle;
-    contrepartie.codeMouvement = this.typesMouvementsSelected
-      ? this.typesMouvementsSelected.id
-      : "";
+    contrepartie.codeMouvement = this.typesMouvementsSelected ? this.typesMouvementsSelected.id : "";
     contrepartie.montantDevise = this.montant.toNumber();
     contrepartie.montantBase = this.montant.toNumber();
-    contrepartie.codeDevise = this.devisesSelected
-      ? this.devisesSelected.id
-      : 0;
+    contrepartie.codeDevise = this.devisesSelected ? this.devisesSelected.id : 0;
     contrepartie.devise = this.devisesSelected;
     contrepartie.caseTva = new CaseTva(this.caseTva);
     return contrepartie;

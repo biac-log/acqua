@@ -13,7 +13,7 @@
     @keydown.esc.stop="closeDialog()"
   >
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
-      <v-card>
+      <v-card :loading="pieceLoading">
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
             <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
@@ -426,6 +426,7 @@ import { numberToString } from '@/utils/FiltersMethods';
 })
 export default class extends Vue {
   public piecereadonly: boolean = true;
+  private pieceLoading = false;
   private errorMessage: string = "";
   private contreparties: PieceComptableContrepartie[] = [];
   private isValid: boolean = true;
@@ -441,6 +442,7 @@ export default class extends Vue {
   private numeroCompteTierRules: any = [(v: { numero: number | string }) => !!v?.numero || "Numéro obligatoire"];
   private comptesTiersSearch: { numero: number, nom: string }[] = [];
   private searchCompteDeTier: string = '';
+  private libelleFromInit = "";
   private libelle: string = "";
   private libelleRules: any = [(v: string) => !!v || "Libellé obligatoire"];
   private libelleWarningMessage: string = "";
@@ -579,6 +581,7 @@ export default class extends Vue {
     this.numeroPiece= "";
     this.numeroCompteTier= "";
     this.libelle= "";
+    this.libelleFromInit = "";
     this.montantDevise= "";
     this.montantEscompte= "";
     this.deviseSelected = this.devises[0];
@@ -611,11 +614,14 @@ export default class extends Vue {
 
   private async GetPiece() {
     this.errorMessage = "";
+    this.pieceLoading = true;
     try {
       let pieceComptable = await AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece);
       this.SetPiece(pieceComptable);
     } catch(err) {
       this.errorMessage = displayAxiosError(err);
+    }finally{
+      this.pieceLoading = false;
     }
   }
 
@@ -624,6 +630,7 @@ export default class extends Vue {
 
     this.numeroCompteTier = pieceComptable.compteTiersNumero.toString();
     this.libelle = pieceComptable.libelle;
+    this.libelleFromInit = pieceComptable.libelle;
 
     if(pieceComptable){
       let compteToSelect = {numero:pieceComptable.compteTiersNumero, nom:pieceComptable.compteTiersNom };
@@ -748,8 +755,8 @@ export default class extends Vue {
   }
 
   private validateLibelle(){
-    if(!this.piecereadonly && this.libelle){
-      AchatVenteApi.ValidateLibelle(this.libelle,this.typeCompte,this.numeroCompteTier).then((isUsed) => {
+    if(!this.piecereadonly && this.libelle && this.libelle != this.libelleFromInit){
+      AchatVenteApi.ValidateLibelle(this.libelle, this.typeCompte, this.numeroCompteTier).then((isUsed) => {
         if(isUsed){
           this.libelleWarningMessage = "Attention, ce libellé est déjà utilisé par une autre pièce";
           (this.$refs.confirmLibellelDialog as Confirm).open("Attention",

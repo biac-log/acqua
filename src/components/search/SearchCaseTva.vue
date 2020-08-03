@@ -1,6 +1,6 @@
 <template>
   <v-dialog width="600" v-model="dialog" @click:outside="close" @keydown.esc="close()">
-    <v-card class="mt-5">
+    <v-card :loading="isLoading">
       <v-card-title>
         Case Tva
         <v-btn color="primary" fab class="ml-5" small @click="refreshcasesTva">
@@ -14,7 +14,7 @@
           single-line
           hide-details
           autofocus
-          @keydown.down="giveFocusToRow(0)"
+          @keydown.down.prevent="giveFocusToRow(0)"
           autocomplete="off"
         ></v-text-field>
       </v-card-title>
@@ -73,7 +73,6 @@ export default class extends Vue {
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
-    overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des cases de tva</span>',
     onRowDoubleClicked: this.rowDoubleClick
   };
 

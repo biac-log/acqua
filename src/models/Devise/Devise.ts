@@ -1,5 +1,5 @@
 export interface IDevise {
-  id:number;
+  id: number;
   libelle: string;
   typeDevise: string;
 }

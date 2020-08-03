@@ -10,6 +10,7 @@ export class ExtraitDTO {
   codeMouvement = "";
   codeDevise = 0;
   libelleDevise = "";
+  codeReglement = 0;
   libelleReglement = "";
   ventilations: Ventilation[] = [];
 }
@@ -30,7 +31,7 @@ export class Extrait extends ExtraitDTO {
   }
 
   get montantCredit(): string {
-    return this.codeMouvement != "DB" ? this.montantDevise.toDecimalString(2) : "";
+    return this.codeMouvement == "CR" ? this.montantDevise.toDecimalString(2) : "";
   }
 
   get montantBaseSigned(): string {
@@ -40,7 +41,7 @@ export class Extrait extends ExtraitDTO {
   }
 
   get montantDeviseSigned(): string {
-    return this.codeMouvement != "CR"
+    return this.codeMouvement == "CR"
       ? (this.montantDevise * -1).toDecimalString(2)
       : this.montantDevise.toDecimalString(2);
   }

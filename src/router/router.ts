@@ -3,6 +3,7 @@ import Router, { Route, RouteConfig } from "vue-router";
 import { UserModule } from "@/store/modules/user";
 import { PermissionModule } from "@/store/modules/permissions";
 import Layout from "@/layout/index.vue";
+import Financier from "@/views/Financier/index.vue"
 import NProgress from "nprogress";
 import 'nprogress/nprogress.css';
 
