@@ -9,7 +9,7 @@ import { PieceSaveDTO } from '@/models/Financier/Save/PieceSave';
 
 export abstract class FinancierApi {
   private static axios = Axios.create({headers: { Authorization: `Bearer ${UserModule.token}` }});
-
+  
   static async getPeriodes(): Promise<PeriodeComptable[]>{
     let responseCourante = await this.axios.get<PeriodeComptableDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetPeriodeCourante`);
     let responsePrecedente = await this.axios.get<PeriodeComptableDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetPeriodePrecedente`);
@@ -30,8 +30,8 @@ export abstract class FinancierApi {
   }
 
   static async getPieceComptable(numeroJournal: string | number, numeroPiece: string | number): Promise<Piece> {
-    let response = await this.axios.get<PieceDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetPieceComptable?journal=${numeroJournal}&piece=${numeroPiece}`);
-    return new Piece(response.data);
+      let response = await this.axios.get<PieceDTO>(`${process.env.VUE_APP_ApiAcQuaCore}/Financier/GetPieceComptable?journal=${numeroJournal}&piece=${numeroPiece}`);
+      return new Piece(response.data);
   }
 
   static async getReglements(): Promise<Reglement[]> {

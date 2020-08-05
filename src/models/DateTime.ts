@@ -5,7 +5,7 @@ export class DateTime {
   public date: Moment;
 
   constructor(date?: string | Date | Moment){
-    this.date = this.momentify(date);
+    this.date = this.momentify(date || new Date());
   }
 
   private momentify(date: string | Date | Moment | undefined) : Moment {
@@ -39,6 +39,10 @@ export class DateTime {
 
   public toUtc(format= "YYYY-MM-DD") : string{
     return this.date.format(format);
+  }
+
+  public toJsonDateTime(){
+    return this.date.format("YYYY-MM-DD[T]HH:mm:ss");
   }
 
   public isBefore(date: DateTime | string) : boolean {
@@ -80,6 +84,10 @@ export class DateTime {
 
   public isValid() : boolean{
     return !!this.date?.isValid();
+  }
+
+  public isMinValue() : boolean{
+    return this.date.isSame(DateTime.minValue());
   }
 
   static today(format = "DD/MM/YYYY"){

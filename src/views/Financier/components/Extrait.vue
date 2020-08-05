@@ -410,6 +410,7 @@ export default class extends Vue {
     extrait.codeMouvement = this.montant.toNumber() > 0 ? "DB" : "CR";
     extrait.codeDevise = this.journal.devise.id;
     extrait.libelleDevise = this.journal.devise.libelle;
+    extrait.codeReglement = this.reglementSelected.numero;
     extrait.libelleReglement = this.reglementSelected.libelle;
     extrait.ventilations = this.ventilations.map(v => new Ventilation(v));
     return extrait;

@@ -39,7 +39,7 @@
             </v-col>
             <v-col cols="4">
               <AutocompleteComptesVue
-                ref="compte"
+                ref="compteComponent"
                 :Readonly.sync="readonly"
                 :TypeCompte.sync="typesComptesSelected.id"
                 @Change="compteChange">
@@ -89,48 +89,11 @@
             <SearchEcheancierVue ref="searchEcheancierDialog"></SearchEcheancierVue>
           </v-col>
           <v-col cols="3" v-show="typesComptesSelected.id == 'G'">
-            <v-combobox
-              ref="dossier"
-              label="N° Dossier"
-              v-model="dossierSelected"
-              :items="dossiersSearch"
-              :search-input.sync="searchDossier"
-              :rules="idDossierRules"
-              @keyup.enter="$event.target.select()"
-              @focus="$event.target.select()"
-              @change="dossierChangeAsync"
-              @keydown.ctrl.f.prevent="OpenSearchDossier()"
-              :hide-details="readonly"
-              :filled="readonly"
-              :readonly="readonly"
-              :disabled="!dossierIsEnabled"
-              validate-on-blur
-              hide-selected
-              item-text="idNom"
-              item-value="idDossier"
-              hide-no-data
-              dense
-            >
-              <template v-slot:append>
-                <v-btn
-                  icon
-                  small
-                  v-show="!readonly"
-                  :disabled="readonly"
-                  @click="OpenSearchDossier()"
-                  @keydown.enter.prevent.stop="OpenSearchDossier()"
-                >
-                  <v-icon>mdi-magnify</v-icon>
-                </v-btn>
-              </template>
-              <template v-slot:selection="{ attr, on, item }">
-                {{ item.idDossier }}
-              </template>
-              <template v-slot:item="{ item }">
-                {{ item.idNom }}
-              </template>
-            </v-combobox>
-            <SearchDossierVue ref="searchDossierDialog"></SearchDossierVue>
+            <AutoCompleteDossierVue 
+              ref="dossierComponent" 
+              :Readonly="!dossierIsEnabled"
+              @Change="dossierChange">
+            </AutoCompleteDossierVue>
           </v-col>  
           <v-col cols="4" v-show="typesComptesSelected.id == 'G'">
             <v-text-field
@@ -240,11 +203,11 @@
                 @blur="montant = montant.toNumber().toDecimalString()"
                 dense
               >
-                <template v-slot:append>
+                <!-- <template v-slot:append>
                   <v-btn icon small :disabled="readonly" @click="calculMontant()" @keydown.enter.prevent.stop="calculMontant()">
                     <v-icon>mdi-calculator</v-icon>
                   </v-btn>
-                </template>
+                </template> -->
               </v-text-field>
             </v-col>
             <v-col cols="2">
@@ -306,7 +269,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Emit, Prop, Watch } from "vue-property-decorator";
+import { Component, Vue, PropSync, Emit, Prop, Watch, Ref } from "vue-property-decorator";
 import {
   TypeCompte,
   Devise,
@@ -334,25 +297,26 @@ import { DateTime } from '@/models/DateTime';
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import { DossierApi } from '../../../api/DossierApi';
 import AutocompleteComptesVue from "./comptes/AutocompleteComptes.vue";
+import AutoCompleteDossierVue from "./dossier/AutocompleteDossier.vue"
+import { VForm } from 'vuetify/lib';
 
 @Component({
-  name: "Ventilation",
-  components: { SearchCaseTvaVue, SearchEcheancierVue, SearchDossierVue, AutocompleteComptesVue }
+  components: { SearchCaseTvaVue, SearchEcheancierVue, SearchDossierVue, AutocompleteComptesVue, AutoCompleteDossierVue }
 })
-export default class extends Vue {
+export default class VentilationVue extends Vue {
+  @Ref() readonly compteComponent!: AutocompleteComptesVue;
+  @Ref() readonly searchEcheancierDialog!: AutocompleteComptesVue;
+  @Ref() readonly caseTvaDialog!: AutocompleteComptesVue;
+  @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
+
+  @PropSync("isReadOnly")  public readonly!: boolean;
+  @PropSync("Ventilations") public ventilations!: Ventilation[];
+  @PropSync("DatePiece")  public datePiece !: DateTime;
+  @PropSync("VentileBase") public ventileBase !: number;
+  @PropSync("VentileDevise") public ventileDevise !: number;
+  @PropSync("Reglement") public reglement !: Reglement;
+
   private dialog: boolean = false;
-  @PropSync("isReadOnly")
-  public readonly!: boolean;
-  @PropSync("Ventilations")
-  public ventilations!: Ventilation[];
-  @PropSync("DatePiece")
-  public datePiece !: DateTime;
-  @PropSync("VentileBase")
-  public ventileBase !: number;
-  @PropSync("VentileDevise")
-  public ventileDevise !: number;
-  @PropSync("Reglement")
-  public reglement !: Reglement;
   private ventilationIsSelected = false;
 
   private warningMessage: string = "";
@@ -402,16 +366,9 @@ export default class extends Vue {
   private referenceJournal: string = "";
   private referencePiece: string = "";
 
-  private dossierLoading: boolean = false;
   private idDossier: string = "";
-  private dossiersSearch: DossierSearch[] = [];
-  private searchDossier: string = "";
-  private idDossierRules: any = [
-    (v: string) => !!v || (!v && !!this.nomDossier) || "Dossier invalide"
-  ];
-  
-  private dossierSelected: DossierSearch = new DossierSearch();
   private nomDossier: string = "";
+  private dossierIsEnabled: boolean = false;
 
   private tvaCalcule : number = 0;
   private tvaImpute : number = 0;
@@ -452,7 +409,7 @@ export default class extends Vue {
     this.$nextTick(() => {
       (this.$refs.form as any)?.resetValidation();
       this.init(ventilation, journal);
-      (this.$refs.compte as any)?.focus();
+      this.compteComponent?.focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -466,8 +423,8 @@ export default class extends Vue {
     journal: Journal
   ) {
     await this.initDevisesAsync(journal.devise, ventilation);
-    (this.$refs.compte as AutocompleteComptesVue)?.resetCompte();
-    this.resetDossier();
+    this.compteComponent?.resetCompte();
+    this.dossierComponent?.resetDossier();
     this.numeroJournal = journal.numero;
     this.typesComptesSelected = this.typesComptes.find(tc => tc.id == ventilation.typeCompte) || this.typesComptes[0];
     this.devisesSelected = this.devises.find(d => d.id == ventilation.codeDevise) ||this.devises[0];
@@ -475,19 +432,9 @@ export default class extends Vue {
     this.nomCompte = ventilation?.nomCompte ? ventilation.nomCompte : "";
 
     if(ventilation){
-      this.$nextTick(() => {(this.$refs.compte as AutocompleteComptesVue)?.init(ventilation.numeroCompte.toString(), ventilation.nomCompte)});
-
+      this.$nextTick(() => {this.compteComponent?.init(ventilation.numeroCompte.toString(), ventilation.nomCompte)});
       if(ventilation.dossier){
-        this.dossierIsEnabled = true;
-        let dossierToSelect = new DossierSearch({
-            idDossier: ventilation.dossier ? ventilation.dossier : "",
-          nom: ventilation.dossierNom,
-          dateEntree: "",
-          dateSortie: ""
-        });
-        this.dossiersSearch = [];
-        this.dossiersSearch.push(dossierToSelect);
-        this.dossierSelected = dossierToSelect;
+        this.dossierComponent.setDossier(new DossierSearch({ idDossier: ventilation.dossier, nom: ventilation.dossierNom, dateEntree: "", dateSortie: "" }));
       }
     }
     
@@ -522,7 +469,7 @@ export default class extends Vue {
       this.setCompteGeneralCaseTvaAsync(compte);
       if(this.typesComptesSelected?.id == "G" && (compte.nature == 'R' || compte.nature == 'C')){
         this.dossierIsEnabled = true;
-        this.$nextTick(() => (this.$refs.dossier as any)?.focus());
+        this.dossierComponent?.focus();
       }
       else{
         this.dossierIsEnabled = false;
@@ -535,6 +482,15 @@ export default class extends Vue {
       this.natureCompte = "";
       this.$nextTick(() => (this.$refs.reference as any)?.focus()); 
     }
+  }
+
+  private dossierChange(dossier: DossierSearch){
+    this.idDossier = dossier.idDossier;
+    this.nomDossier = dossier.nom;
+
+    if(this.datePiece && dossier.idDossier && !dossier.dossierIsActif(this.datePiece))
+      this.warningMessage = `Attention, le dossier ${dossier.idDossier} n'est pas actif à la date du ${this.datePiece.toString()}`;
+    else this.warningMessage = "";
   }
 
   private async setCompteGeneralCaseTvaAsync(compte: CompteGeneralSearch) {
@@ -551,7 +507,7 @@ export default class extends Vue {
         this.numeroCaseTva = "";
         this.libelleCaseTva = "";
       } 
-      this.calculMontant();
+      //this.calculMontant();
     }
   }
 
@@ -575,11 +531,10 @@ export default class extends Vue {
 
   private initFromPieceComptable(piece: PieceAchatVente){
     this.numeroCompte = piece.numeroCompteTiers?.toString();
-    (this.$refs.compte as AutocompleteComptesVue)?.init(piece.numeroCompteTiers, piece.nomCompteTiers);
+    this.compteComponent?.init(piece.numeroCompteTiers, piece.nomCompteTiers);
     this.nomCompte = piece.nomCompteTiers;
     this.montant = piece.montantTotalDv.toDecimalString();
     this.initDeviseFromPieceComptable(piece);
-    
     this.reference = `${piece.numeroJournal}.${piece.numeroPiece}`;
     this.referenceJournal = piece.numeroJournal.toString();
     this.referencePiece = piece.numeroPiece.toString();
@@ -680,90 +635,90 @@ export default class extends Vue {
   //#endregion
 
   //#region Dossier
-  @Watch("searchDossier")
-  private async autocompleteDossiers(matchCode: string) {
-    try {
-      this.dossierLoading = true;
-      if (matchCode) {
-        this.dossiersSearch = await DossierApi.getsById(matchCode.toUpperCase(), 5);
-      } else this.dossiersSearch = [];
-    } catch (err) {
-      console.log(err);
-    } finally {
-      this.dossierLoading = false;
-    }
-  }
-  private OpenSearchDossier(): void {
-    (this.$refs.searchDossierDialog as SearchDossierVue)
-      .open()
-      .then(dossier => {
-        this.setDossier(dossier);
-        this.$nextTick(() => (this.$refs.montant as any)?.focus());
-      }).catch(() => {
-        this.$nextTick(() => (this.$refs.dossier as any)?.focus());
-      });
-  }
+  // @Watch("searchDossier")
+  // private async autocompleteDossiers(matchCode: string) {
+  //   try {
+  //     this.dossierLoading = true;
+  //     if (matchCode) {
+  //       this.dossiersSearch = await DossierApi.getsById(matchCode.toUpperCase(), 5);
+  //     } else this.dossiersSearch = [];
+  //   } catch (err) {
+  //     console.log(err);
+  //   } finally {
+  //     this.dossierLoading = false;
+  //   }
+  // }
+  // private OpenSearchDossier(): void {
+  //   (this.$refs.searchDossierDialog as SearchDossierVue)
+  //     .open()
+  //     .then(dossier => {
+  //       this.setDossier(dossier);
+  //       this.$nextTick(() => (this.$refs.montant as any)?.focus());
+  //     }).catch(() => {
+  //       this.$nextTick(() => (this.$refs.dossier as any)?.focus());
+  //     });
+  // }
 
-  private dossierIsEnabled = false;
-  private async dossierChangeAsync(value: string | DossierSearch | undefined) {
-    if(!value) this.resetDossier();
-    else if(typeof value === "string"){
-      this.dossierLoading = true;
-      let dossier = await DossierApi.getById(value)
-      this.setDossier(dossier);
-      this.dossierLoading = false;
-    } 
-    else  this.setDossier(value);
-  }
-  private setDossier(dossier: DossierSearch) {
-    if (dossier) {
-      this.dossiersSearch = [];
-      this.dossiersSearch.push(dossier);
-      this.dossierSelected = dossier;
-      if(this.datePiece && dossier.idDossier && !dossier.dossierIsActif(this.datePiece))
-        this.warningMessage = `Attention, le dossier ${dossier.idDossier} n'est pas actif à la date du ${this.datePiece.toString()}`;
-      else this.warningMessage = "";
-    }
+  // private dossierIsEnabled = false;
+  // private async dossierChangeAsync(value: string | DossierSearch | undefined) {
+  //   if(!value) this.resetDossier();
+  //   else if(typeof value === "string"){
+  //     this.dossierLoading = true;
+  //     let dossier = await DossierApi.getById(value)
+  //     this.setDossier(dossier);
+  //     this.dossierLoading = false;
+  //   } 
+  //   else  this.setDossier(value);
+  // }
+  // private setDossier(dossier: DossierSearch) {
+  //   if (dossier) {
+  //     this.dossiersSearch = [];
+  //     this.dossiersSearch.push(dossier);
+  //     this.dossierSelected = dossier;
+  //     if(this.datePiece && dossier.idDossier && !dossier.dossierIsActif(this.datePiece))
+  //       this.warningMessage = `Attention, le dossier ${dossier.idDossier} n'est pas actif à la date du ${this.datePiece.toString()}`;
+  //     else this.warningMessage = "";
+  //   }
 
-    this.idDossier = dossier.idDossier.toString();
-    this.nomDossier = dossier.nom;
-  }
+  //   this.idDossier = dossier.idDossier.toString();
+  //   this.nomDossier = dossier.nom;
+  // }
 
-  private resetDossier(){
-    this.dossierSelected = new DossierSearch();
-    this.searchDossier = "";
-    this.idDossier = "";
-    this.nomDossier = "";
-  }
+  // private resetDossier(){
+  //   this.dossierSelected = new DossierSearch();
+  //   this.searchDossier = "";
+  //   this.idDossier = "";
+  //   this.nomDossier = "";
+  // }
   //#endregion 
 
-  private calculMontant(){
-    if(this.caseTva.typeCase == 50)
-      this.montant = this.calculMontantTva().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
-    else if(this.caseTva.typeCase == 1)
-      this.montant = this.calculMontantTaxable().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
-  }
+  // private calculMontant(){
+  //   if(this.caseTva.typeCase == 50)
+  //     this.montant = this.calculMontantTva().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+  //   else if(this.caseTva.typeCase == 1)
+  //     this.montant = this.calculMontantTaxable().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+  // }
 
-  private calculMontantTva() : number{
-    let montantTva = this.tvaCalcule - this.tvaImpute;
-    if(this.typesMouvementsSelected.id == "DB") montantTva = this.tvaImpute -  this.tvaCalcule;
-    if(montantTva < 0)montantTva = 0;
-    return montantTva;
-  }
+  // private calculMontantTva() : number{
+  //   let montantTva = this.tvaCalcule - this.tvaImpute;
+  //   if(this.typesMouvementsSelected.id == "DB") montantTva = this.tvaImpute -  this.tvaCalcule;
+  //   if(montantTva < 0)montantTva = 0;
+  //   return montantTva;
+  // }
 
-  private calculMontantTaxable() : number {
-    let montantTaxable = this.tvaCalcule - this.tvaImpute;
-    if(this.typesMouvementsSelected.id == "CR")
-      montantTaxable = this.ventileDevise - montantTaxable;
-    else montantTaxable = montantTaxable - this.ventileDevise;
+  // private calculMontantTaxable() : number {
+  //   let montantTaxable = this.tvaCalcule - this.tvaImpute;
+  //   if(this.typesMouvementsSelected.id == "CR")
+  //     montantTaxable = this.ventileDevise - montantTaxable;
+  //   else montantTaxable = montantTaxable - this.ventileDevise;
 
-    if(montantTaxable < 0) 
-      montantTaxable = 0;
-    else if(this.caseTva.tauxTvaCase)
-      montantTaxable = (montantTaxable / (1+ (this.caseTva.tauxTvaCase / 100)));
+  //   if(montantTaxable < 0) 
+  //     montantTaxable = 0;
+  //   else if(this.caseTva.tauxTvaCase)
+  //     montantTaxable = (montantTaxable / (1+ (this.caseTva.tauxTvaCase / 100)));
       
-    return montantTaxable;
-  }
+  //   return montantTaxable;
+  // }
 
   private async loadCaseTvaAsync() {
     try {
@@ -777,7 +732,7 @@ export default class extends Vue {
             this.numeroCaseTva = caseTva.numeroCase.toString();
             this.libelleCaseTva = caseTva.libelleCase.toString();
             this.caseTva = caseTva;
-            this.calculMontant();
+            //this.calculMontant();
         }
       } else {
         this.caseTva.Refresh();
@@ -834,15 +789,15 @@ export default class extends Vue {
     });
   }
 
-  @Watch("caseTva")
-  private caseTvaChanged(val: string, oldVal: string){
-    if(!this.readonly && !this.montant) this.calculMontant();
-  }
+  // @Watch("caseTva")
+  // private caseTvaChanged(val: string, oldVal: string){
+  //   if(!this.readonly && !this.montant) this.calculMontant();
+  // }
 
   @Watch("devisesSelected")
   private deviseChanged(val: Devise, oldVal: Devise){
     if(this.readonly) return;
-    if(!this.montant) this.calculMontant();
+    //if(!this.montant) this.calculMontant();
     if(val) this.initTauxDeviseAsync(val.id, this.datePiece);
     else this.taux = "1";
   }

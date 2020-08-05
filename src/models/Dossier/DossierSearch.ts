@@ -14,12 +14,12 @@ export class DossierSearch extends DossierSearchDTO {
     Object.assign(this, dto || new DossierSearchDTO());
   }
 
-  get dateEntreeDate(): Date{
-    return new Date(this.dateEntree);
+  get dateEntreeDate(): DateTime {
+    return new DateTime(this.dateEntree);
   }
 
-  get dateSortieDate(): Date{
-    return new Date(this.dateSortie);
+  get dateSortieDate(): DateTime{
+    return new DateTime(this.dateSortie);
   }
 
   get idNom(): string{
@@ -27,6 +27,6 @@ export class DossierSearch extends DossierSearchDTO {
   }
 
   public dossierIsActif(date: DateTime): boolean{
-    return date.isBetween(new DateTime(this.dateEntreeDate), new DateTime(this.dateSortieDate));
+    return this.dateSortieDate.isMinValue() || date.isBetween(this.dateEntreeDate, this.dateSortieDate);
   }
 }

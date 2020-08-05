@@ -59,8 +59,8 @@ export default class extends Vue {
   private headersDossier = [
     { headerName: "Id", field: "idDossier" , width: 100},
     { headerName: "Nom", field: "nom", flex: 1 },
-    { headerName: "Date entrée", field: "dateEntreeDate", width: 140, type: 'dateColumn', valueFormatter: this.dateToString },
-    { headerName: "Date sortie", field: "dateSortieDate", width: 140, type: 'dateColumn', valueFormatter: this.dateToString },
+    { headerName: "Date entrée", field: "dateEntreeDate", width: 140, type: 'dateColumn' },
+    { headerName: "Date sortie", field: "dateSortieDate", width: 140, type: 'dateColumn' },
   ];
 
   private resolve!: any;
@@ -214,10 +214,10 @@ export default class extends Vue {
     if(selectedCell && pageSize) this.giveFocusToRow(selectedCell.rowIndex - pageSize);
   }
 
-  private dateToString(params: ValueFormatterParams): string {
-    let date = new DateTime(params.value as Date);
-    return date.toString();
-  }
+  // private dateToString(params: ValueFormatterParams): string {
+  //   let date = new DateTime(params.value as Date);
+  //   return (date).toString();
+  // }
 
   private reinitGrid(){
     (this.gridOptions.api as GridApi).resetQuickFilter();

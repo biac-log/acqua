@@ -6,6 +6,7 @@ import "./registerServiceWorker";
 import vuetify from "./plugins/vuetify";
 import * as filters from '@/utils/FiltersMethods'
 import * as moment from 'moment';
+import { LoggingApi } from "@/api/LoggingApi";
 import 'moment/locale/fr';
 import "@/utils/Extensions";
 moment.locale('fr')
@@ -19,6 +20,16 @@ Vue.config.keyCodes.plus = 107;
 Object.keys(filters).forEach(key => {
   Vue.filter(key, (filters as { [key: string ]: Function })[key])
 })
+
+Vue.config.errorHandler = function (err: any, vm, info) {
+  // if(process.env.NODE_ENV === 'production'){
+    LoggingApi.generateLog(err,vm,info);
+  //}
+}
+
+window.onerror = function(message, source, lineno, colno, error) {
+  console.log('Exception: ', error)
+}
 
 new Vue({
   router,
