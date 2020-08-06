@@ -67,7 +67,6 @@ export abstract class LoggingApi {
       // Something happened in setting up the request that triggered an Error
       logging.descriptionLongue += "\n" + err.message;
     }
-    console.log(err.config);
     logging.fonction = `${err.config?.method?.toString()} ${err.config?.url?.toString()}`;
     logging.descriptionLongue += "\n Request config : \n" +  JSON.stringify(err.config);
   }

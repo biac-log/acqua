@@ -22,19 +22,24 @@
       dense
     >
       <template v-slot:append>
-        <v-btn
-          icon
-          small
-          v-show="!readonly"
-          :disabled="readonly"
-          @click="OpenSearchCompte()"
-          @keydown.enter.prevent.stop="OpenSearchCompte()"
-          tabindex="4"
-        >
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
+        <v-tooltip top open-delay=500>
+          <template v-slot:activator="{ on }">
+            <v-btn
+              icon
+              small
+              v-show="!readonly"
+              :disabled="readonly"
+              @click="OpenSearchCompte()"
+              @keydown.enter.prevent.stop="OpenSearchCompte()"
+              tabindex="4"
+              v-on="on">
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+          </template>
+          <span>Recherche de compte <span class="shortcutTooltip">ctrl + f</span></span>
+        </v-tooltip>
       </template>
-      <template v-slot:selection="{ attr, on, item }">
+      <template v-slot:selection="{ item }">
         {{ item.numero }}
       </template>
       <template v-slot:item="{ item }">
@@ -92,9 +97,8 @@ export default class extends Vue {
     if(!value) //Si vide
       this.resetCompte();
     else if(typeof value === "string"){
-     
       //Si on tappe un numéro sans passer pour l'aucomplete
-      if(this.typeCompte == "C" && value.length == 8)
+      if(value.isInt() && value.length == 8 && (this.typeCompte == "C" || this.typeCompte == "F"))
         this.$emit('Change', value);
       else{
          await this.loadCompteByString(value);
@@ -119,7 +123,6 @@ export default class extends Vue {
     try {
       this.compteLoading = true;
     } catch{
-      console.log(value);
       if (value) {
         if(this.typeCompte == "F" || this.typeCompte == "C") {
           let compte = await CompteApi.getCompteDeTier(this.typeCompte, value);
@@ -212,6 +215,10 @@ export default class extends Vue {
 
   public focus(){
     this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+  }
+
+  public blur(){
+    this.$nextTick(() => (this.$refs.numeroCompte as any)?.blur());
   }
 
   @Watch("typeCompte")

@@ -327,12 +327,4 @@ export default class extends Vue {
 #dataTable tbody tr {
   cursor: pointer;
 }
-
-.shortcutTooltip{
-  background: darkslategray;
-  border: 1px solid white;
-  padding: 2px 5px 2px 5px;
-  margin-left: 3px;
-  font-size: 12px;
-}
 </style>

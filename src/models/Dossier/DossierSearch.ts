@@ -27,6 +27,6 @@ export class DossierSearch extends DossierSearchDTO {
   }
 
   public dossierIsActif(date: DateTime): boolean{
-    return this.dateSortieDate.isMinValue() || date.isBetween(this.dateEntreeDate, this.dateSortieDate);
+    return !this.dateSortie || this.dateSortieDate.isMinValue() || date.isBetween(this.dateEntreeDate, this.dateSortieDate);
   }
 }

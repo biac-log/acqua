@@ -22,6 +22,7 @@ export class EcheancierElement extends EcheancierElementDTO {
   }
 
   public isLastRow = false;
+  public isFirstRow = true;
 
   get libellePiece(): string{
     return `${this.numeroJournal}.${this.numeroPiece}`;

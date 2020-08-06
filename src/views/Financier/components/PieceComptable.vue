@@ -4,10 +4,12 @@
     scrollable
     eager
     width="80%"
+    :persistent="!readonly"
     @click:outside="closeDialog"
     @keydown.f2="ModifierPiece"
     @keydown.46.prevent.stop="DeletePiece"
     @keydown.107.prevent.stop="createExtrait"
+    @keydown.esc.prevent="CancelEdit()"
     @keydown.alt.enter.stop="savePiece()"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
@@ -20,23 +22,22 @@
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
           <v-spacer></v-spacer>
-          <v-btn
-            class="mr-5"
-            color="success"
-            @click="ModifierPiece"
-            v-if="readonly"
-          >
-            <v-icon left>mdi-pencil</v-icon>Modifier
-          </v-btn>
-          <v-btn
-            class="mr-10"
-            color="error"
-            v-if="readonly"
-            @click="DeletePiece"
-            :loading="deleteIsLoading"
-          >
-            <v-icon left>mdi-delete</v-icon>Supprimer
-          </v-btn>
+          <v-tooltip v-if="readonly" top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-on="on"  >
+                <v-icon left>mdi-pencil</v-icon>Modifier
+              </v-btn>
+            </template>
+            <span>Modifier la pièce <span class="shortcutTooltip">F2</span></span>
+          </v-tooltip>
+          <v-tooltip v-if="readonly" top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" class="mr-10"  color="error" @click="DeletePiece" :loading="deleteIsLoading">
+                <v-icon left>mdi-delete</v-icon>Supprimer
+              </v-btn>
+            </template>
+            <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
+          </v-tooltip>
           <v-btn
             ref="buttonClose"
             class="ml-10"
@@ -112,17 +113,14 @@
         </v-card-text>
         <v-divider v-if="!readonly"></v-divider>
         <v-card-actions v-if="!readonly" class="d-flex">
-          <v-btn
-            color="error"
-            class="ma-2 pr-4 align-self-start"
-            text
-            tabindex="-1"
-            v-if="numeroPiece"
-            @click="DeletePiece()"
-            :loading="deleteIsLoading"
-            >
-            Supprimer</v-btn
-          >
+          <v-tooltip v-if="numeroPiece" top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn color="error" v-on="on" class="ma-2 pr-4 align-self-start" text tabindex="-1" @click="DeletePiece()" :loading="deleteIsLoading">
+                Supprimer
+              </v-btn>
+            </template>
+            <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
+          </v-tooltip>
           <v-spacer></v-spacer>
           <v-btn
             color="warning"
@@ -147,17 +145,23 @@
             outlined
             class="shrink align-self-start"
           ></v-text-field>
-          <v-btn
-            color="blue darken-1"
-            class="ma-2 mt-0 pr-4 align-self-start"
-            tile outlined
-            @click="cancelEdit()"
-            tabindex="-1"
-            >
-            <v-icon left>mdi-close</v-icon> Annuler</v-btn>
-          <v-btn ref="btnValidate" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()">
-            <v-icon left>mdi-content-save</v-icon>Sauvegarder
-          </v-btn>
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn color="blue darken-1" v-on="on" class="ma-2 mt-0 pr-4 align-self-start" tile outlined @click="CancelEdit()" tabindex="-1">
+                <v-icon left>mdi-close</v-icon> Annuler
+              </v-btn>
+            </template>
+            <span>Annuler les modifications <span class="shortcutTooltip">esc</span></span>
+          </v-tooltip>
+          
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn ref="btnValidate" v-on="on" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()">
+                <v-icon left>mdi-content-save</v-icon>Sauvegarder
+              </v-btn>
+            </template>
+            <span>Sauvegarder la pièce <span class="shortcutTooltip">alt + enter</span></span>
+          </v-tooltip>
         </v-card-actions>
         <v-alert type="error" border="left" v-if="errorMessage"  class="ml-4 mr-4">
             {{errorMessage}}
@@ -171,7 +175,7 @@
 <script lang="ts">
 import axios from "axios";
 import moment from "moment";
-import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
+import { Component, Vue, PropSync, Emit, Watch, Ref } from "vue-property-decorator";
 import {
   PeriodeComptable,
   EntetePieceComptable,
@@ -198,7 +202,11 @@ import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../model
   components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm}
 })
 export default class extends Vue {
+  @Ref() refExtraitVue!: ExtraitVue;
+  @Ref() confirmDialog!: Confirm;
+
   private dialog = false;
+  private oldPiece!: Piece | null;
   private readonly = false;
   private resolve: any;
   private reject: any;
@@ -236,9 +244,12 @@ export default class extends Vue {
   private hash = "";
   public async OpenNew(periode: PeriodeComptable, journal: Journal) : Promise<EntetePieceComptable>{
     this.dialog = true;
+    this.oldPiece = null;
     this.readonly = false;
     this.periode = periode;
     this.journal = journal;
+    this.numeroPiece = "0";   
+    this.hash = "";
     this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`; 
     let solde = await FinancierApi.getSoldeCompte(journal.numeroCompteBanque);
     this.soldeInitial = solde.toDecimalString();
@@ -272,7 +283,7 @@ export default class extends Vue {
 
   private createExtrait() {
     if(!this.readonly){
-      (this.$refs.refExtraitVue as ExtraitVue).openNew(this.journal)
+      this.refExtraitVue.openNew(this.journal)
       .then((resp: Extrait) => {
         const maxLigne = this.extraits?.length ?  Math.max(...this.extraits.map(i => i.numeroExtrait)) : 0;
         resp.numeroExtrait = maxLigne + 1;
@@ -285,7 +296,7 @@ export default class extends Vue {
   }
 
   private editExtrait(extrait: Extrait) {
-    (this.$refs.refExtraitVue as ExtraitVue).open(this.journal, extrait)
+    this.refExtraitVue.open(this.journal, extrait)
       .then((resp: Extrait) => {
         if(resp)
           Vue.set(this.extraits, this.extraits.findIndex(d => d == extrait), resp);
@@ -300,6 +311,7 @@ export default class extends Vue {
   }
 
   private init(piece: Piece){
+    this.oldPiece = piece;
     this.numeroPiece = piece.numeroPiece.toString();
     this.libelleCompte = `${piece.numeroCompteFinancier.toString()} ${piece.nomCompteFinancier}`; 
     this.datePiece = new DateTime(piece.datePiece);
@@ -328,7 +340,7 @@ export default class extends Vue {
   }
 
   private DeletePiece(){
-    (this.$refs.confirmDialog as Confirm)
+    this.confirmDialog
     .open(
       "Suppression",
       `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
@@ -464,6 +476,15 @@ export default class extends Vue {
     (this.$refs.refDatePiece as DatePicker).focus();
   }
 
+  private CancelEdit(){
+    this.readonly = true;
+    if(this.numeroPiece.toNumber() == 0)
+      this.closeDialog();
+    else if(this.oldPiece){
+      this.init(this.oldPiece);
+    }
+  }
+
   private closeDialog(){
     this.reset();
     this.dialog = false;
@@ -472,7 +493,7 @@ export default class extends Vue {
 }
 </script>
 
-<style>
+<style scopped>
 .textMini {
   font-size: 12px;
 }

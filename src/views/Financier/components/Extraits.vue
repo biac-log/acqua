@@ -3,20 +3,19 @@
       <v-toolbar color="#EEEEEE" flat>
         <v-card-title>
           Extraits
-          <v-btn
-            color="primary"
-            fab
-            small
-            class="ml-5"
-            ref="btnAdd"
-            :disabled="readonly"
-            @click.stop="createExtrait"
-          >
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn color="primary" fab small class="ml-5" ref="btnAdd" :disabled="readonly" @click.stop="createExtrait" v-on="on">
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </template>
+            <span>Ajouter un extrait <span class="shortcutTooltip"> + </span></span>
+          </v-tooltip>
       </v-card-title>
         <v-spacer></v-spacer>
-        <v-btn color="info" @click="displayVentilation = !displayVentilation"> {{ displayVentilation ? "Cacher la ventilation" : "Afficher la ventilation"}}</v-btn>
+        <v-btn color="info" @click="displayVentilation = !displayVentilation"> 
+              {{ displayVentilation ? "Cacher la ventilation" : "Afficher la ventilation"}} 
+        </v-btn>
       </v-toolbar>
       <v-data-table
         :headers="headersExtraits"
@@ -44,11 +43,12 @@
             <td></td>
             <td></td>
           </tr>
-          <template v-if="displayVentilation">
+          <template v-if="displayVentilation" >
             <tr class="rowChild" 
                 v-for="(ventilation, index) in item.ventilations" 
                 :key="`${item.numeroExtrait}.${ventilation.numeroVentilation}`"
-                :class="index != Object.keys(item.ventilations).length - 1 ? '' : 'lastChild'">
+                :class="index != Object.keys(item.ventilations).length - 1 ? '' : 'lastChild'"
+                @click="editExtrait(item)">
               <td align="left">{{ `${item.numeroExtrait}.${ventilation.numeroVentilation}` }}</td>
               <!-- <td align="right">{{ ventilation.numeroVentilation }}</td> -->
               <td >{{ `${ventilation.typeCompte} ${ventilation.numeroCompte}` }}</td>
@@ -91,21 +91,21 @@ export default class extends Vue {
   private journal!: Journal;
   @PropSync('DatePiece')
   private datePiece!: DateTime;
-  private displayVentilation: boolean = false;
+  private displayVentilation: boolean = true;
 
   //private selectedRow!: Extrait; 
 
   private headersExtraits = [
     { text: "Ex", value: "numeroExtrait", width: 20 },
     //{ text: "Ven", value: "", width: 20 },
-    { text: "Compte", value: "libelleCompte", width:120 },
-    { text: "Intitulé", value: "nomCompte", width:200  },
-    { text: "Pièce", value: "", width:100  },
-    { text: "Libellé d'écriture", value: "", width:200 },
-    { text: "Débit", value: "montantDebit", width:100  },
-    { text: "Crédit", value: "montantCredit", width:100  },
-    { text: "Devise", value: "libelleDevise", width:50  },
-    { text: "TVA", value: "tva", width:50  },
+    { text: "Compte", value: "libelleCompte", width:150 },
+    { text: "Intitulé", value: "nomCompte" },
+    { text: "Pièce", value: "", width:200  },
+    { text: "Libellé d'écriture", value: "", width:300 },
+    { text: "Débit", value: "montantDebit", width: 100  },
+    { text: "Crédit", value: "montantCredit", width: 100  },
+    { text: "Devise", value: "libelleDevise", width:80  },
+    { text: "TVA", value: "tva", width:80  },
   ];
 
   @Emit("CreateExtrait")
@@ -122,8 +122,7 @@ export default class extends Vue {
     newValue.forEach(element => {
       nbrRow += element.ventilations.length;
     });
-    console.log(nbrRow);
-    this.displayVentilation = nbrRow <= 16;
+    //this.displayVentilation = nbrRow <= 16;
   }
 
   public focus(){
@@ -151,9 +150,13 @@ export default class extends Vue {
   margin-left: 10px;
 }
 
-.rowParent td{
-  background-color: rgba(0, 0, 0, 0.06);
+.rowParent td {
   border-top: thin solid rgba(0, 0, 0, 0.5);
+  margin-top: -1px;
+}
+
+.rowChild td{
+  background-color: rgba(0, 0, 0, 0.06);
   margin-top: -1px;
 }
 

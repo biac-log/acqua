@@ -8,7 +8,7 @@
             @keydown.ctrl.f.prevent="focusSearch()">
     <v-card :loading="isLoading">
       <v-card-title>
-        Echeanciers
+        Échéancier {{ nomCompte }}
         <v-btn color="primary" fab small class="ml-5" @click="refreshEcheancier">
           <v-icon>mdi-refresh</v-icon>
         </v-btn>
@@ -33,6 +33,17 @@
         :rowData="echeanciers"
         :gridOptions="gridOptions">
       </AgGridVue>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-tooltip top open-delay=500>
+          <template v-slot:activator="{ on }">
+            <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" @click="sendEcheancier" v-on="on">
+              <v-icon left>mdi-check</v-icon> Valider
+            </v-btn>
+          </template>
+          <span>Valider la sélection <span class="shortcutTooltip">enter</span></span>
+        </v-tooltip>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
@@ -57,6 +68,7 @@ export default class extends Vue {
 
   private typeLoad!: string;
   private numeroEcheancierToLoad!: string;
+  private nomCompte: string = "";
 
   private filtreEcheancier: string = "";
   private isLoading: boolean = false;
@@ -66,10 +78,11 @@ export default class extends Vue {
       headerName: "Piece", 
       field: "libellePiece", 
       filter: true, 
-      width: 160,
+      width: 140,
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: true, 
+       type: 'rightAligned' 
     },
     { headerName: "Type", field: "typePiece", filter:true, width: 150 },
     { headerName: "Date", field: "datePieceDate", filter:true, width: 120, type: 'dateColumn', valueFormatter: this.dateToString },
@@ -77,7 +90,7 @@ export default class extends Vue {
     { headerName: "Libelle", field: "libelle", filter:true, width: 200, type: 'dateColumn' },
     { headerName: "Date échéance", field: "dateEcheanceDate", filter:true, width: 120, valueFormatter: this.dateToString },
     { headerName: "Solde", field: "solde", filter:true, width: 140, type: 'numericColumn', valueFormatter: this.numberToString },
-    { headerName: "Dépassement", field: "depassement", filter:true, flex:1, type: 'numericColumn' }
+    { headerName: "Dépassement", field: "echu", filter:true, flex:1 }
   ];
 
   private resolve!: any;
@@ -106,11 +119,15 @@ export default class extends Vue {
         return { "border-bottom": "1px solid black", "background-color": "#ffd6cc" };  
       else if (params.node.data.isLastRow)
         return { "border-bottom": "1px solid black" };  
+    },
+    isRowSelectable: function(rowNode) {
+        return rowNode.data ? rowNode.data.typePiece != "Paiement" : false;
     }
   };
 
-  public open(typeToLoad: string, numeroEcheancierToLoad: string): Promise<EcheancierElement[]> {
+  public open(typeToLoad: string, numeroEcheancierToLoad: string, nomCompte: string): Promise<EcheancierElement[]> {
     this.dialog = true;
+    this.nomCompte = nomCompte;
     this.loadEcheancier(typeToLoad, numeroEcheancierToLoad);
 
     return new Promise((resolve, reject) => {
@@ -142,6 +159,7 @@ export default class extends Vue {
 
   private initGrid(elements: EcheancierElement[]){
     _(elements).groupBy(e => `${e.numeroJournalPrincipal}${e.numeroPiecePrincipal}`).forEach(elementsGrouped => {
+      elementsGrouped[0].isFirstRow = true;
       elementsGrouped[elementsGrouped.length -1].isLastRow = true;
     });
 
@@ -204,8 +222,7 @@ export default class extends Vue {
 
   private keypress(event: any) {
     if(event?.event.key === "Enter"){
-      var selectedRows = this?.gridOptions?.api?.getSelectedRows() as EcheancierElement[];
-      this.sendEcheancier(selectedRows)
+      this.sendEcheancier()
     }
   } 
 
@@ -224,11 +241,16 @@ export default class extends Vue {
     (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 
-  private sendEcheancier(compte: EcheancierElement[]) {
-    this.filtreEcheancier = "";
-    this.dialog = false;
-    this.reinitGrid();
-    this.resolve(compte);
+  private sendEcheancier() {
+    var comptes = this?.gridOptions?.api?.getSelectedRows() as EcheancierElement[];
+    if(!comptes?.length)this.close();
+    else
+    {
+      this.filtreEcheancier = "";
+      this.dialog = false;
+      this.reinitGrid();
+      this.resolve(comptes);
+    }
   }
 
   private close(){

@@ -2,6 +2,7 @@
   <div @keydown.alt.enter.stop="sendVentilation()" 
        @click:outside="close()" 
        @keydown.esc.stop="close()"
+       @keydown.46.prevent.stop="deleteVentilation"
        class="ma-0 pa-0" >
     <div :class="ventilationIsSelected ? 'overlay' : ''" @click="close()"/>
     <v-form ref="form" 
@@ -68,22 +69,30 @@
               :readonly="readonly"
               :disabled="typesComptesSelected.id == 'G'"
               :hide-details="readonly"
-              @blur="loadPieceComptable(reference)"
+              :rules="referenceRules"
+              @change="loadPieceComptable(reference)"
               @keydown.ctrl.f.prevent="OpenSearchEcheancier()"
+              validate-on-blur
               dense
             >
             <template v-slot:append>
-              <v-btn
-                icon
-                small
-                v-show="!readonly"
-                :disabled="readonly"
-                @click="OpenSearchEcheancier()"
-                @keydown.enter.prevent.stop="OpenSearchEcheancier()"
-                tabindex="-1"
-              >
-                <v-icon>mdi-magnify</v-icon>
-              </v-btn>
+              <v-tooltip top open-delay=500>
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    icon
+                    small
+                    v-show="!readonly"
+                    :disabled="readonly"
+                    @click="OpenSearchEcheancier()"
+                    @keydown.enter.prevent.stop="OpenSearchEcheancier()"
+                    tabindex="-1"
+                    v-on="on"
+                  >
+                    <v-icon>mdi-magnify</v-icon>
+                  </v-btn>
+                </template>
+                <span>Recherche dans l'échéancier<span class="shortcutTooltip">ctrl + f</span></span>
+              </v-tooltip>
             </template>
             </v-text-field>
             <SearchEcheancierVue ref="searchEcheancierDialog"></SearchEcheancierVue>
@@ -155,9 +164,14 @@
                 dense
               >
                 <template v-slot:append>
-                  <v-btn icon small :disabled="readonly" @click="OpenSearchCaseTva()" @keydown.enter.prevent.stop="OpenSearchCaseTva()" tabindex="-1">
-                    <v-icon>mdi-magnify</v-icon>
-                  </v-btn>
+                  <v-tooltip top open-delay=500>
+                    <template v-slot:activator="{ on }">
+                      <v-btn icon small :disabled="readonly" @click="OpenSearchCaseTva()" @keydown.enter.prevent.stop="OpenSearchCaseTva()" tabindex="-1" v-on="on">
+                        <v-icon>mdi-magnify</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Recherche case TVA<span class="shortcutTooltip">ctrl + f</span></span>
+                  </v-tooltip>
                 </template>
               </v-text-field>
             </v-col>
@@ -238,30 +252,31 @@
           </v-row>
         </v-card-text>
         <v-card-actions v-if="ventilationIsSelected" class="text-center pt-0">
-          <v-btn
-            color="error"
-            class="ma-2 pr-4"
-            text
-            tabindex="-1"
-            v-if="!isNew && !readonly"
-            @click="deleteVentilation()"
-            dense
-            >
-            Supprimer</v-btn
-          >
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn color="error"  class="ma-2 pr-4"  text  tabindex="-1" v-if="!isNew && !readonly" @click="deleteVentilation()" dense v-on="on">
+                Supprimer
+              </v-btn>
+            </template>
+            <span>Supprimer la ventilation<span class="shortcutTooltip">del</span></span>
+          </v-tooltip>
           <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            class="ma-2 pr-4"
-            tile outlined
-            @click="close()"
-            tabindex="-1"
-            >
-            <v-icon left>mdi-close</v-icon> Fermer</v-btn
-          >
-          <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" v-if="!readonly" :disabled="!isValid" @click="sendVentilation">
-            <v-icon left>mdi-check</v-icon> Valider
-          </v-btn>
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn color="blue darken-1" class="ma-2 pr-4" tile outlined @click="close()" tabindex="-1" v-on="on">
+                <v-icon left>mdi-close</v-icon> Fermer
+              </v-btn >
+            </template>
+            <span>Fermer <span class="shortcutTooltip">esc</span></span>
+          </v-tooltip>
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" v-if="!readonly" :disabled="!isValid" @click="sendVentilation" @keydown.tab.prevent="focusFirstElement" v-on="on">
+                <v-icon left>mdi-check</v-icon> Valider
+              </v-btn>
+            </template>
+            <span>Valider les modifications <span class="shortcutTooltip">alt + enter</span></span>
+          </v-tooltip>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -309,9 +324,9 @@ export default class VentilationVue extends Vue {
   @Ref() readonly caseTvaDialog!: AutocompleteComptesVue;
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
 
-  @PropSync("isReadOnly")  public readonly!: boolean;
+  @PropSync("isReadOnly") public readonly!: boolean;
   @PropSync("Ventilations") public ventilations!: Ventilation[];
-  @PropSync("DatePiece")  public datePiece !: DateTime;
+  @PropSync("DatePiece") public datePiece !: DateTime;
   @PropSync("VentileBase") public ventileBase !: number;
   @PropSync("VentileDevise") public ventileDevise !: number;
   @PropSync("Reglement") public reglement !: Reglement;
@@ -365,6 +380,9 @@ export default class VentilationVue extends Vue {
   private reference = "";
   private referenceJournal: string = "";
   private referencePiece: string = "";
+  private referenceRules: any = [(v:string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || "Référence invalide"];
+  private referenceWarning = "";
+
 
   private idDossier: string = "";
   private nomDossier: string = "";
@@ -390,7 +408,7 @@ export default class VentilationVue extends Vue {
     this.$nextTick(() => {
       (this.$refs.form as any)?.resetValidation();
       this.init(ventilation, journal);
-      (this.$refs.compte as AutocompleteComptesVue)?.focus();
+      this.compteComponent?.focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -435,9 +453,12 @@ export default class VentilationVue extends Vue {
       this.$nextTick(() => {this.compteComponent?.init(ventilation.numeroCompte.toString(), ventilation.nomCompte)});
       if(ventilation.dossier){
         this.dossierComponent.setDossier(new DossierSearch({ idDossier: ventilation.dossier, nom: ventilation.dossierNom, dateEntree: "", dateSortie: "" }));
+        this.idDossier = ventilation.dossier;
+        
       }
     }
-    
+    this.idDossier = ventilation.dossier;
+    this.nomDossier = ventilation.dossierNom;
     this.referenceJournal = ventilation?.referenceJournal ? ventilation.referenceJournal.toString() : "";
     this.referencePiece = ventilation?.referencePiece ? ventilation.referencePiece.toString() : "";
     this.reference = ventilation.libellePiece;
@@ -456,11 +477,12 @@ export default class VentilationVue extends Vue {
   //#endregion
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
-    console.log(compte);
-    if(typeof compte === "string" && this.typesComptesSelected.id == "C" && compte.length == 8){
+    this.compteComponent.blur();
+    if(typeof compte === "string" && (this.typesComptesSelected.id == "C" || this.typesComptesSelected.id == "F") && compte.length == 8){
       this.loadPieceComptable(compte);
       this.dossierIsEnabled = false;
       this.natureCompte = "";
+      this.dossierComponent.resetDossier();
       this.$nextTick(() => (this.$refs.montant as any)?.focus());
     }else if(compte instanceof CompteGeneralSearch){
       this.nomCompte = compte.nom;
@@ -473,6 +495,7 @@ export default class VentilationVue extends Vue {
       }
       else{
         this.dossierIsEnabled = false;
+        this.dossierComponent.resetDossier();
         this.$nextTick(() => (this.$refs.montant as any)?.focus());
       }
     }else if(compte instanceof CompteSearch || compte instanceof CompteDeTier){
@@ -480,6 +503,7 @@ export default class VentilationVue extends Vue {
       this.numeroCompte = compte.numero.toString();
       this.dossierIsEnabled = false;
       this.natureCompte = "";
+      this.dossierComponent.resetDossier();
       this.$nextTick(() => (this.$refs.reference as any)?.focus()); 
     }
   }
@@ -487,10 +511,11 @@ export default class VentilationVue extends Vue {
   private dossierChange(dossier: DossierSearch){
     this.idDossier = dossier.idDossier;
     this.nomDossier = dossier.nom;
-
     if(this.datePiece && dossier.idDossier && !dossier.dossierIsActif(this.datePiece))
       this.warningMessage = `Attention, le dossier ${dossier.idDossier} n'est pas actif à la date du ${this.datePiece.toString()}`;
     else this.warningMessage = "";
+
+    this.$nextTick(() => (this.$refs.montant as any)?.focus()); 
   }
 
   private async setCompteGeneralCaseTvaAsync(compte: CompteGeneralSearch) {
@@ -514,6 +539,9 @@ export default class VentilationVue extends Vue {
   //* Init de la ventiliation depuis une piece comptable *//
   //#region Pièce comptable
   private loadPieceComptable(piece: string){
+    this.referenceJournal = "";
+    this.referencePiece = "";
+
     if(piece && piece.length == 8){
       let numeroJournal = piece.substring(0,2);
       let numeroPiece = piece.substring(2,8);
@@ -522,9 +550,9 @@ export default class VentilationVue extends Vue {
         if(piece){
           this.initFromPieceComptable(piece);
           this.$nextTick(() => (this.$refs.montant as any)?.focus());
-        } else this.$nextTick(() => (this.$refs.reference as any)?.focus());
+        }
       }).catch(() => {
-        this.$nextTick(() => (this.$refs.reference as any)?.focus());
+
       });
     }
   }
@@ -533,12 +561,12 @@ export default class VentilationVue extends Vue {
     this.numeroCompte = piece.numeroCompteTiers?.toString();
     this.compteComponent?.init(piece.numeroCompteTiers, piece.nomCompteTiers);
     this.nomCompte = piece.nomCompteTiers;
-    this.montant = piece.montantTotalDv.toDecimalString();
+    this.montant = Math.abs(piece.montantTotalDv).toDecimalString();
     this.initDeviseFromPieceComptable(piece);
     this.reference = `${piece.numeroJournal}.${piece.numeroPiece}`;
     this.referenceJournal = piece.numeroJournal.toString();
     this.referencePiece = piece.numeroPiece.toString();
-    this.typesMouvementsSelected = this.typesComptesSelected.id == "C" ? this.typesMouvements[0] : this.typesMouvements[1];
+    this.typesMouvementsSelected = this.typesComptesSelected.id == "F" ? this.typesMouvements[0] : this.typesMouvements[1];
     this.natureCompte = "";
   }
   
@@ -595,7 +623,7 @@ export default class VentilationVue extends Vue {
   private OpenSearchEcheancier(): void {
     if ((this.typesComptesSelected.id == "C" || this.typesComptesSelected.id == "F") && this.numeroCompte) {
       (this.$refs.searchEcheancierDialog as SearchEcheancierVue)
-        .open(this.typesComptesSelected.id, this.numeroCompte)
+        .open(this.typesComptesSelected.id, this.numeroCompte, `${this.numeroCompte} ${this.nomCompte}`)
         .then(elements => {
           this.initFromEcheancier(elements);
           this.$nextTick(() => (this.$refs.montant as any)?.focus());
@@ -620,6 +648,9 @@ export default class VentilationVue extends Vue {
 
   private createVentilationFromEcheancier(element: EcheancierElement){
     let ventilation = new Ventilation();
+    const maxLigne = this.ventilations?.length ?  Math.max(...this.ventilations.map(i => i.numeroVentilation)) : 0;
+    ventilation.numeroVentilation = maxLigne + 1; 
+    ventilation.typeCompte = this.typesComptesSelected.id;
     ventilation.numeroCompte = this.numeroCompte.toNumber();
     ventilation.nomCompte = this.nomCompte;
     ventilation.referenceJournal = element.numeroJournal;
@@ -633,64 +664,6 @@ export default class VentilationVue extends Vue {
     this.ventilations.push(ventilation);
   }
   //#endregion
-
-  //#region Dossier
-  // @Watch("searchDossier")
-  // private async autocompleteDossiers(matchCode: string) {
-  //   try {
-  //     this.dossierLoading = true;
-  //     if (matchCode) {
-  //       this.dossiersSearch = await DossierApi.getsById(matchCode.toUpperCase(), 5);
-  //     } else this.dossiersSearch = [];
-  //   } catch (err) {
-  //     console.log(err);
-  //   } finally {
-  //     this.dossierLoading = false;
-  //   }
-  // }
-  // private OpenSearchDossier(): void {
-  //   (this.$refs.searchDossierDialog as SearchDossierVue)
-  //     .open()
-  //     .then(dossier => {
-  //       this.setDossier(dossier);
-  //       this.$nextTick(() => (this.$refs.montant as any)?.focus());
-  //     }).catch(() => {
-  //       this.$nextTick(() => (this.$refs.dossier as any)?.focus());
-  //     });
-  // }
-
-  // private dossierIsEnabled = false;
-  // private async dossierChangeAsync(value: string | DossierSearch | undefined) {
-  //   if(!value) this.resetDossier();
-  //   else if(typeof value === "string"){
-  //     this.dossierLoading = true;
-  //     let dossier = await DossierApi.getById(value)
-  //     this.setDossier(dossier);
-  //     this.dossierLoading = false;
-  //   } 
-  //   else  this.setDossier(value);
-  // }
-  // private setDossier(dossier: DossierSearch) {
-  //   if (dossier) {
-  //     this.dossiersSearch = [];
-  //     this.dossiersSearch.push(dossier);
-  //     this.dossierSelected = dossier;
-  //     if(this.datePiece && dossier.idDossier && !dossier.dossierIsActif(this.datePiece))
-  //       this.warningMessage = `Attention, le dossier ${dossier.idDossier} n'est pas actif à la date du ${this.datePiece.toString()}`;
-  //     else this.warningMessage = "";
-  //   }
-
-  //   this.idDossier = dossier.idDossier.toString();
-  //   this.nomDossier = dossier.nom;
-  // }
-
-  // private resetDossier(){
-  //   this.dossierSelected = new DossierSearch();
-  //   this.searchDossier = "";
-  //   this.idDossier = "";
-  //   this.nomDossier = "";
-  // }
-  //#endregion 
 
   // private calculMontant(){
   //   if(this.caseTva.typeCase == 50)
@@ -775,6 +748,8 @@ export default class VentilationVue extends Vue {
     ventilation.libelleCaseTVA = this.caseTva.libelleCase;
     ventilation.referenceJournal = this.referenceJournal.toNumber();
     ventilation.referencePiece = this.referencePiece.toNumber();
+    ventilation.dossier = this.idDossier;
+    ventilation.dossierNom = this.nomDossier;
     ventilation.caseTva = new CaseTva(this.caseTva);
     return ventilation;
   }
@@ -807,9 +782,14 @@ export default class VentilationVue extends Vue {
     this.resolve();
   }
 
+  private focusFirstElement(){
+    this.compteComponent.focus();
+  }
+
   public close() {
     this.ventilationIsSelected = false;
-    this.reject();
+    if(this.reject)
+      this.reject();
   }
 }
 </script>
@@ -820,22 +800,21 @@ export default class VentilationVue extends Vue {
   }
 
   .overlay {
-  position: absolute;
-  display: block;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 2;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 2;
+    cursor: pointer;
+  }
 
-#editVentilation {
-  z-index: 999;
-}
+  #editVentilation {
+    z-index: 999;
+  }
 </style>
 

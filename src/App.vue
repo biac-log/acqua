@@ -38,4 +38,11 @@ export default class App extends Vue {
     color: rgba(0, 0, 0, 0.87) !important;
 }
 
+.shortcutTooltip{
+  background: darkslategray;
+  border: 1px solid white;
+  padding: 2px 5px 2px 5px;
+  margin-left: 3px;
+  font-size: 12px;
+}
 </style>

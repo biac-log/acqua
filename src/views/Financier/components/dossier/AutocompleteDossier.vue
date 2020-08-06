@@ -22,15 +22,20 @@
       dense
       >
       <template v-slot:append>
-        <v-btn
-          icon
-          small
-          :disabled="readonly"
-          @click="OpenSearchDossier()"
-          @keydown.enter.prevent.stop="OpenSearchDossier()"
-        >
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
+        <v-tooltip top open-delay=500>
+          <template v-slot:activator="{ on }">
+            <v-btn
+              icon
+              small
+              :disabled="readonly"
+              @click="OpenSearchDossier()"
+              @keydown.enter.prevent.stop="OpenSearchDossier()"
+              v-on="on">
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+          </template>
+          <span>Recherche de dossier<span class="shortcutTooltip">ctrl + f</span></span>
+        </v-tooltip>
       </template>
       <template v-slot:selection="{ item }">
         {{ item.idDossier }}
@@ -123,6 +128,10 @@
 
     public focus(){
       this.$nextTick(() => this.dossierComponent.focus());
+    }
+
+    public blur(){
+      this.$nextTick(() => (this.$refs.numeroCompte as any)?.blur());
     }
   }
 </script>

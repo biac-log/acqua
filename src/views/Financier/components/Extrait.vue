@@ -3,7 +3,8 @@
             @keydown.alt.enter.stop="sendExtrait()"
             @click:outside="close()"
             @keydown.esc.stop="close()"
-            @keydown.107.prevent.stop="createVentilation">
+            @keydown.107.prevent.stop="createVentilation"
+            @keydown.46.prevent.stop="deleteExtrait">
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card min-height="710px">
         <v-toolbar color="primary" dark flat>
@@ -12,6 +13,14 @@
               <span v-else>Nouvel extrait</span>
           </v-card-title>
           <v-spacer></v-spacer>
+          <v-tooltip v-if="readonly" top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-on="on"  >
+                <v-icon left>mdi-pencil</v-icon>Modifier
+              </v-btn>
+            </template>
+            <span>Modifier<span class="shortcutTooltip">F2</span></span>
+          </v-tooltip>
           <v-btn icon @click="close()">
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -41,6 +50,7 @@
                 </v-col>
                 <v-col cols="3">
                   <v-text-field
+                    ref="montant"
                     label="Montant"
                     v-model="montant"
                     :filled="readonly"
@@ -72,17 +82,14 @@
                   <v-card outlined >
                     <v-toolbar color="#EEEEEE" flat dense>
                       <h2>Ventilations</h2>
-                      <v-btn
-                        color="primary"
-                        fab
-                        x-small
-                        class="ml-5"
-                        ref="btnAdd"
-                        :disabled="readonly || !montant"
-                        @click.stop="createVentilation"
-                      >
-                        <v-icon>mdi-plus</v-icon>
-                      </v-btn>
+                      <v-tooltip top open-delay=500>
+                        <template v-slot:activator="{ on }">
+                          <v-btn color="primary" fab x-small class="ml-5" ref="btnAdd" v-on="on" :disabled="!createVentilationEnabled" @click.stop="createVentilation">
+                            <v-icon>mdi-plus</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Ajouter une ventilation <span class="shortcutTooltip"> + </span></span>
+                      </v-tooltip>
                       <v-spacer></v-spacer>
                       <v-card-title :class="!ventileBase || ventileBase == 0 ? 'equilibre' : 'notEquilibre'">
                           <span v-if="!journal.devise || journal.devise.id == 1">Montant à ventiler : <b>{{ ventileDevise | numberToStringEvenZero }} {{ journal.devise ? journal.devise.libelle : "EUR" }}</b></span>
@@ -119,29 +126,33 @@
             </v-col>
           </v-row>
         </v-card-text>
-        <v-card-actions class="text-center">
-          <v-btn
-            color="error"
-            class="ma-2 pr-4"
-            text
-            tabindex="-1"
-            v-if="!isNew && !readonly"
-            @click="deleteExtrait()"
-          >
-            Supprimer</v-btn
-          >
+        <v-card-actions class="text-center" v-if="!readonly">
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn color="error" class="ma-2 pr-4" text tabindex="-1" v-if="!isNew && !readonly" @click="deleteExtrait()" v-on="on">
+                Supprimer
+              </v-btn>
+            </template>
+            <span>Supprimer l'extrait'<span class="shortcutTooltip">del</span></span>
+          </v-tooltip>
           <v-spacer></v-spacer>
-          <v-btn
-            ref="btnValidate"
-            class="ma-2 pr-4"
-            tile
-            color="success"
-            v-if="!readonly"
-            :disabled="!isValid"
-            @click="sendExtrait"
-          >
-            <v-icon left>mdi-check</v-icon> Valider
-          </v-btn>
+          <v-tooltip top open-delay=500>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                ref="btnValidate"
+                class="ma-2 pr-4"
+                tile
+                color="success"
+                v-if="!readonly"
+                :disabled="!isValid"
+                @click="sendExtrait"
+                v-on="on"
+              >
+                <v-icon left>mdi-check</v-icon> Valider
+              </v-btn>
+            </template>
+            <span>Valider les modifications<span class="shortcutTooltip"> alt + enter </span></span>
+          </v-tooltip>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -155,7 +166,8 @@ import {
   PropSync,
   Emit,
   Prop,
-  Watch
+  Watch,
+	Ref
 } from "vue-property-decorator";
 import { Devise, Extrait, Ventilation, Journal } from "@/models/Financier";
 import { FinancierApi } from "@/api/FinancierApi";
@@ -173,6 +185,8 @@ import { DeviseApi } from '@/api/DeviseApi';
   components: { VentilationVue }
 })
 export default class extends Vue {
+  @Ref() readonly refVentilationVue!: VentilationVue;
+
   private dialog = false;
   @PropSync("isReadOnly")
   public readonly!: boolean;
@@ -205,12 +219,12 @@ export default class extends Vue {
   private ventilations: Ventilation[] = [];
   private headersVentilation = [
     { text: "Vent.", value: "numeroVentilation", width: 40 },
-    { text: "Compte", value: "libelleCompte", width: 110 },
+    { text: "Compte", value: "libelleCompte", width: 120 },
     { text: "Intitulé", value: "nomCompte", width: 180 },
     { text: "Pièce", value: "libellePiece", width: 80 },
     { text: "Libellé d'écriture", value: "libelle", width: 180 },
-    { text: "Débit", value: "montantDebit", width: 100 },
-    { text: "Crédit", value: "montantCredit", width: 100 },
+    { text: "Débit", value: "montantDebit", width: 100, align: "end" },
+    { text: "Crédit", value: "montantCredit", width: 100, align: "end"},
     { text: "Devise", value: "libelleDevise", width: 70 },
     { text: "TVA", value: "libelleTva", width: 100 }
   ];
@@ -257,11 +271,12 @@ export default class extends Vue {
     return this.montant?.toNumber() > 0 ? "DB" : "CR";
   }
 
+  get createVentilationEnabled() { return !this.readonly && this.montant }
   private createVentilation() {
     (this.$refs.form as any).validate();
     this.$nextTick(() => {
       if(this.montant && this.isValid){  
-        (this.$refs.refVentilationVue as VentilationVue).openNew(this.getVentilationToAdd(), this.journal)
+        this.refVentilationVue.openNew(this.getVentilationToAdd(), this.journal)
         .then((ventil) => {
           const maxLigne = this.ventilations?.length ?  Math.max(...this.ventilations.map(i => i.numeroVentilation)) : 0;
           ventil.numeroVentilation = maxLigne + 1;
@@ -276,7 +291,7 @@ export default class extends Vue {
   }
 
   private editVentilation(ventilation: Ventilation) {
-    (this.$refs.refVentilationVue as VentilationVue).open(ventilation, this.journal)
+    this.refVentilationVue.open(ventilation, this.journal)
     .then((resp) => {
       if(resp)
         Vue.set(this.ventilations, this.ventilations.findIndex(d => d == ventilation), resp);
@@ -316,7 +331,6 @@ export default class extends Vue {
     this.numeroCompte = extrait.numeroCompte.toString();
     this.nomCompte = extrait.nomCompte;
     this.ventilations = extrait.ventilations;
-    console.log(extrait);
     this.montant = extrait.montantDeviseSigned;
     this.setReglement(extrait.libelleReglement);
   }
@@ -427,12 +441,19 @@ export default class extends Vue {
   }
 
   private deleteExtrait() {
-    this.dialog = false;
-    this.resolve();
+    if(!this.isNew && !this.readonly){
+      this.dialog = false;
+      this.resolve();
+    }
+  }
+
+  private ModifierPiece(){
+    this.readonly = false;
+    (this.$refs.montant as any)?.focus();
   }
 
   private close() {
-    (this.$refs.refVentilationVue as VentilationVue).close();
+    this.refVentilationVue?.close();
     (this.$refs.form as any).validate();
     this.dialog = false;
     this.reject();
@@ -453,29 +474,6 @@ export default class extends Vue {
 .equilibre{
   color: green;
   margin-left: 10px;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
-}
-
-.overlay {
-  position: absolute;
-  display: block;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 2;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
 #editContrepartie {
