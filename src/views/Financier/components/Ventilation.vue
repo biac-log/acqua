@@ -158,6 +158,7 @@
                 :hide-details="readonly"
                 :loading="tvaLoading"
                 :disabled="typesComptesSelected.id != 'G'"
+                validate-on-blur
                 @keypress.enter="loadCaseTva"
                 @change="loadCaseTvaAsync"
                 @keydown.ctrl.f.prevent="OpenSearchCaseTva()"
@@ -342,6 +343,7 @@ export default class VentilationVue extends Vue {
   private resolve!: any;
   private reject!: any;
   private numeroJournal: number = 0;
+  private numeroVentilation: number=0;
 
   private typesComptes: TypeCompte[] = [];
   private typesComptesSelected: TypeCompte = new TypeCompte();
@@ -371,9 +373,9 @@ export default class VentilationVue extends Vue {
   private caseTva: CaseTva = new CaseTva();
   private numeroCaseTva: string = "";
   private numeroCaseTvaRules: any = [
-    (v: string) => !v || (v.isInt() && v.toNumber() != 0) || "Numero invalide"
+    (v: string) => !v || (v.isInt() && v.toNumber() != 0 && this.caseTva?.libelleCase) || "Numero invalide"
   ];
-  private libelleCaseTva: string = "";
+
   private tauxCase: number = 0;
   private tvaLoading = false;
 
@@ -444,6 +446,7 @@ export default class VentilationVue extends Vue {
     this.compteComponent?.resetCompte();
     this.dossierComponent?.resetDossier();
     this.numeroJournal = journal.numero;
+    this.numeroVentilation = ventilation.numeroVentilation;
     this.typesComptesSelected = this.typesComptes.find(tc => tc.id == ventilation.typeCompte) || this.typesComptes[0];
     this.devisesSelected = this.devises.find(d => d.id == ventilation.codeDevise) ||this.devises[0];
     this.numeroCompte = ventilation.numeroCompte ? ventilation.numeroCompte.toString() : "";
@@ -467,7 +470,6 @@ export default class VentilationVue extends Vue {
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == ventilation.codeMouvement) || this.typesMouvements[0];
     this.montant = ventilation.montantDevise && this.devisesSelected ? ventilation.montantDevise.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
     this.numeroCaseTva = ventilation.caseTva?.numeroCase ? ventilation.caseTva?.numeroCase.toString() : "";
-    this.libelleCaseTva = ventilation.caseTva?.libelleCase ? ventilation.libelleCaseTVA : "" ;
     this.natureCompte = ventilation.natureCompte;
 
     if(this.caseTva){
@@ -525,12 +527,10 @@ export default class VentilationVue extends Vue {
       {
         this.caseTva = caseTva;
         this.numeroCaseTva = compte.numeroCase.toString();
-        this.libelleCaseTva = this.caseTva.libelleCase;
       }
       else{
         this.caseTva = new CaseTva();
         this.numeroCaseTva = "";
-        this.libelleCaseTva = "";
       } 
       //this.calculMontant();
     }
@@ -695,15 +695,14 @@ export default class VentilationVue extends Vue {
 
   private async loadCaseTvaAsync() {
     try {
-      this.tvaLoading = true;
       if (this.readonly) return;
+      this.tvaLoading = true;
       if (this.numeroCaseTva?.isInt()) {
         this.tvaLoading = true;
         this.errorMessage = "";
         let caseTva = await CaseTvaApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal);
         if(caseTva){
             this.numeroCaseTva = caseTva.numeroCase.toString();
-            this.libelleCaseTva = caseTva.libelleCase.toString();
             this.caseTva = caseTva;
             //this.calculMontant();
         }
@@ -712,8 +711,6 @@ export default class VentilationVue extends Vue {
         this.caseTva = new CaseTva();
       }
     }catch (err){
-      this.numeroCaseTva = "";
-      this.libelleCaseTva = "";
       this.caseTva = new CaseTva();
       if (err.request.status != 505)
         this.errorMessage = err.request.response;
@@ -735,6 +732,7 @@ export default class VentilationVue extends Vue {
 
   private GetModel(): Ventilation {
     let ventilation = new Ventilation();
+    ventilation.numeroVentilation = this.numeroVentilation;
     ventilation.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : "";
     ventilation.numeroCompte = +this.numeroCompte;
     ventilation.nomCompte = this.nomCompte;
@@ -787,9 +785,10 @@ export default class VentilationVue extends Vue {
   }
 
   public close() {
-    this.ventilationIsSelected = false;
-    if(this.reject)
-      this.reject();
+    if(this.ventilationIsSelected){
+      this.ventilationIsSelected = false;
+      if(this.reject) this.reject();
+    }
   }
 }
 </script>

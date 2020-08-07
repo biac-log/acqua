@@ -419,8 +419,8 @@ export default class extends Vue {
     extrait.typeCompte = "G";
     extrait.numeroCompte = this.journal.compteBanque.numero;
     extrait.nomCompte = this.journal.compteBanque.nom;
-    extrait.montantBase = this.montant.toNumber() * (this.taux | 1);
-    extrait.montantDevise = this.montant.toNumber();
+    extrait.montantBase = Math.abs(this.montant.toNumber() * (this.taux | 1));
+    extrait.montantDevise = Math.abs(this.montant.toNumber());
     extrait.codeMouvement = this.montant.toNumber() > 0 ? "DB" : "CR";
     extrait.codeDevise = this.journal.devise.id;
     extrait.libelleDevise = this.journal.devise.libelle;
@@ -454,7 +454,6 @@ export default class extends Vue {
 
   private close() {
     this.refVentilationVue?.close();
-    (this.$refs.form as any).validate();
     this.dialog = false;
     this.reject();
   }
