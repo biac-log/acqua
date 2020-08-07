@@ -31,7 +31,7 @@
         dense
       >
         <template v-slot:item="{ item }">
-          <tr :class="displayVentilation ? 'rowParent' : ''" :key="item.id" @click="editExtrait(item)">
+          <tr :class="getClassRowParent(item)" :key="item.id" @click="editExtrait(item)">
             <td align="left">{{ item.numeroExtrait }}</td>
             <!-- <td></td> -->
             <td>{{ item.libelleCompte }}</td>
@@ -93,6 +93,11 @@ export default class extends Vue {
   private datePiece!: DateTime;
   private displayVentilation: boolean = true;
 
+  private getClassRowParent(extrait: Extrait): string{
+    if(!extrait.isEquilibre) return 'notEquilibre';
+    else if(extrait.numeroExtrait != 1) return this.displayVentilation ? 'rowParent' : '';
+    else return "";
+  }
   //private selectedRow!: Extrait; 
 
   private headersExtraits = [
@@ -131,7 +136,7 @@ export default class extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #btn-acqua {
   height: 56px;
 }
@@ -141,13 +146,16 @@ export default class extends Vue {
 }
 
 .notEquilibre{
-  color: red;
-  margin-left: 10px;
-}
+  background-color:  rgb(253, 187, 170, 0.8);
+  td{
+    border-top: thin solid rgba(0, 0, 0);
+    margin-top: -1px;
+  }
 
-.equilibre{
-  color: green;
-  margin-left: 10px;
+  &:hover {
+     border-top: thin solid rgba(0, 0, 0);
+     background-color: rgb(253, 187, 170) !important;
+  }
 }
 
 .rowParent td {
