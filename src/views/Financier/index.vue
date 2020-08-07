@@ -74,6 +74,14 @@
         @click:row="OpenPieceComptable"
         :server-items-length="totalItems"
       >
+        <template v-slot:item.pieceEquilibree="{ item }">
+          <v-tooltip top open-delay=500 >
+            <template v-slot:activator="{ on }">
+              <v-icon v-show="!item.pieceEquilibree" color="red" v-on="on">mdi-alert</v-icon>
+            </template>
+            <span>La pièce n'est pas équilibrée</span>
+          </v-tooltip>
+        </template>
         <template v-slot:item.numeroPiece="{ item }">
           <span>{{ item.numeroJournal}}.{{ item.numeroPiece }}</span>
         </template>
@@ -91,12 +99,6 @@
         </template>
         <template v-slot:item.soldeFinale="{ item }">
           <span>{{ item.soldeFinale | numberToString }}</span>
-        </template>
-        <template v-slot:item.pieceEquilibree="{ item }">
-          <v-simple-checkbox
-            v-model="item.pieceEquilibree"
-            disabled
-          ></v-simple-checkbox>
         </template>
       </v-data-table>
     </v-card>
@@ -163,6 +165,7 @@ export default class extends Vue {
   private selectedPiece!: EntetePieceComptable;
 
   private headers = [
+    { text: "", value: "pieceEquilibree", width: 50 },
     { text: "Numéro pièce", value: "numeroPiece" },
     { text: "Date pièce", value: "datePieceDate" },
     { text: "Libelle", value: "libelle" },
@@ -170,8 +173,8 @@ export default class extends Vue {
     { text: "Débit", value: "totalDebit", align: "end" },
     { text: "Crédit", value: "totalCredit", align: "end" },
     { text: "Solde finale", value: "soldeFinale", align: "end" },
-    { text: "Equilibré", value: "pieceEquilibree" }
   ];
+
   private search: string = "";
   private options: any = {};
   private piecesComptables: EntetePieceComptable[] = [];

@@ -4,7 +4,7 @@
     scrollable
     eager
     width="80%"
-    :persistent="!readonly"
+    :persistent="!readonly || saveLoading || deleteLoading"
     @click:outside="closeDialog"
     @keydown.f2="ModifierPiece"
     @keydown.46.prevent.stop="DeletePiece"
@@ -24,7 +24,7 @@
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay=500>
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-on="on"  >
+              <v-btn class="mr-5" color="success" :disabled="saveLoading || deleteLoading" @click="ModifierPiece" v-on="on"  >
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
@@ -32,7 +32,7 @@
           </v-tooltip>
           <v-tooltip v-if="readonly" top open-delay=500>
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" class="mr-10"  color="error" @click="DeletePiece" :loading="deleteIsLoading">
+              <v-btn v-on="on" class="mr-10" color="error" :disabled="saveLoading" @click="DeletePiece" :loading="deleteLoading">
                 <v-icon left>mdi-delete</v-icon>Supprimer
               </v-btn>
             </template>
@@ -111,11 +111,11 @@
             :DatePiece.sync="datePiece"
           ></ExtraitVue>
         </v-card-text>
-        <v-divider v-if="!readonly"></v-divider>
-        <v-card-actions v-if="!readonly" class="d-flex">
+        <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
+        <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
           <v-tooltip v-if="numeroPiece" top open-delay=500>
             <template v-slot:activator="{ on }">
-              <v-btn color="error" v-on="on" class="ma-2 pr-4 align-self-start" text tabindex="-1" @click="DeletePiece()" :loading="deleteIsLoading">
+              <v-btn color="error" v-on="on" class="ma-2 pr-4 align-self-start" text tabindex="-1" @click="DeletePiece()" :disabled="saveLoading" :loading="deleteLoading">
                 Supprimer
               </v-btn>
             </template>
@@ -156,7 +156,7 @@
           
           <v-tooltip top open-delay=500>
             <template v-slot:activator="{ on }">
-              <v-btn ref="btnValidate" v-on="on" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()">
+              <v-btn ref="btnValidate" v-on="on" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid || deleteLoading"  @click="savePiece()">
                 <v-icon left>mdi-content-save</v-icon>Sauvegarder
               </v-btn>
             </template>
@@ -203,7 +203,9 @@ import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../model
 })
 export default class extends Vue {
   @Ref() refExtraitVue!: ExtraitVue;
+  @Ref() gridExtraits!: ExtraitsVue;
   @Ref() confirmDialog!: Confirm;
+  @Ref() refDatePiece!: DatePicker;
 
   private dialog = false;
   private oldPiece!: Piece | null;
@@ -212,7 +214,6 @@ export default class extends Vue {
   private reject: any;
   private isValid = true;
   private errorMessage = "";
-  private deleteIsLoading = false;
 
   private periode = new PeriodeComptable();
   private journal = new Journal();
@@ -290,13 +291,13 @@ export default class extends Vue {
         this.extraits.push(resp);
       })
       .finally(() => {
-        (this.$refs.gridExtraits as ExtraitsVue)?.focus();
+        this.gridExtraits?.focus();
       });
     }
   }
 
   private editExtrait(extrait: Extrait) {
-    this.refExtraitVue.open(this.journal, extrait)
+    this.refExtraitVue.open(this.journal, this.numeroPiece, extrait)
       .then((resp: Extrait) => {
         if(resp)
           Vue.set(this.extraits, this.extraits.findIndex(d => d == extrait), resp);
@@ -306,7 +307,7 @@ export default class extends Vue {
         
       }).finally(() => {
         this.calculSolde();
-        (this.$refs.gridExtraits as ExtraitsVue)?.focus();
+        this.gridExtraits?.focus();
       });
   }
 
@@ -349,15 +350,17 @@ export default class extends Vue {
     )
     .then((resp) => {
       if (resp) {
-        this.deleteIsLoading = true;    
+        this.deleteLoading = true;    
+        this.readonly = true;
         FinancierApi.deletePieceComptable(this.periode.typePeriodeComptable, this.journal.numero, this.numeroPiece.toNumber())
         .then(() => {
           this.dialog = false;
           this.resolve();
         }).catch((err) => {
+          this.readonly = false;
           this.errorMessage = displayAxiosError(err);
         }).finally(() => {
-          this.deleteIsLoading = false;
+          this.deleteLoading = false;
         });
       }
     });
@@ -463,7 +466,6 @@ export default class extends Vue {
     entetePieceComptable.totalDebit = _.sum(this.extraits.map(m => m.montantDebit.toNumber()));;
     entetePieceComptable.totalCredit = _.sum(this.extraits.map(m => m.montantCredit.toNumber()));;
     entetePieceComptable.soldeFinale = this.soldeActuel.toNumber();
-    //TODO : test si pièce équilibré
     entetePieceComptable.pieceEquilibree = true;
     entetePieceComptable.libelleDevise = this.journal.devise.libelle;
     entetePieceComptable.datePiece = this.datePiece.toString();

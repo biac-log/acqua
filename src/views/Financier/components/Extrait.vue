@@ -9,8 +9,8 @@
       <v-card min-height="710px">
         <v-toolbar color="primary" dark flat>
           <v-card-title class="pa-2">
-            <span v-if="numeroExtrait">Extrait {{ numeroExtrait }} </span>
-              <span v-else>Nouvel extrait</span>
+            <span v-if="numeroExtrait">Pièce {{ journal.numero}}.{{numeroPiece}} - Extrait {{ numeroExtrait }}</span>
+            <span v-else>Nouvel extrait</span>
           </v-card-title>
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay=500>
@@ -198,6 +198,7 @@ export default class extends Vue {
   private resolve!: any;
   private reject!: any;
   private journal: Journal = new Journal();
+  private numeroPiece: string = "";
 
   private numeroExtrait = 0;
   private typeCompte: string = "";
@@ -236,10 +237,11 @@ export default class extends Vue {
     this.loadReglements();
   }
 
-  public open(journal: Journal, extrait: Extrait): Promise<Extrait> {
+  public open(journal: Journal, numeroPiece: string, extrait: Extrait): Promise<Extrait> {
     this.reset();
     this.dialog = true;
     this.isNew = false;
+    this.numeroPiece = numeroPiece;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
       this.initJournal(journal);
