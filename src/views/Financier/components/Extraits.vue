@@ -109,8 +109,8 @@ export default class extends Vue {
     { text: "Intitulé", value: "nomCompte" },
     { text: "Pièce", value: "", width:200  },
     { text: "Libellé d'écriture", value: "", width:300 },
-    { text: "Débit", value: "montantDebit", width: 100  },
-    { text: "Crédit", value: "montantCredit", width: 100  },
+    { text: "Débit", value: "montantDebit", width: 100, align: "end"  },
+    { text: "Crédit", value: "montantCredit", width: 100, align: "end" },
     { text: "Devise", value: "libelleDevise", width:80  },
     { text: "TVA", value: "tva", width:80  },
   ];
