@@ -2,14 +2,14 @@
     <v-card class="pb-0" outlined>
       <v-toolbar color="#EEEEEE" flat>
         <v-card-title>
-          Extraits
+          Lignes de l'extrait
           <v-tooltip top open-delay=500>
             <template v-slot:activator="{ on }">
               <v-btn color="primary" fab small class="ml-5" ref="btnAdd" :disabled="readonly" @click.stop="createExtrait" v-on="on">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
             </template>
-            <span>Ajouter un extrait <span class="shortcutTooltip"> + </span></span>
+            <span>Ajouter une ligne <span class="shortcutTooltip"> + </span></span>
           </v-tooltip>
       </v-card-title>
         <v-spacer></v-spacer>
