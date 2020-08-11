@@ -9,8 +9,8 @@
       <v-card min-height="710px">
         <v-toolbar color="primary" dark flat>
           <v-card-title class="pa-2">
-            <span v-if="numeroExtrait">Pièce {{ journal.numero}}.{{numeroPiece}} - Extrait {{ numeroExtrait }}</span>
-            <span v-else>Nouvel extrait</span>
+            <span v-if="numeroExtrait">Extrait {{ journal.numero}}.{{numeroPiece}} - Ligne {{ numeroExtrait }}</span>
+            <span v-else>Nouvelle ligne</span>
           </v-card-title>
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay=500>

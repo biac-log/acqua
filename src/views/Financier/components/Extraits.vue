@@ -14,7 +14,7 @@
       </v-card-title>
         <v-spacer></v-spacer>
         <v-btn color="info" @click="displayVentilation = !displayVentilation"> 
-              {{ displayVentilation ? "Cacher la ventilation" : "Afficher la ventilation"}} 
+          {{ displayVentilation ? "Cacher la ventilation" : "Afficher la ventilation"}} 
         </v-btn>
       </v-toolbar>
       <v-data-table
