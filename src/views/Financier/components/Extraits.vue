@@ -20,6 +20,7 @@
       <v-data-table
         :headers="headersExtraits"
         :items="extraits"
+        :loading="isLoading"
         height="530px"
         id="dataTable"
         class="elevation-1 pa-0 ma-0"
@@ -91,6 +92,8 @@ export default class extends Vue {
   private journal!: Journal;
   @PropSync('DatePiece')
   private datePiece!: DateTime;
+  @PropSync('IsLoading')
+  private isLoading!: boolean;
   private displayVentilation: boolean = true;
 
   private getClassRowParent(extrait: Extrait): string{
@@ -98,7 +101,6 @@ export default class extends Vue {
     else if(extrait.numeroExtrait != 1) return this.displayVentilation ? 'rowParent' : '';
     else return "";
   }
-  //private selectedRow!: Extrait; 
 
   private headersExtraits = [
     { text: "Ex", value: "numeroExtrait", width: 20 },

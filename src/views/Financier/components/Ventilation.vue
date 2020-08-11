@@ -457,9 +457,9 @@ export default class VentilationVue extends Vue {
       if(ventilation.dossier){
         this.dossierComponent.setDossier(new DossierSearch({ idDossier: ventilation.dossier, nom: ventilation.dossierNom, dateEntree: "", dateSortie: "" }));
         this.idDossier = ventilation.dossier;
-        
       }
     }
+    
     this.idDossier = ventilation.dossier;
     this.nomDossier = ventilation.dossierNom;
     this.referenceJournal = ventilation?.referenceJournal ? ventilation.referenceJournal.toString() : "";

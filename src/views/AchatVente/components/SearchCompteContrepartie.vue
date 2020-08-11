@@ -6,7 +6,7 @@
             @keydown.page-up="nextPage()" 
             @keydown.page-down="previousPage()"
             @keydown.ctrl.f.prevent="focusSearch()">
-    <v-card class="mt-5">
+    <v-card class="mt-5" :loading="isLoading">
       <v-card-title>
         Comptes {{ typeLoad ? typeLoad.libelle : "" }}
         <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">

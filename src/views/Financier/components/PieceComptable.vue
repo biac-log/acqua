@@ -24,7 +24,7 @@
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay=500>
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" :disabled="saveLoading || deleteLoading" @click="ModifierPiece" v-on="on"  >
+              <v-btn class="mr-5" color="success" :disabled="isLoading" @click="ModifierPiece" v-on="on"  >
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
@@ -99,17 +99,23 @@
                   :Extraits.sync="extraits"
                   :IsReadOnly.sync="readonly"
                   :DatePiece.sync="datePiece"
+                  :IsLoading.sync="pieceIsLoading"
                   @CreateExtrait="createExtrait"
                   @EditExtrait="editExtrait"
                 ></ExtraitsVue>
               </v-col>
             </v-row>
           </v-col>
-          <ExtraitVue
-            ref="refExtraitVue"
-            :isReadOnly.sync="readonly"
-            :DatePiece.sync="datePiece"
-          ></ExtraitVue>
+          <v-row dense>
+            <ExtraitVue
+              ref="refExtraitVue"
+              :isReadOnly.sync="readonly"
+              :DatePiece.sync="datePiece"
+            ></ExtraitVue>
+          </v-row>
+          <v-col cols="12">
+            <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
+          </v-col>
         </v-card-text>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
@@ -163,9 +169,6 @@
             <span>Sauvegarder la pièce <span class="shortcutTooltip">alt + enter</span></span>
           </v-tooltip>
         </v-card-actions>
-        <v-alert type="error" border="left" v-if="errorMessage"  class="ml-4 mr-4">
-            {{errorMessage}}
-        </v-alert>
         <Confirm ref="confirmDialog"></Confirm>
       </v-card>
     </v-form>
@@ -187,6 +190,7 @@ import {
 } from "@/models/Financier";
 import { AchatVenteApi } from '@/api/AchatVenteApi';
 import { DateTime } from '@/models/DateTime';
+import AlertMessageVue from "@/components/AlertMessage.vue";
 import DatePicker from '@/components/DatePicker.vue';
 import ExtraitsVue from "./Extraits.vue";
 import { DeviseApi } from "@/api/DeviseApi";
@@ -198,14 +202,14 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
 
 @Component({
-  name: "PieceComptableVue",
-  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm}
+  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue}
 })
-export default class extends Vue {
+export default class PieceComptableVue extends Vue {
   @Ref() refExtraitVue!: ExtraitVue;
   @Ref() gridExtraits!: ExtraitsVue;
   @Ref() confirmDialog!: Confirm;
   @Ref() refDatePiece!: DatePicker;
+  @Ref() warningMessage!: AlertMessageVue;
 
   private dialog = false;
   private oldPiece!: Piece | null;
@@ -213,7 +217,6 @@ export default class extends Vue {
   private resolve: any;
   private reject: any;
   private isValid = true;
-  private errorMessage = "";
 
   private periode = new PeriodeComptable();
   private journal = new Journal();
@@ -236,6 +239,8 @@ export default class extends Vue {
 
   private saveLoading = false;
   private deleteLoading = false;
+  private pieceIsLoading = false;
+  get isLoading() { return this.saveLoading || this.deleteLoading || this.pieceIsLoading}
 
   private validateDatePiece(date: string) : boolean { 
     let dateTime = new DateTime(date);
@@ -245,12 +250,9 @@ export default class extends Vue {
   private hash = "";
   public async OpenNew(periode: PeriodeComptable, journal: Journal) : Promise<EntetePieceComptable>{
     this.dialog = true;
-    this.oldPiece = null;
-    this.readonly = false;
+    this.reset();
     this.periode = periode;
     this.journal = journal;
-    this.numeroPiece = "0";   
-    this.hash = "";
     this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`; 
     let solde = await FinancierApi.getSoldeCompte(journal.numeroCompteBanque);
     this.soldeInitial = solde.toDecimalString();
@@ -269,12 +271,20 @@ export default class extends Vue {
     });
   }
 
-  public Open(periode: PeriodeComptable, journal: Journal, piece: Piece) : Promise<EntetePieceComptable>{
+  public Open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number) : Promise<EntetePieceComptable>{
     this.dialog = true;
     this.readonly = true;
     this.periode = periode;
     this.journal = journal;
-    this.init(piece);
+    this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`; 
+    this.pieceIsLoading = true;
+    FinancierApi.getPieceComptable(journal.numero, numeroPieteToLoad).then((piece) => {
+      this.init(piece);
+    }).catch((err) => {
+      this.warningMessage.show("Une erreur est survenue lors du chargement de la pièce.", err.toString());
+    }).finally(() => {
+      this.pieceIsLoading = false;
+    });
     
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -289,7 +299,7 @@ export default class extends Vue {
         const maxLigne = this.extraits?.length ?  Math.max(...this.extraits.map(i => i.numeroExtrait)) : 0;
         resp.numeroExtrait = maxLigne + 1;
         this.extraits.push(resp);
-      })
+      }).catch()
       .finally(() => {
         this.gridExtraits?.focus();
       });
@@ -303,9 +313,8 @@ export default class extends Vue {
           Vue.set(this.extraits, this.extraits.findIndex(d => d == extrait), resp);
         else 
           this.extraits.splice(this.extraits.indexOf(extrait), 1);
-      }).catch(() => {
-        
-      }).finally(() => {
+      }).catch()
+      .finally(() => {
         this.calculSolde();
         this.gridExtraits?.focus();
       });
@@ -318,16 +327,21 @@ export default class extends Vue {
     this.datePiece = new DateTime(piece.datePiece);
     this.soldeInitial = piece.soldeInitial.toDecimalString(2);
     this.extraits = piece.extraits;
+    
     this.hash = piece.hash;
   }
 
   private reset(){
-    this.errorMessage = "";
+    this.warningMessage.clear();
     this.periode = new PeriodeComptable();
     this.journal = new Journal();
     this.libelleCompte = "";
     this.datePiece = new DateTime();
     this.extraits = [];
+    this.oldPiece = null;
+    this.readonly = false;
+    this.numeroPiece = "0";   
+    this.hash = "";
     this.soldeInitial = "";
     this.soldeActuel = "";
     (this.$refs.extraits as any)?.reset();
@@ -358,7 +372,7 @@ export default class extends Vue {
           this.resolve();
         }).catch((err) => {
           this.readonly = false;
-          this.errorMessage = displayAxiosError(err);
+          this.warningMessage.show("Une erreur est survenue lors de la suppression", displayAxiosError(err))
         }).finally(() => {
           this.deleteLoading = false;
         });
@@ -382,7 +396,6 @@ export default class extends Vue {
   private addPiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
     this.readonly = true;
-    this.errorMessage = "";
     FinancierApi.AddPieceComptable(piece).then((numeroPiece) => {
       this.numeroPiece = numeroPiece.toString();
       this.resolve(this.GetModelForGrid());
@@ -390,7 +403,7 @@ export default class extends Vue {
       this.dialog = false;
       this.reset();
     }).catch((err) => {
-      this.errorMessage = displayAxiosError(err);
+      this.warningMessage.show("Une erreur est survenue lors de la sauvegarde de la pièce", displayAxiosError(err))
       this.readonly = false;
     }).finally(()=> {
       this.saveLoading = false;
@@ -399,7 +412,6 @@ export default class extends Vue {
 
   private updatePiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
-    this.errorMessage = "";
     let pieceComptaToSave = this.GetModelToSave();
     this.readonly = true;
     FinancierApi.UpdatePieceComptable(pieceComptaToSave).then(() => {
@@ -407,7 +419,7 @@ export default class extends Vue {
       this.dialog = false;
       this.reset();
     }).catch((err) => {
-        this.errorMessage = displayAxiosError(err);
+        this.warningMessage.show("Une erreur est survenue lors de la mise à jour de la pièce", displayAxiosError(err))
         this.readonly = false;
     }).finally(()=> {
       this.saveLoading = false;
@@ -474,8 +486,10 @@ export default class extends Vue {
   }
 
   private ModifierPiece(){
-    this.readonly = false;
-    (this.$refs.refDatePiece as DatePicker).focus();
+    if(!this.pieceIsLoading){
+      this.readonly = false;
+      (this.$refs.refDatePiece as DatePicker).focus();
+    }
   }
 
   private CancelEdit(){

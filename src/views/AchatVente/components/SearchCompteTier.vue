@@ -1,6 +1,6 @@
 <template>
   <v-dialog width="1000" v-model="dialog" @click:outside="close()" @keydown.esc="close()" @keydown.page-up="nextPage()" @keydown.page-down="previousPage()">
-    <v-card class="mt-5">
+    <v-card class="mt-5" :loading="isLoading">
       <v-card-title>
         Comptes
         <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">

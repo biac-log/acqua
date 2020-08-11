@@ -121,7 +121,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue, Watch, Ref } from "vue-property-decorator";
 import axios from "axios";
 import moment from "moment";
 import { FinancierApi } from "../../api/FinancierApi";
@@ -140,6 +140,8 @@ import PieceAddResultVue from "./components/PieceAddResult.vue";
   components: { PieceComptableVue, PieceAddResultVue }
 })
 export default class extends Vue {
+  @Ref() readonly refDialogPiece!: PieceComptableVue;
+  @Ref() readonly PieceAddResultVue!: PieceAddResultVue;
   private searchIsValid: boolean = true;
 
   private isErrorPeriode: boolean = false;
@@ -216,10 +218,7 @@ export default class extends Vue {
   }
 
   private async OpenPieceComptable(entete: EntetePieceComptable) {
-    let piece = await FinancierApi.getPieceComptable(entete.numeroJournal, entete.numeroPiece);
-
-    (this.$refs.refDialogPiece as PieceComptableVue)
-      .Open(this.periodeSelected, this.journalSelected, piece)
+    this.refDialogPiece.Open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
       .then(resp => {
         if(resp){
           Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp);
@@ -237,9 +236,7 @@ export default class extends Vue {
   }
 
   private createNewPieceComptable() {
-    let test= "";
-    (this.$refs.refDialogPiece as PieceComptableVue)
-      .OpenNew(this.periodeSelected, this.journalSelected)
+    this.refDialogPiece.OpenNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
         this.displayAddResult(resp);
         this.piecesComptables.unshift(resp);

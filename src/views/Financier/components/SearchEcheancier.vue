@@ -1,6 +1,6 @@
 <template>
   <v-dialog width="1200" 
-            v-model="dialog" 
+            v-model="dialog"
             @click:outside="close()" 
             @keydown.esc="close()" 
             @keydown.page-up="nextPage()" 
