@@ -1,12 +1,11 @@
 import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators'
-import axios from 'axios'
 import { Token } from '@/models/Login/Token';
 import store from '@/store/index';
 import { Utilisateur } from '@/models/Login/Utilisateur';
 import { UserLogin } from "@/models/Login/UserLogin";
 import { JsonObject, JsonProperty, JsonConvert } from "json2typescript";
 import jwtDecode from "jwt-decode";
-
+import api from "@/api/AxiosApi";
 
 export interface IUserState {
   token: string,
@@ -59,7 +58,7 @@ class User extends VuexModule implements IUserState {
     userInfo.takePermissions = true;
     userInfo.application = "ACQUA";
     return new Promise((resolve, reject) => {
-      axios.post<Token>(process.env.VUE_APP_ApiAuth + "/Authentication/LoginApp", userInfo)
+      api.Authentication.post<Token>("/Authentication/LoginApp", userInfo)
         .then((resp) => {
           this.SET_TOKEN(resp.data);
           let tokenDecode = jwtDecode(resp.data.value);
@@ -98,8 +97,7 @@ class User extends VuexModule implements IUserState {
   @Action
   public Logout() {
     this.RESET_TOKEN();
-    //Pas top mais force le refresh des static (Axios) lors de la déconnexion
-    location.reload();
+    api.reset();
   }
 }
 

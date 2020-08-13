@@ -3,37 +3,36 @@ import { Permission, PermissionDTO } from "@/models/GestionUtilisateur/Permissio
 import { Utilisateur, UtilisateurDTO } from "@/models/GestionUtilisateur/Utilisateur";
 import { Application, ApplicationDTO } from "@/models/GestionUtilisateur/Application";
 import { UserModule } from "@/store/modules/user";
+import api from "./AxiosApi";
 
 export abstract class GestionUtilisateurApi {
-  private static GestionUtilisateurAxios = Axios.create({headers: { Authorization: `Bearer ${UserModule.token}` }});
-
   static async getUtilisateurs(onlyActif: boolean): Promise<Utilisateur[]> {
-    let response = await this.GestionUtilisateurAxios.get<UtilisateurDTO[]>(`${process.env.VUE_APP_ApiGestionUser}/User/GetAllUsers/${onlyActif}`);
+    let response = await api.GestionUser.get<UtilisateurDTO[]>(`/User/GetAllUsers/${onlyActif}`);
     return response.data.map(user => new Utilisateur(user));
   }  
 
   static async getPermissionsForUser(user: string): Promise<Permission[]> {
-    let response = await this.GestionUtilisateurAxios.get<PermissionDTO[]>(`${process.env.VUE_APP_ApiGestionUser}/Permission/GetForUser?user=${user}`);
+    let response = await api.GestionUser.get<PermissionDTO[]>(`/Permission/GetForUser?user=${user}`);
     return response.data.map(perm => new Permission(perm));
   }  
 
   static async getPermissionsForApplication(app: string): Promise<Permission[]> {
-    let response = await this.GestionUtilisateurAxios.get<PermissionDTO[]>(`${process.env.VUE_APP_ApiGestionUser}/Permission/GetForApplication/${app}`);
+    let response = await api.GestionUser.get<PermissionDTO[]>(`/Permission/GetForApplication/${app}`);
     return response.data.map(perm => new Permission(perm));
   }  
 
   static async getApplications(): Promise<Application[]> {
-    let response = await this.GestionUtilisateurAxios.get<ApplicationDTO[]>(`${process.env.VUE_APP_ApiGestionUser}/Application/GetAll`);
+    let response = await api.GestionUser.get<ApplicationDTO[]>(`/Application/GetAll`);
     return response.data.map(app => new Application(app));
   }  
 
   static async save(user: Utilisateur): Promise<Utilisateur> {
-    let response = await this.GestionUtilisateurAxios.post<UtilisateurDTO>(`${process.env.VUE_APP_ApiGestionUser}/User/Save`, user);
+    let response = await api.GestionUser.post<UtilisateurDTO>(`/User/Save`, user);
     return new Utilisateur(response.data);
   }  
 
   static async idExist(id: string):Promise<boolean>{
-    let response = await this.GestionUtilisateurAxios.get<boolean>(`${process.env.VUE_APP_ApiGestionUser}/User/IdExist/${id}`);
+    let response = await api.GestionUser.get<boolean>(`/User/IdExist/${id}`);
     return response.data;
   }
 }

@@ -9,6 +9,8 @@ import * as moment from 'moment';
 import { LoggingApi } from "@/api/LoggingApi";
 import 'moment/locale/fr';
 import "@/utils/Extensions";
+import axios, { AxiosStatic } from 'axios';
+import { UserModule } from './store/modules/user';
 moment.locale('fr')
 
 Vue.config.productionTip = false;

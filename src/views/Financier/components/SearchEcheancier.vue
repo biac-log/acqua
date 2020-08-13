@@ -177,7 +177,7 @@ export default class extends Vue {
   }
   
   private numberToString(params: ValueFormatterParams): string {
-    return (params.value as number).toDecimalString(2);
+    return `${(params.value as number).toComptaString(2)} ${params.data.libelleDevise}`;
   }
 
   private dateToString(params: ValueFormatterParams): string {

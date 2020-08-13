@@ -255,7 +255,7 @@ export default class PieceComptableVue extends Vue {
     this.journal = journal;
     this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`; 
     let solde = await FinancierApi.getSoldeCompte(journal.numeroCompteBanque);
-    this.soldeInitial = solde.toDecimalString();
+    this.soldeInitial = solde.toComptaString();
 
     let today = DateTime.today();
     if(today.isBefore(this.periode.dateDebut))
@@ -325,7 +325,7 @@ export default class PieceComptableVue extends Vue {
     this.numeroPiece = piece.numeroPiece.toString();
     this.libelleCompte = `${piece.numeroCompteFinancier.toString()} ${piece.nomCompteFinancier}`; 
     this.datePiece = new DateTime(piece.datePiece);
-    this.soldeInitial = piece.soldeInitial.toDecimalString(2);
+    this.soldeInitial = piece.soldeInitial.toComptaString(2);
     this.extraits = piece.extraits;
     
     this.hash = piece.hash;
@@ -351,7 +351,7 @@ export default class PieceComptableVue extends Vue {
   private calculSolde(){
     let sumCredit = _.sum(this.extraits.map(m => m.montantCredit.toNumber()));
     let sumDebit = _.sum(this.extraits.map(m => m.montantDebit.toNumber()));
-    this.soldeActuel = (this.soldeInitial.toNumber() + sumDebit - sumCredit).toDecimalString();
+    this.soldeActuel = (this.soldeInitial.toNumber() + sumDebit - sumCredit).toComptaString();
   }
 
   private DeletePiece(){

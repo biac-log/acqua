@@ -8,6 +8,10 @@ export const numberToString = (number: number, nbDecimal: number = 2) => {
   else return Intl.NumberFormat("fr-FR", {minimumFractionDigits: 2}).format(number);
 }
 
+export const numberToComptaString = (number: number, nbDecimal: number = 2) => {
+  return number.toComptaString(nbDecimal);
+}
+
 export const numberToStringEvenZero = (number: number, nbDecimal: number = 2) => {
   if(!nbDecimal) nbDecimal = 2;
   

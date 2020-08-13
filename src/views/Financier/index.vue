@@ -89,16 +89,16 @@
           <span>{{ item.datePieceDate.toString() }}</span>
         </template>
         <template v-slot:item.soldeInitiale="{ item }">
-          <span>{{ item.soldeInitiale | numberToString }}</span>
+          <span>{{ item.soldeInitiale | numberToComptaString }}</span>
         </template>
         <template v-slot:item.totalDebit="{ item }">
-          <span>{{ item.totalDebit | numberToString }}</span>
+          <span>{{ item.totalDebit | numberToComptaString }}</span>
         </template>
         <template v-slot:item.totalCredit="{ item }">
-          <span>{{ item.totalCredit | numberToString }}</span>
+          <span>{{ item.totalCredit | numberToComptaString }}</span>
         </template>
         <template v-slot:item.soldeFinale="{ item }">
-          <span>{{ item.soldeFinale | numberToString }}</span>
+          <span>{{ item.soldeFinale | numberToComptaString }}</span>
         </template>
       </v-data-table>
     </v-card>

@@ -1,6 +1,7 @@
 import Axios, { AxiosError } from "axios";
 import { UserModule } from "@/store/modules/user";
 import { DateTime } from '@/models/DateTime';
+import api from "./AxiosApi";
 
 export class LoggingDTO {
   id: number = 0;
@@ -21,11 +22,9 @@ export class LoggingDTO {
 }
 
 export abstract class LoggingApi {
-  private static axios = Axios.create();
-
   static async add(log: LoggingDTO) {
     log.user= UserModule.username;
-    await this.axios.post<LoggingDTO>(`${process.env.VUE_APP_ApiLogging}/Logging`, log);
+    await api.Logging.post<LoggingDTO>(`/Logging`, log);
   }
 
   static generateLog(err: any, vm : any, info : any): LoggingDTO {

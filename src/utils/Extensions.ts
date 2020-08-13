@@ -2,6 +2,7 @@
 interface Number {
   toDecimalString(nbDecimal?: number): string;
   toIntString(): string;
+  toComptaString(nbDecimal?: number): string;
 }
 
 interface String {
@@ -22,12 +23,24 @@ Number.prototype.toIntString = function () {
   else return Intl.NumberFormat("fr-FR").format(this as number);
 }
 
+Number.prototype.toComptaString = function (nbDecimal: number = 2) {
+  if(!nbDecimal) nbDecimal = 2;
+  if(!this) return ''; 
+  else {
+    if(+this >= 0)
+      return Intl.NumberFormat("fr-FR", {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(Math.abs(+this));
+    else 
+      return `${Intl.NumberFormat("fr-FR", {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(Math.abs(+this))}-`;
+  } 
+}
+
 String.prototype.isInt = function (required: boolean = false) {
   if(!this)
     return !required;   
   else {
-    let number = this.toString();
-    return !isNaN(parseInt(number)) && isFinite(+number);
+    let number = this.endsWith('-') ? `-${this.replace('-', '')}` : this;
+    number = number.toString();
+    return !isNaN(parseInt(number.toString())) && isFinite(+number);
   }
 }
 
@@ -35,14 +48,19 @@ String.prototype.isDecimal = function (required: boolean = false) {
   if(!this)
     return !required;   
   else {
-    let number = this.replace(/\./g, '').replace(/\s/g, "").replace(',', '.');
-    return !isNaN(parseFloat(number)) && isFinite(+number);
+    let number = this.endsWith('-') ? `-${this.replace('-', '')}` : this;
+    number = number.replace(/\./g, '').replace(/\s/g, "").replace(',', '.');
+    
+    return !isNaN(parseFloat(number.toString())) && isFinite(+number);
   }
 }
 
 String.prototype.toNumber = function () {
-    let number = +this;
+    let numberString = this.endsWith('-') ? `-${this.replace('-', '')}` : this;
+    let number = +numberString;
+
     if(number || number == 0)
       return number;
-    else return +this.replace(/\./g, '').replace(/\s/g, '').replace(',', '.');
+    else return +numberString.replace(/\./g, '').replace(/\s/g, '').replace(',', '.');
 }
+

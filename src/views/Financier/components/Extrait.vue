@@ -56,7 +56,7 @@
                     :filled="readonly"
                     :readonly="readonly"
                     :suffix="journal.devise.libelle"
-                    @blur="montant = montant.toNumber().toDecimalString()"
+                    @blur="montant = montant.toNumber().toComptaString()"
                     :rules="montantRules"
                     autofocus
                   ></v-text-field>
@@ -258,8 +258,10 @@ export default class extends Vue {
     this.reset();
     this.dialog = true;
     this.isNew = true;
+    
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
+      this.setReglement(5);
       this.initJournal(journal);
     });
 
@@ -333,8 +335,8 @@ export default class extends Vue {
     this.numeroCompte = extrait.numeroCompte.toString();
     this.nomCompte = extrait.nomCompte;
     this.ventilations = extrait.ventilations;
-    this.montant = extrait.montantDeviseSigned;
-    this.setReglement(extrait.libelleReglement);
+    this.montant = extrait.montantDeviseSigned.toNumber().toComptaString();
+    this.setReglement(extrait.codeReglement, extrait.libelleReglement);
   }
 
   public getVentilationToAdd(): Ventilation{
@@ -354,11 +356,11 @@ export default class extends Vue {
     return ventilation;
   }
 
-  private async setReglement(libelleReglement: string){
+  private async setReglement(numero: number, libelleReglement: string = ""){
     if(!this.reglements)
       await this.loadReglements();
     
-    let reglementSelected = this.reglements.find(r => r.libelle == libelleReglement);
+    let reglementSelected = this.reglements.find(r => r.numero == numero);
     if(reglementSelected)
       this.reglementSelected = reglementSelected;
     else
@@ -400,7 +402,7 @@ export default class extends Vue {
     let credit = this.ventilations.filter(c => c.typeCompte != "Z" && c != ventilationToIgnore).map(c => c.montantCredit.toNumber()).reduce((a,b) => a + b, 0);
     let debit = this.ventilations.filter(c => c.typeCompte != "Z" && c != ventilationToIgnore).map(c => c.montantDebit.toNumber()).reduce((a,b) => a + b, 0);
     ventileCompta = ventileCompta + debit - credit;
-    return ventileCompta.toDecimalString(2).toNumber();
+    return ventileCompta.toComptaString(2).toNumber();
   }
 
   public getVentileDevise(ventilationToIgnore?: Ventilation): number{
@@ -412,7 +414,7 @@ export default class extends Vue {
     let debit = this.ventilations.filter(c => c.typeCompte != "Z" && c.codeDevise == this.journal.devise.id && c != ventilationToIgnore).map(c => c.montantDebit.toNumber()).reduce((a,b) => a + b, 0);
     
     ventileDevise = ventileDevise + debit - credit;
-    return ventileDevise.toDecimalString(this.journal.devise.typeDevise == "E" ? 0 : 2).toNumber();
+    return ventileDevise.toComptaString(this.journal.devise.typeDevise == "E" ? 0 : 2).toNumber();
   }
  
   private GetModel(): Extrait {

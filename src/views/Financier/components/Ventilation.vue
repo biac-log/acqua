@@ -147,6 +147,17 @@
                 dense
               ></v-select>
             </v-col>
+            <v-col cols="2">
+              <v-text-field
+                label="Taux devise"
+                readonly
+                v-model="taux"
+                :filled="readonly"
+                :hide-details="readonly"
+                tabindex="-1"
+                dense
+              ></v-text-field>
+            </v-col>
             <v-col cols="3">
               <v-text-field
                 label="Numéro case TVA"
@@ -176,7 +187,7 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="4">
               <v-text-field
                 label="Libellé case TVA"
                 v-model="caseTva.libelleCase"
@@ -215,7 +226,7 @@
                 :readonly="readonly"
                 :rules="montantRules"
                 :hide-details="readonly"
-                @blur="montant = montant.toNumber().toDecimalString()"
+                @blur="montant = montant.toNumber().toComptaString()"
                 dense
               >
                 <!-- <template v-slot:append>
@@ -224,17 +235,6 @@
                   </v-btn>
                 </template> -->
               </v-text-field>
-            </v-col>
-            <v-col cols="2">
-              <v-text-field
-                label="Taux devise"
-                readonly
-                v-model="taux"
-                :filled="readonly"
-                :hide-details="readonly"
-                tabindex="-1"
-                dense
-              ></v-text-field>
             </v-col>
           </v-row>
           <v-row dense>
@@ -468,7 +468,7 @@ export default class VentilationVue extends Vue {
     
     this.libelle = ventilation?.libelle ? ventilation.libelle : "";
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == ventilation.codeMouvement) || this.typesMouvements[0];
-    this.montant = ventilation.montantDevise && this.devisesSelected ? ventilation.montantDevise.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
+    this.montant = ventilation.montantDevise && this.devisesSelected ? ventilation.montantDevise.toComptaString(this.devisesSelected.typeDevise == "E" ? 0 : 2) : "";
     this.numeroCaseTva = ventilation.caseTva?.numeroCase ? ventilation.caseTva?.numeroCase.toString() : "";
     this.natureCompte = ventilation.natureCompte;
 
@@ -561,7 +561,7 @@ export default class VentilationVue extends Vue {
     this.numeroCompte = piece.numeroCompteTiers?.toString();
     this.compteComponent?.init(piece.numeroCompteTiers, piece.nomCompteTiers);
     this.nomCompte = piece.nomCompteTiers;
-    this.montant = Math.abs(piece.montantTotalDv).toDecimalString();
+    this.montant = Math.abs(piece.montantTotalDv).toComptaString();
     this.initDeviseFromPieceComptable(piece);
     this.reference = `${piece.numeroJournal}.${piece.numeroPiece}`;
     this.referenceJournal = piece.numeroJournal.toString();
@@ -607,13 +607,13 @@ export default class VentilationVue extends Vue {
   private async initTauxDeviseAsync(numeroDevise: number, datePiece: DateTime){
     try {
       if(!numeroDevise || numeroDevise == 1)
-        this.taux = "1";
+        this.taux = "1,000000";
       else if(datePiece.isValid() && numeroDevise) {
         let taux = await DeviseApi.getTaux(numeroDevise, datePiece);
-        this.taux = taux.toDecimalString();
+        this.taux = taux.toDecimalString(6);
       }
     } catch{
-      this.taux = "1";
+      this.taux = "1,000000";
     }
   }
   //#endregion
@@ -635,7 +635,7 @@ export default class VentilationVue extends Vue {
 
   private initFromEcheancier(elements: EcheancierElement[]){
     let element = elements[0];
-    this.montant =  Math.abs(element.solde).toDecimalString(2);
+    this.montant =  Math.abs(element.solde).toComptaString(2);
     this.devisesSelected = this.devises.find(e => e.id == element.codeDevise) || this.devises[0];
     this.reference = `${element.numeroJournal}.${element.numeroPiece}`;
     this.referenceJournal = element.numeroJournal.toString();
@@ -667,9 +667,9 @@ export default class VentilationVue extends Vue {
 
   // private calculMontant(){
   //   if(this.caseTva.typeCase == 50)
-  //     this.montant = this.calculMontantTva().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+  //     this.montant = this.calculMontantTva().toComptaString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
   //   else if(this.caseTva.typeCase == 1)
-  //     this.montant = this.calculMontantTaxable().toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
+  //     this.montant = this.calculMontantTaxable().toComptaString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
   // }
 
   // private calculMontantTva() : number{
@@ -772,7 +772,7 @@ export default class VentilationVue extends Vue {
     if(this.readonly) return;
     //if(!this.montant) this.calculMontant();
     if(val) this.initTauxDeviseAsync(val.id, this.datePiece);
-    else this.taux = "1";
+    else this.taux = "1,000000";
   }
 
   private deleteVentilation() {

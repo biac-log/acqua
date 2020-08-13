@@ -1,6 +1,7 @@
 import Axios from "axios";
 import { Departement, DepartementDTO } from "@/models/GestionUtilisateur/Departement";
 import { UserModule } from "@/store/modules/user";
+import api from "./AxiosApi"
 
 export abstract class DepartementApi {
   private static DepartementAxios = Axios.create();
