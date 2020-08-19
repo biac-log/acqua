@@ -122,6 +122,8 @@
                 :isReadOnly.sync="readonly"
                 :DatePiece.sync="datePiece"
                 :Reglement.sync="reglementSelected"
+                :VentileBase.sync="ventileBase"
+                :VentileDevise.sync="ventileDevise"
               ></VentilationVue>
             </v-col>
           </v-row>

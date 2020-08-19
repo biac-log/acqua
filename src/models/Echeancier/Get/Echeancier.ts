@@ -1,4 +1,5 @@
 import { EcheancierElementDTO, EcheancierElement } from './EcheancierElement';
+import _ from "lodash";
 
 export class EcheancierDTO{
   typeCompte = "";

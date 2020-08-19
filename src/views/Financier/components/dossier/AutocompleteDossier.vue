@@ -60,12 +60,14 @@
     @Ref() readonly dossierComponent!: HTMLInputElement;
 
     @PropSync('Readonly', { type: Boolean }) readonly!: boolean;
+    @PropSync('Required', { type: Boolean }) required!: boolean;
 
     private dossierLoading: boolean = false;
     private idDossier: string = "";
     private dossiersSearch: DossierSearch[] = [];
     private searchDossier: string = "";
     private idDossierRules: any = [
+      (v: string | DossierSearch) =>  this.readonly || !this.required || !!v || "Dossier obligatoire",
       (v: string) => !!v || (!v && !!this.nomDossier) || "Dossier invalide"
     ];
     

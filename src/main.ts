@@ -26,7 +26,7 @@ Object.keys(filters).forEach(key => {
 Vue.config.errorHandler = function (err: any, vm, info) {
   if(process.env.NODE_ENV === 'production'){
     LoggingApi.generateLog(err,vm,info);
-  }else{
+  } else{
     console.log(err);
     console.log(vm);
     console.log(info);

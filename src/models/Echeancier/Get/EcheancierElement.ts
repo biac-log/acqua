@@ -5,14 +5,18 @@ export class EcheancierElementDTO{
   numeroPiece = 0;
   typePiece = "";
   datePiece = "";
-  montant = 0;
   libelleDevise = "";
   codeDevise = 0;
   libelle = "";
   dateEcheance = "";
-  solde = 0;
   rappel = 0;
   echu = "";
+  soldeDevise = 0;
+  soldeBase = 0;
+  montantDevise = 0;
+  montantBase = 0;
+  codeBlocage = 0;
+  libelleCodeBlocage = "";
 }
 
 export class EcheancierElement extends EcheancierElementDTO {
@@ -22,7 +26,6 @@ export class EcheancierElement extends EcheancierElementDTO {
   }
 
   public isLastRow = false;
-  public isFirstRow = true;
 
   get libellePiece(): string{
     return `${this.numeroJournal}.${this.numeroPiece}`;
@@ -34,5 +37,17 @@ export class EcheancierElement extends EcheancierElementDTO {
 
   get dateEcheanceDate(): Date{
     return new Date(this.datePiece);
+  }
+
+  get isPiecePrincipale(): boolean{
+    return this.numeroPiecePrincipal == this.numeroPiece;
+  }
+
+  get isSolde(): boolean{
+    return this.soldeBase == 0 && this.soldeDevise == 0;
+  }
+
+  get codeBlocageDisplay(): string{
+    return this.codeBlocage ? `${this.codeBlocage} ${this.libelleCodeBlocage}` : "";
   }
 }

@@ -95,12 +95,13 @@
               </v-tooltip>
             </template>
             </v-text-field>
-            <SearchEcheancierVue ref="searchEcheancierDialog"></SearchEcheancierVue>
+            <SearchEcheancierVue :MontantAVentileDevise.sync="ventileDevise" :MontantAVentileBase.sync="ventileBase" ref="searchEcheancierDialog"></SearchEcheancierVue>
           </v-col>
           <v-col cols="3" v-show="typesComptesSelected.id == 'G'">
             <AutoCompleteDossierVue 
               ref="dossierComponent" 
               :Readonly="!dossierIsEnabled"
+              :Required="true"
               @Change="dossierChange">
             </AutoCompleteDossierVue>
           </v-col>  
@@ -385,7 +386,6 @@ export default class VentilationVue extends Vue {
   private referenceRules: any = [(v:string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || "Référence invalide"];
   private referenceWarning = "";
 
-
   private idDossier: string = "";
   private nomDossier: string = "";
   private dossierIsEnabled: boolean = false;
@@ -635,12 +635,12 @@ export default class VentilationVue extends Vue {
 
   private initFromEcheancier(elements: EcheancierElement[]){
     let element = elements[0];
-    this.montant =  Math.abs(element.solde).toComptaString(2);
     this.devisesSelected = this.devises.find(e => e.id == element.codeDevise) || this.devises[0];
     this.reference = `${element.numeroJournal}.${element.numeroPiece}`;
     this.referenceJournal = element.numeroJournal.toString();
     this.referencePiece = element.numeroPiece.toString();
     this.typesMouvementsSelected = this.typesComptesSelected.id == "F" ? this.typesMouvements[0] : this.typesMouvements[1];
+    this.montant =  Math.abs(element.montantDevise).toComptaString(2);
     for (let index = 1; index < elements.length; index++){
       this.createVentilationFromEcheancier(elements[index]);
     }
@@ -656,9 +656,9 @@ export default class VentilationVue extends Vue {
     ventilation.referenceJournal = element.numeroJournal;
     ventilation.referencePiece = element.numeroPiece;
     ventilation.libelle = this.reglement.libelle;
-    ventilation.codeMouvement = element.montant < 0 ? "DB" : "CR";
-    ventilation.montantDevise = Math.abs(element.solde);
-    ventilation.montantBase = Math.abs(element.solde * (this.taux.toNumber() | 1));
+    ventilation.codeMouvement = element.montantDevise < 0 ? "DB" : "CR";
+    ventilation.montantDevise = Math.abs(element.montantDevise);
+    ventilation.montantBase = Math.abs(element.montantBase);
     ventilation.codeDevise = element.codeDevise;
     ventilation.libelleDevise = element.libelleDevise;
     this.ventilations.push(ventilation);
