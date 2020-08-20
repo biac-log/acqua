@@ -60,7 +60,7 @@
             </v-col>
           </v-row>
           <v-row> 
-          <v-col cols="7" v-show="typesComptesSelected.id != 'G'">
+          <v-col cols="7" v-if="typesComptesSelected.id != 'G'">
             <v-text-field
               ref="reference"
               label="Référence"
@@ -97,21 +97,21 @@
             </v-text-field>
             <SearchEcheancierVue :MontantAVentileDevise.sync="ventileDevise" :MontantAVentileBase.sync="ventileBase" ref="searchEcheancierDialog"></SearchEcheancierVue>
           </v-col>
-          <v-col cols="3" v-show="typesComptesSelected.id == 'G'">
+          <v-col cols="3" v-if="typesComptesSelected.id == 'G'">
             <AutoCompleteDossierVue 
               ref="dossierComponent" 
-              :Readonly="!dossierIsEnabled"
-              :Required="true"
+              :disabled.sync="dossierIsDisabled"
+              :required="true"
               @Change="dossierChange">
             </AutoCompleteDossierVue>
           </v-col>  
-          <v-col cols="4" v-show="typesComptesSelected.id == 'G'">
+          <v-col cols="4" v-if="typesComptesSelected.id == 'G'">
             <v-text-field
               label="Nom Dossier"
               v-model="nomDossier"
               :filled="readonly"
               :hide-details="readonly"
-              :disabled="!dossierIsEnabled"
+              :disabled="dossierIsDisabled"
               tabindex="-1"
               readonly
               dense
@@ -388,7 +388,7 @@ export default class VentilationVue extends Vue {
 
   private idDossier: string = "";
   private nomDossier: string = "";
-  private dossierIsEnabled: boolean = false;
+  private dossierIsDisabled: boolean = false;
 
   private tvaCalcule : number = 0;
   private tvaImpute : number = 0;
@@ -482,7 +482,7 @@ export default class VentilationVue extends Vue {
     this.compteComponent.blur();
     if(typeof compte === "string" && (this.typesComptesSelected.id == "C" || this.typesComptesSelected.id == "F") && compte.length == 8){
       this.loadPieceComptable(compte);
-      this.dossierIsEnabled = false;
+      this.dossierIsDisabled = true;
       this.natureCompte = "";
       this.dossierComponent.resetDossier();
       this.$nextTick(() => (this.$refs.montant as any)?.focus());
@@ -492,18 +492,18 @@ export default class VentilationVue extends Vue {
       this.natureCompte = compte.nature;
       this.setCompteGeneralCaseTvaAsync(compte);
       if(this.typesComptesSelected?.id == "G" && (compte.nature == 'R' || compte.nature == 'C')){
-        this.dossierIsEnabled = true;
+        this.dossierIsDisabled = false;
         this.dossierComponent?.focus();
       }
       else{
-        this.dossierIsEnabled = false;
+        this.dossierIsDisabled = true;
         this.dossierComponent.resetDossier();
         this.$nextTick(() => (this.$refs.montant as any)?.focus());
       }
     }else if(compte instanceof CompteSearch || compte instanceof CompteDeTier){
       this.nomCompte = compte.nom;
       this.numeroCompte = compte.numero.toString();
-      this.dossierIsEnabled = false;
+      this.dossierIsDisabled = true;
       this.natureCompte = "";
       this.dossierComponent.resetDossier();
       this.$nextTick(() => (this.$refs.reference as any)?.focus()); 

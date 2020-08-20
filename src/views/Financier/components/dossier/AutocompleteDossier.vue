@@ -11,9 +11,9 @@
       @focus="$event.target.select()"
       @change="dossierChangeAsync"
       @keydown.ctrl.f.prevent="OpenSearchDossier()"
-      :hide-details="readonly"
-      :readonly="readonly"
-      :disabled="readonly"
+      :hide-details="disabled"
+      :readonly="disabled"
+      :disabled="disabled"
       validate-on-blur
       hide-selected
       item-text="idNom"
@@ -27,7 +27,7 @@
             <v-btn
               icon
               small
-              :disabled="readonly"
+              :disabled="disabled"
               @click="OpenSearchDossier()"
               @keydown.enter.prevent.stop="OpenSearchDossier()"
               v-on="on">
@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Vue, Watch, Ref, PropSync } from "vue-property-decorator";
+  import { Component, Vue, Watch, Ref, PropSync, Prop } from "vue-property-decorator";
   import { DossierSearch } from '@/models/Dossier/DossierSearch';
   import { DossierApi } from '@/api/DossierApi';
   import SearchDossierVue from '@/components/search/SearchDossier.vue';
@@ -59,18 +59,27 @@
     @Ref() readonly searchDossierDialog!: SearchDossierVue;
     @Ref() readonly dossierComponent!: HTMLInputElement;
 
-    @PropSync('Readonly', { type: Boolean }) readonly!: boolean;
-    @PropSync('Required', { type: Boolean }) required!: boolean;
+    @PropSync('disabled', { type: Boolean } ) isDisabled!: boolean;
+    @Prop() required!: boolean;
 
     private dossierLoading: boolean = false;
     private idDossier: string = "";
     private dossiersSearch: DossierSearch[] = [];
     private searchDossier: string = "";
     private idDossierRules: any = [
-      (v: string | DossierSearch) =>  this.readonly || !this.required || !!v || "Dossier obligatoire",
-      (v: string) => !!v || (!v && !!this.nomDossier) || "Dossier invalide"
+      (v: any) => this.validateDossier(v)
     ];
-    
+    private validateDossier(value: string | DossierSearch): boolean | string{
+      if(this.isDisabled || !this.required)
+        return true;
+      if(value instanceof DossierSearch && !value.idDossier && !this.isDisabled && this.required)
+        return "Dossier obligatoire";
+      else if(!!value && !this.isDisabled && this.required)
+        return "Dossier obligatoire";
+      else if(value && !this.nomDossier){
+        return "Dossier invalide";
+      } else return true;
+    }
     private dossierSelected: DossierSearch = new DossierSearch();
     private nomDossier: string = "";
 
