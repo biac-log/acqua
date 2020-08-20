@@ -27,6 +27,8 @@ export class PieceComptableContrepartieDTO implements IPieceComptableContreparti
   public codeDevise:number=0;
   public caseTva: CaseTva = new CaseTva();
   public devise: Devise= new Devise();
+  public dossier = "";
+  public dossierNom = "";
 }
 
 export class PieceComptableContrepartie extends PieceComptableContrepartieDTO {

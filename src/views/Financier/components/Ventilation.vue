@@ -314,7 +314,7 @@ import { DateTime } from '@/models/DateTime';
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import { DossierApi } from '../../../api/DossierApi';
 import AutocompleteComptesVue from "./comptes/AutocompleteComptes.vue";
-import AutoCompleteDossierVue from "./dossier/AutocompleteDossier.vue"
+import AutoCompleteDossierVue from "@/components/autocomplete/AutocompleteDossier.vue"
 import { VForm } from 'vuetify/lib';
 
 @Component({

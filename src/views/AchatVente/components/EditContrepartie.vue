@@ -69,7 +69,7 @@
                       <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
                     </v-tooltip>
                   </template>
-                  <template v-slot:selection="{ attr, on, item }">
+                  <template v-slot:selection="{ item }">
                     {{ item.numero }}
                   </template>
                   <template v-slot:item="{ item }">
@@ -210,8 +210,41 @@
                 </v-text-field>
               </v-col>
             </v-row>
+            <v-row dense v-if="typesComptesSelected.id == 'G'">
+              <v-col cols="2">
+                <AutoCompleteDossierVue 
+                  ref="dossierComponent" 
+                  :readonly.sync="readonly"
+                  :required="false"
+                  @Change="dossierChange">
+                </AutoCompleteDossierVue>
+              </v-col>  
+              <v-col cols="4">
+                <v-text-field
+                  label="Nom Dossier"
+                  v-model="nomDossier"
+                  :filled="readonly"
+                  :hide-details="readonly"
+                  tabindex="-1"
+                  readonly
+                  dense
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row dense v-if="warningMessage">
+              <v-alert prominent type="warning" class="ma-0 pa-0 pl-5">
+                <v-row align="center">
+                  <v-col class="grow">{{ warningMessage }}</v-col>
+                  <v-col class="shrink">
+                    <v-btn class="ma-2" large icon @click="warningMessage = ''">
+                      <v-icon>mdi-close-circle</v-icon>
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-alert>
+            </v-row>
           </v-card-text>
-          <v-card-actions class="text-center ma-0">
+          <v-card-actions class="text-center ma-0 pt-0">
             <v-btn
               color="error"
               class="ma-2 pr-4"
@@ -286,7 +319,8 @@ import {
   PropSync,
   Emit,
   Prop,
-  Watch
+  Watch,
+	Ref
 } from "vue-property-decorator";
 import {
   PieceComptableContrepartie,
@@ -306,15 +340,20 @@ import { CompteBanque } from "../../../models/Financier";
 import GridContrepartiesVue from './GridContreparties.vue';
 import { CaseTvaApi } from '../../../api/CaseTvaApi';
 import { CaseTva } from "@/models/CaseTva";
+import { DossierSearch } from '@/models/Dossier/DossierSearch';
+import AutoCompleteDossierVue from "@/components/autocomplete/AutocompleteDossier.vue";
+import { DateTime } from '@/models/DateTime';
 
 @Component({
   name: "EditContrepartie",
-  components: { SearchCompteContrepartieVue, SearchCaseTvaVue }
+  components: { SearchCompteContrepartieVue, SearchCaseTvaVue, AutoCompleteDossierVue }
 })
 export default class extends Vue {
+  @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
+  @PropSync("isReadOnly") public readonly!: boolean;
+  @PropSync("DatePiece") private datePiece!: DateTime;
+
   private dialog: boolean = false;
-  @PropSync("isReadOnly")
-  public readonly!: boolean;
   private isNew: boolean = true;
   private errorMessage: string = "";
   private isValid: boolean = true;
@@ -360,6 +399,7 @@ export default class extends Vue {
   private tvaLoading = false;
   private reference: string = "";
   private referenceRules: any = [(v: string) => !!v || "Référence obligatoire"];
+  private warningMessage: string = "";
 
   private tvaCalcule: number = 0;
   private tvaImpute: number = 0;
@@ -438,6 +478,7 @@ export default class extends Vue {
     tvaImpute: number,
     propositionLibelle: string
   ) {
+    this.dossierComponent?.resetDossier();
     this.initDevises(deviseEntete, contrepartie);
     this.numeroJournal = numeroJournal;
     this.typesComptesSelected = this.typesComptes.find(tc => tc.id == contrepartie.typeCompte) || this.typesComptes[0];
@@ -451,6 +492,11 @@ export default class extends Vue {
       this.comptesSearch = [];
       this.comptesSearch.push(compteToSelect);
       this.numeroCompteSelected = compteToSelect;
+
+      if(contrepartie.dossier){
+        this.dossierComponent.setDossier(new DossierSearch({ idDossier: contrepartie.dossier, nom: contrepartie.dossierNom, dateEntree: "", dateSortie: "" }));
+        this.idDossier = contrepartie.dossier;
+      }
     }
 
     this.numeroCompte = contrepartie.numeroCompte ? contrepartie.numeroCompte.toString() : "";
@@ -461,6 +507,7 @@ export default class extends Vue {
     this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : "";
     this.caseTva.Refresh(contrepartie.caseTva);
     this.libelleCaseTva = contrepartie.caseTva.libelleCase;
+    
 
     this.ventileDevise = ventileDevise;
     this.tvaCalcule = tvaCalcule;
@@ -654,6 +701,7 @@ export default class extends Vue {
     contrepartie.codeDevise = this.devisesSelected ? this.devisesSelected.id : 0;
     contrepartie.devise = this.devisesSelected;
     contrepartie.caseTva = new CaseTva(this.caseTva);
+    contrepartie.dossier = this.idDossier;
     return contrepartie;
   }
 
@@ -665,6 +713,19 @@ export default class extends Vue {
         this.resolve(this.GetModel());
       }
     });
+  }
+
+  private idDossier: string = "";
+  private nomDossier: string = "";
+  private dossierIsDisabled: boolean = false;
+  private dossierChange(dossier: DossierSearch){
+    this.idDossier = dossier.idDossier;
+    this.nomDossier = dossier.nom;
+    if(this.datePiece && dossier.idDossier && !dossier.dossierIsActif(this.datePiece))
+      this.warningMessage = `Attention, le dossier n'est pas actif à la date du ${this.datePiece.toString()}`;
+    else this.warningMessage = "";
+
+    this.$nextTick(() => (this.$refs.montant as any)?.focus()); 
   }
 
   @Watch("caseTva")

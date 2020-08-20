@@ -35,6 +35,7 @@
       <EditContrepartieVue
         ref="editContrepartie"
         :isReadOnly.sync="readonly"
+        :DatePiece.sync="datePiece"
       ></EditContrepartieVue>
   </v-container>
 </template>
@@ -49,32 +50,24 @@ import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
 import { CompteApi } from '@/api/CompteApi';
 import { Devise } from '@/models/Devise/Devise';
 import { CaseTvaApi } from "@/api/CaseTvaApi";
+import { DateTime } from '@/models/DateTime';
 
 @Component({
   name: "GridContreparties",
   components: { EditContrepartieVue }
 })
 export default class extends Vue {
-  @PropSync("IsReadOnly")
-  public readonly!: boolean;
-  @PropSync("Contreparties")
-  private contreparties!: PieceComptableContrepartie[];
-  @PropSync("Journal")
-  public journal!: Journal;
-  @PropSync("DeviseEntete")
-  public devise!: Devise;
-  @PropSync("CompteAchatVente")
-  private numeroCompteAchatVente!: string;
-  @PropSync("MontantDevise")
-  private montantDevise!: string;
-  @PropSync("MontantBase")
-  private montantBase!: string;
-  @PropSync("NomCompteDeTier")
-  private nomCompteDeTier!: string;
-  @PropSync("CodeTaxe")
-  private codeTaxe!: number;
-  @PropSync("TauxDevise")
-  private tauxDevise!: string;
+  @PropSync("IsReadOnly") public readonly!: boolean;
+  @PropSync("Contreparties") private contreparties!: PieceComptableContrepartie[];
+  @PropSync("Journal") public journal!: Journal;
+  @PropSync("DeviseEntete") public devise!: Devise;
+  @PropSync("CompteAchatVente") private numeroCompteAchatVente!: string;
+  @PropSync("MontantDevise") private montantDevise!: string;
+  @PropSync("MontantBase") private montantBase!: string;
+  @PropSync("NomCompteDeTier") private nomCompteDeTier!: string;
+  @PropSync("CodeTaxe") private codeTaxe!: number;
+  @PropSync("TauxDevise") private tauxDevise!: string;
+  @PropSync("DatePiece") private datePiece!: DateTime;
   private overlay = false;
   
   private ventilleBase: number = 0;

@@ -11,8 +11,9 @@
       @focus="$event.target.select()"
       @change="dossierChangeAsync"
       @keydown.ctrl.f.prevent="OpenSearchDossier()"
-      :hide-details="disabled"
-      :readonly="disabled"
+      :filled="readonly"
+      :hide-details="disabled || readonly"
+      :readonly="isReadonly"
       :disabled="disabled"
       validate-on-blur
       hide-selected
@@ -27,7 +28,7 @@
             <v-btn
               icon
               small
-              :disabled="disabled"
+              :disabled="disabled || readonly"
               @click="OpenSearchDossier()"
               @keydown.enter.prevent.stop="OpenSearchDossier()"
               v-on="on">
@@ -59,6 +60,7 @@
     @Ref() readonly searchDossierDialog!: SearchDossierVue;
     @Ref() readonly dossierComponent!: HTMLInputElement;
 
+    @PropSync('readonly', { type: Boolean } ) isReadonly!: boolean;
     @PropSync('disabled', { type: Boolean } ) isDisabled!: boolean;
     @Prop() required!: boolean;
 

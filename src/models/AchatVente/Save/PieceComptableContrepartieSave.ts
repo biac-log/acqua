@@ -18,5 +18,6 @@ export class PieceComptableContrepartieSaveDTO implements IPieceComptableContrep
   public montantBase: number = 0;
   public libelle: string = "";
   public numeroCaseTVA: number = 0;
-  public numeroLigne:number=0;
+  public numeroLigne:number= 0;
+  public dossier: string = "";
 }

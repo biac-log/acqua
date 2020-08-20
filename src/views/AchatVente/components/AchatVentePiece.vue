@@ -48,8 +48,8 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-card-text>
-          <v-row fill-height>
+        <v-card-text style="height: 1000px;">
+          <v-row>
             <v-col cols="5">
               <v-row dense>
                 <v-col cols="4">
@@ -83,7 +83,7 @@
                         <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
                       </v-tooltip>
                     </template>
-                    <template v-slot:selection="{ attr, on, item }">
+                    <template v-slot:selection="{ item }">
                       {{ item.numero }}
                     </template>
                     <template v-slot:item="{ item }">
@@ -311,6 +311,7 @@
                 :TauxDevise.sync="taux"
                 :CodeTaxe.sync="codeTaxe"
                 :NomCompteDeTier.sync="compteTiersNom"
+                :DatePiece.sync="datePiece"
               ></GridContreparties>
               <SearchCompteTier ref="compteDialog"></SearchCompteTier>
             </v-col>
@@ -647,7 +648,7 @@ export default class extends Vue {
     this.montantEscompte = pieceComptable.montantEscompteDevise.toDecimalString(2);
     this.compteTiersNom = pieceComptable.compteTiersNom;
     this.libellePiece = pieceComptable.libelle;
-    this.taux = pieceComptable.taux.toDecimalString(2);
+    this.taux = pieceComptable.taux.toDecimalString(6);
     this.pieceAcquittee = pieceComptable.pieceAcquittee;
     this.libelleMontantBase = pieceComptable.libelleMontantBase;
     this.libelleSoldeCompteTiers = pieceComptable.libelleSoldeCompteTiers;
@@ -846,11 +847,11 @@ export default class extends Vue {
 
   private initTauxDevise(numeroDevise: number, datePiece: DateTime){
     if(!numeroDevise || numeroDevise == 1)
-      this.taux = "1";
+      this.taux = "1,000000";
     else if(this.datePiece.isValid() && numeroDevise) {
       DeviseApi.getTaux(numeroDevise, datePiece)
       .then((resp) => {
-        this.taux = resp.toDecimalString(2);
+        this.taux = resp.toDecimalString(6);
       }).catch((err) => {
         this.errorMessage = displayAxiosError(err);
       });
