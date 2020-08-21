@@ -1,7 +1,7 @@
 <template>
   <span>
     <v-combobox
-      ref="numeroCompte"
+      ref="comboboxCompte"
       label="N° compte"
       v-model="numeroCompteSelected"
       :items="comptesSearch"
@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Emit, Prop, Watch, Model } from "vue-property-decorator";
+import { Component, Vue, PropSync, Emit, Prop, Watch, Model, Ref } from "vue-property-decorator";
 import SearchCompteTierVue from "./SearchCompteTier.vue";
 import SearchCompteGeneralVue from "./SearchCompteGeneral.vue";
 import { CompteApi } from '@/api/CompteApi';
@@ -64,6 +64,10 @@ import { CompteDeTier } from '../../../../models/Compte/CompteDeTier';
   components: { SearchCompteTierVue, SearchCompteGeneralVue }
 })
 export default class extends Vue {
+  @Ref() readonly comboboxCompte!: HTMLInputElement;
+  @Ref() readonly searchCompteTierDialog!: SearchCompteTierVue;
+  @Ref() readonly searchCompteGeneralDialog!: SearchCompteGeneralVue;
+
   @PropSync("Readonly")
   private readonly!: boolean;
   @PropSync("TypeCompte")
@@ -165,6 +169,7 @@ export default class extends Vue {
 
   private OpenSearchCompte(): void {
     if (this.typeCompte) {
+      this.comboboxCompte.blur();
       if(this.typeCompte == "G" || this.typeCompte == "Z")
         this.OpenSearchCompteGeneral();
       else this.OpenSearchCompteTier();
@@ -173,26 +178,26 @@ export default class extends Vue {
 
   private OpenSearchCompteGeneral() {
     if (this.typeCompte) {
-      (this.$refs.searchCompteGeneralDialog as SearchCompteGeneralVue)
-        .open(this.typeCompte)
+      this.comboboxCompte.blur();
+      this.searchCompteGeneralDialog.open(this.typeCompte)
         .then(compte => {
           this.setCompte(compte);
           this.$emit('Change', compte);
         }).catch(() => {
-          this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+          this.$nextTick(() => this.comboboxCompte?.focus());
         });
     }
   }
 
   private OpenSearchCompteTier(): void {
     if (this.typeCompte) {
-      (this.$refs.searchCompteTierDialog as SearchCompteTierVue)
-        .open(this.typeCompte)
+      this.comboboxCompte.blur();
+      this.searchCompteTierDialog.open(this.typeCompte)
         .then(compte => {
           this.setCompte(compte);
           this.$emit('Change', compte);
         }).catch(() => {
-          this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+          this.$nextTick(() => this.comboboxCompte?.focus());
         });
     }
   }
@@ -214,11 +219,11 @@ export default class extends Vue {
   }
 
   public focus(){
-    this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+    this.$nextTick(() => this.comboboxCompte?.focus());
   }
 
   public blur(){
-    this.$nextTick(() => (this.$refs.numeroCompte as any)?.blur());
+    this.$nextTick(() => this.comboboxCompte?.blur());
   }
 
   @Watch("typeCompte")

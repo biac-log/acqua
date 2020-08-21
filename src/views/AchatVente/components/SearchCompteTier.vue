@@ -54,7 +54,8 @@ export default class extends Vue {
     { headerName: "Numéro", field: "numero", filter:true, width: 120 },
     { headerName: "Nom", field: "nom", filter:true, width: 300 },
     { headerName: "Raison sociale", field: "raisonSocial", filter:true, width: 140 },
-    { headerName: "Adresse", field: "adresse", filter:true, flex:1 }
+    { headerName: "Adresse", field: "adresse", filter:true, flex:1 },
+    { headerName: "Case TVA", field: "caseTvaDisplay", filter:true, width: 120 }
   ];
 
   private resolve!: any;

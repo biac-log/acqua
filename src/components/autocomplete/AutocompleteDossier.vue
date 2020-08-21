@@ -100,6 +100,7 @@
     }
 
     private OpenSearchDossier(): void {
+      this.dossierComponent.blur();
       this.searchDossierDialog.open()
         .then(dossier => {
           this.setDossier(dossier);

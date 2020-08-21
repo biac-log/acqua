@@ -1,398 +1,406 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    scrollable
-    width="2000"
-    :persistent="!piecereadonly"
-    eager
-    @keydown.f2="ModifierPiece"
-    @keydown.46.prevent.stop="DeletePiece"
-    @keydown.107.prevent.stop="createContrepartie"
-    @keydown.alt.enter="savePiece()"
-    @click:outside.stop="closeDialog()" 
-    @keydown.esc.stop="closeDialog()"
-  >
-    <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
-      <v-card :loading="pieceLoading">
-        <v-toolbar color="primary" dark flat>
-          <v-card-title class="d-flex justify-start">
-            <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
-            <p class="mb-0" v-if="!numeroPiece">Nouvelle pièce</p>
-            <p class="ml-10 mb-0 textMini">Période {{ periodeDisplay }}</p>
-            <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
-          </v-card-title>
-          <v-spacer></v-spacer>
-          <v-tooltip v-if="piecereadonly" top open-delay=500>
-            <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" :disabled="saveLoading" @click="ModifierPiece" v-on="on">
-                <v-icon left>mdi-pencil</v-icon>Modifier
-              </v-btn>
-            </template>
-            <span>Modifier la pièce <span class="shortcutTooltip">F2</span></span>
-          </v-tooltip>
-          <v-tooltip top open-delay=500 open-on-hover>
-            <template v-slot:activator="{ on }">
-              <v-btn class="mr-10" color="error" :disabled="saveLoading" v-show="piecereadonly" @click="DeletePiece" :loading="deleteIsLoading" v-on="on" >
-                <v-icon left>mdi-delete</v-icon>Supprimer
-              </v-btn>
-            </template>
-            <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
-          </v-tooltip>
-          <v-btn
-            ref="buttonClose"
-            class="ml-10"
-            icon
-            color="white"
-            @click="closeDialog()"
-          >
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-toolbar>
-        <v-card-text style="height: 1000px;">
-          <v-row>
-            <v-col cols="5">
-              <v-row dense>
-                <v-col cols="4">
-                  <v-combobox
-                    ref="numeroCompteTier"
-                    label="Numéro compte tiers"
-                    v-model="numeroCompteTierSelected"
-                    :items="comptesTiersSearch"
-                    :search-input.sync="searchCompteDeTier"
-                    :rules="numeroCompteTierRules"
-                    @keypress.enter="loadCompte"
-                    @keyup.enter="$event.target.select()"
-                    @focus="$event.target.select()"
-                    @change="numeroCompteTierChange"
-                    @keydown.ctrl.f.prevent="OpenSearchCompte()"
-                    :hide-details="piecereadonly"
-                    :filled="piecereadonly"
-                    :readonly="piecereadonly"
-                    hide-selected
-                    item-text="nom"
-                    item-value="numero"
-                    hide-no-data
-                  >
-                    <template v-slot:append>
-                      <v-tooltip top open-delay="500" open-on-hover>
-                        <template v-slot:activator="{ on }">
-                            <v-btn icon small v-show="!piecereadonly" v-on="on" :disabled="piecereadonly || saveLoading" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()" tabindex="-1">
-                              <v-icon>mdi-magnify</v-icon>
-                            </v-btn>
-                        </template>
-                        <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
-                      </v-tooltip>
-                    </template>
-                    <template v-slot:selection="{ item }">
-                      {{ item.numero }}
-                    </template>
-                    <template v-slot:item="{ item }">
-                      {{ item.nom }}
-                    </template>
-                  </v-combobox>
-                </v-col>
-                <v-col cols="8">
-                  <v-text-field
-                    label="Nom compte tiers"
-                    :value="compteTiersNom"
-                    :filled="piecereadonly"
-                    :hide-details="piecereadonly"
-                    tabindex="-1"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col cols="12">
-                  <v-text-field
-                    label="Libelle"
-                    ref="libellePiece"
-                    autocomplete="off"
-                    counter
-                    maxlength="23"
-                    v-model="libelle"
-                    :value="libellePiece"
-                    :filled="piecereadonly"
-                    :readonly="piecereadonly"
-                    :hide-details="piecereadonly"
-                    :color="libelleWarningMessage ? 'orange' : 'primary'"
-                    :messages="libelleWarningMessage"
-                    :rules="libelleRules"
-                    validate-on-blur
-                    @blur="validateLibelle"
-                  >
-                    <template slot="message">
-                      <span class="warningMessage"> {{ libelleWarningMessage }}</span>
-                    </template>
-                  </v-text-field>
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col cols="4">
-                  <v-text-field
-                    ref="montant"
-                    label="Montant"
-                    v-model="montantDevise"
-                    validate-on-blur
-                    :rules="montantRules"
-                    :filled="piecereadonly"
-                    :readonly="piecereadonly"
-                    :hide-details="piecereadonly"
-                    @blur="montantDevise = montantDevise.toNumber().toDecimalString()"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="2">
-                  <v-select
-                    :items="devises"
-                    v-model="deviseSelected"
-                    :filled="piecereadonly"
-                    :readonly="piecereadonly"
-                    :hide-details="piecereadonly"
-                    :loading="devisesLoading"
-                    tabindex="-1"
-                    return-object
-                    item-text="libelle"
-                    label="Devise pièce"
-                  ></v-select>
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    label="Montant Escompte"
-                    v-model="montantEscompte"
-                    :rules="montantEscompteRules"
-                    :filled="piecereadonly"
-                    :readonly="piecereadonly"
-                    :hide-details="piecereadonly"
-                    @blur="montantEscompte = montantEscompte.toNumber().toDecimalString()"
-                    tabindex="-1"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="2">
-                  <v-text-field
-                    label="Taux devise"
-                    readonly
-                    v-model="taux"
-                    :filled="piecereadonly"
-                    :hide-details="piecereadonly"
-                    tabindex="-1"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col cols="4">
-                  <DatePicker
-                    label="Date pièce"
-                    :date.sync="datePiece"
-                    :readonly.sync="piecereadonly"
-                    :rules.sync="datePieceRules"
-                  ></DatePicker>
-                </v-col>
-                <v-col cols="4">
-                  <DatePicker
-                    label="Date échéance"
-                    :date.sync="dateEcheance"
-                    :readonly.sync="piecereadonly"
-                    :rules.sync="dateEcheanceRules"
-                  ></DatePicker>
-                </v-col>
-                <v-col cols="4">
-                  <v-select
-                    v-model="statutSelected"
-                    :items="statuts"
-                    :filled="piecereadonly"
-                    :readonly="piecereadonly"
-                    :loading="statutsLoading"
-                    return-object
-                    item-value="id"
-                    item-text="libelle"
-                    label="Statut"
-                    hide-details="auto"
-                    tabindex="-1"
-                  ></v-select>
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col cols="4">
-                  <v-checkbox
-                    label="Pièce acquitée"
-                    v-model="pieceAcquittee"
-                    :readonly="piecereadonly"
-                    tabindex="-1"
-                  ></v-checkbox>
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    label="Montant en devise comptable"
-                    v-model="libelleMontantBase"
-                    filled
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-divider></v-divider>
-              <v-card-title>Informations compte tiers</v-card-title>
-              <v-row dense>
-                <v-col cols="3">
-                  <v-text-field
-                    label="Solde du compte"
-                    v-model="libelleSoldeCompteTiers"
-                    filled
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field
-                    label="Délai de paiement"
-                    v-model="delaiPaiementLibelle"
-                    filled
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field
-                    label="% Escompte"
-                    v-model="compteTiersEscomptePourcentage"
-                    filled
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field
-                    label="Nombre jours escompte"
-                    v-model="compteTiersEscompteNombreJours"
-                    filled
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col cols="6">
-                  <v-text-field
-                    label="Compte associé"
-                    v-model="libelleCompteAssocie"
-                    filled
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    label="Compte achat/vente"
-                    v-model="libelleCompteVenteAchat"
-                    filled
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="7">
-              <GridContreparties
-                ref="gridContreparties"
-                :Contreparties.sync="contreparties"
-                :IsReadOnly.sync="piecereadonly"
-                :Journal.sync="journal"
-                :DeviseEntete.sync="deviseSelected"
-                :CompteAchatVente.sync="numeroCompteAchatVente"
-                :MontantDevise.sync="montantDevise"
-                :MontantBase.sync="montantBase"
-                :TauxDevise.sync="taux"
-                :CodeTaxe.sync="codeTaxe"
-                :NomCompteDeTier.sync="compteTiersNom"
-                :DatePiece.sync="datePiece"
-              ></GridContreparties>
-              <SearchCompteTier ref="compteDialog"></SearchCompteTier>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-divider v-if="!piecereadonly"></v-divider>
-        <v-card-actions v-if="saveLoading || !piecereadonly" class="d-flex">
-          <v-tooltip top open-delay=500 open-on-hover>
-            <template v-slot:activator="{ on }">
+  <v-row justify="center">
+    <v-dialog
+      v-model="dialog"
+      scrollable
+      width="2000"
+      :persistent="!piecereadonly"
+      eager
+      @keydown.f2="ModifierPiece"
+      @keydown.46.prevent.stop="DeletePiece"
+      @keydown.107.prevent.stop="createContrepartie"
+      @keydown.alt.enter="savePiece()"
+      @click:outside.stop="closeDialog()" 
+      @keydown.esc.stop="closeDialog()"
+    >
+      <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
+        <v-card :loading="pieceLoading">
+          <v-toolbar color="primary" dark flat>
+            <v-card-title class="d-flex justify-start">
+              <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
+              <p class="mb-0" v-if="!numeroPiece">Nouvelle pièce</p>
+              <p class="ml-10 mb-0 textMini">Période {{ periodeDisplay }}</p>
+              <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
+            </v-card-title>
+            <v-spacer></v-spacer>
+            <v-tooltip v-if="piecereadonly" top open-delay=500>
+              <template v-slot:activator="{ on }">
+                <v-btn class="mr-5" color="success" :disabled="saveLoading" @click="ModifierPiece" v-on="on">
+                  <v-icon left>mdi-pencil</v-icon>Modifier
+                </v-btn>
+              </template>
+              <span>Modifier la pièce <span class="shortcutTooltip">F2</span></span>
+            </v-tooltip>
+            <v-tooltip top open-delay=500 open-on-hover>
+              <template v-slot:activator="{ on }">
+                <v-btn class="mr-10" color="error" :disabled="saveLoading" v-show="piecereadonly" @click="DeletePiece" :loading="deleteIsLoading" v-on="on" >
+                  <v-icon left>mdi-delete</v-icon>Supprimer
+                </v-btn>
+              </template>
+              <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
+            </v-tooltip>
             <v-btn
-              color="error"
-              class="ma-2 pr-4 align-self-start"
+              ref="buttonClose"
+              class="ml-10"
+              icon
+              color="white"
+              @click="closeDialog()"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-progress-linear
+            :active="pieceLoading"
+            :indeterminate="pieceLoading"
+            top
+            color="primary accent-4"
+          ></v-progress-linear>
+          <v-card-text style="height: 750px;">
+            <v-row >
+              <v-col cols="5">
+                <v-row dense>
+                  <v-col cols="4">
+                    <v-combobox
+                      ref="autocompleteCompteTier"
+                      label="Numéro compte tiers"
+                      v-model="numeroCompteTierSelected"
+                      :items="comptesTiersSearch"
+                      :search-input.sync="searchCompteDeTier"
+                      :rules="numeroCompteTierRules"
+                      @keypress.enter="loadCompte"
+                      @keyup.enter="$event.target.select()"
+                      @focus="$event.target.select()"
+                      @change="numeroCompteTierChange"
+                      @keydown.ctrl.f.prevent="OpenSearchCompte()"
+                      :hide-details="piecereadonly"
+                      :filled="piecereadonly"
+                      :readonly="piecereadonly"
+                      hide-selected
+                      item-text="nom"
+                      item-value="numero"
+                      hide-no-data
+                    >
+                      <template v-slot:append>
+                        <v-tooltip top open-delay="500" open-on-hover>
+                          <template v-slot:activator="{ on }">
+                              <v-btn icon small v-show="!piecereadonly" v-on="on" :disabled="piecereadonly || saveLoading" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()" tabindex="-1">
+                                <v-icon>mdi-magnify</v-icon>
+                              </v-btn>
+                          </template>
+                          <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
+                        </v-tooltip>
+                      </template>
+                      <template v-slot:selection="{ item }">
+                        {{ item.numero }}
+                      </template>
+                      <template v-slot:item="{ item }">
+                        {{ item.nom }}
+                      </template>
+                    </v-combobox>
+                  </v-col>
+                  <v-col cols="8">
+                    <v-text-field
+                      label="Nom compte tiers"
+                      :value="compteTiersNom"
+                      :filled="piecereadonly"
+                      :hide-details="piecereadonly"
+                      tabindex="-1"
+                      readonly
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col cols="12">
+                    <v-text-field
+                      label="Libelle"
+                      ref="libellePiece"
+                      autocomplete="off"
+                      counter
+                      maxlength="23"
+                      v-model="libelle"
+                      :value="libellePiece"
+                      :filled="piecereadonly"
+                      :readonly="piecereadonly"
+                      :hide-details="piecereadonly"
+                      :color="libelleWarningMessage ? 'orange' : 'primary'"
+                      :messages="libelleWarningMessage"
+                      :rules="libelleRules"
+                      validate-on-blur
+                      @blur="validateLibelle"
+                    >
+                      <template slot="message">
+                        <span class="warningMessage"> {{ libelleWarningMessage }}</span>
+                      </template>
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col cols="4">
+                    <v-text-field
+                      ref="montant"
+                      label="Montant"
+                      v-model="montantDevise"
+                      validate-on-blur
+                      :rules="montantRules"
+                      :filled="piecereadonly"
+                      :readonly="piecereadonly"
+                      :hide-details="piecereadonly"
+                      @blur="montantDevise = montantDevise.toNumber().toDecimalString()"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="2">
+                    <v-select
+                      :items="devises"
+                      v-model="deviseSelected"
+                      :filled="piecereadonly"
+                      :readonly="piecereadonly"
+                      :hide-details="piecereadonly"
+                      :loading="devisesLoading"
+                      tabindex="-1"
+                      return-object
+                      item-text="libelle"
+                      label="Devise pièce"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="4">
+                    <v-text-field
+                      label="Montant Escompte"
+                      v-model="montantEscompte"
+                      :rules="montantEscompteRules"
+                      :filled="piecereadonly"
+                      :readonly="piecereadonly"
+                      :hide-details="piecereadonly"
+                      @blur="montantEscompte = montantEscompte.toNumber().toDecimalString()"
+                      tabindex="-1"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field
+                      label="Taux devise"
+                      readonly
+                      v-model="taux"
+                      :filled="piecereadonly"
+                      :hide-details="piecereadonly"
+                      tabindex="-1"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col cols="4">
+                    <DatePicker
+                      label="Date pièce"
+                      :date.sync="datePiece"
+                      :readonly.sync="piecereadonly"
+                      :rules.sync="datePieceRules"
+                    ></DatePicker>
+                  </v-col>
+                  <v-col cols="4">
+                    <DatePicker
+                      label="Date échéance"
+                      :date.sync="dateEcheance"
+                      :readonly.sync="piecereadonly"
+                      :rules.sync="dateEcheanceRules"
+                    ></DatePicker>
+                  </v-col>
+                  <v-col cols="4">
+                    <v-select
+                      v-model="statutSelected"
+                      :items="statuts"
+                      :filled="piecereadonly"
+                      :readonly="piecereadonly"
+                      :loading="statutsLoading"
+                      return-object
+                      item-value="id"
+                      item-text="libelle"
+                      label="Statut"
+                      hide-details="auto"
+                      tabindex="-1"
+                    ></v-select>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <!-- <v-col cols="4">
+                    <v-checkbox
+                      label="Pièce acquitée"
+                      v-model="pieceAcquittee"
+                      :readonly="piecereadonly"
+                      tabindex="-1"
+                    ></v-checkbox>
+                  </v-col> -->
+                  <v-col cols="4">
+                    <v-text-field
+                      label="Montant en devise comptable"
+                      v-model="libelleMontantBase"
+                      filled
+                      readonly
+                      tabindex="-1"
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-divider></v-divider>
+                <v-card-title>Informations compte tiers</v-card-title>
+                <v-row dense>
+                  <v-col cols="3">
+                    <v-text-field
+                      label="Solde du compte"
+                      v-model="libelleSoldeCompteTiers"
+                      filled
+                      readonly
+                      tabindex="-1"
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field
+                      label="Délai de paiement"
+                      v-model="delaiPaiementLibelle"
+                      filled
+                      readonly
+                      tabindex="-1"
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field
+                      label="% Escompte"
+                      v-model="compteTiersEscomptePourcentage"
+                      filled
+                      readonly
+                      tabindex="-1"
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field
+                      label="Nombre jours escompte"
+                      v-model="compteTiersEscompteNombreJours"
+                      filled
+                      readonly
+                      tabindex="-1"
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col cols="6">
+                    <v-text-field
+                      label="Compte associé"
+                      v-model="libelleCompteAssocie"
+                      filled
+                      readonly
+                      tabindex="-1"
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      label="Compte achat/vente"
+                      v-model="libelleCompteVenteAchat"
+                      filled
+                      readonly
+                      tabindex="-1"
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="7">
+                <GridContreparties
+                  ref="gridContreparties"
+                  :Contreparties.sync="contreparties"
+                  :IsReadOnly.sync="piecereadonly"
+                  :Journal.sync="journal"
+                  :DeviseEntete.sync="deviseSelected"
+                  :CompteAchatVente.sync="numeroCompteAchatVente"
+                  :MontantDevise.sync="montantDevise"
+                  :MontantBase.sync="montantBase"
+                  :TauxDevise.sync="taux"
+                  :CodeTaxe.sync="codeTaxe"
+                  :NomCompteDeTier.sync="compteTiersNom"
+                  :DatePiece.sync="datePiece"
+                ></GridContreparties>
+                <SearchCompteTier ref="compteDialog"></SearchCompteTier>
+              </v-col>
+            </v-row>
+          </v-card-text>
+          <v-divider v-if="!piecereadonly"></v-divider>
+          <v-card-actions v-if="saveLoading || !piecereadonly" class="d-flex">
+            <v-tooltip top open-delay=500 open-on-hover>
+              <template v-slot:activator="{ on }">
+              <v-btn
+                color="error"
+                class="ma-2 pr-4 align-self-start"
+                text
+                tabindex="-1"
+                :disabled="saveLoading"
+                v-if="numeroPiece"
+                @click="DeletePiece()"
+                :loading="deleteIsLoading"
+                v-on="on"
+                >
+                Supprimer</v-btn
+              >
+              </template>
+              <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
+            </v-tooltip>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="warning"
+              class="ma-2 mt-0 pr-4 align-self-start"
               text
               tabindex="-1"
+              v-if="!numeroPiece && !forcerNumero"
               :disabled="saveLoading"
-              v-if="numeroPiece"
-              @click="DeletePiece()"
-              :loading="deleteIsLoading"
-              v-on="on"
+              @click="forcerNumero = true"
               >
-              Supprimer</v-btn
+              Forcer le numéro de pièce</v-btn
             >
-            </template>
-            <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
-          </v-tooltip>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="warning"
-            class="ma-2 mt-0 pr-4 align-self-start"
-            text
-            tabindex="-1"
-            v-if="!numeroPiece && !forcerNumero"
-            :disabled="saveLoading"
-            @click="forcerNumero = true"
-            >
-            Forcer le numéro de pièce</v-btn
-          >
-          <v-text-field 
-            label="Numéro pièce"
-            v-model="numeroToForce"
-            v-if="forcerNumero"
-            append-icon="mdi-close"
-            @click:append="forcerNumero = false"
-            :rules="numeroToForceRules"
-            hide-details="auto"
-            autofocus
-            dense
-            outlined
-            class="shrink align-self-start"
-          ></v-text-field>
-          <v-tooltip top open-delay=500 open-on-hover>
-            <template v-slot:activator="{ on }">
-              <v-btn color="blue darken-1" class="ma-2 mt-0 pr-4 align-self-start" :disabled="saveLoading" tile outlined @click="cancelEdit()" tabindex="-1" v-on="on">
-                <v-icon left>mdi-close</v-icon> Annuler
+            <v-text-field 
+              label="Numéro pièce"
+              v-model="numeroToForce"
+              v-if="forcerNumero"
+              append-icon="mdi-close"
+              @click:append="forcerNumero = false"
+              :rules="numeroToForceRules"
+              hide-details="auto"
+              autofocus
+              dense
+              outlined
+              class="shrink align-self-start"
+            ></v-text-field>
+            <v-tooltip top open-delay=500 open-on-hover>
+              <template v-slot:activator="{ on }">
+                <v-btn color="blue darken-1" class="ma-2 mt-0 pr-4 align-self-start" :disabled="saveLoading" tile outlined @click="cancelEdit()" tabindex="-1" v-on="on">
+                  <v-icon left>mdi-close</v-icon> Annuler
+                </v-btn>
+              </template>
+              <span>Annuler les modifications <span class="shortcutTooltip">esc</span></span>
+            </v-tooltip>
+            <v-tooltip top open-delay=500 open-on-hover>
+              <template v-slot:activator="{ on }">
+              <v-btn ref="btnValidate" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()" v-on="on">
+                <v-icon left>mdi-content-save</v-icon>Sauvegarder
               </v-btn>
-            </template>
-            <span>Annuler les modifications <span class="shortcutTooltip">esc</span></span>
-          </v-tooltip>
-          <v-tooltip top open-delay=500 open-on-hover>
-            <template v-slot:activator="{ on }">
-            <v-btn ref="btnValidate" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()" v-on="on">
-              <v-icon left>mdi-content-save</v-icon>Sauvegarder
-            </v-btn>
-            </template>
-            <span>Sauvegarder la pièce <span class="shortcutTooltip">alt + enter</span></span>
-          </v-tooltip>
-        </v-card-actions>
-        <v-alert type="error" border="left" v-if="errorMessage"  class="ml-4 mr-4">
-            {{errorMessage}}
-        </v-alert>
-        <Confirm ref="confirmDialog"></Confirm>
-        <Confirm ref="confirmLibellelDialog" :displayButtonCancel="false" :focusOk="false"></Confirm>
-      </v-card>
-    </v-form>
-  </v-dialog>
+              </template>
+              <span>Sauvegarder la pièce <span class="shortcutTooltip">alt + enter</span></span>
+            </v-tooltip>
+          </v-card-actions>
+          <v-alert type="error" border="left" v-if="errorMessage"  class="ml-4 mr-4">
+              {{errorMessage}}
+          </v-alert>
+          <Confirm ref="confirmDialog"></Confirm>
+          <Confirm ref="confirmLibellelDialog" :displayButtonCancel="false" :focusOk="false"></Confirm>
+        </v-card>
+      </v-form>
+    </v-dialog>
+  </v-row>
 </template>
 
 <script lang="ts">
 import axios from "axios";
 import moment from "moment";
-import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
+import { Component, Vue, PropSync, Emit, Watch, Ref } from "vue-property-decorator";
 import {
   PeriodeComptable,
   EntetePieceComptable,
@@ -411,7 +419,6 @@ import DatePicker from "@/components/DatePicker.vue";
 import { CompteApi } from "@/api/CompteApi";
 import { AchatVenteApi } from "@/api/AchatVenteApi";
 import GridContreparties from "./GridContreparties.vue";
-import GridContrepartiesVue from './GridContreparties.vue';
 import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
 import CompteGeneralSearch from '../../../models/Compte/CompteGeneralSearch';
 import { displayAxiosError } from '@/utils/ErrorMethods';
@@ -426,6 +433,11 @@ import { numberToString } from '@/utils/FiltersMethods';
   components: { SearchCompteTier, GridContreparties, Confirm, DatePicker }
 })
 export default class extends Vue {
+  @Ref() readonly autocompleteCompteTier!: HTMLInputElement;
+  @Ref() readonly buttonSave!: HTMLButtonElement;
+  @Ref() readonly gridContreparties!: GridContreparties;
+  @Ref() readonly confirmDialog!: Confirm;
+
   public piecereadonly: boolean = true;
   private pieceLoading = false;
   private errorMessage: string = "";
@@ -518,10 +530,9 @@ export default class extends Vue {
 
   private ventilleBase: number = 0;
 
-  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
+  public openNew(periode: PeriodeComptable, journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
     this.dialog= true;
     this.piecereadonly = false;
-    //await this.loadDataForEdit();
     this.init(periode, journal);
 
     let today = DateTime.today();
@@ -532,7 +543,7 @@ export default class extends Vue {
     else this.datePiece = today;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      (this.$refs.numeroCompteTier as any)?.focus();
+      this.autocompleteCompteTier?.focus();
     });
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -548,7 +559,7 @@ export default class extends Vue {
     this.init(periode, journal, entete);
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      (this.$refs.numeroCompteTier as any)?.focus();
+      this.autocompleteCompteTier?.focus();
     });
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -677,7 +688,7 @@ export default class extends Vue {
         this.setCompteDeTier(compte);
       }).catch((err) => {
         this.setCompteDeTier();
-        this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+        this.$nextTick(() => this.autocompleteCompteTier?.focus());
       })
       .finally(() => {
         this.compteLoading = false;
@@ -687,7 +698,7 @@ export default class extends Vue {
 
   private OpenSearchCompte(): void {
     if(this.piecereadonly) return;
-
+    this.autocompleteCompteTier.blur();
     (this.$refs.compteDialog as SearchCompteTier)
       .open(this.typeCompte)
       .then(compte => {
@@ -695,7 +706,7 @@ export default class extends Vue {
         this.loadCompte();
         this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
       }).catch(() => {
-        this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
+        this.$nextTick(() => this.autocompleteCompteTier?.focus());
       });
   }
 
@@ -721,7 +732,7 @@ export default class extends Vue {
     else if(value instanceof CompteSearch)
     {
       this.numeroCompteTier = value.numero.toString();
-      this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.blur());
+      this.$nextTick(() => this.autocompleteCompteTier?.blur());
       this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
     }
     else {
@@ -774,7 +785,7 @@ export default class extends Vue {
   private async ModifierPiece() {
     this.piecereadonly = false;
     await this.loadCompte();
-    this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
+    this.$nextTick(() => this.autocompleteCompteTier?.focus());
   }
 
   private devisesLoading = false;
@@ -849,12 +860,13 @@ export default class extends Vue {
     if(!numeroDevise || numeroDevise == 1)
       this.taux = "1,000000";
     else if(this.datePiece.isValid() && numeroDevise) {
-      DeviseApi.getTaux(numeroDevise, datePiece)
-      .then((resp) => {
-        this.taux = resp.toDecimalString(6);
-      }).catch((err) => {
-        this.errorMessage = displayAxiosError(err);
-      });
+      this.taux = "0,890000";
+      // DeviseApi.getTaux(numeroDevise, datePiece)
+      // .then((resp) => {
+      //   this.taux = resp.toDecimalString(6);
+      // }).catch((err) => {
+      //   this.errorMessage = displayAxiosError(err);
+      // });
     }
     this.recalculmontantBase();
   }
@@ -888,7 +900,7 @@ export default class extends Vue {
 
   private createContrepartie(){
     if(this.compteTiersNom)
-      (this.$refs.gridContreparties as GridContrepartiesVue).createContrepartie();
+      this.gridContreparties.createContrepartie();
   }
 
   private saveLoading: boolean = false;
@@ -907,12 +919,10 @@ export default class extends Vue {
 
   private async confirmEquilibre(): Promise<boolean>{
     try {
-      if(!(this.$refs.gridContreparties as GridContreparties).pieceIsEquilibre()){
+      if(!this.gridContreparties.pieceIsEquilibre())
         return await (this.$refs.confirmDialog as Confirm).open( "Attention, pièce non équilibrée", `La pièce n'est pas équilibrée, voulez vous sauvegarder ?`, "error", "Sauvegarder");
-      } 
-      else if((this.$refs.gridContreparties as GridContreparties).errorInTVA()){
+      else if(this.gridContreparties.errorInTVA())
         return await (this.$refs.confirmDialog as Confirm).open( "Attention, contrôle de tva", `La tva calculée est différente de la tva assignée, voulez-vous continuer ?`, "error", "Sauvegarder");
-      } 
       return true;
     } catch (err) {
       return false;
@@ -956,8 +966,11 @@ export default class extends Vue {
 
   private deleteIsLoading : boolean = false;
   private DeletePiece() {
-    (this.$refs.confirmDialog as Confirm)
-      .open(
+    this.autocompleteCompteTier?.blur();
+    this.$nextTick(() => this.OpenConfirmDelete());
+  }
+  private OpenConfirmDelete() {
+    this.confirmDialog.open(
         "Suppression",
         `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
         "error",
@@ -975,7 +988,11 @@ export default class extends Vue {
           }).finally(() => {
             this.deleteIsLoading = false;
           });
+        }else {
+          this.$nextTick(() => this.autocompleteCompteTier?.focus());
         }
+      }).catch(() => {
+        this.$nextTick(() => this.autocompleteCompteTier?.focus());
       });
   }
 
@@ -1035,20 +1052,42 @@ export default class extends Vue {
     entete.numeroCompte = this.numeroCompteTier.toNumber();
     entete.nomCompte = this.compteTiersNom;
     entete.devise = this.deviseSelected.libelle;
-    entete.isEquilibre = (this.$refs.gridContreparties as GridContreparties).pieceIsEquilibre();
+    entete.isEquilibre = this.gridContreparties.pieceIsEquilibre();
     return entete;
   }
 
   private cancelEdit(){
     this.piecereadonly = true;
     if(this.numeroPiece.toNumber() == 0)
-     this.closeDialog();
+     {
+       this.$nextTick(() => {
+          this.confirmDialog
+          .open(
+            "Annuler",
+            `Êtes-vous sur de vouloir annuler  ?`,
+            "warning",
+            "Annuler la création"
+          )
+          .then((resp) => {
+            if (resp) {
+              this.closeDialog();
+            }else {
+              this.$nextTick(() => this.autocompleteCompteTier?.focus());
+            }
+          }).catch(() => {
+             this.$nextTick(() => this.autocompleteCompteTier?.focus());
+          });
+       });
+     }
   }
 
   private closeDialog(){
     this.resetForm();
-    this.dialog = false;
-    this.reject();
+    this.autocompleteCompteTier?.blur();
+    this.$nextTick(() => {
+      this.dialog = false;
+      this.reject();
+    });
   }
 }
 </script>

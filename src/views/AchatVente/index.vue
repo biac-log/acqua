@@ -92,7 +92,7 @@
         :page.sync="currentPage"
         @page-count="pageCount = $event"
       >
-        <template v-slot:item.isEquilibre="{ item }">
+        <template v-slot:[`item.isEquilibre`]="{ item }">
           <v-tooltip top open-delay=500 >
             <template v-slot:activator="{ on }">
               <v-icon v-show="!item.isEquilibre" color="red" v-on="on">mdi-alert</v-icon>
@@ -100,13 +100,13 @@
             <span>La pièce n'est pas équilibrée</span>
           </v-tooltip>
         </template>
-        <template v-slot:item.datePieceDate="{ item }">
+        <template v-slot:[`item.datePieceDate`]="{ item }">
           <span>{{ item.datePieceDate.toString() }}</span>
         </template>
-        <template v-slot:item.dateEcheanceDate="{ item }">
+        <template v-slot:[`item.dateEcheanceDate`]="{ item }">
           <span>{{ item.dateEcheanceDate.toString() }}</span>
         </template>
-        <template v-slot:item.montant="{ item }">
+        <template v-slot:[`item.montant`]="{ item }">
           <span>{{ item.montant | numberToString }}</span>
         </template>
       </v-data-table>
@@ -169,11 +169,11 @@ export default class extends Vue {
    private headers = [
     { text: "", value: "isEquilibre" },
     { text: "Numéro pièce", value: "codePieceDisplay" },
-    { text: "Date pièce", value: "datePieceDate" },
-    { text: "Date échéance", value: "dateEcheanceDate" },
     { text: "Numéro compte", value: "numeroCompte" },
     { text: "Nom compte", value: "nomCompte" },
+    { text: "Date pièce", value: "datePieceDate" },
     { text: "Libelle", value: "libelle" },
+    { text: "Date échéance", value: "dateEcheanceDate" },
     { text: "Montant", value: "montant", align: "end" },
     { text: "Escompte", value: "escompteDisplay", align: "end" },
     { text: "Devise", value: "devise" },
@@ -217,6 +217,7 @@ export default class extends Vue {
   }
 
   @Watch("options")
+  @Watch("search")
   private async LoadPiecesComptables() {
     try {
       if(this.periodeSelected && this.journalSelected.numero){

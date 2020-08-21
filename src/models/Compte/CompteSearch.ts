@@ -11,6 +11,8 @@ export class CompteSearchDTO implements ICompteSearch{
   nom: string = "";
   raisonSocial: string ="";
   adresse: string = "";
+  numeroCase: number = 0;
+  libelleCase: string = "";
 }
   
 export default class CompteSearch extends CompteSearchDTO {
@@ -25,5 +27,9 @@ export default class CompteSearch extends CompteSearchDTO {
 
   get numeroNom(): string{
     return `${this.numero ? this.numero : ""} ${this.nom}`.trim();
+  }
+
+  get caseTvaDisplay(){
+    return `${this.numeroCase ? this.numeroCase : ""} ${this.libelleCase? this.libelleCase : ""}`
   }
 }

@@ -1,11 +1,11 @@
 <template>
   <v-container class="ma-0 pa-0">
       <v-card class="mb-3">
-        <v-card-title>
+        <v-card-title class="pa-3">
           Contreparties
           <v-tooltip open-delay=500 top>
             <template v-slot:activator="{ on }">
-              <v-btn color="primary" fab small class="ml-5" ref="btnAdd" :disabled="readonly || !nomCompteDeTier" @click.stop="createContrepartie" v-on="on">
+              <v-btn color="primary" fab x-small class="ml-5" ref="btnAdd" :disabled="readonly || !nomCompteDeTier" @click.stop="createContrepartie" v-on="on">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
             </template>
@@ -36,6 +36,7 @@
         ref="editContrepartie"
         :isReadOnly.sync="readonly"
         :DatePiece.sync="datePiece"
+        :TauxDevise.sync="tauxDevise"
       ></EditContrepartieVue>
   </v-container>
 </template>
@@ -57,6 +58,7 @@ import { DateTime } from '@/models/DateTime';
   components: { EditContrepartieVue }
 })
 export default class extends Vue {
+  
   @PropSync("IsReadOnly") public readonly!: boolean;
   @PropSync("Contreparties") private contreparties!: PieceComptableContrepartie[];
   @PropSync("Journal") public journal!: Journal;
@@ -139,7 +141,7 @@ export default class extends Vue {
         let tva = await CaseTvaApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
         if(tva){
           contrepartie.montantDevise = this.montantDevise.toNumber() / ( 1 + (tva.tauxTvaCase/100));
-          contrepartie.montantBase = this.montantDevise.toNumber() / ( 1 + (tva.tauxTvaCase/100));
+          contrepartie.montantBase = this.montantBase.toNumber() / ( 1 + (tva.tauxTvaCase/100));
           contrepartie.caseTva = tva;
         }
       }

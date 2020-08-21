@@ -1,6 +1,6 @@
 <template>
   <!-- <v-dialog v-model="dialog" width="800" @click:outside="close()" @keydown.esc="close()" @keydown.alt.enter="sendContrepartie()"> -->
-      <div class="ma-0 pa-0 editContainer" @keydown.esc.stop="close()" @keydown.alt.enter.stop="sendContrepartie()">
+      <div class="ma-0 pa-0 editContainer" @keydown.esc.stop="close()" @keydown.alt.enter.stop="sendContrepartie()" @keydown.46.prevent.stop="deleteContrepartie">
       <div :class="dialog ? 'overlay' : ''" @click="close()"/>
     <!-- <transition name="fade" leave-absolute> -->
       <v-form
@@ -186,6 +186,7 @@
               </v-col>
               <v-col cols="3">
                 <v-text-field
+                  ref="montantComponent"
                   v-model="montant"
                   label="Montant"
                   :filled="readonly"
@@ -350,8 +351,11 @@ import { DateTime } from '@/models/DateTime';
 })
 export default class extends Vue {
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
+  @Ref() readonly montantComponent!: HTMLInputElement;
+
   @PropSync("isReadOnly") public readonly!: boolean;
   @PropSync("DatePiece") private datePiece!: DateTime;
+  @PropSync("TauxDevise") private tauxDevise!: string;
 
   private dialog: boolean = false;
   private isNew: boolean = true;
@@ -478,6 +482,7 @@ export default class extends Vue {
     tvaImpute: number,
     propositionLibelle: string
   ) {
+    console.log(contrepartie);
     this.dossierComponent?.resetDossier();
     this.initDevises(deviseEntete, contrepartie);
     this.numeroJournal = numeroJournal;
@@ -503,11 +508,13 @@ export default class extends Vue {
     this.nomCompte = contrepartie.compteLibelle;
     this.libelle = contrepartie.libelle ? contrepartie.libelle : propositionLibelle;
     this.typesMouvementsSelected = this.typesMouvements.find(d => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
-    this.montant = contrepartie.montantBase && this.devisesSelected ? contrepartie.montantBase.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2): "";
+    if(contrepartie.montantDevise == 0)
+      this.montant = contrepartie.montantBase && this.devisesSelected ? contrepartie.montantBase.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2): "";
+    else
+      this.montant = contrepartie.montantDevise && this.devisesSelected ? contrepartie.montantDevise.toDecimalString(this.devisesSelected.typeDevise == "E" ? 0 : 2): "";
     this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : "";
     this.caseTva.Refresh(contrepartie.caseTva);
     this.libelleCaseTva = contrepartie.caseTva.libelleCase;
-    
 
     this.ventileDevise = ventileDevise;
     this.tvaCalcule = tvaCalcule;
@@ -552,6 +559,7 @@ export default class extends Vue {
   }
   private OpenSearchCompte(): void {
     if (this.typesComptesSelected) {
+      (this.$refs.numeroCompte as any).blur();
       (this.$refs.compteDialog as SearchCompteContrepartieVue)
         .open(this.typesComptesSelected, this.searchCompte)
         .then(compte => {
@@ -680,9 +688,9 @@ export default class extends Vue {
       .open(this.numeroJournal)
       .then(caseTva => {
         this.numeroCaseTva = caseTva.numeroCase.toString();
-        this.caseTva = caseTva;
-        //this.calculMontant();
-        this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
+        this.caseTva = new CaseTva(caseTva);
+        this.calculMontant();
+        this.$nextTick(() => this.montantComponent?.focus());
       })
       .catch(() => {
         this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus());
@@ -725,7 +733,7 @@ export default class extends Vue {
       this.warningMessage = `Attention, le dossier n'est pas actif à la date du ${this.datePiece.toString()}`;
     else this.warningMessage = "";
 
-    this.$nextTick(() => (this.$refs.montant as any)?.focus()); 
+    this.$nextTick(() => this.montantComponent?.focus()); 
   }
 
   @Watch("caseTva")
@@ -752,7 +760,7 @@ export default class extends Vue {
   {
     let parent = (this.$parent as GridContrepartiesVue);
     this.init(await parent.getContrepartieTVA(), parent.journal.numero, parent.devise, parent.getVentileDevise(), parent.getTvaCalcule(), parent.getTvaImpute(), parent.propositionLibelle);
-    this.montant =   Math.abs(parent.getVentileDevise()).toDecimalString(2);
+    this.montant = Math.abs(parent.getVentileDevise()).toDecimalString(2);
   }
 
   private focusFirstElement(){

@@ -1,5 +1,9 @@
 <template>
-  <v-dialog v-model="dialog" persistent width="unset">
+  <v-dialog 
+    v-model="dialog" 
+    persistent width="unset" 
+    @keydown.left="setFocusToOk()"
+    @keydown.right="setFocusToAnnuler()">
     <v-card>
       <v-card-title :color="color" class="headline" dark>{{
         windowTitle
@@ -7,13 +11,15 @@
       <v-divider></v-divider>
       <v-card-text class="mt-5">{{ message }}</v-card-text>
       <v-card-actions>
+        <span tabindex="1" @focus="setFocusToAnnuler()"/>
         <v-spacer></v-spacer>
-        <v-btn ref="btnOk" :color="color" text @click="sendResponse(true)">{{
+        <v-btn ref="btnOk" tabindex="2" :color="color" text @click="sendResponse(true)">{{
           this.btnLabel
         }}</v-btn>
-        <v-btn ref="btnAnnuler" v-if="displayButtonCancel" text @click="sendResponse(false)"
+        <v-btn ref="btnAnnuler" tabindex="3" v-if="displayButtonCancel" text @click="sendResponse(false)"
           >Annuler</v-btn
         >
+        <span tabindex="4" @focus="setFocusToOk()"/>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -60,6 +66,14 @@ export default class extends Vue {
       this.resolve = resolve;
       this.reject = reject;
     });
+  }
+
+  private setFocusToOk(){
+    (this.$refs.btnOk as any)?.$el.focus();
+  }
+
+  private setFocusToAnnuler(){
+    (this.$refs.btnAnnuler as any)?.$el.focus();
   }
 
   private sendResponse(value: boolean) {
