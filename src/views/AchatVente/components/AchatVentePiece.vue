@@ -10,7 +10,7 @@
       @keydown.46.prevent.stop="DeletePiece"
       @keydown.107.prevent.stop="createContrepartie"
       @keydown.alt.enter="savePiece()"
-      @click:outside.stop="closeDialog()" 
+      @click:outside.stop="closeDialog()"
       @keydown.esc.stop="closeDialog()"
     >
       <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
@@ -23,7 +23,7 @@
               <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
             </v-card-title>
             <v-spacer></v-spacer>
-            <v-tooltip v-if="piecereadonly" top open-delay=500>
+            <v-tooltip v-if="piecereadonly" top open-delay="500">
               <template v-slot:activator="{ on }">
                 <v-btn class="mr-5" color="success" :disabled="saveLoading" @click="ModifierPiece" v-on="on">
                   <v-icon left>mdi-pencil</v-icon>Modifier
@@ -31,21 +31,23 @@
               </template>
               <span>Modifier la pièce <span class="shortcutTooltip">F2</span></span>
             </v-tooltip>
-            <v-tooltip top open-delay=500 open-on-hover>
+            <v-tooltip top open-delay="500" open-on-hover>
               <template v-slot:activator="{ on }">
-                <v-btn class="mr-10" color="error" :disabled="saveLoading" v-show="piecereadonly" @click="DeletePiece" :loading="deleteIsLoading" v-on="on" >
+                <v-btn
+                  class="mr-10"
+                  color="error"
+                  :disabled="saveLoading"
+                  v-show="piecereadonly"
+                  @click="DeletePiece"
+                  :loading="deleteIsLoading"
+                  v-on="on"
+                >
                   <v-icon left>mdi-delete</v-icon>Supprimer
                 </v-btn>
               </template>
               <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
             </v-tooltip>
-            <v-btn
-              ref="buttonClose"
-              class="ml-10"
-              icon
-              color="white"
-              @click="closeDialog()"
-            >
+            <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-toolbar>
@@ -56,7 +58,7 @@
             color="primary accent-4"
           ></v-progress-linear>
           <v-card-text style="height: 750px;">
-            <v-row >
+            <v-row>
               <v-col cols="5">
                 <v-row dense>
                   <v-col cols="4">
@@ -83,9 +85,18 @@
                       <template v-slot:append>
                         <v-tooltip top open-delay="500" open-on-hover>
                           <template v-slot:activator="{ on }">
-                              <v-btn icon small v-show="!piecereadonly" v-on="on" :disabled="piecereadonly || saveLoading" @click="OpenSearchCompte()" @keydown.enter.prevent.stop="OpenSearchCompte()" tabindex="-1">
-                                <v-icon>mdi-magnify</v-icon>
-                              </v-btn>
+                            <v-btn
+                              icon
+                              small
+                              v-show="!piecereadonly"
+                              v-on="on"
+                              :disabled="piecereadonly || saveLoading"
+                              @click="OpenSearchCompte()"
+                              @keydown.enter.prevent.stop="OpenSearchCompte()"
+                              tabindex="-1"
+                            >
+                              <v-icon>mdi-magnify</v-icon>
+                            </v-btn>
                           </template>
                           <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
                         </v-tooltip>
@@ -326,21 +337,21 @@
           </v-card-text>
           <v-divider v-if="!piecereadonly"></v-divider>
           <v-card-actions v-if="saveLoading || !piecereadonly" class="d-flex">
-            <v-tooltip top open-delay=500 open-on-hover>
+            <v-tooltip top open-delay="500" open-on-hover>
               <template v-slot:activator="{ on }">
-              <v-btn
-                color="error"
-                class="ma-2 pr-4 align-self-start"
-                text
-                tabindex="-1"
-                :disabled="saveLoading"
-                v-if="numeroPiece"
-                @click="DeletePiece()"
-                :loading="deleteIsLoading"
-                v-on="on"
+                <v-btn
+                  color="error"
+                  class="ma-2 pr-4 align-self-start"
+                  text
+                  tabindex="-1"
+                  :disabled="saveLoading"
+                  v-if="numeroPiece"
+                  @click="DeletePiece()"
+                  :loading="deleteIsLoading"
+                  v-on="on"
                 >
-                Supprimer</v-btn
-              >
+                  Supprimer</v-btn
+                >
               </template>
               <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
             </v-tooltip>
@@ -353,10 +364,10 @@
               v-if="!numeroPiece && !forcerNumero"
               :disabled="saveLoading"
               @click="forcerNumero = true"
-              >
+            >
               Forcer le numéro de pièce</v-btn
             >
-            <v-text-field 
+            <v-text-field
               label="Numéro pièce"
               v-model="numeroToForce"
               v-if="forcerNumero"
@@ -369,25 +380,43 @@
               outlined
               class="shrink align-self-start"
             ></v-text-field>
-            <v-tooltip top open-delay=500 open-on-hover>
+            <v-tooltip top open-delay="500" open-on-hover>
               <template v-slot:activator="{ on }">
-                <v-btn color="blue darken-1" class="ma-2 mt-0 pr-4 align-self-start" :disabled="saveLoading" tile outlined @click="cancelEdit()" tabindex="-1" v-on="on">
+                <v-btn
+                  color="blue darken-1"
+                  class="ma-2 mt-0 pr-4 align-self-start"
+                  :disabled="saveLoading"
+                  tile
+                  outlined
+                  @click="cancelEdit()"
+                  tabindex="-1"
+                  v-on="on"
+                >
                   <v-icon left>mdi-close</v-icon> Annuler
                 </v-btn>
               </template>
               <span>Annuler les modifications <span class="shortcutTooltip">esc</span></span>
             </v-tooltip>
-            <v-tooltip top open-delay=500 open-on-hover>
+            <v-tooltip top open-delay="500" open-on-hover>
               <template v-slot:activator="{ on }">
-              <v-btn ref="btnValidate" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid"  @click="savePiece()" v-on="on">
-                <v-icon left>mdi-content-save</v-icon>Sauvegarder
-              </v-btn>
+                <v-btn
+                  ref="btnValidate"
+                  class="ma-2 mt-0 pr-4 align-self-start"
+                  tile
+                  color="success"
+                  :loading="saveLoading"
+                  :disabled="!isValid"
+                  @click="savePiece()"
+                  v-on="on"
+                >
+                  <v-icon left>mdi-content-save</v-icon>Sauvegarder
+                </v-btn>
               </template>
               <span>Sauvegarder la pièce <span class="shortcutTooltip">alt + enter</span></span>
             </v-tooltip>
           </v-card-actions>
-          <v-alert type="error" border="left" v-if="errorMessage"  class="ml-4 mr-4">
-              {{errorMessage}}
+          <v-alert type="error" border="left" v-if="errorMessage" class="ml-4 mr-4">
+            {{ errorMessage }}
           </v-alert>
           <Confirm ref="confirmDialog"></Confirm>
           <Confirm ref="confirmLibellelDialog" :displayButtonCancel="false" :focusOk="false"></Confirm>
@@ -398,9 +427,7 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
-import moment from "moment";
-import { Component, Vue, PropSync, Emit, Watch, Ref } from "vue-property-decorator";
+import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
 import {
   PeriodeComptable,
   EntetePieceComptable,
@@ -408,29 +435,25 @@ import {
   PieceComptableContrepartie,
   Statut,
   Journal,
-	PieceComptableContrepartieSaveDTO,
-  PieceComptableContrepartieDTO,
+  PieceComptableContrepartieSaveDTO,
   PieceComptableSaveDTO
-} from "@/models/AchatVente";
-import CompteSearch from "@/models/Compte/CompteSearch";
-import SearchCompteTier from "./SearchCompteTier.vue";
-import Confirm from "@/components/Confirm.vue";
-import DatePicker from "@/components/DatePicker.vue";
-import { CompteApi } from "@/api/CompteApi";
-import { AchatVenteApi } from "@/api/AchatVenteApi";
-import GridContreparties from "./GridContreparties.vue";
+} from '@/models/AchatVente';
+import CompteSearch from '@/models/Compte/CompteSearch';
+import SearchCompteTier from './SearchCompteTier.vue';
+import Confirm from '@/components/Confirm.vue';
+import DatePicker from '@/components/DatePicker.vue';
+import { CompteApi } from '@/api/CompteApi';
+import { AchatVenteApi } from '@/api/AchatVenteApi';
+import GridContreparties from './GridContreparties.vue';
 import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
-import CompteGeneralSearch from '../../../models/Compte/CompteGeneralSearch';
 import { displayAxiosError } from '@/utils/ErrorMethods';
-import * as DateMethods from '@/utils/DateMethods'
 import { DateTime } from '../../../models/DateTime';
-import { DeviseApi } from "@/api/DeviseApi";
+import { DeviseApi } from '@/api/DeviseApi';
 import { Devise } from '@/models/Devise/Devise';
-import { numberToString } from '@/utils/FiltersMethods';
-import { DialogActionResult } from "@/models/DialogResult";
+import { DialogActionResult } from '@/models/DialogResult';
 
 @Component({
-  name: "AchatVentePiece",
+  name: 'AchatVentePiece',
   components: { SearchCompteTier, GridContreparties, Confirm, DatePicker }
 })
 export default class extends Vue {
@@ -439,111 +462,121 @@ export default class extends Vue {
   @Ref() readonly gridContreparties!: GridContreparties;
   @Ref() readonly confirmDialog!: Confirm;
 
-  public piecereadonly: boolean = true;
+  public piecereadonly = true;
   private pieceLoading = false;
-  private errorMessage: string = "";
+  private errorMessage = '';
   private contreparties: PieceComptableContrepartie[] = [];
-  private isValid: boolean = true;
+  private isValid = true;
   //Titre
   private periode: PeriodeComptable = new PeriodeComptable();
-  private periodeDisplay: string = "";
+  private periodeDisplay = '';
   private journal: Journal = new Journal();
-  private numeroPiece: string = "";
+  private numeroPiece = '';
 
   //Encodage
-  private numeroCompteTier: string= "";
-  private numeroCompteTierSelected: { numero: number | string, nom: string } = { numero: "", nom:"" };
-  private numeroCompteTierRules: any = [(v: { numero: number | string }) => !!v?.numero || "Numéro obligatoire"];
-  private comptesTiersSearch: { numero: number, nom: string }[] = [];
-  private searchCompteDeTier: string = '';
-  private libelleFromInit = "";
-  private libelle: string = "";
-  private libelleRules: any = [(v: string) => !!v || "Libellé obligatoire"];
-  private libelleWarningMessage: string = "";
-  private compteAssocieNumero:string = "";
-  private compteAssocieNom:string = "";
-  private montantDevise: string = "";
-  private montantRules: any = [(v: string) => v.isDecimal(true) || "Montant invalide"];
-  private montantEscompte: string = "";
-  private montantEscompteRules: any = [(v: string) => v.isDecimal(false) || "Montant invalide"];
+  private numeroCompteTier = '';
+  private numeroCompteTierSelected: { numero: number | string; nom: string } = {
+    numero: '',
+    nom: ''
+  };
+  private numeroCompteTierRules: any = [(v: { numero: number | string }) => !!v?.numero || 'Numéro obligatoire'];
+  private comptesTiersSearch: { numero: number; nom: string }[] = [];
+  private searchCompteDeTier = '';
+  private libelleFromInit = '';
+  private libelle = '';
+  private libelleRules: any = [(v: string) => !!v || 'Libellé obligatoire'];
+  private libelleWarningMessage = '';
+  private compteAssocieNumero = '';
+  private compteAssocieNom = '';
+  private montantDevise = '';
+  private montantRules: any = [(v: string) => v.isDecimal(true) || 'Montant invalide'];
+  private montantEscompte = '';
+  private montantEscompteRules: any = [(v: string) => v.isDecimal(false) || 'Montant invalide'];
   private devises: Devise[] = [];
   private deviseSelected: Devise = new Devise();
   private statuts: Statut[] = [];
   private statutSelected: Statut = new Statut();
-  
+
   private datePiece: DateTime = new DateTime();
-  private datePieceRules: any = [(v: string) => !!v || "Date obligatoire",
-                                 (v: string) => DateTime.isValid(v) || "Date invalide",
-                                 (v: string) => this.validateDatePiece(v) || "La date est hors période"]
+  private datePieceRules: any = [
+    (v: string) => !!v || 'Date obligatoire',
+    (v: string) => DateTime.isValid(v) || 'Date invalide',
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
+  ];
 
   private dateEcheance: DateTime = new DateTime();
-  private dateEcheanceRules: any =[(v: string) => !!v || "Date obligatoire",
-                                   (v: string) => DateTime.isValid(v) || "Date invalide",
-                                   (v: string) => this.validateDateEcheance(v)]
+  private dateEcheanceRules: any = [
+    (v: string) => !!v || 'Date obligatoire',
+    (v: string) => DateTime.isValid(v) || 'Date invalide',
+    (v: string) => this.validateDateEcheance(v)
+  ];
 
-  mounted(){
+  mounted() {
     this.loadDevises();
     this.loadStatuts();
   }
 
-  private validateDatePiece(date: string) : boolean { 
-    let dateTime = new DateTime(date);
+  private validateDatePiece(date: string): boolean {
+    const dateTime = new DateTime(date);
     return dateTime.isBetween(this.periode.dateDebut, this.periode.dateFin);
   }
 
-  private validateDateEcheance(date: string) : string | boolean {
-    let dateTime = new DateTime(date);
-    if(dateTime.isBefore(this.datePiece))
-      return "La date doit être supérieur ou égale à la date piece"
+  private validateDateEcheance(date: string): string | boolean {
+    const dateTime = new DateTime(date);
+    if (dateTime.isBefore(this.datePiece)) return 'La date doit être supérieur ou égale à la date piece';
     else return true;
   }
 
-  public typeCompte: string = "";
-  private isEdit: boolean = false;
+  public typeCompte = '';
+  private isEdit = false;
 
-  public dialog: boolean = false;
-  public searchCompteTiersDialog: boolean = false;
+  public dialog = false;
+  public searchCompteTiersDialog = false;
 
-  private compteTiersNom: string = "";
-  private libellePiece: string = "";
-  private taux: string = "";
-  private pieceAcquittee: boolean = false;
-  private montantBase: string = "";
-  private libelleMontantBase: string = "";
-  private libelleSoldeCompteTiers: string = "";
-  private delaiPaiementLibelle: string = "";
-  private compteTiersEscomptePourcentage: string = "";
-  private compteTiersEscompteNombreJours: string = "";
-  private libelleCompteAssocie: string = "";
-  private numeroCompteAchatVente: string ="";
-  private nomCompteAchatVente: string ="";
-  private libelleCompteVenteAchat: string = "";
-  private codeTaxe: number = 0;
-  private hash: string = "";
+  private compteTiersNom = '';
+  private libellePiece = '';
+  private taux = '';
+  private pieceAcquittee = false;
+  private montantBase = '';
+  private libelleMontantBase = '';
+  private libelleSoldeCompteTiers = '';
+  private delaiPaiementLibelle = '';
+  private compteTiersEscomptePourcentage = '';
+  private compteTiersEscompteNombreJours = '';
+  private libelleCompteAssocie = '';
+  private numeroCompteAchatVente = '';
+  private nomCompteAchatVente = '';
+  private libelleCompteVenteAchat = '';
+  private codeTaxe = 0;
+  private hash = '';
 
   private resolve!: any;
 
-  private forcerNumero: boolean = false;
-  private numeroToForce: string = "";
-  private numeroToForceRules: any = [(v: string) =>  !!v || "Numéro obligatoire", 
-                                     (v: string) => !!v.toNumber() || "Numéro invalide"];
+  private forcerNumero = false;
+  private numeroToForce = '';
+  private numeroToForceRules: any = [
+    (v: string) => !!v || 'Numéro obligatoire',
+    (v: string) => !!v.toNumber() || 'Numéro invalide'
+  ];
 
-  private ventilleBase: number = 0;
+  private ventilleBase = 0;
 
-  public open(periode: PeriodeComptable, journal: Journal, entete?: EntetePieceComptable): Promise<{ action: DialogActionResult, data: EntetePieceComptable }> {
-    this.dialog=true;
-    if(entete){
+  public open(
+    periode: PeriodeComptable,
+    journal: Journal,
+    entete?: EntetePieceComptable
+  ): Promise<{ action: DialogActionResult; data: EntetePieceComptable }> {
+    this.dialog = true;
+    if (entete) {
       this.piecereadonly = true;
       this.init(periode, journal, entete);
-    } else{
+    } else {
       this.piecereadonly = false;
       this.init(periode, journal);
-      
-      let today = DateTime.today();
-      if(today.isBefore(this.periode.dateDebut))
-        this.datePiece = this.periode.dateDebut;
-      else if(today.isAfter(this.periode.dateFin)) 
-        this.datePiece = this.periode.dateFin;
+
+      const today = DateTime.today();
+      if (today.isBefore(this.periode.dateDebut)) this.datePiece = this.periode.dateDebut;
+      else if (today.isAfter(this.periode.dateFin)) this.datePiece = this.periode.dateFin;
       else this.datePiece = today;
     }
 
@@ -556,72 +589,72 @@ export default class extends Vue {
     });
   }
 
-	private init(periode: PeriodeComptable, journal: Journal, entete?: EntetePieceComptable) {
+  private init(periode: PeriodeComptable, journal: Journal, entete?: EntetePieceComptable) {
     this.journal = journal;
     this.periode = periode;
     this.periodeDisplay = periode.libellePeriodeFull;
     this.typeCompte = journal.typeCompteChar;
-    if(entete){
-      this.numeroPiece = entete.codePiece ? entete.codePiece.toString() : "";
+    if (entete) {
+      this.numeroPiece = entete.codePiece ? entete.codePiece.toString() : '';
       this.GetPiece();
     }
   }
 
-  private resetForm(){
-    this.errorMessage = "";
-    this.libelleWarningMessage = "";
+  private resetForm() {
+    this.errorMessage = '';
+    this.libelleWarningMessage = '';
     this.forcerNumero = false;
-    this.numeroToForce = "";
+    this.numeroToForce = '';
 
-    this.comptesTiersSearch= [];
-    this.searchCompteDeTier = "";
+    this.comptesTiersSearch = [];
+    this.searchCompteDeTier = '';
     this.numeroCompteTierSelected = { numero: '', nom: '' };
-    
-    this.periodeDisplay = "";
+
+    this.periodeDisplay = '';
     this.journal = new Journal();
-    this.numeroPiece= "";
-    this.numeroCompteTier= "";
-    this.libelle= "";
-    this.libelleFromInit = "";
-    this.montantDevise= "";
-    this.montantEscompte= "";
+    this.numeroPiece = '';
+    this.numeroCompteTier = '';
+    this.libelle = '';
+    this.libelleFromInit = '';
+    this.montantDevise = '';
+    this.montantEscompte = '';
     this.deviseSelected = this.devises[0];
     this.statutSelected = this.statuts[0];
     this.datePiece = new DateTime();
     this.dateEcheance = new DateTime();
-    this.typeCompte= "";
-      
-    this.compteTiersNom = "";
-    this.libellePiece = "";
-    this.taux = ""
+    this.typeCompte = '';
+
+    this.compteTiersNom = '';
+    this.libellePiece = '';
+    this.taux = '';
     this.pieceAcquittee = false;
-    this.montantBase = "";
-    this.libelleMontantBase = "";
-    this.libelleSoldeCompteTiers = "";
-    this.delaiPaiementLibelle = "";
-    this.compteTiersEscomptePourcentage = "";
-    this.compteTiersEscompteNombreJours = "";
-    this.libelleCompteAssocie = "";
-    this.numeroCompteAchatVente = "";
-    this.nomCompteAchatVente = "";
-    this.libelleCompteVenteAchat = "";
+    this.montantBase = '';
+    this.libelleMontantBase = '';
+    this.libelleSoldeCompteTiers = '';
+    this.delaiPaiementLibelle = '';
+    this.compteTiersEscomptePourcentage = '';
+    this.compteTiersEscompteNombreJours = '';
+    this.libelleCompteAssocie = '';
+    this.numeroCompteAchatVente = '';
+    this.nomCompteAchatVente = '';
+    this.libelleCompteVenteAchat = '';
     this.codeTaxe = 0;
     this.contreparties = [];
-    this.compteAssocieNumero = "";
-    this.compteAssocieNom = "";
-    this.hash = "";
+    this.compteAssocieNumero = '';
+    this.compteAssocieNom = '';
+    this.hash = '';
     (this.$refs.form as any).resetValidation();
   }
 
   private async GetPiece() {
-    this.errorMessage = "";
+    this.errorMessage = '';
     this.pieceLoading = true;
     try {
-      let pieceComptable = await AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece);
+      const pieceComptable = await AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece);
       this.SetPiece(pieceComptable);
-    } catch(err) {
+    } catch (err) {
       this.errorMessage = displayAxiosError(err);
-    }finally{
+    } finally {
       this.pieceLoading = false;
     }
   }
@@ -633,8 +666,11 @@ export default class extends Vue {
     this.libelle = pieceComptable.libelle;
     this.libelleFromInit = pieceComptable.libelle;
 
-    if(pieceComptable){
-      let compteToSelect = {numero:pieceComptable.compteTiersNumero, nom:pieceComptable.compteTiersNom };
+    if (pieceComptable) {
+      const compteToSelect = {
+        numero: pieceComptable.compteTiersNumero,
+        nom: pieceComptable.compteTiersNom
+      };
       this.comptesTiersSearch = [];
       this.comptesTiersSearch.push(compteToSelect);
       this.numeroCompteTierSelected = compteToSelect;
@@ -662,113 +698,130 @@ export default class extends Vue {
     this.compteAssocieNom = pieceComptable.compteAssocieNom;
     this.compteAssocieNumero = pieceComptable.compteAssocieNumero;
 
-    this.deviseSelected = pieceComptable ? this.getDeviseToSelect(new Devise({id: pieceComptable.codeDevise, libelle: pieceComptable.libelleDevise, typeDevise: "D"})) : this.devises[0];
-    this.statutSelected = pieceComptable ? this.getStatutToSelect(new Statut({id: pieceComptable.statut, libelle: pieceComptable.statutLibelle})) : this.statuts[0];
+    this.deviseSelected = pieceComptable
+      ? this.getDeviseToSelect(
+          new Devise({
+            id: pieceComptable.codeDevise,
+            libelle: pieceComptable.libelleDevise,
+            typeDevise: 'D'
+          })
+        )
+      : this.devises[0];
+    this.statutSelected = pieceComptable
+      ? this.getStatutToSelect(
+          new Statut({
+            id: pieceComptable.statut,
+            libelle: pieceComptable.statutLibelle
+          })
+        )
+      : this.statuts[0];
     this.hash = pieceComptable.hash;
   }
 
-  private compteLoading: boolean = false;
+  private compteLoading = false;
   private loadCompte() {
-    if(this.piecereadonly) return;
+    if (this.piecereadonly) return;
     this.compteLoading = true;
-    if(+this.numeroCompteTier){
+    if (+this.numeroCompteTier) {
       CompteApi.getCompteDeTier(this.typeCompte, this.numeroCompteTier.toString())
-      .then(compte => {
-        this.setCompteDeTier(compte);
-      }).catch((err) => {
-        this.setCompteDeTier();
-        this.$nextTick(() => this.autocompleteCompteTier?.focus());
-      })
-      .finally(() => {
-        this.compteLoading = false;
-      });
+        .then((compte) => {
+          this.setCompteDeTier(compte);
+        })
+        .catch(() => {
+          this.setCompteDeTier();
+          this.$nextTick(() => this.autocompleteCompteTier?.focus());
+        })
+        .finally(() => {
+          this.compteLoading = false;
+        });
     }
   }
 
   private OpenSearchCompte(): void {
-    if(this.piecereadonly) return;
+    if (this.piecereadonly) return;
     this.autocompleteCompteTier.blur();
     (this.$refs.compteDialog as SearchCompteTier)
       .open(this.typeCompte)
-      .then(compte => {
+      .then((compte) => {
         this.numeroCompteTier = compte.numero.toString();
         this.loadCompte();
         this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
-      }).catch(() => {
+      })
+      .catch(() => {
         this.$nextTick(() => this.autocompleteCompteTier?.focus());
       });
   }
 
-  @Watch("searchCompteDeTier")
-  private async searchCompteDeTierChanged(matchCode: string){
+  @Watch('searchCompteDeTier')
+  private async searchCompteDeTierChanged(matchCode: string) {
     try {
-      if(matchCode && !matchCode.toNumber()){
+      if (matchCode && !matchCode.toNumber()) {
         this.compteLoading = true;
         this.comptesTiersSearch = await CompteApi.searchCompteDeTier(this.typeCompte, matchCode.toUpperCase(), 5);
-      }
-      else this.comptesTiersSearch = [];
-    } catch (err) {
-      
-    }finally{
+      } else this.comptesTiersSearch = [];
+    } finally {
       this.compteLoading = false;
     }
   }
-  private numeroCompteTierChange(value: string | CompteSearch){
-    
-    if(typeof value === "string"){
+  private numeroCompteTierChange(value: string | CompteSearch) {
+    if (typeof value === 'string') {
       this.numeroCompteTier = value;
-    }
-    else if(value instanceof CompteSearch)
-    {
+    } else if (value instanceof CompteSearch) {
       this.numeroCompteTier = value.numero.toString();
       this.$nextTick(() => this.autocompleteCompteTier?.blur());
       this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
-    }
-    else {
-      this.numeroCompteTier = "";
-      this.compteTiersNom = "";
+    } else {
+      this.numeroCompteTier = '';
+      this.compteTiersNom = '';
     }
     this.loadCompte();
   }
 
   private async setCompteDeTier(compte?: CompteDeTier) {
-    if(compte){
-      let compteToSelect = {numero:compte.numero, nom:compte.nom };
+    if (compte) {
+      const compteToSelect = { numero: compte.numero, nom: compte.nom };
       this.comptesTiersSearch = [];
       this.comptesTiersSearch.push(compteToSelect);
       this.numeroCompteTierSelected = compteToSelect;
     }
 
-    this.numeroCompteTier = compte ? compte.numero.toString() : "";
-    this.compteTiersNom = compte ?  compte.nom : "";
-    this.deviseSelected = compte ? this.getDeviseToSelect(new Devise({id: compte.codeDevise, libelle: compte.libelleDevise, typeDevise: "D"})) : this.devises[0];
-    this.libelleSoldeCompteTiers = compte ? compte.libelleSoldeCompteTiers: "";
-    this.compteTiersEscomptePourcentage = compte ? compte.escomptePourcentage.toDecimalString(2): "";
-    this.compteTiersEscompteNombreJours = compte ? compte.escompteNombreJours.toDecimalString(2): "";
-    this.libelleCompteAssocie = compte ? compte.libelleCompteAssocie: "";
-    this.numeroCompteAchatVente = compte ? compte.compteVenteAchatNumero.toString(): "";
-    this.libelleCompteVenteAchat = compte ? compte.libelleCompteVenteAchat : "";
-    this.delaiPaiementLibelle = compte ? compte.delaiPaiementLibelle : "";
+    this.numeroCompteTier = compte ? compte.numero.toString() : '';
+    this.compteTiersNom = compte ? compte.nom : '';
+    this.deviseSelected = compte
+      ? this.getDeviseToSelect(
+          new Devise({
+            id: compte.codeDevise,
+            libelle: compte.libelleDevise,
+            typeDevise: 'D'
+          })
+        )
+      : this.devises[0];
+    this.libelleSoldeCompteTiers = compte ? compte.libelleSoldeCompteTiers : '';
+    this.compteTiersEscomptePourcentage = compte ? compte.escomptePourcentage.toDecimalString(2) : '';
+    this.compteTiersEscompteNombreJours = compte ? compte.escompteNombreJours.toDecimalString(2) : '';
+    this.libelleCompteAssocie = compte ? compte.libelleCompteAssocie : '';
+    this.numeroCompteAchatVente = compte ? compte.compteVenteAchatNumero.toString() : '';
+    this.libelleCompteVenteAchat = compte ? compte.libelleCompteVenteAchat : '';
+    this.delaiPaiementLibelle = compte ? compte.delaiPaiementLibelle : '';
     this.codeTaxe = compte ? compte.codeTaxe : 0;
-    this.compteAssocieNumero = compte ? compte.compteAssocieNumero.toString() : "";
-    this.compteAssocieNom = compte ? compte.compteAssocieNom : "";
+    this.compteAssocieNumero = compte ? compte.compteAssocieNumero.toString() : '';
+    this.compteAssocieNom = compte ? compte.compteAssocieNom : '';
     this.initDateEcheance(this.numeroCompteTier, this.typeCompte, this.datePiece);
   }
 
-  private validateLibelle(){
-    if(!this.piecereadonly && this.libelle && this.libelle != this.libelleFromInit){
+  private validateLibelle() {
+    if (!this.piecereadonly && this.libelle && this.libelle != this.libelleFromInit) {
       AchatVenteApi.ValidateLibelle(this.libelle, this.typeCompte, this.numeroCompteTier).then((isUsed) => {
-        if(isUsed){
-          this.libelleWarningMessage = "Attention, ce libellé est déjà utilisé par une autre pièce";
-          (this.$refs.confirmLibellelDialog as Confirm).open("Attention",
-            `Attention, ce libellé est déjà utilisé par une autre pièce`,
-            "error",
-            "J'ai compris"
-          ).then(() => { this.$nextTick(() => (this.$refs.montant as any)?.focus()); });
-        } 
-        else this.libelleWarningMessage = "";
-     });
-    } else this.libelleWarningMessage = "";
+        if (isUsed) {
+          this.libelleWarningMessage = 'Attention, ce libellé est déjà utilisé par une autre pièce';
+          (this.$refs.confirmLibellelDialog as Confirm)
+            .open('Attention', `Attention, ce libellé est déjà utilisé par une autre pièce`, 'error', "J'ai compris")
+            .then(() => {
+              this.$nextTick(() => (this.$refs.montant as any)?.focus());
+            });
+        } else this.libelleWarningMessage = '';
+      });
+    } else this.libelleWarningMessage = '';
   }
 
   private async ModifierPiece() {
@@ -780,138 +833,133 @@ export default class extends Vue {
   private devisesLoading = false;
   private async loadDevises() {
     try {
-      if(this.devises.length <= 1){
+      if (this.devises.length <= 1) {
         this.devisesLoading = true;
         this.devises = await DeviseApi.getAllDevises();
       }
-    } catch (err) {
-      
-    }finally{
+    } finally {
       this.devisesLoading = false;
     }
   }
-  private getDeviseToSelect(deviseSelected: Devise): Devise{
-    let deviseToSelect = this.devises.find(d => d.id == deviseSelected.id);
-    if(!deviseToSelect){
+  private getDeviseToSelect(deviseSelected: Devise): Devise {
+    const deviseToSelect = this.devises.find((d) => d.id == deviseSelected.id);
+    if (!deviseToSelect) {
       this.devises.push(deviseSelected);
       return deviseSelected;
-    }
-    else return deviseToSelect;
+    } else return deviseToSelect;
   }
 
   private statutsLoading = false;
-  private async loadStatuts(){
+  private async loadStatuts() {
     try {
-      if(this.statuts.length <= 1){
+      if (this.statuts.length <= 1) {
         this.statutsLoading = true;
         this.statuts = await AchatVenteApi.getAllStatut();
         this.statutSelected = this.statuts[0];
       }
-    }catch (err) {
-      
-    }finally{
+    } finally {
       this.statutsLoading = false;
     }
   }
   private getStatutToSelect(statutSelected: Statut): Statut {
-    let statutToSelect = this.statuts.find(d => d.id == statutSelected.id);
-    if(!statutToSelect)
-    {
+    const statutToSelect = this.statuts.find((d) => d.id == statutSelected.id);
+    if (!statutToSelect) {
       this.statuts.push(statutSelected);
       return statutSelected;
-    }
-    else return statutSelected;
+    } else return statutSelected;
   }
 
-  @Watch("datePiece")
-  private datePieceChanged(val: DateTime, oldVal: DateTime) {
+  @Watch('datePiece')
+  private datePieceChanged(val: DateTime) {
     if (!this.piecereadonly) {
       this.initDateEcheance(this.numeroCompteTier, this.typeCompte, val);
-      if(this.deviseSelected) this.initTauxDevise(this.deviseSelected.id, val);
+      if (this.deviseSelected) this.initTauxDevise(this.deviseSelected.id, val);
     }
   }
 
-  private initDateEcheance(numeroCompteTier: string, typeComptetier: string, datePiece : DateTime){
-    if(this.numeroCompteTier && this.typeCompte && datePiece.isValid()){
-      AchatVenteApi.getDateEcheance(
-        typeComptetier,
-        numeroCompteTier,
-        datePiece
-      ).then(dateEcheance => {
-        this.dateEcheance = dateEcheance;
-      }).catch((err) => {
-        this.errorMessage = displayAxiosError(err);
-      });
+  private initDateEcheance(numeroCompteTier: string, typeComptetier: string, datePiece: DateTime) {
+    if (this.numeroCompteTier && this.typeCompte && datePiece.isValid()) {
+      AchatVenteApi.getDateEcheance(typeComptetier, numeroCompteTier, datePiece)
+        .then((dateEcheance) => {
+          this.dateEcheance = dateEcheance;
+        })
+        .catch((err) => {
+          this.errorMessage = displayAxiosError(err);
+        });
     }
   }
 
-  private initTauxDevise(numeroDevise: number, datePiece: DateTime){
-    if(!numeroDevise || numeroDevise == 1)
-      this.taux = "1,000000";
-    else if(this.datePiece.isValid() && numeroDevise) {
+  private initTauxDevise(numeroDevise: number, datePiece: DateTime) {
+    if (!numeroDevise || numeroDevise == 1) this.taux = '1,000000';
+    else if (this.datePiece.isValid() && numeroDevise) {
       //this.taux = "0,890000";
       DeviseApi.getTaux(numeroDevise, datePiece)
-      .then((resp) => {
-        this.taux = resp.toDecimalString(6);
-      }).catch((err) => {
-        this.errorMessage = displayAxiosError(err);
-      });
+        .then((resp) => {
+          this.taux = resp.toDecimalString(6);
+        })
+        .catch((err) => {
+          this.errorMessage = displayAxiosError(err);
+        });
     }
     this.recalculmontantBase();
   }
 
-  @Watch("montantDevise")
-  private montantDeviseChanged(val: string, oldVal: string){
-    if(!this.piecereadonly)
-      this.recalculmontantBase();
+  @Watch('montantDevise')
+  private montantDeviseChanged() {
+    if (!this.piecereadonly) this.recalculmontantBase();
   }
 
-  @Watch("deviseSelected")
-  private deviseSelectedChanged(val: Devise, oldVal: Devise){
-    if(!this.piecereadonly && val && this.datePiece.isValid()){
+  @Watch('deviseSelected')
+  private deviseSelectedChanged(val: Devise) {
+    if (!this.piecereadonly && val && this.datePiece.isValid()) {
       this.initTauxDevise(this.deviseSelected.id, this.datePiece);
-
     }
   }
 
-  private recalculmontantBase(){
-    if(this.piecereadonly) return;
+  private recalculmontantBase() {
+    if (this.piecereadonly) return;
 
-    if(this.taux.isDecimal(true) && this.montantDevise.isDecimal(true)){
+    if (this.taux.isDecimal(true) && this.montantDevise.isDecimal(true)) {
       this.montantBase = (this.montantDevise.toNumber() * this.taux.toNumber()).toDecimalString(2);
       this.libelleMontantBase = `${this.montantBase} EUR`;
-    }
-    else{
-      this.montantBase = "";
-      this.libelleMontantBase = "";
+    } else {
+      this.montantBase = '';
+      this.libelleMontantBase = '';
     }
   }
 
-  private createContrepartie(){
-    if(this.compteTiersNom)
-      this.gridContreparties.createContrepartie();
+  private createContrepartie() {
+    if (this.compteTiersNom) this.gridContreparties.createContrepartie();
   }
 
-  private saveLoading: boolean = false;
+  private saveLoading = false;
   private async savePiece() {
     (this.$refs.form as any).validate();
     this.$nextTick(async () => {
-      if (this.isValid && await this.confirmEquilibre()) {
-        let pieceToSave = this.GetModelToSave();
-        if(pieceToSave.numeroPiece == 0)
-          this.addPiece(pieceToSave);
-        else 
-          this.updatePiece(pieceToSave);
+      if (this.isValid && (await this.confirmEquilibre())) {
+        const pieceToSave = this.GetModelToSave();
+        if (pieceToSave.numeroPiece == 0) this.addPiece(pieceToSave);
+        else this.updatePiece();
       }
-    })
+    });
   }
 
-  private async confirmEquilibre(): Promise<boolean>{
+  private async confirmEquilibre(): Promise<boolean> {
     try {
-      if(!this.gridContreparties.pieceIsEquilibre())
-        return await (this.$refs.confirmDialog as Confirm).open( "Attention, pièce non équilibrée", `La pièce n'est pas équilibrée, voulez vous sauvegarder ?`, "error", "Sauvegarder");
-      else if(this.gridContreparties.errorInTVA())
-        return await (this.$refs.confirmDialog as Confirm).open( "Attention, contrôle de tva", `La tva calculée est différente de la tva assignée, voulez-vous continuer ?`, "error", "Sauvegarder");
+      if (!this.gridContreparties.pieceIsEquilibre())
+        return await (this.$refs.confirmDialog as Confirm).open(
+          'Attention, pièce non équilibrée',
+          `La pièce n'est pas équilibrée, voulez vous sauvegarder ?`,
+          'error',
+          'Sauvegarder'
+        );
+      else if (this.gridContreparties.errorInTVA())
+        return await (this.$refs.confirmDialog as Confirm).open(
+          'Attention, contrôle de tva',
+          `La tva calculée est différente de la tva assignée, voulez-vous continuer ?`,
+          'error',
+          'Sauvegarder'
+        );
       return true;
     } catch (err) {
       return false;
@@ -921,74 +969,92 @@ export default class extends Vue {
   private addPiece(piece: PieceComptableSaveDTO) {
     this.saveLoading = true;
     this.piecereadonly = true;
-    this.errorMessage = "";
-    AchatVenteApi.AddPiece(piece).then((numeroPiece) => {
-      this.numeroPiece = numeroPiece.toString();
-      this.resolve({ action: DialogActionResult.Create, data: this.GetModelForGrid()});
-      (this.$refs.form as any).resetValidation();
-      this.dialog = false;
-      this.resetForm();
-    }).catch((err) => {
-      this.errorMessage = displayAxiosError(err);
-      this.piecereadonly = false;
-    }).finally(()=> {
-      this.saveLoading = false;
-    });
-  }
-
-  private updatePiece(piece: PieceComptableSaveDTO) {
-    this.saveLoading = true;
-    this.errorMessage = "";
-    let pieceComptaToSave = this.GetModelToSave();
-    this.piecereadonly = true;
-    AchatVenteApi.UpdatePiece(pieceComptaToSave).then(() => {
-      this.resolve({ action: DialogActionResult.Update, data: this.GetModelForGrid()});
-      this.dialog = false;
-      this.resetForm();
-    }).catch((err) => {
+    this.errorMessage = '';
+    AchatVenteApi.AddPiece(piece)
+      .then((numeroPiece) => {
+        this.numeroPiece = numeroPiece.toString();
+        this.resolve({
+          action: DialogActionResult.Create,
+          data: this.GetModelForGrid()
+        });
+        (this.$refs.form as any).resetValidation();
+        this.dialog = false;
+        this.resetForm();
+      })
+      .catch((err) => {
         this.errorMessage = displayAxiosError(err);
         this.piecereadonly = false;
-    }).finally(()=> {
-      this.saveLoading = false;
-    });
+      })
+      .finally(() => {
+        this.saveLoading = false;
+      });
   }
 
-  private deleteIsLoading : boolean = false;
+  private updatePiece() {
+    this.saveLoading = true;
+    this.errorMessage = '';
+    const pieceComptaToSave = this.GetModelToSave();
+    this.piecereadonly = true;
+    AchatVenteApi.UpdatePiece(pieceComptaToSave)
+      .then(() => {
+        this.resolve({
+          action: DialogActionResult.Update,
+          data: this.GetModelForGrid()
+        });
+        this.dialog = false;
+        this.resetForm();
+      })
+      .catch((err) => {
+        this.errorMessage = displayAxiosError(err);
+        this.piecereadonly = false;
+      })
+      .finally(() => {
+        this.saveLoading = false;
+      });
+  }
+
+  private deleteIsLoading = false;
   private DeletePiece() {
     this.autocompleteCompteTier?.blur();
     this.$nextTick(() => this.OpenConfirmDelete());
   }
   private OpenConfirmDelete() {
-    this.confirmDialog.open(
-        "Suppression",
+    this.confirmDialog
+      .open(
+        'Suppression',
         `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
-        "error",
-        "Supprimer"
+        'error',
+        'Supprimer'
       )
       .then((resp) => {
         if (resp) {
           this.deleteIsLoading = true;
           AchatVenteApi.DeletePiece(this.periode.typePeriodeComptable, this.journal.numero, +this.numeroPiece)
-          .then(() => {
-            this.dialog = false;
-            this.resolve({ action: DialogActionResult.Delete, data: this.GetModelForGrid()});
-          }).catch((err) => {
-            this.errorMessage = displayAxiosError(err);
-          }).finally(() => {
-            this.deleteIsLoading = false;
-          });
-        }else {
+            .then(() => {
+              this.dialog = false;
+              this.resolve({
+                action: DialogActionResult.Delete,
+                data: this.GetModelForGrid()
+              });
+            })
+            .catch((err) => {
+              this.errorMessage = displayAxiosError(err);
+            })
+            .finally(() => {
+              this.deleteIsLoading = false;
+            });
+        } else {
           this.$nextTick(() => this.autocompleteCompteTier?.focus());
         }
-      }).catch(() => {
+      })
+      .catch(() => {
         this.$nextTick(() => this.autocompleteCompteTier?.focus());
       });
   }
 
   private GetModelToSave(): PieceComptableSaveDTO {
-    let pieceComptaSave: PieceComptableSaveDTO = new PieceComptableSaveDTO();
-    if(this.forcerNumero && this.numeroToForce)
-      pieceComptaSave.numeroPiece = +this.numeroPiece;
+    const pieceComptaSave: PieceComptableSaveDTO = new PieceComptableSaveDTO();
+    if (this.forcerNumero && this.numeroToForce) pieceComptaSave.numeroPiece = +this.numeroPiece;
 
     pieceComptaSave.periode = this.periode.typePeriodeComptable;
     pieceComptaSave.numeroJournal = this.journal.numero;
@@ -1010,8 +1076,8 @@ export default class extends Vue {
     pieceComptaSave.contreparties = [];
 
     let i = 1;
-    this.contreparties.forEach(c => {
-      let contr : PieceComptableContrepartieSaveDTO = new PieceComptableContrepartieSaveDTO();
+    this.contreparties.forEach((c) => {
+      const contr: PieceComptableContrepartieSaveDTO = new PieceComptableContrepartieSaveDTO();
       contr.typeCompte = c.typeCompte;
       contr.numeroCompte = c.numeroCompte;
       contr.libelle = c.libelle;
@@ -1028,7 +1094,7 @@ export default class extends Vue {
   }
 
   private GetModelForGrid(): EntetePieceComptable {
-    let entete = new EntetePieceComptable();
+    const entete = new EntetePieceComptable();
     entete.codeJournal = this.journal.numero;
     entete.codePiece = this.numeroPiece.toNumber();
     entete.escompte = this.montantEscompte.toNumber();
@@ -1045,37 +1111,32 @@ export default class extends Vue {
     return entete;
   }
 
-  private cancelEdit(){
+  private cancelEdit() {
     this.piecereadonly = true;
-    if(this.numeroPiece.toNumber() == 0)
-     {
-       this.$nextTick(() => {
-          this.confirmDialog
-          .open(
-            "Annuler",
-            `Êtes-vous sur de vouloir annuler  ?`,
-            "warning",
-            "Annuler la création"
-          )
+    if (this.numeroPiece.toNumber() == 0) {
+      this.$nextTick(() => {
+        this.confirmDialog
+          .open('Annuler', `Êtes-vous sur de vouloir annuler  ?`, 'warning', 'Annuler la création')
           .then((resp) => {
             if (resp) {
               this.closeDialog();
-            }else {
+            } else {
               this.$nextTick(() => this.autocompleteCompteTier?.focus());
             }
-          }).catch(() => {
-             this.$nextTick(() => this.autocompleteCompteTier?.focus());
+          })
+          .catch(() => {
+            this.$nextTick(() => this.autocompleteCompteTier?.focus());
           });
-       });
-     }
+      });
+    }
   }
 
-  private closeDialog(){
+  private closeDialog() {
     this.resetForm();
     this.autocompleteCompteTier?.blur();
     this.$nextTick(() => {
       this.dialog = false;
-      this.resolve({action: DialogActionResult.None});
+      this.resolve({ action: DialogActionResult.None });
     });
   }
 }
@@ -1086,8 +1147,8 @@ export default class extends Vue {
   font-size: 12px;
 }
 
-.warningMessage{
-  color: #FB8C00;
+.warningMessage {
+  color: #fb8c00;
   font-weight: 500;
 }
 </style>

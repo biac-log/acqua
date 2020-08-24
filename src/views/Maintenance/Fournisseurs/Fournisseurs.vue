@@ -1,6 +1,7 @@
 <template>
-	<div>Bonjour
-  <!-- <v-data-table
+  <div>
+    Fournisseurs
+    <!-- <v-data-table
     :headers="Headers"
     :items="fournisseurs"
     :items-per-page="5"
@@ -16,27 +17,15 @@
       :gridOptions="gridOptions">
     </AgGridVue> -->
   </div>
-  
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
-import {FournisseurApi} from "../../../api/FournisseurApi"
-import axios from "axios";
-import { SearchFournisseur } from '../../../models/Fournisseur/SearchFournisseur';
-import { AgGridVue } from "ag-grid-vue";
+import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
-  name: "Fournisseurs"
-  })
-export default class extends Vue {
-  
-  
-}
-   
+  name: 'Fournisseurs'
+})
+export default class extends Vue {}
 </script>
 
-
-<style scopped>
-
-</style>
+<style scopped></style>

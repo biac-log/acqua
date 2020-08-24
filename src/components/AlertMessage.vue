@@ -1,8 +1,7 @@
 <template>
   <v-alert prominent :type="type" class="ma-0 pa-0 pl-5" v-if="message">
     <v-row align="center">
-      <v-col class="grow">{{ message }}
-      </v-col>
+      <v-col class="grow">{{ message }} </v-col>
       <v-col class="shrink ma-0 pa-0">
         <v-btn text v-if="messageDetails" class=" ma-0 pa-0" @click="dialog = true">voir détail</v-btn>
       </v-col>
@@ -14,7 +13,7 @@
     </v-row>
     <v-dialog v-model="dialog" max-width="800">
       <v-card>
-        <v-card-title class="headline" >{{ message }}</v-card-title>
+        <v-card-title class="headline">{{ message }}</v-card-title>
         <v-card-text>
           {{ messageDetails }}
         </v-card-text>
@@ -30,28 +29,26 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
-  import { Component, Prop, PropSync } from 'vue-property-decorator';
-  
-  @Component
-  export default class AlertMessage extends Vue {
-    @Prop() readonly type!: string;
-    private message: string = "";
-    private messageDetails: string = "";
-    private dialog: boolean = false;
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
 
-    public show(message: string, messageDetails: string = ""){
-      this.message = message;
-      this.messageDetails = messageDetails;
-    }
+@Component
+export default class AlertMessage extends Vue {
+  @Prop() readonly type!: string;
+  private message = '';
+  private messageDetails = '';
+  private dialog = false;
 
-    public clear(){
-      this.message = "";
-      this.messageDetails = "";
-    }
+  public show(message: string, messageDetails = '') {
+    this.message = message;
+    this.messageDetails = messageDetails;
   }
+
+  public clear() {
+    this.message = '';
+    this.messageDetails = '';
+  }
+}
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

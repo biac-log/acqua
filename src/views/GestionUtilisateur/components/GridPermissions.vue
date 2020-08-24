@@ -1,11 +1,5 @@
-  <template>
-  <v-dialog
-    v-model="dialog"
-    width="900"
-    scrollable
-    @click:outside="closeDialog"
-    @keydown.esc="closeDialog()"
-  >
+<template>
+  <v-dialog v-model="dialog" width="900" scrollable @click:outside="closeDialog" @keydown.esc="closeDialog()">
     <v-form ref="form" v-model="isValid">
       <v-card>
         <v-card-title class="d-flex justify-start">
@@ -34,7 +28,7 @@
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions v-if="!isReadOnly" class="d-flex">
-                    <v-spacer></v-spacer>     
+          <v-spacer></v-spacer>
           <v-btn
             color="blue darken-1"
             class="ma-2 mt-0 pr-4 align-self-start"
@@ -56,33 +50,30 @@
             <v-icon left>mdi-checkbox-marked-circle</v-icon>Valider
           </v-btn>
         </v-card-actions>
-        <v-alert type="error" border="left" v-if="errorMessage" class="ml-4 mr-4">{{errorMessage}}</v-alert>
+        <v-alert type="error" border="left" v-if="errorMessage" class="ml-4 mr-4">{{ errorMessage }}</v-alert>
       </v-card>
     </v-form>
   </v-dialog>
 </template>
-  
+
 <script lang="ts">
-import { Component, Vue, PropSync, Watch } from "vue-property-decorator";
-import {
-  Permission,
-  PermissionDTO
-} from "@/models/GestionUtilisateur/Permission";
-import { Application } from "@/models/GestionUtilisateur/Application";
-import { GestionUtilisateurApi } from "../../../api/GestionUtilisateurApi";
-import { Utilisateur } from "../../../models/Login/Utilisateur";
+import { Component, Vue } from 'vue-property-decorator';
+import { Permission } from '@/models/GestionUtilisateur/Permission';
+import { Application } from '@/models/GestionUtilisateur/Application';
+import { GestionUtilisateurApi } from '../../../api/GestionUtilisateurApi';
+import { Utilisateur } from '../../../models/Login/Utilisateur';
 
 @Component({
-  name: "GridPermissions"
+  name: 'GridPermissions'
 })
 export default class extends Vue {
-  private applicationId = "";
-  private applicationNom = "";
+  private applicationId = '';
+  private applicationNom = '';
   private permissions: Permission[] = [];
   private permissionsUtilisateur: Permission[] = [];
   private utilisateur: Utilisateur = new Utilisateur();
   private loading = false;
-  private errorMessage = "";
+  private errorMessage = '';
 
   private selected: Permission[] = [];
 
@@ -93,8 +84,8 @@ export default class extends Vue {
   private reject!: any;
 
   private headersPermissions = [
-    { text: "Nom", value: "Nom", width: 150 },
-    { text: "Description", value: "Description", width: 300 }
+    { text: 'Nom', value: 'Nom', width: 150 },
+    { text: 'Description', value: 'Description', width: 300 }
   ];
 
   public open(
@@ -122,17 +113,14 @@ export default class extends Vue {
       this.permissions = [];
       this.selected = [];
       this.loading = true;
-      GestionUtilisateurApi.getPermissionsForApplication(
-        this.applicationId
-      ).then(resp => {
+      GestionUtilisateurApi.getPermissionsForApplication(this.applicationId).then((resp) => {
         if (this.isReadOnly) {
-          resp.forEach(permission => {
-            if (!!this.permissionsUtilisateur.find(e => e.Id === permission.Id)) {
+          resp.forEach((permission) => {
+            if (this.permissionsUtilisateur.find((e) => e.Id === permission.Id)) {
               this.permissions.push(permission);
             }
           });
-        } 
-        else {
+        } else {
           this.permissions = resp;
           this.GivePermissions();
         }
@@ -145,9 +133,8 @@ export default class extends Vue {
   }
 
   private GivePermissions() {
-    this.permissions.forEach(permission => {
-      if (!!this.permissionsUtilisateur.find(e => e.Id === permission.Id))
-        this.selected.push(permission);
+    this.permissions.forEach((permission) => {
+      if (this.permissionsUtilisateur.find((e) => e.Id === permission.Id)) this.selected.push(permission);
     });
   }
 
@@ -165,10 +152,8 @@ export default class extends Vue {
   }
 
   private getModel(): Permission[] {
-    this.permissionsUtilisateur = this.permissionsUtilisateur.filter(
-      e => e.ApplicationId !== this.applicationId
-    );
-    this.selected.forEach(element => {
+    this.permissionsUtilisateur = this.permissionsUtilisateur.filter((e) => e.ApplicationId !== this.applicationId);
+    this.selected.forEach((element) => {
       this.permissionsUtilisateur.push(element);
     });
     return this.permissionsUtilisateur;

@@ -1,11 +1,11 @@
-const path = require('path')
+const path = require('path');
 module.exports = {
-  transpileDependencies: ["vuetify"],
+  transpileDependencies: ['vuetify'],
   configureWebpack: {
     devtool: 'source-map'
   },
   pwa: {
-    name: "acqua",
+    name: 'acqua',
     workboxPluginMode: 'InjectManifest',
     workboxOptions: {
       swSrc: path.resolve(__dirname, 'src/service-worker.js')

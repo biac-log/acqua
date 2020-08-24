@@ -1,11 +1,11 @@
 export class PieceAchatVenteDTO {
-  public numeroJournal: number = 0;
-  public numeroPiece: number = 0;
-  public codeDevise: number = 0;
-  public libelleDevise: string = "";
-  public typeCompteTiers: string = "";
-  public numeroCompteTiers: string = "";
-  public nomCompteTiers = "";
+  public numeroJournal = 0;
+  public numeroPiece = 0;
+  public codeDevise = 0;
+  public libelleDevise = '';
+  public typeCompteTiers = '';
+  public numeroCompteTiers = '';
+  public nomCompteTiers = '';
   public montantTotalDv = 0;
   public montantTotalBase = 0;
   public montantAVentilerDv = 0;

@@ -3,13 +3,13 @@ export interface IStatut {
   libelle: string;
 }
 
-export class StatutDTO implements IStatut{
-  public id:number=0;
-  public libelle:string="";
+export class StatutDTO implements IStatut {
+  public id = 0;
+  public libelle = '';
 }
 
 export class Statut extends StatutDTO {
-  constructor(dto?: StatutDTO){
+  constructor(dto?: StatutDTO) {
     super();
     Object.assign(this, dto || new StatutDTO());
   }

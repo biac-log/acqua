@@ -1,13 +1,9 @@
-import Axios from "axios";
-import { Departement, DepartementDTO } from "@/models/GestionUtilisateur/Departement";
-import { UserModule } from "@/store/modules/user";
-import api from "./AxiosApi"
+import { Departement, DepartementDTO } from '@/models/GestionUtilisateur/Departement';
+import api from './AxiosApi';
 
 export abstract class DepartementApi {
-  private static DepartementAxios = Axios.create();
-
   static async getDepartements(): Promise<Departement[]> {
-    let response = await this.DepartementAxios.get<DepartementDTO[]>(`${process.env.VUE_APP_ApiAcQua}/Departement/GetAll?typeAcces=SQLServer`);
-    return response.data.map(dep => new Departement(dep));
-  }  
+    const response = await api.AcQuaCore.get<DepartementDTO[]>(`Departement/GetAll?typeAcces=SQLServer`);
+    return response.data.map((dep) => new Departement(dep));
+  }
 }

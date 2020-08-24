@@ -10,14 +10,14 @@ export interface IPieceComptableContrepartieSave {
 }
 
 export class PieceComptableContrepartieSaveDTO implements IPieceComptableContrepartieSave {
-  public typeCompte: string = "";
-  public numeroCompte: number = 0;
-  public codeDevise: number = 0;
-  public codeMouvement: string = "";
-  public montantDevise: number = 0;
-  public montantBase: number = 0;
-  public libelle: string = "";
-  public numeroCaseTVA: number = 0;
-  public numeroLigne:number= 0;
-  public dossier: string = "";
+  public typeCompte = '';
+  public numeroCompte = 0;
+  public codeDevise = 0;
+  public codeMouvement = '';
+  public montantDevise = 0;
+  public montantBase = 0;
+  public libelle = '';
+  public numeroCaseTVA = 0;
+  public numeroLigne = 0;
+  public dossier = '';
 }

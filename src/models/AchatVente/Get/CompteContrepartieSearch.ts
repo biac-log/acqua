@@ -1,4 +1,3 @@
-
 export interface ICompteContrepartieSearch {
   numero: number;
   nom: string;
@@ -6,17 +5,17 @@ export interface ICompteContrepartieSearch {
   nature: string;
   caseTva: string;
 }
-  
-export class CompteContrepartieSearchDTO implements ICompteContrepartieSearch{
-  numero: number = 0;
-  nom: string = "";
-  solde: number = 0;
-  nature: string = "";
-  caseTva: string = "";
+
+export class CompteContrepartieSearchDTO implements ICompteContrepartieSearch {
+  numero = 0;
+  nom = '';
+  solde = 0;
+  nature = '';
+  caseTva = '';
 }
-  
+
 export class CompteContrepartieSearch extends CompteContrepartieSearchDTO {
-  constructor(dto: CompteContrepartieSearchDTO){
+  constructor(dto: CompteContrepartieSearchDTO) {
     super();
     Object.assign(this, dto);
   }

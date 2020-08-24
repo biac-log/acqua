@@ -1,4 +1,4 @@
-workbox.core.setCacheNameDetails({prefix: "acqua"});
+workbox.core.setCacheNameDetails({ prefix: 'acqua' });
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'skipWaiting') {
@@ -13,4 +13,3 @@ self.addEventListener('message', (event) => {
  */
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
-

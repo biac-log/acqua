@@ -1,142 +1,127 @@
-import Vue from "vue";
-import Router, { Route, RouteConfig } from "vue-router";
-import { UserModule } from "@/store/modules/user";
-import { PermissionModule } from "@/store/modules/permissions";
-import Layout from "@/layout/index.vue";
-import Financier from "@/views/Financier/index.vue"
-import NProgress from "nprogress";
+import Vue from 'vue';
+import Router, { Route, RouteConfig } from 'vue-router';
+import { UserModule } from '@/store/modules/user';
+import { PermissionModule } from '@/store/modules/permissions';
+import Layout from '@/layout/index.vue';
+import Financier from '@/views/Financier/index.vue';
+import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 
-NProgress.configure({ showSpinner: false })
+NProgress.configure({ showSpinner: false });
 
 Vue.use(Router);
-const whiteList = ["/login", "/auth-redirect"];
+const whiteList = ['/login', '/auth-redirect'];
 
 export const constantRoutes: RouteConfig[] = [
   {
-    path: "/",
+    path: '/',
     component: Layout,
-    redirect: "/home",
+    redirect: '/home',
     children: [
       {
-        path: "home",
-        component: () =>
-          import(/* webpackChunkName: "home" */ "@/views/Home.vue"),
-        name: "Home",
+        path: 'home',
+        component: () => import(/* webpackChunkName: "home" */ '@/views/Home.vue'),
+        name: 'Home',
         meta: {
-          title: "home",
-          icon: "mdi-home",
+          title: 'home',
+          icon: 'mdi-home',
           affix: true
         }
       }
     ]
   },
   {
-    path: "/login",
-    name: "Login",
-    component: () =>
-      import(/* webpackChunkName: "login" */ "@/views/login/index.vue"),
+    path: '/login',
+    name: 'Login',
+    component: () => import(/* webpackChunkName: "login" */ '@/views/login/index.vue'),
     meta: { hidden: true }
   }
 ];
 
 export const asyncRoutes: RouteConfig[] = [
   {
-    path: "/achatvente",
+    path: '/achatvente',
     component: Layout,
-    redirect: "achatvente/index",
-    meta: { roles: ["admin", "ACQUAACHATVENTE"] },
+    redirect: 'achatvente/index',
+    meta: { roles: ['admin', 'ACQUAACHATVENTE'] },
     children: [
       {
-        path: "index",
-        component: () =>
-          import(
-            /* webpackChunkName: "achatvente" */ "@/views/AchatVente/index.vue"
-          ),
-        name: "Achat Vente",
+        path: 'index',
+        component: () => import(/* webpackChunkName: "achatvente" */ '@/views/AchatVente/index.vue'),
+        name: 'Achat Vente',
         meta: {
-          title: "Achat Vente",
-          icon: "mdi-currency-eur",
+          title: 'Achat Vente',
+          icon: 'mdi-currency-eur',
           affix: true
         }
       }
     ]
   },
   {
-    path: "/financier",
+    path: '/financier',
     component: Layout,
-    redirect: "financier/index",
-    meta: { roles: ["admin", "ACQUAACHATVENTE"] },
+    redirect: 'financier/index',
+    meta: { roles: ['admin', 'ACQUAACHATVENTE'] },
     children: [
       {
-        path: "index",
-        component: () =>
-          import(
-            /* webpackChunkName: "achatvente" */ "@/views/Financier/index.vue"
-          ),
-        name: "Financier",
+        path: 'index',
+        component: () => import(/* webpackChunkName: "achatvente" */ '@/views/Financier/index.vue'),
+        name: 'Financier',
         meta: {
-          title: "Financier",
-          icon: "mdi-bank-transfer",
+          title: 'Financier',
+          icon: 'mdi-bank-transfer',
           affix: true
         }
       }
     ]
   },
   {
-    path: "/maintenance",
+    path: '/maintenance',
     component: Layout,
-    redirect: "maintenance/fournisseurs",
-    meta: { 
-      roles: ["admin", "ACQUAGESTIONUTILISATEUR"], 
-      title: "Maintenance",
-      icon: "mdi-tools",
+    redirect: 'maintenance/fournisseurs',
+    meta: {
+      roles: ['admin', 'ACQUAGESTIONUTILISATEUR'],
+      title: 'Maintenance',
+      icon: 'mdi-tools'
     },
     children: [
       {
-        path: "fournisseurs",
+        path: 'fournisseurs',
         component: () =>
-          import(
-            /* webpackChunkName: "achatvente" */ "@/views/Maintenance/Fournisseurs/Fournisseurs.vue"
-          ),
-        name: "Fournisseurs",
+          import(/* webpackChunkName: "achatvente" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
+        name: 'Fournisseurs',
         meta: {
-          title: "Fournisseurs",
-          icon: "mdi-truck",
+          title: 'Fournisseurs',
+          icon: 'mdi-truck',
           affix: true
         }
       },
       {
-        path: "clients",
+        path: 'clients',
         component: () =>
-          import(
-            /* webpackChunkName: "achatvente" */ "@/views/Maintenance/Fournisseurs/Fournisseurs.vue"
-          ),
-        name: "Clients",
+          import(/* webpackChunkName: "achatvente" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
+        name: 'Clients',
         meta: {
-          title: "Clients",
-          icon: "mdi-account-supervisor-circle",
+          title: 'Clients',
+          icon: 'mdi-account-supervisor-circle',
           affix: true
         }
       }
     ]
   },
   {
-    path: "/utilisateurs",
+    path: '/utilisateurs',
     component: Layout,
-    redirect: "utilisateurs/index",
-    meta: { roles: ["ACQUAGESTIONUTILISATEUR"] },
+    redirect: 'utilisateurs/index',
+    meta: { roles: ['ACQUAGESTIONUTILISATEUR'] },
     children: [
       {
-        path: "index",
-        component: () =>
-          import(
-            "@/views/GestionUtilisateur/index.vue"
-          ),
-        name: "Utilisateurs",
+        path: 'index',
+        component: () => import('@/views/GestionUtilisateur/index.vue'),
+        name: 'Utilisateurs',
         meta: {
-          title: "Utilisateurs",
-          icon: "mdi-account-multiple",
+          title: 'Utilisateurs',
+          icon: 'mdi-account-multiple',
           affix: true
         }
       }
@@ -167,10 +152,10 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
       try {
         await UserModule.LoadUser();
         PermissionModule.GenerateRoutes(UserModule.utilisateur.Permissions);
-          //Dynamically add accessible routes
+        //Dynamically add accessible routes
         router.addRoutes(PermissionModule.dynamicRoutes);
-        if (to.path.toUpperCase() == "/LOGIN") {
-          next({ path: "/" });
+        if (to.path.toUpperCase() == '/LOGIN') {
+          next({ path: '/' });
         } else {
           next({ ...to, replace: true });
         }

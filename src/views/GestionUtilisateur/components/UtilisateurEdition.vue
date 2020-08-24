@@ -13,12 +13,7 @@
             <div v-if="!utilisateur.ID" class="font-weight-light mr-2">Nouveau utilisateur</div>
           </v-card-title>
           <v-spacer></v-spacer>
-          <v-btn
-            class="mr-5"
-            color="success"
-            @click="ModifierUtilisateur"
-            v-if="utilisateurReadonly"
-          >
+          <v-btn class="mr-5" color="success" @click="ModifierUtilisateur" v-if="utilisateurReadonly">
             <v-icon left>mdi-pencil</v-icon>Modifier
           </v-btn>
           <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
@@ -27,7 +22,7 @@
         </v-toolbar>
         <v-card-text>
           <v-row>
-            <v-col cols="8">              
+            <v-col cols="8">
               <v-row class="ma-0 pa-0">
                 <v-card-title class="font-weight-medium ma-0 pa-0 ml-2">Informations générales</v-card-title>
               </v-row>
@@ -86,7 +81,6 @@
                     :readonly="utilisateurReadonly"
                     :filled="utilisateurReadonly"
                     :rules="nomRules"
-
                     validate-on-blur
                     prepend-inner-icon="mdi-lock"
                     autocomplete="off"
@@ -122,7 +116,7 @@
                     validate-on-blur
                     prepend-inner-icon="mdi-briefcase"
                   ></v-text-field>
-                    <v-select
+                  <v-select
                     label="Département"
                     persistent-hint
                     v-model="departement"
@@ -141,7 +135,7 @@
                     prepend-inner-icon="mdi-translate"
                   ></v-select>
                 </v-col>
-                <v-col>                
+                <v-col>
                   <v-text-field
                     label="Adresse 1"
                     ref="adresseLigne1"
@@ -172,7 +166,7 @@
                     prepend-inner-icon="mdi-map-marker"
                     validate-on-blur
                   ></v-text-field>
-                    <v-text-field
+                  <v-text-field
                     label="Téléphone"
                     ref="telephone"
                     v-model="telephone"
@@ -212,7 +206,7 @@
                     prepend-inner-icon="mdi-email"
                     validate-on-blur
                   ></v-text-field>
-                </v-col>              
+                </v-col>
               </v-row>
             </v-col>
             <v-col cols="auto">
@@ -259,66 +253,65 @@
             <v-icon left>mdi-content-save</v-icon>Sauvegarder
           </v-btn>
         </v-card-actions>
-        <v-alert type="error" border="left" v-if="errorMessage" class="ml-4 mr-4">{{errorMessage}}</v-alert>
+        <v-alert type="error" border="left" v-if="errorMessage" class="ml-4 mr-4">{{ errorMessage }}</v-alert>
       </v-card>
     </v-form>
   </v-dialog>
 </template>
 
 <script lang="ts">
-import moment from "moment";
-import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
-import { Utilisateur } from "@/models/GestionUtilisateur/Utilisateur";
-import { Permission } from "@/models/GestionUtilisateur/Permission";
-import ImageUploader from "@/components/imageUploader/imageUploader.vue";
-import { GestionUtilisateurApi } from "@/api/GestionUtilisateurApi";
-import { DepartementApi } from "@/api/DepartementApi";
-import GridApplications from "./GridApplications.vue";
-import { displayAxiosError } from "@/utils/ErrorMethods";
-import { Application } from "../../../models/GestionUtilisateur/Application";
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Utilisateur } from '@/models/GestionUtilisateur/Utilisateur';
+import { Permission } from '@/models/GestionUtilisateur/Permission';
+import ImageUploader from '@/components/imageUploader/imageUploader.vue';
+import { GestionUtilisateurApi } from '@/api/GestionUtilisateurApi';
+import { DepartementApi } from '@/api/DepartementApi';
+import GridApplications from './GridApplications.vue';
+import { displayAxiosError } from '@/utils/ErrorMethods';
+import { Application } from '../../../models/GestionUtilisateur/Application';
 
 @Component({
-  name: "UtilisateurEdition",
+  name: 'UtilisateurEdition',
   components: { GridApplications, ImageUploader }
 })
 export default class extends Vue {
-  public utilisateurReadonly: boolean = true;
-  private errorMessage: string = "";
-  private isValid: boolean = true;
+  public utilisateurReadonly = true;
+  private errorMessage = '';
+  private isValid = true;
 
   private Avatar: any = null;
-  private nomRules: any = [(v: string) => (!!v || !this.utilisateurReadonly) || "Valeur obligatoire"];
+  private nomRules: any = [(v: string) => !!v || !this.utilisateurReadonly || 'Valeur obligatoire'];
 
   //Statiques
   private departements: string[] = [];
-  private langues: string[] = ["Français", "Deutsch", "English"];
+  private langues: string[] = ['Français', 'Deutsch', 'English'];
 
   //Titre
   private utilisateur: Utilisateur = new Utilisateur();
-  private numeroUtilisateur = "";
+  private numeroUtilisateur = '';
 
   //Edition Pemissions
   private permissions: Permission[] = [];
   private applications: Application[] = [];
 
   //Encodage
-  private nomPrenom = "";
-  private code = "";
-  private codeRules: any = [(v: string) => (!!v || !this.utilisateurReadonly) || "Valeur obligatoire"];
-  private codeErrorMessage = "";
+  private nomPrenom = '';
+  private code = '';
+  private codeRules: any = [(v: string) => !!v || !this.utilisateurReadonly || 'Valeur obligatoire'];
+  private codeErrorMessage = '';
 
-  private motDePasse = "";
-  private idActiveDirectory = "";
-  private fonction = "";
-  private departement = "";
-  private langue = "";
-  private adresseLigne1 = "";
-  private adresseLigne2 = "";
-  private adresseLigne3 = "";
-  private telephone = "";
-  private numeroInterne = "";
-  private fax = "";
-  private email = "";
+  private motDePasse = '';
+  private idActiveDirectory = '';
+  private fonction = '';
+  private departement = '';
+  private langue = '';
+  private adresseLigne1 = '';
+  private adresseLigne2 = '';
+  private adresseLigne3 = '';
+  private telephone = '';
+  private numeroInterne = '';
+  private fax = '';
+  private email = '';
 
   private isEdit = false;
   public dialog = false;
@@ -333,17 +326,14 @@ export default class extends Vue {
   private async LoadDepartements() {
     try {
       const departements = await DepartementApi.getDepartements();
-      this.departements = departements.map(e => e.Nom);
-      this.departements.unshift("");
+      this.departements = departements.map((e) => e.Nom);
+      this.departements.unshift('');
     } catch (err) {
       this.isErrorLoading = true;
     }
   }
 
-  public open(
-    utilisateur: Utilisateur,
-    apps: Application[]
-  ): Promise<Utilisateur> {
+  public open(utilisateur: Utilisateur, apps: Application[]): Promise<Utilisateur> {
     this.dialog = true;
     this.utilisateurReadonly = !!utilisateur;
     this.applications = apps;
@@ -356,7 +346,7 @@ export default class extends Vue {
   }
 
   private SetUtilisateur(utilisateur: Utilisateur) {
-    this.utilisateur = !!utilisateur ? utilisateur : new Utilisateur();
+    this.utilisateur = utilisateur ? utilisateur : new Utilisateur();
     this.numeroUtilisateur = utilisateur?.ID;
 
     this.permissions = utilisateur?.Permissions;
@@ -376,11 +366,11 @@ export default class extends Vue {
     this.email = utilisateur?.Email;
   }
 
-  @Watch("code")
-  private async validateId(){
-    if(this.utilisateur.ID !== this.code && await GestionUtilisateurApi.idExist(this.code))
+  @Watch('code')
+  private async validateId() {
+    if (this.utilisateur.ID !== this.code && (await GestionUtilisateurApi.idExist(this.code)))
       this.codeErrorMessage = "L'id est déjà utilisé";
-    else this.codeErrorMessage = "";
+    else this.codeErrorMessage = '';
   }
 
   private async ModifierUtilisateur() {
@@ -388,7 +378,7 @@ export default class extends Vue {
     this.$nextTick(() => (this.$refs.nomPrenom as any)?.focus());
   }
 
-  private saveLoading: boolean = false;
+  private saveLoading = false;
   private saveUtilisateur() {
     (this.$refs.form as any).validate();
     this.$nextTick(() => {
@@ -400,15 +390,15 @@ export default class extends Vue {
 
   private save() {
     this.saveLoading = true;
-    this.errorMessage = "";
-    let model = this.GetModelToSave();
+    this.errorMessage = '';
+    const model = this.GetModelToSave();
     this.utilisateurReadonly = true;
     GestionUtilisateurApi.save(model)
-      .then(resp => {
+      .then((resp) => {
         this.resolve(resp);
         this.dialog = false;
       })
-      .catch(err => {
+      .catch((err) => {
         this.errorMessage = displayAxiosError(err);
         this.utilisateurReadonly = false;
       })
@@ -437,7 +427,7 @@ export default class extends Vue {
   }
 
   private cancelEdit() {
-    if (!!this.utilisateur.ID) {
+    if (this.utilisateur.ID) {
       this.utilisateurReadonly = true;
       this.SetUtilisateur(this.utilisateur);
     } else this.closeDialog();

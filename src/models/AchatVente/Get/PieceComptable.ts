@@ -1,8 +1,5 @@
-import {
-  IPieceComptableContrepartie,
-  PieceComptableContrepartie
-} from "./PieceComptableContrepartie";
-import moment from "moment";
+import { IPieceComptableContrepartie, PieceComptableContrepartie } from './PieceComptableContrepartie';
+import moment from 'moment';
 export interface IPieceComptable {
   numeroJournal: number;
   numeroPiece: number;
@@ -37,36 +34,36 @@ export interface IPieceComptable {
 }
 
 export class PieceComptableDTO implements IPieceComptable {
-  public numeroJournal: number = 0;
-  public numeroPiece: number = 0;
-  public codeDevise: number = 0;
-  public libelleDevise: string = "";
-  public libelle: string = "";
-  public taux: number = 0;
-  public montantDevise: number = 0;
-  public montantBase: number = 0;
-  public datePiece: string = "";
-  public dateEcheance: string = "";
-  public montantEscompteDevise: number = 0;
-  public montantEscompteBase: number = 0;
-  public pieceAcquittee: boolean = false;
-  public statut: number = 0;
-  public statutLibelle: string = "";
-  public compteTiersCodeDevise: number = 0;
-  public compteTiersLibelleDevise: string = "";
-  public compteTiersNumero: number = 0;
-  public compteTiersNom: string = "";
-  public compteTiersSoldeComptable: number = 0;
-  public compteTiersCodeTaxe: number = 0;
-  public delaiPaiementLibelle: string = "";
-  public compteTiersEscomptePourcentage: string = "";
-  public compteTiersEscompteNombreJours: string = "";
-  public compteAssocieNumero: string = "";
-  public compteAssocieNom: string = "";
-  public compteVenteAchatNumero: number = 0;
-  public compteVenteAchatNom: string = "";
-  public deviseComptaLibelle: string = "";
-  public hash: string = "";
+  public numeroJournal = 0;
+  public numeroPiece = 0;
+  public codeDevise = 0;
+  public libelleDevise = '';
+  public libelle = '';
+  public taux = 0;
+  public montantDevise = 0;
+  public montantBase = 0;
+  public datePiece = '';
+  public dateEcheance = '';
+  public montantEscompteDevise = 0;
+  public montantEscompteBase = 0;
+  public pieceAcquittee = false;
+  public statut = 0;
+  public statutLibelle = '';
+  public compteTiersCodeDevise = 0;
+  public compteTiersLibelleDevise = '';
+  public compteTiersNumero = 0;
+  public compteTiersNom = '';
+  public compteTiersSoldeComptable = 0;
+  public compteTiersCodeTaxe = 0;
+  public delaiPaiementLibelle = '';
+  public compteTiersEscomptePourcentage = '';
+  public compteTiersEscompteNombreJours = '';
+  public compteAssocieNumero = '';
+  public compteAssocieNom = '';
+  public compteVenteAchatNumero = 0;
+  public compteVenteAchatNom = '';
+  public deviseComptaLibelle = '';
+  public hash = '';
   public contreparties: PieceComptableContrepartie[] = [];
 }
 
@@ -76,7 +73,7 @@ export class PieceComptable extends PieceComptableDTO {
     Object.assign(this, dto || new PieceComptableDTO());
     if (dto) {
       this.contreparties = [];
-      dto.contreparties.forEach(element => {
+      dto.contreparties.forEach((element) => {
         this.contreparties.push(new PieceComptableContrepartie(element));
       });
     }
@@ -99,13 +96,11 @@ export class PieceComptable extends PieceComptableDTO {
   }
 
   get libelleCompteVenteAchat(): string {
-    return  `${this.compteVenteAchatNumero} ${this.compteVenteAchatNom}`;
+    return `${this.compteVenteAchatNumero} ${this.compteVenteAchatNom}`;
   }
 
   get libelleSoldeCompteTiers(): string {
-    return `${this.compteTiersSoldeComptable.toDecimalString(2)} ${
-      this.compteTiersLibelleDevise
-    }`;
+    return `${this.compteTiersSoldeComptable.toDecimalString(2)} ${this.compteTiersLibelleDevise}`;
   }
 
   get datePieceDate(): Date {

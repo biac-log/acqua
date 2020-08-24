@@ -22,29 +22,30 @@
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
           <v-spacer></v-spacer>
-          <v-tooltip v-if="readonly" top open-delay=500>
+          <v-tooltip v-if="readonly" top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" :disabled="isLoading" @click="ModifierPiece" v-on="on"  >
+              <v-btn class="mr-5" color="success" :disabled="isLoading" @click="ModifierPiece" v-on="on">
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
             <span>Modifier la pièce <span class="shortcutTooltip">F2</span></span>
           </v-tooltip>
-          <v-tooltip v-if="readonly" top open-delay=500>
+          <v-tooltip v-if="readonly" top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" class="mr-10" color="error" :disabled="saveLoading" @click="DeletePiece" :loading="deleteLoading">
+              <v-btn
+                v-on="on"
+                class="mr-10"
+                color="error"
+                :disabled="saveLoading"
+                @click="DeletePiece"
+                :loading="deleteLoading"
+              >
                 <v-icon left>mdi-delete</v-icon>Supprimer
               </v-btn>
             </template>
             <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
           </v-tooltip>
-          <v-btn
-            ref="buttonClose"
-            class="ml-10"
-            icon
-            color="white"
-            @click="closeDialog()"
-          >
+          <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
@@ -54,13 +55,7 @@
               <v-col cols="12" x-lg="5" lg="12">
                 <v-row dense>
                   <v-col cols="4">
-                    <v-text-field
-                      v-model="libelleCompte"
-                      label="Compte"
-                      :filled="readonly"
-                      readonly
-                      tabindex="-1"
-                    >
+                    <v-text-field v-model="libelleCompte" label="Compte" :filled="readonly" readonly tabindex="-1">
                     </v-text-field>
                   </v-col>
                   <v-col cols="3">
@@ -72,12 +67,7 @@
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3">
-                    <v-text-field
-                      label="Solde actuel"
-                      v-model="soldeActuel"
-                      :filled="readonly"
-                      readonly
-                    ></v-text-field>
+                    <v-text-field label="Solde actuel" v-model="soldeActuel" :filled="readonly" readonly></v-text-field>
                   </v-col>
                   <v-col cols="2">
                     <DatePicker
@@ -107,11 +97,7 @@
             </v-row>
           </v-col>
           <v-row dense>
-            <ExtraitVue
-              ref="refExtraitVue"
-              :isReadOnly.sync="readonly"
-              :DatePiece.sync="datePiece"
-            ></ExtraitVue>
+            <ExtraitVue ref="refExtraitVue" :isReadOnly.sync="readonly" :DatePiece.sync="datePiece"></ExtraitVue>
           </v-row>
           <v-col cols="12">
             <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
@@ -119,9 +105,18 @@
         </v-card-text>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
-          <v-tooltip v-if="numeroPiece" top open-delay=500>
+          <v-tooltip v-if="numeroPiece" top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn color="error" v-on="on" class="ma-2 pr-4 align-self-start" text tabindex="-1" @click="DeletePiece()" :disabled="saveLoading" :loading="deleteLoading">
+              <v-btn
+                color="error"
+                v-on="on"
+                class="ma-2 pr-4 align-self-start"
+                text
+                tabindex="-1"
+                @click="DeletePiece()"
+                :disabled="saveLoading"
+                :loading="deleteLoading"
+              >
                 Supprimer
               </v-btn>
             </template>
@@ -135,10 +130,10 @@
             tabindex="-1"
             v-if="!numeroPiece && !forcerNumero"
             @click="forcerNumero = true"
-            >
+          >
             Forcer le numéro de pièce</v-btn
           >
-          <v-text-field 
+          <v-text-field
             label="Numéro pièce"
             v-model="numeroToForce"
             v-if="forcerNumero"
@@ -151,18 +146,35 @@
             outlined
             class="shrink align-self-start"
           ></v-text-field>
-          <v-tooltip top open-delay=500>
+          <v-tooltip top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn color="blue darken-1" v-on="on" class="ma-2 mt-0 pr-4 align-self-start" tile outlined @click="CancelEdit()" tabindex="-1">
+              <v-btn
+                color="blue darken-1"
+                v-on="on"
+                class="ma-2 mt-0 pr-4 align-self-start"
+                tile
+                outlined
+                @click="CancelEdit()"
+                tabindex="-1"
+              >
                 <v-icon left>mdi-close</v-icon> Annuler
               </v-btn>
             </template>
             <span>Annuler les modifications <span class="shortcutTooltip">esc</span></span>
           </v-tooltip>
-          
-          <v-tooltip top open-delay=500>
+
+          <v-tooltip top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn ref="btnValidate" v-on="on" class="ma-2 mt-0 pr-4 align-self-start" tile color="success" :loading="saveLoading" :disabled="!isValid || deleteLoading"  @click="savePiece()">
+              <v-btn
+                ref="btnValidate"
+                v-on="on"
+                class="ma-2 mt-0 pr-4 align-self-start"
+                tile
+                color="success"
+                :loading="saveLoading"
+                :disabled="!isValid || deleteLoading"
+                @click="savePiece()"
+              >
                 <v-icon left>mdi-content-save</v-icon>Sauvegarder
               </v-btn>
             </template>
@@ -176,33 +188,21 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
-import moment from "moment";
-import { Component, Vue, PropSync, Emit, Watch, Ref } from "vue-property-decorator";
-import {
-  PeriodeComptable,
-  EntetePieceComptable,
-  Devise,
-  Journal,
-	CompteBanque,
-	Piece,
-	Extrait,
-} from "@/models/Financier";
-import { AchatVenteApi } from '@/api/AchatVenteApi';
+import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
+import { PeriodeComptable, EntetePieceComptable, Journal, Piece, Extrait } from '@/models/Financier';
 import { DateTime } from '@/models/DateTime';
-import AlertMessageVue from "@/components/AlertMessage.vue";
+import AlertMessageVue from '@/components/AlertMessage.vue';
 import DatePicker from '@/components/DatePicker.vue';
-import ExtraitsVue from "./Extraits.vue";
-import { DeviseApi } from "@/api/DeviseApi";
+import ExtraitsVue from './Extraits.vue';
 import { FinancierApi } from '../../../api/FinancierApi';
-import ExtraitVue from "./Extrait.vue";
-import _, { sum } from "lodash";
-import Confirm from "@/components/Confirm.vue";
+import ExtraitVue from './Extrait.vue';
+import _ from 'lodash';
+import Confirm from '@/components/Confirm.vue';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
 
 @Component({
-  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue}
+  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue }
 })
 export default class PieceComptableVue extends Vue {
   @Ref() refExtraitVue!: ExtraitVue;
@@ -220,48 +220,52 @@ export default class PieceComptableVue extends Vue {
 
   private periode = new PeriodeComptable();
   private journal = new Journal();
-  private numeroPiece = "";
-  private libelleCompte = "";
+  private numeroPiece = '';
+  private libelleCompte = '';
 
   private datePiece: DateTime = new DateTime();
-  private datePieceRules: any = [(v: string) => !!v || "Date obligatoire",
-                                 (v: string) => DateTime.isValid(v) || "Date invalide",
-                                 (v: string) => this.validateDatePiece(v) || "La date est hors période"]
+  private datePieceRules: any = [
+    (v: string) => !!v || 'Date obligatoire',
+    (v: string) => DateTime.isValid(v) || 'Date invalide',
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
+  ];
 
   private extraits: Extrait[] = [];
-  private soldeInitial: string = "";
-  private soldeActuel: string= "";
+  private soldeInitial = '';
+  private soldeActuel = '';
 
-  private forcerNumero: boolean = false;
-  private numeroToForce: string = "";
-  private numeroToForceRules: any = [(v: string) =>  !!v || "Numéro obligatoire", 
-                                     (v: string) => !!v.toNumber() || "Numéro invalide"];
+  private forcerNumero = false;
+  private numeroToForce = '';
+  private numeroToForceRules: any = [
+    (v: string) => !!v || 'Numéro obligatoire',
+    (v: string) => !!v.toNumber() || 'Numéro invalide'
+  ];
 
   private saveLoading = false;
   private deleteLoading = false;
   private pieceIsLoading = false;
-  get isLoading() { return this.saveLoading || this.deleteLoading || this.pieceIsLoading}
+  get isLoading() {
+    return this.saveLoading || this.deleteLoading || this.pieceIsLoading;
+  }
 
-  private validateDatePiece(date: string) : boolean { 
-    let dateTime = new DateTime(date);
+  private validateDatePiece(date: string): boolean {
+    const dateTime = new DateTime(date);
     return dateTime.isBetween(this.periode.dateDebut, this.periode.dateFin);
   }
 
-  private hash = "";
-  public async OpenNew(periode: PeriodeComptable, journal: Journal) : Promise<EntetePieceComptable>{
+  private hash = '';
+  public async OpenNew(periode: PeriodeComptable, journal: Journal): Promise<EntetePieceComptable> {
     this.dialog = true;
     this.reset();
     this.periode = periode;
     this.journal = journal;
-    this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`; 
-    let solde = await FinancierApi.getSoldeCompte(journal.numeroCompteBanque);
+    this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`;
+    const solde = await FinancierApi.getSoldeCompte(journal.numeroCompteBanque);
     this.soldeInitial = solde.toComptaString();
 
-    let today = DateTime.today();
-    if(today.isBefore(this.periode.dateDebut))
-      this.datePiece = this.periode.dateDebut;
-    else if(today.isAfter(this.periode.dateFin)) 
-      this.datePiece = this.periode.dateFin;
+    const today = DateTime.today();
+    if (today.isBefore(this.periode.dateDebut)) this.datePiece = this.periode.dateDebut;
+    else if (today.isAfter(this.periode.dateFin)) this.datePiece = this.periode.dateFin;
     else this.datePiece = today;
 
     this.$nextTick(() => (this.$refs.refDatePiece as DatePicker).focus());
@@ -271,21 +275,24 @@ export default class PieceComptableVue extends Vue {
     });
   }
 
-  public Open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number) : Promise<EntetePieceComptable>{
+  public Open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<EntetePieceComptable> {
     this.dialog = true;
     this.readonly = true;
     this.periode = periode;
     this.journal = journal;
-    this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`; 
+    this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`;
     this.pieceIsLoading = true;
-    FinancierApi.getPieceComptable(journal.numero, numeroPieteToLoad).then((piece) => {
-      this.init(piece);
-    }).catch((err) => {
-      this.warningMessage.show("Une erreur est survenue lors du chargement de la pièce.", err.toString());
-    }).finally(() => {
-      this.pieceIsLoading = false;
-    });
-    
+    FinancierApi.getPieceComptable(journal.numero, numeroPieteToLoad)
+      .then((piece) => {
+        this.init(piece);
+      })
+      .catch((err) => {
+        this.warningMessage.show('Une erreur est survenue lors du chargement de la pièce.', err.toString());
+      })
+      .finally(() => {
+        this.pieceIsLoading = false;
+      });
+
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -293,143 +300,158 @@ export default class PieceComptableVue extends Vue {
   }
 
   private createExtrait() {
-    if(!this.readonly){
-      this.refExtraitVue.openNew(this.journal)
-      .then((resp: Extrait) => {
-        const maxLigne = this.extraits?.length ?  Math.max(...this.extraits.map(i => i.numeroExtrait)) : 0;
-        resp.numeroExtrait = maxLigne + 1;
-        this.extraits.push(resp);
-      }).catch()
-      .finally(() => {
-        this.gridExtraits?.focus();
-      });
+    if (!this.readonly) {
+      this.refExtraitVue
+        .openNew(this.journal)
+        .then((resp: Extrait) => {
+          const maxLigne = this.extraits?.length ? Math.max(...this.extraits.map((i) => i.numeroExtrait)) : 0;
+          resp.numeroExtrait = maxLigne + 1;
+          this.extraits.push(resp);
+        })
+        .catch()
+        .finally(() => {
+          this.gridExtraits?.focus();
+        });
     }
   }
 
   private editExtrait(extrait: Extrait) {
-    this.refExtraitVue.open(this.journal, this.numeroPiece, extrait)
+    this.refExtraitVue
+      .open(this.journal, this.numeroPiece, extrait)
       .then((resp: Extrait) => {
-        if(resp)
-          Vue.set(this.extraits, this.extraits.findIndex(d => d == extrait), resp);
-        else 
-          this.extraits.splice(this.extraits.indexOf(extrait), 1);
-      }).catch()
+        if (resp)
+          Vue.set(
+            this.extraits,
+            this.extraits.findIndex((d) => d == extrait),
+            resp
+          );
+        else this.extraits.splice(this.extraits.indexOf(extrait), 1);
+      })
+      .catch()
       .finally(() => {
         this.calculSolde();
         this.gridExtraits?.focus();
       });
   }
 
-  private init(piece: Piece){
+  private init(piece: Piece) {
     this.oldPiece = piece;
     this.numeroPiece = piece.numeroPiece.toString();
-    this.libelleCompte = `${piece.numeroCompteFinancier.toString()} ${piece.nomCompteFinancier}`; 
+    this.libelleCompte = `${piece.numeroCompteFinancier.toString()} ${piece.nomCompteFinancier}`;
     this.datePiece = new DateTime(piece.datePiece);
     this.soldeInitial = piece.soldeInitial.toComptaString(2);
     this.extraits = piece.extraits;
-    
+
     this.hash = piece.hash;
   }
 
-  private reset(){
+  private reset() {
     this.warningMessage.clear();
     this.periode = new PeriodeComptable();
     this.journal = new Journal();
-    this.libelleCompte = "";
+    this.libelleCompte = '';
     this.datePiece = new DateTime();
     this.extraits = [];
     this.oldPiece = null;
     this.readonly = false;
-    this.numeroPiece = "0";   
-    this.hash = "";
-    this.soldeInitial = "";
-    this.soldeActuel = "";
+    this.numeroPiece = '0';
+    this.hash = '';
+    this.soldeInitial = '';
+    this.soldeActuel = '';
     (this.$refs.extraits as any)?.reset();
   }
 
-  @Watch("extraits")
-  private calculSolde(){
-    let sumCredit = _.sum(this.extraits.map(m => m.montantCredit.toNumber()));
-    let sumDebit = _.sum(this.extraits.map(m => m.montantDebit.toNumber()));
+  @Watch('extraits')
+  private calculSolde() {
+    const sumCredit = _.sum(this.extraits.map((m) => m.montantCredit.toNumber()));
+    const sumDebit = _.sum(this.extraits.map((m) => m.montantDebit.toNumber()));
     this.soldeActuel = (this.soldeInitial.toNumber() + sumDebit - sumCredit).toComptaString();
   }
 
-  private DeletePiece(){
+  private DeletePiece() {
     this.confirmDialog
-    .open(
-      "Suppression",
-      `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
-      "error",
-      "Supprimer"
-    )
-    .then((resp) => {
-      if (resp) {
-        this.deleteLoading = true;    
-        this.readonly = true;
-        FinancierApi.deletePieceComptable(this.periode.typePeriodeComptable, this.journal.numero, this.numeroPiece.toNumber())
-        .then(() => {
-          this.dialog = false;
-          this.resolve();
-        }).catch((err) => {
-          this.readonly = false;
-          this.warningMessage.show("Une erreur est survenue lors de la suppression", displayAxiosError(err))
-        }).finally(() => {
-          this.deleteLoading = false;
-        });
-      }
-    });
+      .open(
+        'Suppression',
+        `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
+        'error',
+        'Supprimer'
+      )
+      .then((resp) => {
+        if (resp) {
+          this.deleteLoading = true;
+          this.readonly = true;
+          FinancierApi.deletePieceComptable(
+            this.periode.typePeriodeComptable,
+            this.journal.numero,
+            this.numeroPiece.toNumber()
+          )
+            .then(() => {
+              this.dialog = false;
+              this.resolve();
+            })
+            .catch((err) => {
+              this.readonly = false;
+              this.warningMessage.show('Une erreur est survenue lors de la suppression', displayAxiosError(err));
+            })
+            .finally(() => {
+              this.deleteLoading = false;
+            });
+        }
+      });
   }
 
   private async savePiece() {
     (this.$refs.form as any).validate();
     this.$nextTick(async () => {
       if (this.isValid) {
-        let pieceToSave = this.GetModelToSave();
-        if(pieceToSave.numeroPiece == 0)
-          this.addPiece(pieceToSave);
-        else 
-          this.updatePiece(pieceToSave);
+        const pieceToSave = this.GetModelToSave();
+        if (pieceToSave.numeroPiece == 0) this.addPiece(pieceToSave);
+        else this.updatePiece(pieceToSave);
       }
-    })
+    });
   }
 
   private addPiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
     this.readonly = true;
-    FinancierApi.AddPieceComptable(piece).then((numeroPiece) => {
-      this.numeroPiece = numeroPiece.toString();
-      this.resolve(this.GetModelForGrid());
-      (this.$refs.form as any).resetValidation();
-      this.dialog = false;
-      this.reset();
-    }).catch((err) => {
-      this.warningMessage.show("Une erreur est survenue lors de la sauvegarde de la pièce", displayAxiosError(err))
-      this.readonly = false;
-    }).finally(()=> {
-      this.saveLoading = false;
-    });
+    FinancierApi.AddPieceComptable(piece)
+      .then((numeroPiece) => {
+        this.numeroPiece = numeroPiece.toString();
+        this.resolve(this.GetModelForGrid());
+        (this.$refs.form as any).resetValidation();
+        this.dialog = false;
+        this.reset();
+      })
+      .catch((err) => {
+        this.warningMessage.show('Une erreur est survenue lors de la sauvegarde de la pièce', displayAxiosError(err));
+        this.readonly = false;
+      })
+      .finally(() => {
+        this.saveLoading = false;
+      });
   }
 
   private updatePiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
-    let pieceComptaToSave = this.GetModelToSave();
     this.readonly = true;
-    FinancierApi.UpdatePieceComptable(pieceComptaToSave).then(() => {
-      this.resolve(this.GetModelForGrid());
-      this.dialog = false;
-      this.reset();
-    }).catch((err) => {
-        this.warningMessage.show("Une erreur est survenue lors de la mise à jour de la pièce", displayAxiosError(err))
+    FinancierApi.UpdatePieceComptable(piece)
+      .then(() => {
+        this.resolve(this.GetModelForGrid());
+        this.dialog = false;
+        this.reset();
+      })
+      .catch((err) => {
+        this.warningMessage.show('Une erreur est survenue lors de la mise à jour de la pièce', displayAxiosError(err));
         this.readonly = false;
-    }).finally(()=> {
-      this.saveLoading = false;
-    });
+      })
+      .finally(() => {
+        this.saveLoading = false;
+      });
   }
 
   private GetModelToSave(): PieceSaveDTO {
-    let pieceToSave: PieceSaveDTO = new PieceSaveDTO();
-    if(this.forcerNumero && this.numeroToForce)
-      pieceToSave.numeroPiece = +this.numeroPiece;
+    const pieceToSave: PieceSaveDTO = new PieceSaveDTO();
+    if (this.forcerNumero && this.numeroToForce) pieceToSave.numeroPiece = +this.numeroPiece;
 
     pieceToSave.periode = this.periode.typePeriodeComptable;
     pieceToSave.numeroJournal = this.journal.numero;
@@ -439,9 +461,8 @@ export default class PieceComptableVue extends Vue {
     pieceToSave.hash = this.hash;
     pieceToSave.extraits = [];
 
-    let i = 1;
-    this.extraits.forEach(e => {
-      let extrait : ExtraitSaveDTO = new ExtraitSaveDTO();
+    this.extraits.forEach((e) => {
+      const extrait: ExtraitSaveDTO = new ExtraitSaveDTO();
       extrait.numeroExtrait = e.numeroExtrait;
       extrait.montantBase = e.montantBase;
       extrait.montantDevise = e.montantDevise;
@@ -450,9 +471,9 @@ export default class PieceComptableVue extends Vue {
       extrait.codeReglement = e.codeReglement;
       pieceToSave.extraits.push(extrait);
 
-      e.ventilations.forEach(v => {
-        let ventilation : VentilationSaveDTO = new VentilationSaveDTO();
-        ventilation.numeroVentilation= v.numeroVentilation;
+      e.ventilations.forEach((v) => {
+        const ventilation: VentilationSaveDTO = new VentilationSaveDTO();
+        ventilation.numeroVentilation = v.numeroVentilation;
         ventilation.typeCompte = v.typeCompte;
         ventilation.numeroCompte = v.numeroCompte;
         ventilation.montantBase = v.montantBase;
@@ -470,13 +491,13 @@ export default class PieceComptableVue extends Vue {
     return pieceToSave;
   }
 
-  private GetModelForGrid() : EntetePieceComptable {
-    let entetePieceComptable = new EntetePieceComptable();
+  private GetModelForGrid(): EntetePieceComptable {
+    const entetePieceComptable = new EntetePieceComptable();
     entetePieceComptable.numeroJournal = this.journal.numero;
     entetePieceComptable.numeroPiece = this.numeroPiece.toNumber();
     entetePieceComptable.soldeInitiale = this.soldeInitial.toNumber();
-    entetePieceComptable.totalDebit = _.sum(this.extraits.map(m => m.montantDebit.toNumber()));;
-    entetePieceComptable.totalCredit = _.sum(this.extraits.map(m => m.montantCredit.toNumber()));;
+    entetePieceComptable.totalDebit = _.sum(this.extraits.map((m) => m.montantDebit.toNumber()));
+    entetePieceComptable.totalCredit = _.sum(this.extraits.map((m) => m.montantCredit.toNumber()));
     entetePieceComptable.soldeFinale = this.soldeActuel.toNumber();
     entetePieceComptable.pieceEquilibree = true;
     entetePieceComptable.libelleDevise = this.journal.devise.libelle;
@@ -485,23 +506,22 @@ export default class PieceComptableVue extends Vue {
     return entetePieceComptable;
   }
 
-  private ModifierPiece(){
-    if(!this.pieceIsLoading){
+  private ModifierPiece() {
+    if (!this.pieceIsLoading) {
       this.readonly = false;
       (this.$refs.refDatePiece as DatePicker).focus();
     }
   }
 
-  private CancelEdit(){
+  private CancelEdit() {
     this.readonly = true;
-    if(this.numeroPiece.toNumber() == 0)
-      this.closeDialog();
-    else if(this.oldPiece){
+    if (this.numeroPiece.toNumber() == 0) this.closeDialog();
+    else if (this.oldPiece) {
       this.init(this.oldPiece);
     }
   }
 
-  private closeDialog(){
+  private closeDialog() {
     this.reset();
     this.dialog = false;
     this.reject();
@@ -514,8 +534,8 @@ export default class PieceComptableVue extends Vue {
   font-size: 12px;
 }
 
-.warningMessage{
-  color: #FB8C00;
+.warningMessage {
+  color: #fb8c00;
   font-weight: 500;
 }
 

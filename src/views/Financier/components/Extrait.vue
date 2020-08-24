@@ -1,21 +1,23 @@
 <template>
-  <v-dialog v-model="dialog"
-            @keydown.alt.enter.stop="sendExtrait()"
-            @click:outside="close()"
-            @keydown.esc.stop="close()"
-            @keydown.107.prevent.stop="createVentilation"
-            @keydown.46.prevent.stop="deleteExtrait">
+  <v-dialog
+    v-model="dialog"
+    @keydown.alt.enter.stop="sendExtrait()"
+    @click:outside="close()"
+    @keydown.esc.stop="close()"
+    @keydown.107.prevent.stop="createVentilation"
+    @keydown.46.prevent.stop="deleteExtrait"
+  >
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card min-height="710px">
         <v-toolbar color="primary" dark flat>
           <v-card-title class="pa-2">
-            <span v-if="numeroExtrait">Extrait {{ journal.numero}}.{{numeroPiece}} - Ligne {{ numeroExtrait }}</span>
+            <span v-if="numeroExtrait">Extrait {{ journal.numero }}.{{ numeroPiece }} - Ligne {{ numeroExtrait }}</span>
             <span v-else>Nouvelle ligne</span>
           </v-card-title>
           <v-spacer></v-spacer>
-          <v-tooltip v-if="readonly" top open-delay=500>
+          <v-tooltip v-if="readonly" top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-on="on"  >
+              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-on="on">
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
@@ -35,17 +37,11 @@
           </v-row>
         </v-card-title>
         <v-card-text>
-          <v-row >
+          <v-row>
             <v-col cols="7">
               <v-row dense>
                 <v-col cols="5">
-                  <v-text-field
-                    v-model="libelleCompte"
-                    label="Compte"
-                    :filled="readonly"
-                    readonly
-                    tabindex="-1"
-                  >
+                  <v-text-field v-model="libelleCompte" label="Compte" :filled="readonly" readonly tabindex="-1">
                   </v-text-field>
                 </v-col>
                 <v-col cols="3">
@@ -79,12 +75,21 @@
               </v-row>
               <v-row>
                 <v-col cols="12" class="pt-0">
-                  <v-card outlined >
+                  <v-card outlined>
                     <v-toolbar color="#EEEEEE" flat dense>
                       <h2>Ventilations</h2>
-                      <v-tooltip top open-delay=500>
+                      <v-tooltip top open-delay="500">
                         <template v-slot:activator="{ on }">
-                          <v-btn color="primary" fab x-small class="ml-5" ref="btnAdd" v-on="on" :disabled="!createVentilationEnabled" @click.stop="createVentilation">
+                          <v-btn
+                            color="primary"
+                            fab
+                            x-small
+                            class="ml-5"
+                            ref="btnAdd"
+                            v-on="on"
+                            :disabled="!createVentilationEnabled"
+                            @click.stop="createVentilation"
+                          >
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
                         </template>
@@ -92,10 +97,21 @@
                       </v-tooltip>
                       <v-spacer></v-spacer>
                       <v-card-title :class="!ventileBase || ventileBase == 0 ? 'equilibre' : 'notEquilibre'">
-                          <span v-if="!journal.devise || journal.devise.id == 1">Montant à ventiler : <b>{{ ventileDevise | numberToStringEvenZero }} {{ journal.devise ? journal.devise.libelle : "EUR" }}</b></span>
-                          <span v-if="journal.devise && journal.devise.id != 1">
-                              Ventiler devise : <b>{{ ventileDevise | numberToStringEvenZero }} {{ journal.devise ? journal.devise.libelle : "EUR" }}</b>
-                              - Ventiler base : <b>{{ ventileBase | numberToStringEvenZero }} EUR</b></span>
+                        <span v-if="!journal.devise || journal.devise.id == 1"
+                          >Montant à ventiler :
+                          <b
+                            >{{ ventileDevise | numberToStringEvenZero }}
+                            {{ journal.devise ? journal.devise.libelle : 'EUR' }}</b
+                          ></span
+                        >
+                        <span v-if="journal.devise && journal.devise.id != 1">
+                          Ventiler devise :
+                          <b
+                            >{{ ventileDevise | numberToStringEvenZero }}
+                            {{ journal.devise ? journal.devise.libelle : 'EUR' }}</b
+                          >
+                          - Ventiler base : <b>{{ ventileBase | numberToStringEvenZero }} EUR</b></span
+                        >
                       </v-card-title>
                     </v-toolbar>
                     <v-data-table
@@ -129,16 +145,24 @@
           </v-row>
         </v-card-text>
         <v-card-actions class="text-center" v-if="!readonly">
-          <v-tooltip top open-delay=500>
+          <v-tooltip top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn color="error" class="ma-2 pr-4" text tabindex="-1" v-if="!isNew && !readonly" @click="deleteExtrait()" v-on="on">
+              <v-btn
+                color="error"
+                class="ma-2 pr-4"
+                text
+                tabindex="-1"
+                v-if="!isNew && !readonly"
+                @click="deleteExtrait()"
+                v-on="on"
+              >
                 Supprimer
               </v-btn>
             </template>
             <span>Supprimer l'extrait'<span class="shortcutTooltip">del</span></span>
           </v-tooltip>
           <v-spacer></v-spacer>
-          <v-tooltip top open-delay=500>
+          <v-tooltip top open-delay="500">
             <template v-slot:activator="{ on }">
               <v-btn
                 ref="btnValidate"
@@ -162,80 +186,72 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Vue,
-  PropSync,
-  Emit,
-  Prop,
-  Watch,
-	Ref
-} from "vue-property-decorator";
-import { Devise, Extrait, Ventilation, Journal } from "@/models/Financier";
-import { FinancierApi } from "@/api/FinancierApi";
-import { CompteApi } from "@/api/CompteApi";
-import axios, { AxiosError } from "axios";
-import CompteGeneralSearch from "@/models/Compte/CompteGeneralSearch";
-import { TypeCompte } from "@/models/AchatVente";
-import VentilationVue from "./Ventilation.vue";
+import { Component, Vue, PropSync, Watch, Ref } from 'vue-property-decorator';
+import { Extrait, Ventilation, Journal } from '@/models/Financier';
+import { FinancierApi } from '@/api/FinancierApi';
+import VentilationVue from './Ventilation.vue';
 import { Reglement } from '@/models/Financier/Get/Reglement';
 import { DateTime } from '@/models/DateTime';
 import { DeviseApi } from '@/api/DeviseApi';
 
 @Component({
-  name: "Extrait",
+  name: 'Extrait',
   components: { VentilationVue }
 })
 export default class extends Vue {
   @Ref() readonly refVentilationVue!: VentilationVue;
 
   private dialog = false;
-  @PropSync("isReadOnly")
+  @PropSync('isReadOnly')
   public readonly!: boolean;
-  @PropSync("DatePiece")
-  public datePiece !: DateTime;
-  private isNew: boolean = true;
-  private errorMessage: string = "";
-  private isValid: boolean = true;
+  @PropSync('DatePiece')
+  public datePiece!: DateTime;
+  private isNew = true;
+  private errorMessage = '';
+  private isValid = true;
   private resolve!: any;
   private reject!: any;
   private journal: Journal = new Journal();
-  private numeroPiece: string = "";
+  private numeroPiece = '';
 
   private numeroExtrait = 0;
-  private typeCompte: string = "";
-  private compteLoading: boolean = false;
-  private numeroCompte: string = "";
-  private nomCompte: string = "";
-  private libelleCompte = "";
+  private typeCompte = '';
+  private compteLoading = false;
+  private numeroCompte = '';
+  private nomCompte = '';
+  private libelleCompte = '';
 
   private reglementsLoading = false;
   private reglements: Reglement[] = [];
   private reglementSelected: Reglement = new Reglement();
-  private reglementsRules = [(v: Reglement) => !!v || "Règlement obligatoire",
-                             (v: Reglement) => v.numero != 0 || "Règlement obligatoire"];
+  private reglementsRules = [
+    (v: Reglement) => !!v || 'Règlement obligatoire',
+    (v: Reglement) => v.numero != 0 || 'Règlement obligatoire'
+  ];
 
-  private montant = "";
-  private montantRules: any = [(v: string) => !!v || "Montant obligatoire",
-                               (v:string) => v.isDecimal() || "Montant invalide"];
+  private montant = '';
+  private montantRules: any = [
+    (v: string) => !!v || 'Montant obligatoire',
+    (v: string) => v.isDecimal() || 'Montant invalide'
+  ];
 
   private ventilations: Ventilation[] = [];
   private headersVentilation = [
-    { text: "Vent.", value: "numeroVentilation", width: 40 },
-    { text: "Compte", value: "libelleCompte", width: 120 },
-    { text: "Intitulé", value: "nomCompte", width: 180 },
-    { text: "Pièce", value: "libellePiece", width: 80 },
-    { text: "Libellé d'écriture", value: "libelle", width: 180 },
-    { text: "Débit", value: "montantDebit", width: 100, align: "end" },
-    { text: "Crédit", value: "montantCredit", width: 100, align: "end"},
-    { text: "Devise", value: "libelleDevise", width: 70 },
-    { text: "TVA", value: "libelleTva", width: 100 }
+    { text: 'Vent.', value: 'numeroVentilation', width: 40 },
+    { text: 'Compte', value: 'libelleCompte', width: 120 },
+    { text: 'Intitulé', value: 'nomCompte', width: 180 },
+    { text: 'Pièce', value: 'libellePiece', width: 80 },
+    { text: "Libellé d'écriture", value: 'libelle', width: 180 },
+    { text: 'Débit', value: 'montantDebit', width: 100, align: 'end' },
+    { text: 'Crédit', value: 'montantCredit', width: 100, align: 'end' },
+    { text: 'Devise', value: 'libelleDevise', width: 70 },
+    { text: 'TVA', value: 'libelleTva', width: 100 }
   ];
 
-  private ventileBase: number = 0;
-  private ventileDevise: number = 0;
+  private ventileBase = 0;
+  private ventileDevise = 0;
 
-  mounted(){
+  mounted() {
     this.loadReglements();
   }
 
@@ -260,7 +276,7 @@ export default class extends Vue {
     this.reset();
     this.dialog = true;
     this.isNew = true;
-    
+
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
       this.setReglement(5);
@@ -274,59 +290,66 @@ export default class extends Vue {
   }
 
   get typeMouvement(): string {
-    return this.montant?.toNumber() > 0 ? "DB" : "CR";
+    return this.montant?.toNumber() > 0 ? 'DB' : 'CR';
   }
 
-  get createVentilationEnabled() { return !this.readonly && this.montant }
+  get createVentilationEnabled() {
+    return !this.readonly && this.montant;
+  }
   private createVentilation() {
     (this.$refs.form as any).validate();
     this.$nextTick(() => {
-      if(this.montant && this.isValid){  
-        this.refVentilationVue.openNew(this.getVentilationToAdd(), this.journal)
-        .then((ventil) => {
-          const maxLigne = this.ventilations?.length ?  Math.max(...this.ventilations.map(i => i.numeroVentilation)) : 0;
-          ventil.numeroVentilation = maxLigne + 1;
-          this.ventilations.push(ventil);
-        }).catch(() => {
-
-        }).finally(() => {
-          this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-        });
+      if (this.montant && this.isValid) {
+        this.refVentilationVue
+          .openNew(this.getVentilationToAdd(), this.journal)
+          .then((ventil) => {
+            const maxLigne = this.ventilations?.length
+              ? Math.max(...this.ventilations.map((i) => i.numeroVentilation))
+              : 0;
+            ventil.numeroVentilation = maxLigne + 1;
+            this.ventilations.push(ventil);
+          })
+          .catch()
+          .finally(() => {
+            this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+          });
       }
     });
   }
 
   private editVentilation(ventilation: Ventilation) {
-    this.refVentilationVue.open(ventilation, this.journal)
-    .then((resp) => {
-      if(resp)
-        Vue.set(this.ventilations, this.ventilations.findIndex(d => d == ventilation), resp);
-      else 
-        this.ventilations.splice(this.ventilations.indexOf(ventilation), 1);
-    }).catch(() => {
-
-    }).finally(() => {
-      this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-    });
+    this.refVentilationVue
+      .open(ventilation, this.journal)
+      .then((resp) => {
+        if (resp)
+          Vue.set(
+            this.ventilations,
+            this.ventilations.findIndex((d) => d == ventilation),
+            resp
+          );
+        else this.ventilations.splice(this.ventilations.indexOf(ventilation), 1);
+      })
+      .catch()
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+      });
   }
 
-  private initJournal(journal: Journal){
+  private initJournal(journal: Journal) {
     this.journal = journal;
     this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`;
   }
 
-  private taux: number = 0;
+  private taux = 0;
   @Watch('dateExtrait')
-  private dateExtraitChange(){
-    if(!this.journal.devise || this.journal.devise.id == 1)
-      this.taux = 1;
-    else if(this.datePiece.isValid() && this.journal?.devise?.id) {
+  private dateExtraitChange() {
+    if (!this.journal.devise || this.journal.devise.id == 1) this.taux = 1;
+    else if (this.datePiece.isValid() && this.journal?.devise?.id) {
       DeviseApi.getTaux(this.journal?.devise?.id, this.datePiece)
-      .then((taux) => {
-        this.taux = taux;
-      }).catch((err) => {
-        //this.errorMessage = displayAxiosError(err);
-      });
+        .then((taux) => {
+          this.taux = taux;
+        })
+        .catch();
     }
     this.refreshMontantAVentille();
   }
@@ -341,98 +364,105 @@ export default class extends Vue {
     this.setReglement(extrait.codeReglement, extrait.libelleReglement);
   }
 
-  public getVentilationToAdd(): Ventilation{
-    let ventilation = new Ventilation();
+  public getVentilationToAdd(): Ventilation {
+    const ventilation = new Ventilation();
     ventilation.libelle = this.reglementSelected.libelle;
     ventilation.codeDevise = this.journal.devise.id;
     ventilation.libelleDevise = this.journal.devise.libelle;
     ventilation.montantDevise = Math.abs(this.ventileDevise);
     ventilation.montantBase = Math.abs(this.ventileDevise * (this.taux | 1));
-    if(this.montant.toNumber() > 0){
-      ventilation.codeMouvement = "CR";
-      ventilation.typeCompte = "C";
-    }else{
-      ventilation.codeMouvement = "DB";
-      ventilation.typeCompte = "F";
+    if (this.montant.toNumber() > 0) {
+      ventilation.codeMouvement = 'CR';
+      ventilation.typeCompte = 'C';
+    } else {
+      ventilation.codeMouvement = 'DB';
+      ventilation.typeCompte = 'F';
     }
     return ventilation;
   }
 
-  private async setReglement(numero: number, libelleReglement: string = ""){
-    if(!this.reglements)
-      await this.loadReglements();
-    
-    let reglementSelected = this.reglements.find(r => r.numero == numero);
-    if(reglementSelected)
-      this.reglementSelected = reglementSelected;
-    else
-      this.reglementSelected = new Reglement({numero: 999, libelle: libelleReglement});
+  private async setReglement(numero: number, libelleReglement = '') {
+    if (!this.reglements) await this.loadReglements();
+
+    const reglementSelected = this.reglements.find((r) => r.numero == numero);
+    if (reglementSelected) this.reglementSelected = reglementSelected;
+    else this.reglementSelected = new Reglement({ numero: 999, libelle: libelleReglement });
   }
 
-  private async loadReglements(){
+  private async loadReglements() {
     try {
       this.reglementsLoading = true;
       this.reglements = await FinancierApi.getReglements();
-    }finally{
+    } finally {
       this.reglementsLoading = false;
     }
   }
 
-  private reset(){
+  private reset() {
     this.numeroExtrait = 0;
     this.ventilations = [];
-    this.libelleCompte = "";
-    this.montant = "";
+    this.libelleCompte = '';
+    this.montant = '';
     this.reglementSelected = new Reglement();
   }
 
   @Watch('ventilations')
-  @Watch("montant")
-  private refreshMontantAVentille(){
+  @Watch('montant')
+  private refreshMontantAVentille() {
     this.ventileBase = Math.abs(this.getVentileBase());
     this.ventileDevise = Math.abs(this.getVentileDevise());
   }
 
   private getVentileBase(ventilationToIgnore?: Ventilation): number {
-    if(!this.ventilations || !this.journal)
-      return 0;
+    if (!this.ventilations || !this.journal) return 0;
 
     let ventileCompta = 0;
-    if(this.journal.devise.id == 1) ventileCompta = this.montant.toNumber();
+    if (this.journal.devise.id == 1) ventileCompta = this.montant.toNumber();
     else ventileCompta = this.montant.toNumber() * (this.taux | 0);
 
-    let credit = this.ventilations.filter(c => c.typeCompte != "Z" && c != ventilationToIgnore).map(c => c.montantCredit.toNumber()).reduce((a,b) => a + b, 0);
-    let debit = this.ventilations.filter(c => c.typeCompte != "Z" && c != ventilationToIgnore).map(c => c.montantDebit.toNumber()).reduce((a,b) => a + b, 0);
+    const credit = this.ventilations
+      .filter((c) => c.typeCompte != 'Z' && c != ventilationToIgnore)
+      .map((c) => c.montantCredit.toNumber())
+      .reduce((a, b) => a + b, 0);
+    const debit = this.ventilations
+      .filter((c) => c.typeCompte != 'Z' && c != ventilationToIgnore)
+      .map((c) => c.montantDebit.toNumber())
+      .reduce((a, b) => a + b, 0);
     ventileCompta = ventileCompta + debit - credit;
     return ventileCompta.toComptaString(2).toNumber();
   }
 
-  public getVentileDevise(ventilationToIgnore?: Ventilation): number{
-    if(!this.journal?.devise || !this.ventilations)
-      return 0;
+  public getVentileDevise(ventilationToIgnore?: Ventilation): number {
+    if (!this.journal?.devise || !this.ventilations) return 0;
 
-    let ventileDevise : number = this.montant.toNumber();
-    let credit = this.ventilations.filter(c => c.typeCompte != "Z" && c.codeDevise == this.journal.devise.id && c != ventilationToIgnore).map(c => c.montantCredit.toNumber()).reduce((a,b) => a + b, 0);
-    let debit = this.ventilations.filter(c => c.typeCompte != "Z" && c.codeDevise == this.journal.devise.id && c != ventilationToIgnore).map(c => c.montantDebit.toNumber()).reduce((a,b) => a + b, 0);
-    
+    let ventileDevise: number = this.montant.toNumber();
+    const credit = this.ventilations
+      .filter((c) => c.typeCompte != 'Z' && c.codeDevise == this.journal.devise.id && c != ventilationToIgnore)
+      .map((c) => c.montantCredit.toNumber())
+      .reduce((a, b) => a + b, 0);
+    const debit = this.ventilations
+      .filter((c) => c.typeCompte != 'Z' && c.codeDevise == this.journal.devise.id && c != ventilationToIgnore)
+      .map((c) => c.montantDebit.toNumber())
+      .reduce((a, b) => a + b, 0);
+
     ventileDevise = ventileDevise + debit - credit;
-    return ventileDevise.toComptaString(this.journal.devise.typeDevise == "E" ? 0 : 2).toNumber();
+    return ventileDevise.toComptaString(this.journal.devise.typeDevise == 'E' ? 0 : 2).toNumber();
   }
- 
+
   private GetModel(): Extrait {
-    let extrait = new Extrait();
+    const extrait = new Extrait();
     extrait.numeroExtrait = this.numeroExtrait;
-    extrait.typeCompte = "G";
+    extrait.typeCompte = 'G';
     extrait.numeroCompte = this.journal.compteBanque.numero;
     extrait.nomCompte = this.journal.compteBanque.nom;
     extrait.montantBase = Math.abs(this.montant.toNumber() * (this.taux | 1));
     extrait.montantDevise = Math.abs(this.montant.toNumber());
-    extrait.codeMouvement = this.montant.toNumber() > 0 ? "DB" : "CR";
+    extrait.codeMouvement = this.montant.toNumber() > 0 ? 'DB' : 'CR';
     extrait.codeDevise = this.journal.devise.id;
     extrait.libelleDevise = this.journal.devise.libelle;
     extrait.codeReglement = this.reglementSelected.numero;
     extrait.libelleReglement = this.reglementSelected.libelle;
-    extrait.ventilations = this.ventilations.map(v => new Ventilation(v));
+    extrait.ventilations = this.ventilations.map((v) => new Ventilation(v));
     return extrait;
   }
 
@@ -447,13 +477,13 @@ export default class extends Vue {
   }
 
   private deleteExtrait() {
-    if(!this.isNew && !this.readonly){
+    if (!this.isNew && !this.readonly) {
       this.dialog = false;
       this.resolve();
     }
   }
 
-  private ModifierPiece(){
+  private ModifierPiece() {
     this.readonly = false;
     (this.$refs.montant as any)?.focus();
   }
@@ -471,12 +501,12 @@ export default class extends Vue {
   margin-bottom: 0px;
 }
 
-.notEquilibre{
+.notEquilibre {
   color: red;
   margin-left: 10px;
 }
 
-.equilibre{
+.equilibre {
   color: green;
   margin-left: 10px;
 }
@@ -484,5 +514,4 @@ export default class extends Vue {
 #editContrepartie {
   z-index: 999;
 }
-
 </style>

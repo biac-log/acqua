@@ -9,4 +9,3 @@ export * from './Get/Ventilation';
 export * from './Get/CompteBanque';
 export * from './Get/TypeCompte';
 export * from './Get/PieceAchatVente';
-

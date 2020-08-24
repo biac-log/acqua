@@ -23,23 +23,23 @@ export interface IPieceComptableSave {
 }
 
 export class PieceComptableSaveDTO implements IPieceComptableSave {
-  public periode: string = "";
-  public numeroJournal: number = 0;
-  public numeroPiece: number = 0;
-  public datePiece: string = "";
-  public dateEcheance: string = "";
-  public montantDevise: number = 0;
-  public montantBase: number = 0;
-  public codeDevise: number = 0;
-  public libelle: string = "";
-  public typeCompte: string = "";
-  public numeroCompte: number = 0;
-  public montantEscompteBase: number = 0;
-  public montantEscompteDevise: number = 0
-  public codeMouvement: string = "";
-  public numeroCompteAssocie: number = 0;
-  public codeBlocage: number = 0;
-  public pieceAcquittee: boolean= false;
+  public periode = '';
+  public numeroJournal = 0;
+  public numeroPiece = 0;
+  public datePiece = '';
+  public dateEcheance = '';
+  public montantDevise = 0;
+  public montantBase = 0;
+  public codeDevise = 0;
+  public libelle = '';
+  public typeCompte = '';
+  public numeroCompte = 0;
+  public montantEscompteBase = 0;
+  public montantEscompteDevise = 0;
+  public codeMouvement = '';
+  public numeroCompteAssocie = 0;
+  public codeBlocage = 0;
+  public pieceAcquittee = false;
   public contreparties: PieceComptableContrepartieSaveDTO[] = [];
-  public hash: string = "";
+  public hash = '';
 }

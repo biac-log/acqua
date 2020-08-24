@@ -1,34 +1,34 @@
 export class PieceSaveDTO {
-  periode = "";
+  periode = '';
   numeroJournal = 0;
   numeroPiece = 0;
-  datePiece = "";
+  datePiece = '';
   soldeInitial = 0;
-  hash = "";
-  extraits: ExtraitSaveDTO[] = []
+  hash = '';
+  extraits: ExtraitSaveDTO[] = [];
 }
 
 export class ExtraitSaveDTO {
   numeroExtrait = 0;
   montantBase = 0;
   montantDevise = 0;
-  libelle = "";
-  codeMouvement = "";
+  libelle = '';
+  codeMouvement = '';
   codeReglement = 0;
-  ventilations: VentilationSaveDTO[] = []
+  ventilations: VentilationSaveDTO[] = [];
 }
 
 export class VentilationSaveDTO {
-  numeroVentilation= 0;
-  typeCompte = "";
+  numeroVentilation = 0;
+  typeCompte = '';
   numeroCompte = 0;
   montantBase = 0;
   montantDevise = 0;
-  libelle = "";
+  libelle = '';
   codeDevise = 0;
   numeroCaseTVA = 0;
-  codeMouvement = "";
+  codeMouvement = '';
   referenceJournal = 0;
   referencePiece = 0;
-  dossier = "";
+  dossier = '';
 }

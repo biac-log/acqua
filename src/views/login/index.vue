@@ -32,9 +32,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" :loading="loading" @click="login"
-                  >Se connecter</v-btn
-                >
+                <v-btn color="primary" :loading="loading" @click="login">Se connecter</v-btn>
               </v-card-actions>
               <v-card-text v-if="errorMessage != ''">
                 <v-alert type="warning">{{ errorMessage }}</v-alert>
@@ -48,34 +46,34 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { UserModule } from "@/store/modules/user";
+import { Component, Vue } from 'vue-property-decorator';
+import { UserModule } from '@/store/modules/user';
 import { UserLogin } from '@/models/Login/UserLogin';
 
 @Component({
-  name: "Login"
+  name: 'Login'
 })
 export default class extends Vue {
-  public username: string = "";
-  public password: string = "";
-  public loading: Boolean = false;
-  public errorMessage: string = "";
+  public username = '';
+  public password = '';
+  public loading = false;
+  public errorMessage = '';
 
   public login() {
     this.loading = true;
-    this.errorMessage = "";
+    this.errorMessage = '';
 
     const { username, password } = this;
-    let userLogin = new UserLogin();
+    const userLogin = new UserLogin();
     userLogin.userName = username;
     userLogin.password = password;
     UserModule.Login(userLogin)
       .then(() => {
-        this.username = "";
-        this.password = "";
-        this.$router.push("/");
+        this.username = '';
+        this.password = '';
+        this.$router.push('/');
       })
-      .catch(reason => {
+      .catch((reason) => {
         this.errorMessage = reason;
       })
       .finally(() => {

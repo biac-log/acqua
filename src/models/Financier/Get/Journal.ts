@@ -1,29 +1,28 @@
-
-import { Devise, DeviseDTO } from "../../Devise/Devise";
+import { Devise, DeviseDTO } from '../../Devise/Devise';
 import { CompteBanqueDTO } from './CompteBanque';
-  
+
 export interface IJournal {
   numero: number;
   libelle: string;
   codeDevise: string;
   devise: DeviseDTO;
   numeroDernierePiece: number;
-  numeroCompteBanque: number,
+  numeroCompteBanque: number;
   compteBanque: CompteBanqueDTO;
 }
 
-export class JournalDTO implements IJournal{
-  numero: number = 0;
-  libelle: string = "";
-  codeDevise: string = "";
+export class JournalDTO implements IJournal {
+  numero = 0;
+  libelle = '';
+  codeDevise = '';
   devise: DeviseDTO = new DeviseDTO();
-  numeroDernierePiece: number = 0;
-  numeroCompteBanque: number = 0;
+  numeroDernierePiece = 0;
+  numeroCompteBanque = 0;
   compteBanque: CompteBanqueDTO = new CompteBanqueDTO();
 }
 
 export class Journal extends JournalDTO {
-  constructor(dto?: JournalDTO){
+  constructor(dto?: JournalDTO) {
     super();
     Object.assign(this, dto || new JournalDTO());
   }

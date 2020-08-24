@@ -1,9 +1,10 @@
 <template>
-  <v-container 
-    fluid 
+  <v-container
+    fluid
     @keydown.107.prevent="OpenPieceComptable()"
     @keydown.page-up="nextPage()"
-    @keydown.page-down="previousPage()">
+    @keydown.page-down="previousPage()"
+  >
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
@@ -33,9 +34,7 @@
               :loading="journauxIsLoading"
               item-text="fullLibelle"
               item-value="numero"
-              :hint="
-                `Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`
-              "              
+              :hint="`Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`"
               return-object
               persistent-hint
               @change="LoadPiecesComptables"
@@ -50,9 +49,18 @@
     <v-card class="mt-5">
       <v-card-title>
         Pièces comptables
-        <v-tooltip top open-delay=500 >
+        <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn ref="btnAdd" color="warning" small fab class="ml-5" :disabled="!searchIsValid" @click="OpenPieceComptable()" v-on="on">
+            <v-btn
+              ref="btnAdd"
+              color="warning"
+              small
+              fab
+              class="ml-5"
+              :disabled="!searchIsValid"
+              @click="OpenPieceComptable()"
+              v-on="on"
+            >
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </template>
@@ -81,7 +89,7 @@
         @page-count="pageCount = $event"
       >
         <template v-slot:[`item.isEquilibre`]="{ item }">
-          <v-tooltip top open-delay=500 >
+          <v-tooltip top open-delay="500">
             <template v-slot:activator="{ on }">
               <v-icon v-show="!item.isEquilibre" color="red" v-on="on">mdi-alert</v-icon>
             </template>
@@ -102,7 +110,7 @@
     <AchatVentePieceVue ref="refDialogPiece"></AchatVentePieceVue>
     <PieceAddResultVue ref="PieceAddResultVue" :SkipDialog.sync="skipAddResult"></PieceAddResultVue>
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
-      <v-icon dark class="mr-3">{{ snackbarColor == "error" ? "mdi-delete" : "mdi-check" }}</v-icon>
+      <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
       <v-btn icon dark @click="snackbar = false"><v-icon>mdi-close</v-icon></v-btn>
     </v-snackbar>
@@ -110,74 +118,67 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch, Ref } from "vue-property-decorator";
-import axios from "axios";
-import {
-  PeriodeComptable,
-  EntetePieceComptable,
-  Journal
-} from "@/models/AchatVente";
-import { JournalApi } from "@/api/JournalApi";
-import moment from "moment";
-import AchatVentePieceVue from "./components/AchatVentePiece.vue";
-import PieceAddResultVue from "./components/PieceAddResult.vue";
-import { AchatVenteApi } from "../../api/AchatVenteApi";
+import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
+import { PeriodeComptable, EntetePieceComptable, Journal } from '@/models/AchatVente';
+import AchatVentePieceVue from './components/AchatVentePiece.vue';
+import PieceAddResultVue from './components/PieceAddResult.vue';
+import { AchatVenteApi } from '../../api/AchatVenteApi';
 import { Pagination } from '@/models/Pagination';
 import { DialogActionResult } from '@/models/DialogResult';
 
 @Component({
-  name: "AchatVente",
+  name: 'AchatVente',
   components: { AchatVentePieceVue, PieceAddResultVue }
 })
 export default class extends Vue {
-  @Ref() readonly refDialogPiece!:AchatVentePieceVue;
+  @Ref() readonly refDialogPiece!: AchatVentePieceVue;
   @Ref() readonly PieceAddResultVue!: PieceAddResultVue;
 
-  private skipAddResult: boolean = false;
-  private searchIsValid: boolean = true;
-  private isErrorPeriode: boolean = false;
-  private libellePeriode: string = "";
+  private skipAddResult = false;
+  private searchIsValid = true;
+  private isErrorPeriode = false;
+  private libellePeriode = '';
 
-  private periodeIsLoading: boolean = false;
+  private periodeIsLoading = false;
   private periodes: PeriodeComptable[] = [];
   private periodeSelected: PeriodeComptable = new PeriodeComptable();
-  private periodesRules: any = [
-    (v: string) => !this.isErrorPeriode || "Connexion impossible",
-    (v: string) => !!v || "La période est obligatoire"
+  private periodesRules: unknown = [
+    () => !this.isErrorPeriode || 'Connexion impossible',
+    (v: string) => !!v || 'La période est obligatoire'
   ];
 
-  private isErrorJournaux: boolean = false;
+  private isErrorJournaux = false;
   private journaux: Journal[] = [];
-  private journauxIsLoading: boolean = false;
+  private journauxIsLoading = false;
   private journalSelected: Journal = new Journal();
-  private detailJournalSelected: string = "";
-  private journalRules: any = [
-    (v: Journal) => !this.isErrorJournaux || "Connexion impossible",
-    (v: Journal) => !!v || "Sélection de journal obligatoire",
-    (v: Journal) => v.numero != 0 || "Sélection de journal obligatoire"
+  private detailJournalSelected = '';
+  private journalRules: unknown = [
+    () => !this.isErrorJournaux || 'Connexion impossible',
+    (v: Journal) => !!v || 'Sélection de journal obligatoire',
+    (v: Journal) => v.numero != 0 || 'Sélection de journal obligatoire'
   ];
 
   private selectedPiece!: EntetePieceComptable;
-   private headers = [
-    { text: "", value: "isEquilibre" },
-    { text: "Numéro pièce", value: "codePieceDisplay" },
-    { text: "Numéro compte", value: "numeroCompte" },
-    { text: "Nom compte", value: "nomCompte" },
-    { text: "Date pièce", value: "datePieceDate" },
-    { text: "Libelle", value: "libelle" },
-    { text: "Date échéance", value: "dateEcheanceDate" },
-    { text: "Montant", value: "montant", align: "end" },
-    { text: "Escompte", value: "escompteDisplay", align: "end" },
-    { text: "Devise", value: "devise" },
-    { text: "Status", value: "statusLibelle" }
+  private headers = [
+    { text: '', value: 'isEquilibre' },
+    { text: 'Numéro pièce', value: 'codePieceDisplay' },
+    { text: 'Numéro compte', value: 'numeroCompte' },
+    { text: 'Nom compte', value: 'nomCompte' },
+    { text: 'Date pièce', value: 'datePieceDate' },
+    { text: 'Libelle', value: 'libelle' },
+    { text: 'Date échéance', value: 'dateEcheanceDate' },
+    { text: 'Montant', value: 'montant', align: 'end' },
+    { text: 'Escompte', value: 'escompteDisplay', align: 'end' },
+    { text: 'Devise', value: 'devise' },
+    { text: 'Status', value: 'statusLibelle' }
   ];
-  private search: string = "";
+  private search = '';
   private piecesComptables: EntetePieceComptable[] = [];
-  private isLoadingPieces: boolean = false;
+  private isLoadingPieces = false;
   private options: any = {};
-  private totalItems: number = 0;
-  private currentPage: number = 1;
-  private pageCount: number = 0;
+  private totalItems = 0;
+  private currentPage = 1;
+  private pageCount = 0;
 
   mounted() {
     this.LoadPeriodes();
@@ -187,8 +188,8 @@ export default class extends Vue {
   private async LoadPeriodes() {
     try {
       this.periodeIsLoading = true;
-      let periodes = await AchatVenteApi.getPeriodes();
-      periodes.forEach(p => this.periodes.push(p));
+      const periodes = await AchatVenteApi.getPeriodes();
+      periodes.forEach((p) => this.periodes.push(p));
     } catch (err) {
       this.isErrorPeriode = true;
     } finally {
@@ -199,8 +200,8 @@ export default class extends Vue {
   private async LoadJournaux() {
     try {
       this.journauxIsLoading = true;
-      let journaux = await AchatVenteApi.getJournaux();
-      journaux.forEach(j => this.journaux.push(j));
+      const journaux = await AchatVenteApi.getJournaux();
+      journaux.forEach((j) => this.journaux.push(j));
     } catch (err) {
       this.isErrorJournaux = true;
     } finally {
@@ -208,65 +209,78 @@ export default class extends Vue {
     }
   }
 
-  @Watch("options")
-  @Watch("search")
+  @Watch('options')
+  @Watch('search')
   private async LoadPiecesComptables() {
     try {
-      if(this.periodeSelected && this.journalSelected.numero){
+      if (this.periodeSelected && this.journalSelected.numero) {
         this.isLoadingPieces = true;
         const { sortBy, sortDesc, page, itemsPerPage } = this.options;
 
-        let pagination = new Pagination();
+        const pagination = new Pagination();
         pagination.terms = this.search;
-        pagination.sortBy = sortBy.length ? this.getSortColumnName(sortBy[0]) : "";
+        pagination.sortBy = sortBy.length ? this.getSortColumnName(sortBy[0]) : '';
         pagination.sortDesc = sortDesc.length ? sortDesc : false;
         pagination.page = page;
         pagination.limit = itemsPerPage;
 
-        let paginationResult = await AchatVenteApi.GetEntetePiecesComptables(this.journalSelected.numero, this.periodeSelected.typePeriodeComptable, pagination);
-        this.piecesComptables = paginationResult.items.map(i => new EntetePieceComptable(i));
+        const paginationResult = await AchatVenteApi.GetEntetePiecesComptables(
+          this.journalSelected.numero,
+          this.periodeSelected.typePeriodeComptable,
+          pagination
+        );
+        this.piecesComptables = paginationResult.items.map((i) => new EntetePieceComptable(i));
         this.totalItems = paginationResult.totalCount;
       }
-    }catch (err) {
-      
-    }finally{
+    } catch (err) {
+      console.log(err);
+    } finally {
       this.isLoadingPieces = false;
     }
   }
 
-  private getSortColumnName(column: string): string{
-    if(!column) return "";
+  private getSortColumnName(column: string): string {
+    if (!column) return '';
 
-    switch (column){
-      case "codePieceDisplay": return "CodePiece"
-      case "datePieceDate": return "DatePiece"
-      case "dateEcheanceDate": return "DateEcheance"
-      case "dateEcheanceDate": return "DateEcheance"
-      case "escompteDisplay": return "Escompte"
-      default: return column.charAt(0).toUpperCase() + column.slice(1);
+    switch (column) {
+      case 'codePieceDisplay':
+        return 'CodePiece';
+      case 'datePieceDate':
+        return 'DatePiece';
+      case 'dateEcheanceDate':
+        return 'DateEcheance';
+      case 'escompteDisplay':
+        return 'Escompte';
+      default:
+        return column.charAt(0).toUpperCase() + column.slice(1);
     }
   }
 
-  private nextPage(){
-    this.currentPage < this.pageCount ? this.currentPage++ : this.currentPage = 1;
+  private nextPage() {
+    this.currentPage < this.pageCount ? this.currentPage++ : (this.currentPage = 1);
   }
 
-  private previousPage(){
-    this.currentPage > 1 ? this.currentPage-- : this.currentPage = this.pageCount;
+  private previousPage() {
+    this.currentPage > 1 ? this.currentPage-- : (this.currentPage = this.pageCount);
   }
 
   private OpenPieceComptable(entete?: EntetePieceComptable) {
-    this.refDialogPiece.open(this.periodeSelected, this.journalSelected, entete)
-      .then(resp => {
-        if (resp.action == DialogActionResult.Create){
-          if(!this.skipAddResult) this.displayAddResult(resp.data);
+    this.refDialogPiece
+      .open(this.periodeSelected, this.journalSelected, entete)
+      .then((resp) => {
+        if (resp.action == DialogActionResult.Create) {
+          if (!this.skipAddResult) this.displayAddResult(resp.data);
           this.piecesComptables.unshift(resp.data);
-        } else if(resp.action == DialogActionResult.Update && entete){
-          Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp.data);
-          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, "success");
-        } else if(resp.action == DialogActionResult.Delete && entete){
+        } else if (resp.action == DialogActionResult.Update && entete) {
+          Vue.set(
+            this.piecesComptables,
+            this.piecesComptables.findIndex((e) => e == entete),
+            resp.data
+          );
+          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, 'success');
+        } else if (resp.action == DialogActionResult.Delete && entete) {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
-          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, "error");
+          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, 'error');
         }
       })
       .finally(() => {
@@ -274,23 +288,30 @@ export default class extends Vue {
       });
   }
 
-  private displayAddResult(piece : EntetePieceComptable){
-    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.codeJournal, piece.codePiece, this.periodeSelected.typePeriodeComptable).then((numero) => {
-        if(piece.codePiece != numero){
+  private displayAddResult(piece: EntetePieceComptable) {
+    (this.$refs.PieceAddResultVue as PieceAddResultVue)
+      .open(piece.codeJournal, piece.codePiece, this.periodeSelected.typePeriodeComptable)
+      .then((numero) => {
+        if (piece.codePiece != numero) {
           piece.codePiece = numero;
-        Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);
-      }
-    }).finally(() => {
-      this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-    });
+          Vue.set(
+            this.piecesComptables,
+            this.piecesComptables.findIndex((e) => e == piece),
+            piece
+          );
+        }
+      })
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+      });
   }
 
-  private snackbar: boolean = false;
-  private snackbarTimeout: number = 5000;
-  private snackbarMessage: string = "";
-  private snackbarColor: string = "";
+  private snackbar = false;
+  private snackbarTimeout = 5000;
+  private snackbarMessage = '';
+  private snackbarColor = '';
 
-  private notifier(message: string, color:string){
+  private notifier(message: string, color: string) {
     this.snackbarColor = color;
     this.snackbarMessage = message;
     this.snackbar = true;

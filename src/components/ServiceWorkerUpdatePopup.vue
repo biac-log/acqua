@@ -1,18 +1,15 @@
 <template>
   <v-snackbar v-model="snackbar" color="info" :timeout="10000">
-      {{ notificationText }}
-      <v-btn
-        color="orange"
-        @click="refreshApp"
-      >
-        <v-icon>mdi-refresh</v-icon>
-        {{ refreshButtonText}}
-      </v-btn>
-    </v-snackbar>
+    {{ notificationText }}
+    <v-btn color="orange" @click="refreshApp">
+      <v-icon>mdi-refresh</v-icon>
+      {{ refreshButtonText }}
+    </v-btn>
+  </v-snackbar>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
   name: 'ServiceWorkerUpdatePopup'
@@ -22,16 +19,16 @@ export default class extends Vue {
   private refreshing = false;
   private notificationText = 'New content is available! refresh to update';
   private refreshButtonText = 'Refresh';
-  private registration: ServiceWorkerRegistration | null = null
+  private registration: ServiceWorkerRegistration | null = null;
 
   created() {
     // Listen for swUpdated event and display refresh notification as required.
-    document.addEventListener('swUpdated', this.showRefreshUI, { once: true })
+    document.addEventListener('swUpdated', this.showRefreshUI, { once: true });
     // Refresh all open app tabs when a new service worker is installed.
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (this.refreshing) return;
       this.refreshing = true;
-    })
+    });
   }
 
   render() {

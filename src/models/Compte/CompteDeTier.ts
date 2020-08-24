@@ -6,7 +6,7 @@ export interface ICompteDeTier {
   libelleDevise: string;
   typeDevise: string;
   soldeComptable: number;
-  delaiPaiementLibelle: string,
+  delaiPaiementLibelle: string;
   escomptePourcentage: number;
   escompteNombreJours: number;
   compteAssocieNumero: number;
@@ -15,44 +15,44 @@ export interface ICompteDeTier {
   compteVenteAchatNom: string;
   codeTaxe: number;
 }
-  
-export class CompteDeTierDTO implements ICompteDeTier{
-  type: string = "";
-  numero: number = 0;
-  nom: string = "";
-  codeDevise: number = 0;
-  libelleDevise: string = "";
-  typeDevise: string = "";
-  soldeComptable: number = 0;
-  delaiPaiementLibelle: string = "";
-  escomptePourcentage: number = 0;
-  escompteNombreJours: number = 0;
-  compteAssocieNumero: number = 0;
-  compteAssocieNom: string = "";
-  compteVenteAchatNumero: number = 0;
-  compteVenteAchatNom: string= "";
-  codeTaxe: number = 0;
+
+export class CompteDeTierDTO implements ICompteDeTier {
+  type = '';
+  numero = 0;
+  nom = '';
+  codeDevise = 0;
+  libelleDevise = '';
+  typeDevise = '';
+  soldeComptable = 0;
+  delaiPaiementLibelle = '';
+  escomptePourcentage = 0;
+  escompteNombreJours = 0;
+  compteAssocieNumero = 0;
+  compteAssocieNom = '';
+  compteVenteAchatNumero = 0;
+  compteVenteAchatNom = '';
+  codeTaxe = 0;
 }
-  
+
 export class CompteDeTier extends CompteDeTierDTO {
-  constructor(dto: CompteDeTierDTO){
+  constructor(dto: CompteDeTierDTO) {
     super();
     Object.assign(this, dto);
   }
 
-  get libelleCompteAssocie(): string{
+  get libelleCompteAssocie(): string {
     return `${this.compteAssocieNumero} ${this.compteAssocieNom}`;
   }
 
-  get libelleCompteVenteAchat(): string{
-    return !!this.compteVenteAchatNumero ? `${this.compteVenteAchatNumero} ${this.compteVenteAchatNom}` : "";
+  get libelleCompteVenteAchat(): string {
+    return this.compteVenteAchatNumero ? `${this.compteVenteAchatNumero} ${this.compteVenteAchatNom}` : '';
   }
 
-  get libelleSoldeCompteTiers(): string{
+  get libelleSoldeCompteTiers(): string {
     return `${this.soldeComptable.toDecimalString(2)} ${this.libelleDevise}`;
   }
 
-  get numeroNom(): string{
-    return `${this.numero ? this.numero : ""} ${this.nom}`.trim();
+  get numeroNom(): string {
+    return `${this.numero ? this.numero : ''} ${this.nom}`.trim();
   }
 }

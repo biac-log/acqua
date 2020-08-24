@@ -56,13 +56,7 @@
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-        ></v-text-field>
+        <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
       </v-card-title>
       <v-data-table
         id="dataTable"
@@ -74,114 +68,100 @@
         @click:row="OpenPieceComptable"
         :server-items-length="totalItems"
       >
-        <template v-slot:item.pieceEquilibree="{ item }">
-          <v-tooltip top open-delay=500 >
+        <template v-slot:[`item.pieceEquilibree`]="{ item }">
+          <v-tooltip top open-delay="500">
             <template v-slot:activator="{ on }">
               <v-icon v-show="!item.pieceEquilibree" color="red" v-on="on">mdi-alert</v-icon>
             </template>
             <span>La pièce n'est pas équilibrée</span>
           </v-tooltip>
         </template>
-        <template v-slot:item.numeroPiece="{ item }">
-          <span>{{ item.numeroJournal}}.{{ item.numeroPiece }}</span>
+        <template v-slot:[`item.numeroPiece`]="{ item }">
+          <span>{{ item.numeroJournal }}.{{ item.numeroPiece }}</span>
         </template>
-        <template v-slot:item.datePieceDate="{ item }">
+        <template v-slot:[`item.datePieceDate`]="{ item }">
           <span>{{ item.datePieceDate.toString() }}</span>
         </template>
-        <template v-slot:item.soldeInitiale="{ item }">
+        <template v-slot:[`item.soldeInitiale`]="{ item }">
           <span>{{ item.soldeInitiale | numberToComptaString }}</span>
         </template>
-        <template v-slot:item.totalDebit="{ item }">
+        <template v-slot:[`item.totalDebit`]="{ item }">
           <span>{{ item.totalDebit | numberToComptaString }}</span>
         </template>
-        <template v-slot:item.totalCredit="{ item }">
+        <template v-slot:[`item.totalCredit`]="{ item }">
           <span>{{ item.totalCredit | numberToComptaString }}</span>
         </template>
-        <template v-slot:item.soldeFinale="{ item }">
+        <template v-slot:[`item.soldeFinale`]="{ item }">
           <span>{{ item.soldeFinale | numberToComptaString }}</span>
         </template>
       </v-data-table>
     </v-card>
     <PieceComptableVue ref="refDialogPiece"></PieceComptableVue>
     <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue>
-    <v-snackbar
-      v-model="snackbar"
-      :timeout="snackbarTimeout"
-      :color="snackbarColor"
-    >
-      <v-icon dark class="mr-3">{{
-        snackbarColor == "error" ? "mdi-delete" : "mdi-check"
-      }}</v-icon>
+    <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
+      <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
-      <v-btn icon dark @click="snackbar = false"
-        ><v-icon>mdi-close</v-icon></v-btn
-      >
+      <v-btn icon dark @click="snackbar = false"><v-icon>mdi-close</v-icon></v-btn>
     </v-snackbar>
   </v-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch, Ref } from "vue-property-decorator";
-import axios from "axios";
-import moment from "moment";
-import { FinancierApi } from "../../api/FinancierApi";
-import { displayAxiosError } from "@/utils/ErrorMethods";
-import {
-  PeriodeComptable,
-  Journal,
-  EntetePieceComptable
-} from "@/models/Financier";
-import { Pagination } from "@/models/Pagination";
-import PieceComptableVue from "./components/PieceComptable.vue";
-import PieceAddResultVue from "./components/PieceAddResult.vue";
+import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
+import { FinancierApi } from '../../api/FinancierApi';
+import { displayAxiosError } from '@/utils/ErrorMethods';
+import { PeriodeComptable, Journal, EntetePieceComptable } from '@/models/Financier';
+import { Pagination } from '@/models/Pagination';
+import PieceComptableVue from './components/PieceComptable.vue';
+import PieceAddResultVue from './components/PieceAddResult.vue';
 
 @Component({
-  name: "Financier",
+  name: 'Financier',
   components: { PieceComptableVue, PieceAddResultVue }
 })
 export default class extends Vue {
   @Ref() readonly refDialogPiece!: PieceComptableVue;
   @Ref() readonly PieceAddResultVue!: PieceAddResultVue;
-  private searchIsValid: boolean = true;
+  private searchIsValid = true;
 
-  private isErrorPeriode: boolean = false;
-  private periodeIsLoading: boolean = false;
+  private isErrorPeriode = false;
+  private periodeIsLoading = false;
   private periodes: PeriodeComptable[] = [];
   private periodeSelected: PeriodeComptable = new PeriodeComptable();
   private periodesRules: any = [
-    (v: string) => !this.isErrorPeriode || "Connexion impossible",
-    (v: string) => !!v || "La période est obligatoire"
+    () => !this.isErrorPeriode || 'Connexion impossible',
+    (v: string) => !!v || 'La période est obligatoire'
   ];
 
-  private isErrorJournaux: boolean = false;
+  private isErrorJournaux = false;
   private journaux: Journal[] = [];
-  private journauxIsLoading: boolean = false;
+  private journauxIsLoading = false;
   private journalSelected: Journal = new Journal();
-  private detailJournalSelected: string = "";
+  private detailJournalSelected = '';
   private journalRules: any = [
-    (v: Journal) => !this.isErrorJournaux || "Connexion impossible",
-    (v: Journal) => !!v || "Sélection de journal obligatoire",
-    (v: Journal) => v.numero != 0 || "Sélection de journal obligatoire"
+    () => !this.isErrorJournaux || 'Connexion impossible',
+    (v: Journal) => !!v || 'Sélection de journal obligatoire',
+    (v: Journal) => v.numero != 0 || 'Sélection de journal obligatoire'
   ];
 
   private selectedPiece!: EntetePieceComptable;
 
   private headers = [
-    { text: "", value: "pieceEquilibree", width: 50 },
-    { text: "Numéro pièce", value: "numeroPiece" },
-    { text: "Date pièce", value: "datePieceDate" },
-    { text: "Libelle", value: "libelle" },
-    { text: "Solde initiale", value: "soldeInitiale", align: "end" },
-    { text: "Débit", value: "totalDebit", align: "end" },
-    { text: "Crédit", value: "totalCredit", align: "end" },
-    { text: "Solde finale", value: "soldeFinale", align: "end" },
+    { text: '', value: 'pieceEquilibree', width: 50 },
+    { text: 'Numéro pièce', value: 'numeroPiece' },
+    { text: 'Date pièce', value: 'datePieceDate' },
+    { text: 'Libelle', value: 'libelle' },
+    { text: 'Solde initiale', value: 'soldeInitiale', align: 'end' },
+    { text: 'Débit', value: 'totalDebit', align: 'end' },
+    { text: 'Crédit', value: 'totalCredit', align: 'end' },
+    { text: 'Solde finale', value: 'soldeFinale', align: 'end' }
   ];
 
-  private search: string = "";
+  private search = '';
   private options: any = {};
   private piecesComptables: EntetePieceComptable[] = [];
-  private totalItems: number = 0;
-  private isLoadingPieces: boolean = false;
+  private totalItems = 0;
+  private isLoadingPieces = false;
 
   mounted() {
     this.LoadPeriodes();
@@ -191,8 +171,8 @@ export default class extends Vue {
   private async LoadPeriodes() {
     try {
       this.periodeIsLoading = true;
-      let periodes = await FinancierApi.getPeriodes();
-      periodes.forEach(p => this.periodes.push(p));
+      const periodes = await FinancierApi.getPeriodes();
+      periodes.forEach((p) => this.periodes.push(p));
     } catch (err) {
       this.isErrorPeriode = true;
     } finally {
@@ -203,8 +183,8 @@ export default class extends Vue {
   private async LoadJournaux() {
     try {
       this.journauxIsLoading = true;
-      let journaux = await FinancierApi.getJournaux();
-      journaux.forEach(j => this.journaux.push(j));
+      const journaux = await FinancierApi.getJournaux();
+      journaux.forEach((j) => this.journaux.push(j));
     } catch (err) {
       this.isErrorJournaux = true;
     } finally {
@@ -212,31 +192,36 @@ export default class extends Vue {
     }
   }
 
-  @Watch("options")
+  @Watch('options')
   onOptionsChanged() {
     this.LoadPiecesComptables();
   }
 
   private async OpenPieceComptable(entete: EntetePieceComptable) {
-    this.refDialogPiece.Open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
-      .then(resp => {
-        if(resp){
-          Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp);
-          this.notifier(`Pièce numéro <b>${resp.codePieceDisplay}</b> mise à jour.`, "success");
-        }else {
+    this.refDialogPiece
+      .Open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
+      .then((resp) => {
+        if (resp) {
+          Vue.set(
+            this.piecesComptables,
+            this.piecesComptables.findIndex((e) => e == entete),
+            resp
+          );
+          this.notifier(`Pièce numéro <b>${resp.codePieceDisplay}</b> mise à jour.`, 'success');
+        } else {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
-          this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimer.`, "error");
+          this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimer.`, 'error');
         }
-      }).catch(() => {
-        
       })
+      .catch()
       .finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
       });
   }
 
   private createNewPieceComptable() {
-    this.refDialogPiece.OpenNew(this.periodeSelected, this.journalSelected)
+    this.refDialogPiece
+      .OpenNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
         this.displayAddResult(resp);
         this.piecesComptables.unshift(resp);
@@ -246,22 +231,29 @@ export default class extends Vue {
       });
   }
 
-  private displayAddResult(piece : EntetePieceComptable){
-    (this.$refs.PieceAddResultVue as PieceAddResultVue).open(piece.numeroJournal, piece.numeroPiece, this.periodeSelected.typePeriodeComptable).then((numero) => {
-        if(piece.numeroPiece != numero){
+  private displayAddResult(piece: EntetePieceComptable) {
+    (this.$refs.PieceAddResultVue as PieceAddResultVue)
+      .open(piece.numeroJournal, piece.numeroPiece, this.periodeSelected.typePeriodeComptable)
+      .then((numero) => {
+        if (piece.numeroPiece != numero) {
           piece.numeroPiece = numero;
-        Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == piece), piece);
-      }
-    }).finally(() => {
-      this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-    });
+          Vue.set(
+            this.piecesComptables,
+            this.piecesComptables.findIndex((e) => e == piece),
+            piece
+          );
+        }
+      })
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+      });
   }
 
   private async LoadPiecesComptables() {
     try {
       if (this.periodeSelected.typePeriodeComptable && this.journalSelected.numero) {
         const { sortBy, sortDesc, page, itemsPerPage } = this.options;
-        let pagination = new Pagination();
+        const pagination = new Pagination();
         pagination.terms = this.search;
         pagination.sortBy = sortBy;
         pagination.sortDesc = sortDesc;
@@ -269,25 +261,25 @@ export default class extends Vue {
         pagination.limit = itemsPerPage;
 
         this.isLoadingPieces = true;
-        let paginationResult = await FinancierApi.getEntetePiecesComptables(
+        const paginationResult = await FinancierApi.getEntetePiecesComptables(
           this.journalSelected.numero,
           this.periodeSelected.typePeriodeComptable,
           pagination
         );
-        this.piecesComptables = paginationResult.items.map(i => new EntetePieceComptable(i));
+        this.piecesComptables = paginationResult.items.map((i) => new EntetePieceComptable(i));
         this.totalItems = paginationResult.totalCount;
       }
     } catch (err) {
-      this.notifier(displayAxiosError(err), "red");
+      this.notifier(displayAxiosError(err), 'red');
     } finally {
       this.isLoadingPieces = false;
     }
   }
 
-  private snackbar: boolean = false;
-  private snackbarTimeout: number = 5000;
-  private snackbarMessage: string = "";
-  private snackbarColor: string = "";
+  private snackbar = false;
+  private snackbarTimeout = 5000;
+  private snackbarMessage = '';
+  private snackbarColor = '';
 
   private notifier(message: string, color: string) {
     this.snackbarColor = color;

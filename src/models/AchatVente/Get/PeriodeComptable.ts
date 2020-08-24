@@ -1,4 +1,3 @@
-import moment from "moment";
 import { DateTime } from '@/models/DateTime';
 
 export interface IPeriodeComptable {
@@ -8,9 +7,9 @@ export interface IPeriodeComptable {
 }
 
 export class PeriodeComptableDTO implements IPeriodeComptable {
-  public debut: string = "";
-  public fin: string = "";
-  public typePeriodeComptable: string = "";
+  public debut = '';
+  public fin = '';
+  public typePeriodeComptable = '';
 }
 
 export class PeriodeComptable extends PeriodeComptableDTO {
@@ -38,18 +37,18 @@ export class PeriodeComptable extends PeriodeComptableDTO {
   }
 
   get libellePeriodeFull(): string {
-    let stPeriode = "Courante";
-    if (this.typePeriodeComptable == "precedente") stPeriode = "Précédente";
+    let stPeriode = 'Courante';
+    if (this.typePeriodeComptable == 'precedente') stPeriode = 'Précédente';
     return `${stPeriode} du ${this.dateDebut} au ${this.dateFin}`;
   }
 
-  get typePeriodeComptableId(): string{
-    return this.typePeriodeComptable == "C" ? "courante" : "precedente";
+  get typePeriodeComptableId(): string {
+    return this.typePeriodeComptable == 'C' ? 'courante' : 'precedente';
   }
 
-  get typePeriodeComptableLibelle(): string{
-    if(this.typePeriodeComptable == "courante") return "Période courante";
-    else if (this.typePeriodeComptable == "precedente") return  "Période précédente";
-    else return "";
+  get typePeriodeComptableLibelle(): string {
+    if (this.typePeriodeComptable == 'courante') return 'Période courante';
+    else if (this.typePeriodeComptable == 'precedente') return 'Période précédente';
+    else return '';
   }
 }

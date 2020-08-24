@@ -18,47 +18,44 @@
           autocomplete="off"
         ></v-text-field>
       </v-card-title>
-      <AgGridVue 
+      <AgGridVue
         style="height: 561px;"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersCasesTva"
         :rowData="casesTva"
         rowSelection="single"
-        :gridOptions="gridOptions">
+        :gridOptions="gridOptions"
+      >
       </AgGridVue>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts">
-import { AgGridVue } from "ag-grid-vue";
-import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
-import { CaseTva } from "@/models/CaseTva";
-import { CompteApi } from "@/api/CompteApi";
-import axios from "axios";
-import { AchatVenteApi } from '@/api/AchatVenteApi';
+import { AgGridVue } from 'ag-grid-vue';
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { CaseTva } from '@/models/CaseTva';
 import { GridOptions, ICellRenderer, GridApi } from 'ag-grid-community';
 import { CaseTvaApi } from '../../api/CaseTvaApi';
 
-
 @Component({
-  name: "SearchCaseTva",
+  name: 'SearchCaseTva',
   components: { AgGridVue }
 })
 export default class extends Vue {
-  private dialog: boolean = false;
+  private dialog = false;
 
   private numeroJournalLoad!: number;
-  private filtreCaseTva: string = "";
-  private isLoading: boolean = false;
+  private filtreCaseTva = '';
+  private isLoading = false;
   private casesTva: CaseTva[] = [];
   private headersCasesTva = [
-    { headerName: "Numéro case", field: "numeroCase" , cellStyle: { textAlign: "right" }, width: 120},
-    { headerName: "Libellé", field: "libelleCase", flex:1 },
-    { headerName: "Type", field: "libelleTypeCase", width: 120 },
-    { headerName: "Nature", field: "natureCase", width: 120 },
-    { headerName: "Taux", field: "tauxTvaCase", cellStyle: { textAlign: "right" }, width: 120}
+    { headerName: 'Numéro case', field: 'numeroCase', cellStyle: { textAlign: 'right' }, width: 120 },
+    { headerName: 'Libellé', field: 'libelleCase', flex: 1 },
+    { headerName: 'Type', field: 'libelleTypeCase', width: 120 },
+    { headerName: 'Nature', field: 'natureCase', width: 120 },
+    { headerName: 'Taux', field: 'tauxTvaCase', cellStyle: { textAlign: 'right' }, width: 120 }
   ];
 
   private resolve!: any;
@@ -68,7 +65,7 @@ export default class extends Vue {
   private loadingCellRendererParams = null;
   private gridOptions: GridOptions = {
     columnDefs: this.headersCasesTva,
-    rowSelection: "single",
+    rowSelection: 'single',
     rowData: this.casesTva,
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
@@ -97,16 +94,16 @@ export default class extends Vue {
     if (this.numeroJournalLoad) {
       (this.gridOptions.api as GridApi)?.showLoadingOverlay();
       CaseTvaApi.getCasesTVADisponibles(this.numeroJournalLoad)
-        .then(resp => {
+        .then((resp) => {
           this.casesTva = resp;
         })
         .finally(() => {
-         (this.gridOptions.api as GridApi)?.hideOverlay();
+          (this.gridOptions.api as GridApi)?.hideOverlay();
         });
     }
   }
 
-private giveFocusToRow(id: number) {
+  private giveFocusToRow(id: number) {
     let ds = 0;
     this.gridOptions?.api?.forEachNode(function(node) {
       if (node.rowIndex === id) {
@@ -114,11 +111,11 @@ private giveFocusToRow(id: number) {
         ds = node.rowIndex;
       }
     });
-    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, "numeroCase"));
+    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, 'numeroCase'));
   }
 
-  @Watch("filtreCaseTva")
-  private filterGrid(){
+  @Watch('filtreCaseTva')
+  private filterGrid() {
     this.gridOptions?.api?.setQuickFilter(this.filtreCaseTva);
   }
 
@@ -154,25 +151,23 @@ private giveFocusToRow(id: number) {
       case KEY_RIGHT:
         return suggestedNextCell;
       default:
-        console.log(
-          "this will never happen, navigation is always one of the 4 keys above"
-        );
+        console.log('this will never happen, navigation is always one of the 4 keys above');
     }
   }
 
   private keypress(event: any) {
-    if(event?.event.key === "Enter"){
-      var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CaseTva;
-      this.sendCaseTva(selectedRow)
+    if (event?.event.key === 'Enter') {
+      const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CaseTva;
+      this.sendCaseTva(selectedRow);
     }
-  } 
-
-  private rowDoubleClick(vlaue : any){
-    var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CaseTva;
-    this.sendCaseTva(selectedRow)
   }
 
-  private reinitGrid(){
+  private rowDoubleClick() {
+    const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CaseTva;
+    this.sendCaseTva(selectedRow);
+  }
+
+  private reinitGrid() {
     (this.gridOptions.api as GridApi).resetQuickFilter();
     (this.gridOptions.api as GridApi).deselectAll();
     (this.gridOptions.api as GridApi).setFilterModel(null);
@@ -180,13 +175,13 @@ private giveFocusToRow(id: number) {
   }
 
   private sendCaseTva(caseTva: CaseTva) {
-    this.filtreCaseTva = "";
+    this.filtreCaseTva = '';
     this.dialog = false;
     this.resolve(caseTva);
   }
 
-  private close(){
-    this.filtreCaseTva = "";
+  private close() {
+    this.filtreCaseTva = '';
     this.dialog = false;
     this.reject();
   }

@@ -1,14 +1,16 @@
 <template>
-  <v-dialog width="800" 
-            v-model="dialog" 
-            @click:outside="close()" 
-            @keydown.esc="close()" 
-            @keydown.page-up="nextPage()" 
-            @keydown.page-down="previousPage()"
-            @keydown.ctrl.f.prevent="focusSearch()">>
+  <v-dialog
+    width="800"
+    v-model="dialog"
+    @click:outside="close()"
+    @keydown.esc="close()"
+    @keydown.page-up="nextPage()"
+    @keydown.page-down="previousPage()"
+    @keydown.ctrl.f.prevent="focusSearch()"
+    >>
     <v-card :loading="isLoading">
       <v-card-title>
-        Comptes {{ typeLoad ? typeLoad.libelle : "" }}
+        Comptes {{ typeLoad ? typeLoad.libelle : '' }}
         <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">
           <v-icon>mdi-refresh</v-icon>
         </v-btn>
@@ -25,46 +27,51 @@
           autocomplete="off"
         ></v-text-field>
       </v-card-title>
-      <AgGridVue 
+      <AgGridVue
         style="height: 561px;"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersComptes"
         :rowData="comptes"
         rowSelection="single"
-        :gridOptions="gridOptions">
+        :gridOptions="gridOptions"
+      >
       </AgGridVue>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
-import {TypeCompte} from "@/models/AchatVente";
-import CompteGeneralSearch from "@/models/Compte/CompteGeneralSearch";
-import { AchatVenteApi } from "@/api/AchatVenteApi";
-import { CompteApi } from "@/api/CompteApi";
-import axios from "axios";
-import { ICellRenderer, GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
-import { AgGridVue } from "ag-grid-vue";
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import CompteGeneralSearch from '@/models/Compte/CompteGeneralSearch';
+import { CompteApi } from '@/api/CompteApi';
+import { GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
+import { AgGridVue } from 'ag-grid-vue';
 
 @Component({
-  name: "SearchCompteGeneral",
+  name: 'SearchCompteGeneral',
   components: { AgGridVue }
 })
 export default class extends Vue {
-  private dialog: boolean = false;
-  private typeLoad: string = "";
-  private filtreCompte: string = "";
-  private isLoading: boolean = false;
+  private dialog = false;
+  private typeLoad = '';
+  private filtreCompte = '';
+  private isLoading = false;
   private comptes: CompteGeneralSearch[] = [];
   private displayComptes: CompteGeneralSearch[] = [];
   private headersComptes = [
-    { headerName: "Numéro", field: "numero", filter:true, width: 120 },
-    { headerName: "Nom", field: "nom", filter:true, flex:1 },
-    { headerName: "Solde", field: "solde", filter:true, cellStyle: { textAlign: "right" }, width: 100, valueFormatter: this.numberToString },
-    { headerName: "Nature", field: "libelleNature", filter:true, width: 120 },
-    { headerName: "Case TVA", field: "caseTvaDisplay", filter:true, width: 120 }
+    { headerName: 'Numéro', field: 'numero', filter: true, width: 120 },
+    { headerName: 'Nom', field: 'nom', filter: true, flex: 1 },
+    {
+      headerName: 'Solde',
+      field: 'solde',
+      filter: true,
+      cellStyle: { textAlign: 'right' },
+      width: 100,
+      valueFormatter: this.numberToString
+    },
+    { headerName: 'Nature', field: 'libelleNature', filter: true, width: 120 },
+    { headerName: 'Case TVA', field: 'caseTvaDisplay', filter: true, width: 120 }
   ];
 
   private resolve!: any;
@@ -72,13 +79,13 @@ export default class extends Vue {
 
   private gridOptions: GridOptions = {
     columnDefs: this.headersComptes,
-    rowSelection: "single",
+    rowSelection: 'single',
     rowData: this.comptes,
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
     pagination: true,
-    paginationAutoPageSize:true,
+    paginationAutoPageSize: true,
     onRowDoubleClicked: this.rowDoubleClick
   };
 
@@ -92,7 +99,7 @@ export default class extends Vue {
     });
   }
 
-  private setFilteredItems(e : CompteGeneralSearch[]){
+  private setFilteredItems(e: CompteGeneralSearch[]) {
     this.displayComptes = e;
   }
 
@@ -107,22 +114,22 @@ export default class extends Vue {
     if (this.typeLoad) {
       this.isLoading = true;
       CompteApi.getComptesGeneraux(this.typeLoad)
-      .then(resp => {
-        this.comptes = resp;
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
+        .then((resp) => {
+          this.comptes = resp;
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
     }
   }
 
-  @Watch("filtreCompte")
-  private filterGrid(newValue: string){
-    var numeroFilterComponent = this.gridOptions?.api?.getFilterInstance('numero');
-    if(newValue && newValue.isInt()){
-      numeroFilterComponent?.setModel({type: 'startsWith', filter: newValue});
-    } else{
-      numeroFilterComponent?.setModel({type: 'startsWith', filter: ""});
+  @Watch('filtreCompte')
+  private filterGrid(newValue: string) {
+    const numeroFilterComponent = this.gridOptions?.api?.getFilterInstance('numero');
+    if (newValue && newValue.isInt()) {
+      numeroFilterComponent?.setModel({ type: 'startsWith', filter: newValue });
+    } else {
+      numeroFilterComponent?.setModel({ type: 'startsWith', filter: '' });
     }
     this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
   }
@@ -147,9 +154,10 @@ export default class extends Vue {
         });
         return suggestedNextCell;
       case KEY_UP:
-        if(previousCell.rowIndex == 0)
+        if (previousCell.rowIndex == 0) {
           this.focusSearch();
-        else{
+          break;
+        } else {
           previousCell = params.previousCellPosition;
           // set selected cell on current cell - 1
           this.gridOptions?.api?.forEachNode(function(node) {
@@ -163,44 +171,41 @@ export default class extends Vue {
       case KEY_RIGHT:
         return suggestedNextCell;
       default:
-        console.log(
-          "this will never happen, navigation is always one of the 4 keys above"
-        );
+        console.log('this will never happen, navigation is always one of the 4 keys above');
     }
   }
 
-
   private keypress(event: any) {
-    if(event?.event.key === "Enter"){
-      var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
-      this.sendCompte(selectedRow)
+    if (event?.event.key === 'Enter') {
+      const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
+      this.sendCompte(selectedRow);
     }
-  } 
-  
+  }
+
   private numberToString(params: ValueFormatterParams): string {
     return (params.value as number).toDecimalString(2);
   }
 
-  private rowDoubleClick(vlaue : any){
-    var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
+  private rowDoubleClick() {
+    const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
     this.reinitGrid();
-    this.sendCompte(selectedRow)
+    this.sendCompte(selectedRow);
   }
-  
-  private focusSearch(){
+
+  private focusSearch() {
     (this.gridOptions.api as GridApi).deselectAll();
     this.$nextTick(() => (this.$refs.filterField as any).focus());
   }
 
-  private giveFocusToFirstDisplayRow(){
-    let rowToFocus = this?.gridOptions?.api?.getFirstDisplayedRow() || 0;
+  private giveFocusToFirstDisplayRow() {
+    const rowToFocus = this?.gridOptions?.api?.getFirstDisplayedRow() || 0;
     this.giveFocusToRow(rowToFocus);
   }
 
   private giveFocusToRow(id: number) {
-    if (id < (this?.gridOptions?.api?.getFirstDisplayedRow() || 0)) id = 0;  
+    if (id < (this?.gridOptions?.api?.getFirstDisplayedRow() || 0)) id = 0;
     else if (id > (this?.gridOptions?.api?.getLastDisplayedRow() || 0))
-      id = this?.gridOptions?.api?.getLastDisplayedRow() || 0; 
+      id = this?.gridOptions?.api?.getLastDisplayedRow() || 0;
 
     let ds = 0;
     this.gridOptions?.api?.forEachNode(function(node) {
@@ -210,25 +215,25 @@ export default class extends Vue {
       }
     });
 
-    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, "numero"));
+    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, 'numero'));
   }
 
-  private nextPage(){
+  private nextPage() {
     this?.gridOptions?.api?.paginationGoToNextPage();
-    let selectedCell = this?.gridOptions?.api?.getSelectedNodes()[0];
-    let pageSize = this?.gridOptions?.api?.paginationGetPageSize();
+    const selectedCell = this?.gridOptions?.api?.getSelectedNodes()[0];
+    const pageSize = this?.gridOptions?.api?.paginationGetPageSize();
     this?.gridOptions?.api?.getFirstDisplayedRow();
-    if(selectedCell && pageSize) this.giveFocusToRow(selectedCell.rowIndex + pageSize);
+    if (selectedCell && pageSize) this.giveFocusToRow(selectedCell.rowIndex + pageSize);
   }
 
-  private previousPage(){
+  private previousPage() {
     this?.gridOptions?.api?.paginationGoToPreviousPage();
-    let selectedCell = this?.gridOptions?.api?.getSelectedNodes()[0];
-    let pageSize = this?.gridOptions?.api?.paginationGetPageSize();
-    if(selectedCell && pageSize) this.giveFocusToRow(selectedCell.rowIndex - pageSize);
+    const selectedCell = this?.gridOptions?.api?.getSelectedNodes()[0];
+    const pageSize = this?.gridOptions?.api?.paginationGetPageSize();
+    if (selectedCell && pageSize) this.giveFocusToRow(selectedCell.rowIndex - pageSize);
   }
 
-  private reinitGrid(){
+  private reinitGrid() {
     (this.gridOptions.api as GridApi).resetQuickFilter();
     (this.gridOptions.api as GridApi).deselectAll();
     (this.gridOptions.api as GridApi).setFilterModel(null);
@@ -236,14 +241,14 @@ export default class extends Vue {
   }
 
   private sendCompte(compte: CompteGeneralSearch) {
-    this.filtreCompte = "";
+    this.filtreCompte = '';
     this.dialog = false;
     this.reinitGrid();
     this.resolve(compte);
   }
 
-  private close(){
-    this.filtreCompte = "";
+  private close() {
+    this.filtreCompte = '';
     this.dialog = false;
     this.reinitGrid();
     this.reject();

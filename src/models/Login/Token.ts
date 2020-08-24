@@ -1,4 +1,4 @@
 export class Token {
-  public value: string = '';
-  public expires_in: number = 0;
+  public value = '';
+  public expires_in = 0;
 }

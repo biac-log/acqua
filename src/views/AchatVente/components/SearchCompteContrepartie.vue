@@ -1,14 +1,16 @@
 <template>
-  <v-dialog width="800" 
-            v-model="dialog" 
-            @click:outside="close()" 
-            @keydown.esc="close()" 
-            @keydown.page-up="nextPage()" 
-            @keydown.page-down="previousPage()"
-            @keydown.ctrl.f.prevent="focusSearch()">
+  <v-dialog
+    width="800"
+    v-model="dialog"
+    @click:outside="close()"
+    @keydown.esc="close()"
+    @keydown.page-up="nextPage()"
+    @keydown.page-down="previousPage()"
+    @keydown.ctrl.f.prevent="focusSearch()"
+  >
     <v-card class="mt-5" :loading="isLoading">
       <v-card-title>
-        Comptes {{ typeLoad ? typeLoad.libelle : "" }}
+        Comptes {{ typeLoad ? typeLoad.libelle : '' }}
         <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">
           <v-icon>mdi-refresh</v-icon>
         </v-btn>
@@ -25,46 +27,45 @@
           autocomplete="off"
         ></v-text-field>
       </v-card-title>
-      <AgGridVue 
+      <AgGridVue
         style="height: 561px;"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersComptes"
         :rowData="comptes"
         rowSelection="single"
-        :gridOptions="gridOptions">
+        :gridOptions="gridOptions"
+      >
       </AgGridVue>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Emit, Watch } from "vue-property-decorator";
-import {TypeCompte} from "@/models/AchatVente";
-import CompteGeneralSearch from "@/models/Compte/CompteGeneralSearch";
-import { AchatVenteApi } from "@/api/AchatVenteApi";
-import { CompteApi } from "@/api/CompteApi";
-import axios from "axios";
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { TypeCompte } from '@/models/AchatVente';
+import CompteGeneralSearch from '@/models/Compte/CompteGeneralSearch';
+import { CompteApi } from '@/api/CompteApi';
 import { ICellRenderer, GridOptions, GridApi } from 'ag-grid-community';
-import { AgGridVue } from "ag-grid-vue";
+import { AgGridVue } from 'ag-grid-vue';
 
 @Component({
-  name: "SearchCompteContrepartie",
+  name: 'SearchCompteContrepartie',
   components: { AgGridVue }
 })
 export default class extends Vue {
-  private dialog: boolean = false;
+  private dialog = false;
   private typeLoad: TypeCompte = new TypeCompte();
-  private filtreCompte: string = "";
-  private isLoading: boolean = false;
+  private filtreCompte = '';
+  private isLoading = false;
   private comptes: CompteGeneralSearch[] = [];
   private displayComptes: CompteGeneralSearch[] = [];
   private headersComptes = [
-    { headerName: "Numéro", field: "numero", filter:true, width: 120},
-    { headerName: "Nom", field: "nom", filter:true, flex:1 },
-    { headerName: "Solde", field: "libelleSolde", filter:true, cellStyle: { textAlign: "right" }, width: 100 },
-    { headerName: "Nature", field: "libelleNature", filter:true, width: 120 },
-    { headerName: "Case TVA", field: "caseTvaDisplay", filter:true, width: 120 }
+    { headerName: 'Numéro', field: 'numero', filter: true, width: 120 },
+    { headerName: 'Nom', field: 'nom', filter: true, flex: 1 },
+    { headerName: 'Solde', field: 'libelleSolde', filter: true, cellStyle: { textAlign: 'right' }, width: 100 },
+    { headerName: 'Nature', field: 'libelleNature', filter: true, width: 120 },
+    { headerName: 'Case TVA', field: 'caseTvaDisplay', filter: true, width: 120 }
   ];
 
   private resolve!: any;
@@ -74,20 +75,20 @@ export default class extends Vue {
   private loadingCellRendererParams = null;
   private gridOptions: GridOptions = {
     columnDefs: this.headersComptes,
-    rowSelection: "single",
+    rowSelection: 'single',
     rowData: this.comptes,
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
     overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
     pagination: true,
-    paginationAutoPageSize:true,
+    paginationAutoPageSize: true,
     onRowDoubleClicked: this.rowDoubleClick
   };
 
   public open(typeToLoad: TypeCompte, filtre: string): Promise<CompteGeneralSearch> {
     this.dialog = true;
-    if(filtre){
+    if (filtre) {
       this.filtreCompte = filtre;
       this.filterGrid(filtre);
     }
@@ -99,7 +100,7 @@ export default class extends Vue {
     });
   }
 
-  private setFilteredItems(e : CompteGeneralSearch[]){
+  private setFilteredItems(e: CompteGeneralSearch[]) {
     this.displayComptes = e;
   }
 
@@ -114,7 +115,7 @@ export default class extends Vue {
     if (this.typeLoad.id) {
       this.isLoading = true;
       CompteApi.getComptesGeneraux(this.typeLoad.id)
-        .then(resp => {
+        .then((resp) => {
           this.comptes = resp;
         })
         .finally(() => {
@@ -131,16 +132,16 @@ export default class extends Vue {
         ds = node.rowIndex;
       }
     });
-    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, "numero"));
+    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, 'numero'));
   }
 
-  @Watch("filtreCompte")
-  private filterGrid(newValue: string){
-    var numeroFilterComponent = this.gridOptions?.api?.getFilterInstance('numero');
-    if(newValue && newValue.isInt()){
-      numeroFilterComponent?.setModel({type: 'startsWith', filter: newValue});
-    } else{
-      numeroFilterComponent?.setModel({type: 'startsWith', filter: ""});
+  @Watch('filtreCompte')
+  private filterGrid(newValue: string) {
+    const numeroFilterComponent = this.gridOptions?.api?.getFilterInstance('numero');
+    if (newValue && newValue.isInt()) {
+      numeroFilterComponent?.setModel({ type: 'startsWith', filter: newValue });
+    } else {
+      numeroFilterComponent?.setModel({ type: 'startsWith', filter: '' });
     }
     this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
   }
@@ -177,39 +178,37 @@ export default class extends Vue {
       case KEY_RIGHT:
         return suggestedNextCell;
       default:
-        console.log(
-          "this will never happen, navigation is always one of the 4 keys above"
-        );
+        console.log('this will never happen, navigation is always one of the 4 keys above');
     }
   }
 
-  private focusSearch(){
+  private focusSearch() {
     (this.gridOptions.api as GridApi).deselectAll();
     this.$nextTick(() => (this.$refs.filterField as any).focus());
   }
 
   private keypress(event: any) {
-    if(event?.event.key === "Enter"){
-      var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
-      this.sendCompte(selectedRow)
+    if (event?.event.key === 'Enter') {
+      const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
+      this.sendCompte(selectedRow);
     }
-  } 
-
-  private rowDoubleClick(vlaue : any){
-    var selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
-    this.reinitGrid();
-    this.sendCompte(selectedRow)
   }
-  
-  private nextPage(){
+
+  private rowDoubleClick() {
+    const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
+    this.reinitGrid();
+    this.sendCompte(selectedRow);
+  }
+
+  private nextPage() {
     this?.gridOptions?.api?.paginationGoToNextPage();
   }
 
-  private previousPage(){
+  private previousPage() {
     this?.gridOptions?.api?.paginationGoToPreviousPage();
   }
 
-  private reinitGrid(){
+  private reinitGrid() {
     (this.gridOptions.api as GridApi).resetQuickFilter();
     (this.gridOptions.api as GridApi).deselectAll();
     (this.gridOptions.api as GridApi).setFilterModel(null);
@@ -217,14 +216,14 @@ export default class extends Vue {
   }
 
   private sendCompte(compte: CompteGeneralSearch) {
-    this.filtreCompte = "";
+    this.filtreCompte = '';
     this.dialog = false;
     this.reinitGrid();
     this.resolve(compte);
   }
 
-  private close(){
-    this.filtreCompte = "";
+  private close() {
+    this.filtreCompte = '';
     this.dialog = false;
     this.reinitGrid();
     this.reject();

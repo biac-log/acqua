@@ -8,5 +8,5 @@ export * from './Get/PieceComptableContrepartie';
 export * from './Get/PieceComptable';
 export * from './Get/CompteContrepartieSearch';
 export * from './Get/TypeMouvement';
-export * from './Save/PieceComptableSave'
-export * from './Save/PieceComptableContrepartieSave'
+export * from './Save/PieceComptableSave';
+export * from './Save/PieceComptableContrepartieSave';

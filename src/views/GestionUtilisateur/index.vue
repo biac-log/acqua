@@ -29,11 +29,11 @@
           fixed-header
           @click:row="OpenUtilisateur"
           sort-by="ID"
-          :footer-props="{'items-per-page-options': [10,100,500]}"
+          :footer-props="{ 'items-per-page-options': [10, 100, 500] }"
           :items-per-page="10"
           style="width:100%; height:100%;"
         >
-          <template v-slot:item.ApplicationsNom="{ item }">
+          <template v-slot:[`item.ApplicationsNom`]="{ item }">
             <v-chip
               class="ma-1"
               text-color="white"
@@ -45,7 +45,7 @@
               <span>{{ app }}</span>
             </v-chip>
           </template>
-          <template v-slot:item.HasEmail="{ item }">
+          <template v-slot:[`item.HasEmail`]="{ item }">
             <v-simple-checkbox v-model="item.HasEmail" disabled></v-simple-checkbox>
           </template>
         </v-data-table>
@@ -54,9 +54,7 @@
     <UtilisateurEditionVue ref="UtilisateurEdition"></UtilisateurEditionVue>
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">
-        {{
-        snackbarColor == "error" ? "mdi-delete" : "mdi-check"
-        }}
+        {{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}
       </v-icon>
       <span v-html="snackbarMessage"></span>
       <v-btn icon dark @click="snackbar = false">
@@ -67,17 +65,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
-import moment from "moment";
-import { GestionUtilisateurApi } from "../../api/GestionUtilisateurApi";
-import { displayAxiosError } from "@/utils/ErrorMethods";
-import { Utilisateur } from "@/models/GestionUtilisateur/Utilisateur";
-import { Pagination } from "@/models/Pagination";
-import UtilisateurEditionVue from "./components/UtilisateurEdition.vue";
-import { Application } from "../../models/GestionUtilisateur/Application";
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { GestionUtilisateurApi } from '../../api/GestionUtilisateurApi';
+import { Utilisateur } from '@/models/GestionUtilisateur/Utilisateur';
+import UtilisateurEditionVue from './components/UtilisateurEdition.vue';
+import { Application } from '../../models/GestionUtilisateur/Application';
 
 @Component({
-  name: "GestionUtilisateur",
+  name: 'GestionUtilisateur',
   components: { UtilisateurEditionVue }
 })
 export default class extends Vue {
@@ -86,33 +81,31 @@ export default class extends Vue {
   private utilisateurs: Utilisateur[] = [];
   private applications: Application[] = [];
   private utilisateurSelected: Utilisateur = new Utilisateur();
-  private search: string = "";
-  private totalItems: number = 0;
+  private search = '';
+  private totalItems = 0;
   private exclureInactifs = true;
 
   private headers = [
-    { text: "Code", value: "ID", width: 80 },
-    { text: "Nom Prénom", value: "NomPrenom", width: 200 },
-    { text: "Email", value: "HasEmail", width: 40 },
-    { text: "Département", value: "Departement", width: 150 },
-    { text: "Applications", value: "ApplicationsNom", width: 250 }
+    { text: 'Code', value: 'ID', width: 80 },
+    { text: 'Nom Prénom', value: 'NomPrenom', width: 200 },
+    { text: 'Email', value: 'HasEmail', width: 40 },
+    { text: 'Département', value: 'Departement', width: 150 },
+    { text: 'Applications', value: 'ApplicationsNom', width: 250 }
   ];
 
   mounted() {
     this.LoadUtilisateurs();
   }
 
-  @Watch("exclureInactifs")
+  @Watch('exclureInactifs')
   private async LoadUtilisateurs() {
     try {
       this.utilisateurs = [];
       this.isLoading = true;
       this.applications = await GestionUtilisateurApi.getApplications();
-      const utilisateurs = await GestionUtilisateurApi.getUtilisateurs(
-        this.exclureInactifs
-      );
+      const utilisateurs = await GestionUtilisateurApi.getUtilisateurs(this.exclureInactifs);
       this.utilisateurs = [];
-      utilisateurs.forEach(element => {
+      utilisateurs.forEach((element) => {
         element.Applications = this.applications;
         this.utilisateurs.push(element);
       });
@@ -126,29 +119,22 @@ export default class extends Vue {
   private OpenUtilisateur(utilisateur: Utilisateur) {
     (this.$refs.UtilisateurEdition as UtilisateurEditionVue)
       .open(utilisateur, this.applications)
-      .then(resp => {
-        if (this.utilisateurs.some(e => e.ID === resp.ID)) {
-          resp.Applications = this.applications
+      .then((resp) => {
+        if (this.utilisateurs.some((e) => e.ID === resp.ID)) {
+          resp.Applications = this.applications;
           Vue.set(
             this.utilisateurs,
-            this.utilisateurs.findIndex(e => e.ID === resp.ID),
+            this.utilisateurs.findIndex((e) => e.ID === resp.ID),
             resp
           );
-          this.notifier(
-            `Utilisateur <b>${resp.NomPrenom} (${resp.ID})</b> mis à jour.`,
-            "success"
-          );
-        } 
-        else {
+          this.notifier(`Utilisateur <b>${resp.NomPrenom} (${resp.ID})</b> mis à jour.`, 'success');
+        } else {
           resp.Applications = this.applications;
           this.utilisateurs.push(resp);
-          this.notifier(
-            `Utilisateur <b>${resp.NomPrenom} (${resp.ID})</b> ajouté.`,
-            "success"
-          );
+          this.notifier(`Utilisateur <b>${resp.NomPrenom} (${resp.ID})</b> ajouté.`, 'success');
         }
       })
-      .catch(() => {})
+      .catch()
       .finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
       });
@@ -156,30 +142,30 @@ export default class extends Vue {
 
   private colorsApplications: [string, string][] = [];
   private colorsAvailable: string[] = [
-    "primary",
-    "indigo",
-    "orange",
-    "green",
-    "teal",
-    "black",
-    "red",
-    "pink",
-    "cyan",
-    "deep purple",
-    "purple",
-    "yellow",
-    "grey",
-    "brown",
-    "lime",
-    "blue grey",
-    "light blue",
-    "amber",
-    "#76FF03",
-    "#E65100"
+    'primary',
+    'indigo',
+    'orange',
+    'green',
+    'teal',
+    'black',
+    'red',
+    'pink',
+    'cyan',
+    'deep purple',
+    'purple',
+    'yellow',
+    'grey',
+    'brown',
+    'lime',
+    'blue grey',
+    'light blue',
+    'amber',
+    '#76FF03',
+    '#E65100'
   ];
 
   private getColor(nomApplication: string): string {
-    const sameApp = this.colorsApplications.find(e => e[0] === nomApplication);
+    const sameApp = this.colorsApplications.find((e) => e[0] === nomApplication);
     if (sameApp) return sameApp[1];
 
     const color = this.colorsAvailable[0];
@@ -193,10 +179,10 @@ export default class extends Vue {
     this.$nextTick(() => (this.$refs.recherche as any).$el.focus());
   }
 
-  private snackbar: boolean = false;
-  private snackbarTimeout: number = 5000;
-  private snackbarMessage: string = "";
-  private snackbarColor: string = "";
+  private snackbar = false;
+  private snackbarTimeout = 5000;
+  private snackbarMessage = '';
+  private snackbarColor = '';
 
   private notifier(message: string, color: string) {
     this.snackbarColor = color;
