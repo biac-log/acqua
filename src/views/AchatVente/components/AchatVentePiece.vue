@@ -427,6 +427,7 @@ import { DateTime } from '../../../models/DateTime';
 import { DeviseApi } from "@/api/DeviseApi";
 import { Devise } from '@/models/Devise/Devise';
 import { numberToString } from '@/utils/FiltersMethods';
+import { DialogActionResult } from "@/models/DialogResult";
 
 @Component({
   name: "AchatVentePiece",
@@ -521,7 +522,6 @@ export default class extends Vue {
   private hash: string = "";
 
   private resolve!: any;
-  private reject!: any;
 
   private forcerNumero: boolean = false;
   private numeroToForce: string = "";
@@ -530,40 +530,29 @@ export default class extends Vue {
 
   private ventilleBase: number = 0;
 
-  public openNew(periode: PeriodeComptable, journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
-    this.dialog= true;
-    this.piecereadonly = false;
-    this.init(periode, journal);
-
-    let today = DateTime.today();
-    if(today.isBefore(this.periode.dateDebut))
-      this.datePiece = this.periode.dateDebut;
-    else if(today.isAfter(this.periode.dateFin)) 
-      this.datePiece = this.periode.dateFin;
-    else this.datePiece = today;
-    this.$nextTick(() => {
-      (this.$refs.form as any).resetValidation();
-      this.autocompleteCompteTier?.focus();
-    });
-    return new Promise((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
-    });
-  }
-
-  public open(entete: EntetePieceComptable,
-    periode: PeriodeComptable,
-    journal: Journal): Promise<{ action: string, data: EntetePieceComptable}> {
+  public open(periode: PeriodeComptable, journal: Journal, entete?: EntetePieceComptable): Promise<{ action: DialogActionResult, data: EntetePieceComptable }> {
     this.dialog=true;
-    this.piecereadonly=true;
-    this.init(periode, journal, entete);
+    if(entete){
+      this.piecereadonly = true;
+      this.init(periode, journal, entete);
+    } else{
+      this.piecereadonly = false;
+      this.init(periode, journal);
+      
+      let today = DateTime.today();
+      if(today.isBefore(this.periode.dateDebut))
+        this.datePiece = this.periode.dateDebut;
+      else if(today.isAfter(this.periode.dateFin)) 
+        this.datePiece = this.periode.dateFin;
+      else this.datePiece = today;
+    }
+
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
       this.autocompleteCompteTier?.focus();
     });
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.resolve = resolve;
-      this.reject = reject;
     });
   }
 
@@ -860,13 +849,13 @@ export default class extends Vue {
     if(!numeroDevise || numeroDevise == 1)
       this.taux = "1,000000";
     else if(this.datePiece.isValid() && numeroDevise) {
-      this.taux = "0,890000";
-      // DeviseApi.getTaux(numeroDevise, datePiece)
-      // .then((resp) => {
-      //   this.taux = resp.toDecimalString(6);
-      // }).catch((err) => {
-      //   this.errorMessage = displayAxiosError(err);
-      // });
+      //this.taux = "0,890000";
+      DeviseApi.getTaux(numeroDevise, datePiece)
+      .then((resp) => {
+        this.taux = resp.toDecimalString(6);
+      }).catch((err) => {
+        this.errorMessage = displayAxiosError(err);
+      });
     }
     this.recalculmontantBase();
   }
@@ -935,7 +924,7 @@ export default class extends Vue {
     this.errorMessage = "";
     AchatVenteApi.AddPiece(piece).then((numeroPiece) => {
       this.numeroPiece = numeroPiece.toString();
-      this.resolve({ action: "ADD", data: this.GetModelForGrid()});
+      this.resolve({ action: DialogActionResult.Create, data: this.GetModelForGrid()});
       (this.$refs.form as any).resetValidation();
       this.dialog = false;
       this.resetForm();
@@ -953,7 +942,7 @@ export default class extends Vue {
     let pieceComptaToSave = this.GetModelToSave();
     this.piecereadonly = true;
     AchatVenteApi.UpdatePiece(pieceComptaToSave).then(() => {
-      this.resolve({ action: "UPDATE", data: this.GetModelForGrid()});
+      this.resolve({ action: DialogActionResult.Update, data: this.GetModelForGrid()});
       this.dialog = false;
       this.resetForm();
     }).catch((err) => {
@@ -982,7 +971,7 @@ export default class extends Vue {
           AchatVenteApi.DeletePiece(this.periode.typePeriodeComptable, this.journal.numero, +this.numeroPiece)
           .then(() => {
             this.dialog = false;
-            this.resolve({ action: "DELETE", data: this.GetModelForGrid()});
+            this.resolve({ action: DialogActionResult.Delete, data: this.GetModelForGrid()});
           }).catch((err) => {
             this.errorMessage = displayAxiosError(err);
           }).finally(() => {
@@ -1086,7 +1075,7 @@ export default class extends Vue {
     this.autocompleteCompteTier?.blur();
     this.$nextTick(() => {
       this.dialog = false;
-      this.reject();
+      this.resolve({action: DialogActionResult.None});
     });
   }
 }

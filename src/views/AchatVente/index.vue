@@ -1,7 +1,7 @@
 <template>
   <v-container 
     fluid 
-    @keydown.107.prevent="openNewPieceComptable"
+    @keydown.107.prevent="OpenPieceComptable()"
     @keydown.page-up="nextPage()"
     @keydown.page-down="previousPage()">
     <v-card>
@@ -44,18 +44,6 @@
             >
             </v-select>
           </v-col>
-          <!-- <v-col cols="12" xs="12" md="3" lg="3">
-            <v-btn
-              color="primary"
-              id="btn-acqua"
-              x-large
-              :disabled="!searchIsValid"
-              @click="LoadPiecesComptables"
-            >
-              <v-icon>mdi-magnify</v-icon>
-              Charger
-            </v-btn>
-          </v-col> -->
         </v-row>
       </v-form>
     </v-card>
@@ -64,7 +52,7 @@
         Pièces comptables
         <v-tooltip top open-delay=500 >
           <template v-slot:activator="{ on }">
-            <v-btn ref="btnAdd" color="warning" small fab class="ml-5" :disabled="!searchIsValid" @click="openNewPieceComptable" v-on="on">
+            <v-btn ref="btnAdd" color="warning" small fab class="ml-5" :disabled="!searchIsValid" @click="OpenPieceComptable()" v-on="on">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </template>
@@ -122,7 +110,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue, Watch, Ref } from "vue-property-decorator";
 import axios from "axios";
 import {
   PeriodeComptable,
@@ -135,12 +123,16 @@ import AchatVentePieceVue from "./components/AchatVentePiece.vue";
 import PieceAddResultVue from "./components/PieceAddResult.vue";
 import { AchatVenteApi } from "../../api/AchatVenteApi";
 import { Pagination } from '@/models/Pagination';
+import { DialogActionResult } from '@/models/DialogResult';
 
 @Component({
   name: "AchatVente",
   components: { AchatVentePieceVue, PieceAddResultVue }
 })
 export default class extends Vue {
+  @Ref() readonly refDialogPiece!:AchatVentePieceVue;
+  @Ref() readonly PieceAddResultVue!: PieceAddResultVue;
+
   private skipAddResult: boolean = false;
   private searchIsValid: boolean = true;
   private isErrorPeriode: boolean = false;
@@ -263,36 +255,22 @@ export default class extends Vue {
     this.currentPage > 1 ? this.currentPage-- : this.currentPage = this.pageCount;
   }
 
-  private OpenPieceComptable(entete: EntetePieceComptable) {
-    (this.$refs.refDialogPiece as AchatVentePieceVue)
-      .open(entete, this.periodeSelected, this.journalSelected)
+  private OpenPieceComptable(entete?: EntetePieceComptable) {
+    this.refDialogPiece.open(this.periodeSelected, this.journalSelected, entete)
       .then(resp => {
-        if(resp.action == "UPDATE"){
+        if (resp.action == DialogActionResult.Create){
+          if(!this.skipAddResult) this.displayAddResult(resp.data);
+          this.piecesComptables.unshift(resp.data);
+        } else if(resp.action == DialogActionResult.Update && entete){
           Vue.set(this.piecesComptables, this.piecesComptables.findIndex(e => e == entete), resp.data);
           this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, "success");
-        }else if(resp.action == "DELETE"){
+        } else if(resp.action == DialogActionResult.Delete && entete){
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
           this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, "error");
         }
-      }).catch(() => {
-        //La fenêtre à été fermé manuellement
       })
       .finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
-      });
-  }
-
-  private openNewPieceComptable() {
-    (this.$refs.refDialogPiece as AchatVentePieceVue)
-      .openNew(this.periodeSelected, this.journalSelected)
-      .then((resp) => {
-        if(!this.skipAddResult) this.displayAddResult(resp.data);
-        this.piecesComptables.unshift(resp.data);
-      }).catch(() => {
-        //La fenêtre à été fermé manuellement
-      })
-      .finally(() => {
-        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
       });
   }
 

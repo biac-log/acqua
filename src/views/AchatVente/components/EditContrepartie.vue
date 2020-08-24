@@ -482,7 +482,6 @@ export default class extends Vue {
     tvaImpute: number,
     propositionLibelle: string
   ) {
-    console.log(contrepartie);
     this.dossierComponent?.resetDossier();
     this.initDevises(deviseEntete, contrepartie);
     this.numeroJournal = numeroJournal;
