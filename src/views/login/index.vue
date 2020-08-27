@@ -67,7 +67,7 @@ export default class extends Vue {
     const userLogin = new UserLogin();
     userLogin.userName = username;
     userLogin.password = password;
-    UserModule.Login(userLogin)
+    UserModule.login(userLogin)
       .then(() => {
         this.username = '';
         this.password = '';

@@ -85,7 +85,7 @@
 import { AgGridVue } from 'ag-grid-vue';
 import { Component, Vue, PropSync, Watch } from 'vue-property-decorator';
 import { GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
-import { EcheancierApi } from '@/api/EcheancierApi';
+import EcheancierApi from '@/api/EcheancierApi';
 import { Echeancier, EcheancierElement } from '../../../models/Echeancier';
 import { DateTime } from '@/models/DateTime';
 import _ from 'lodash';
@@ -197,15 +197,15 @@ export default class extends Vue {
         suppressMenu: true
       }
     },
-    getRowStyle: function(params: any) {
+    getRowStyle(params: any) {
       if (params.node.data.isLastRow && params.node.data.echu)
         return { 'border-bottom': '1px solid black', 'background-color': '#ffd6cc' };
       else if (params.node.data.isLastRow) return { 'border-bottom': '1px solid black' };
     },
-    isRowSelectable: function(rowNode) {
+    isRowSelectable(rowNode) {
       return rowNode.data ? rowNode.data.isPiecePrincipale : false;
     },
-    postSort: function(rowNodes) {
+    postSort(rowNodes) {
       function move(toIndex: any, fromIndex: any) {
         rowNodes.splice(toIndex, 0, rowNodes.splice(fromIndex, 1)[0]);
       }

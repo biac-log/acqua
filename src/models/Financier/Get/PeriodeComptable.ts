@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { DateTime } from '@/models/DateTime';
 
 export interface IPeriodeComptable {

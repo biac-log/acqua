@@ -3,7 +3,6 @@ import Router, { Route, RouteConfig } from 'vue-router';
 import { UserModule } from '@/store/modules/user';
 import { PermissionModule } from '@/store/modules/permissions';
 import Layout from '@/layout/index.vue';
-import Financier from '@/views/Financier/index.vue';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 
@@ -150,8 +149,8 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
   if (UserModule.token) {
     if (!UserModule.utilisateur || (PermissionModule.routes && PermissionModule.routes.length === 0)) {
       try {
-        await UserModule.LoadUser();
-        PermissionModule.GenerateRoutes(UserModule.utilisateur.Permissions);
+        await UserModule.loadUser();
+        PermissionModule.generateRoutes(UserModule.utilisateur.Permissions);
         //Dynamically add accessible routes
         router.addRoutes(PermissionModule.dynamicRoutes);
         if (to.path.toUpperCase() == '/LOGIN') {

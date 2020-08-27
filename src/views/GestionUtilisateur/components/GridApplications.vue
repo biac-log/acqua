@@ -13,7 +13,7 @@
           @click:row="loadPermissions"
         >
           <template v-slot:[`item.Acces`]="{ item }">
-            <v-simple-checkbox :value="HasAccessApplication(item)" disabled></v-simple-checkbox>
+            <v-simple-checkbox :value="hasAccessApplication(item)" disabled></v-simple-checkbox>
           </template>
         </v-data-table>
       </v-col>
@@ -69,7 +69,7 @@ export default class extends Vue {
       .catch();
   }
 
-  private HasAccessApplication(application: Application) {
+  private hasAccessApplication(application: Application) {
     return !!this.allPermissions?.find((e) => e.ApplicationId === application.Id);
   }
 }

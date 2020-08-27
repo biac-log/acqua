@@ -1,7 +1,7 @@
 import { CaseTva, CaseTvaDTO } from '@/models/CaseTva/CaseTva';
 import api from '@/api/AxiosApi';
 
-export abstract class CaseTvaApi {
+export default abstract class CaseTvaApi {
   static async getCasesTVADisponibles(journal: number | string): Promise<CaseTva[]> {
     const response = await api.AcQuaCore.get<CaseTva[]>(`CaseTVA/GetCasesTVADisponibles?numeroJournal=${journal}`);
     return response.data.map((caseTvaDTO) => new CaseTva(caseTvaDTO));

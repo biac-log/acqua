@@ -20,7 +20,7 @@ export class CompteGeneralSearchDTO implements ICompteGeneralSearch {
   libelleCase = '';
 }
 
-export default class CompteGeneralSearch extends CompteGeneralSearchDTO {
+export class CompteGeneralSearch extends CompteGeneralSearchDTO {
   constructor(dto: CompteGeneralSearchDTO) {
     super();
     Object.assign(this, dto);

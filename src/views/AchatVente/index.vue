@@ -1,7 +1,7 @@
 <template>
   <v-container
     fluid
-    @keydown.107.prevent="OpenPieceComptable()"
+    @keydown.107.prevent="openPieceComptable()"
     @keydown.page-up="nextPage()"
     @keydown.page-down="previousPage()"
   >
@@ -22,7 +22,7 @@
               :loading="periodeIsLoading"
               :hint="periodeSelected.libellePeriode"
               :rules="periodesRules"
-              @change="LoadPiecesComptables"
+              @change="loadPiecesComptables"
             ></v-select>
           </v-col>
           <v-col cols="12" xs="12" md="6" lg="3">
@@ -37,7 +37,7 @@
               :hint="`Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`"
               return-object
               persistent-hint
-              @change="LoadPiecesComptables"
+              @change="loadPiecesComptables"
               :rules="journalRules"
               required
             >
@@ -58,7 +58,7 @@
               fab
               class="ml-5"
               :disabled="!searchIsValid"
-              @click="OpenPieceComptable()"
+              @click="openPieceComptable()"
               v-on="on"
             >
               <v-icon>mdi-plus</v-icon>
@@ -73,7 +73,7 @@
           label="Search"
           single-line
           hide-details
-          @keydown.enter="LoadPiecesComptables()"
+          @keydown.enter="loadPiecesComptables()"
         ></v-text-field>
       </v-card-title>
       <v-data-table
@@ -82,7 +82,7 @@
         :items="piecesComptables"
         :search="search"
         :loading="isLoadingPieces"
-        @click:row="OpenPieceComptable"
+        @click:row="openPieceComptable"
         :options.sync="options"
         :server-items-length="totalItems"
         :page.sync="currentPage"
@@ -122,7 +122,7 @@ import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
 import { PeriodeComptable, EntetePieceComptable, Journal } from '@/models/AchatVente';
 import AchatVentePieceVue from './components/AchatVentePiece.vue';
 import PieceAddResultVue from './components/PieceAddResult.vue';
-import { AchatVenteApi } from '../../api/AchatVenteApi';
+import AchatVenteApi from '@/api/AchatVenteApi';
 import { Pagination } from '@/models/Pagination';
 import { DialogActionResult } from '@/models/DialogResult';
 
@@ -181,11 +181,11 @@ export default class extends Vue {
   private pageCount = 0;
 
   mounted() {
-    this.LoadPeriodes();
-    this.LoadJournaux();
+    this.loadPeriodes();
+    this.loadJournaux();
   }
 
-  private async LoadPeriodes() {
+  private async loadPeriodes() {
     try {
       this.periodeIsLoading = true;
       const periodes = await AchatVenteApi.getPeriodes();
@@ -197,7 +197,7 @@ export default class extends Vue {
     }
   }
 
-  private async LoadJournaux() {
+  private async loadJournaux() {
     try {
       this.journauxIsLoading = true;
       const journaux = await AchatVenteApi.getJournaux();
@@ -211,7 +211,7 @@ export default class extends Vue {
 
   @Watch('options')
   @Watch('search')
-  private async LoadPiecesComptables() {
+  private async loadPiecesComptables() {
     try {
       if (this.periodeSelected && this.journalSelected.numero) {
         this.isLoadingPieces = true;
@@ -224,7 +224,7 @@ export default class extends Vue {
         pagination.page = page;
         pagination.limit = itemsPerPage;
 
-        const paginationResult = await AchatVenteApi.GetEntetePiecesComptables(
+        const paginationResult = await AchatVenteApi.getEntetePiecesComptables(
           this.journalSelected.numero,
           this.periodeSelected.typePeriodeComptable,
           pagination
@@ -264,7 +264,7 @@ export default class extends Vue {
     this.currentPage > 1 ? this.currentPage-- : (this.currentPage = this.pageCount);
   }
 
-  private OpenPieceComptable(entete?: EntetePieceComptable) {
+  private openPieceComptable(entete?: EntetePieceComptable) {
     this.refDialogPiece
       .open(this.periodeSelected, this.journalSelected, entete)
       .then((resp) => {

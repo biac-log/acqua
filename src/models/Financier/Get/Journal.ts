@@ -1,4 +1,4 @@
-import { Devise, DeviseDTO } from '../../Devise/Devise';
+import { DeviseDTO } from '../../Devise/Devise';
 import { CompteBanqueDTO } from './CompteBanque';
 
 export interface IJournal {

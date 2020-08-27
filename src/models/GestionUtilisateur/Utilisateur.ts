@@ -1,5 +1,5 @@
 import { Permission } from './Permission';
-import { Application, ApplicationDTO } from './Application';
+import { Application } from './Application';
 
 export interface IUtilisateur {
   ID: string;

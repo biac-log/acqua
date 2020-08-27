@@ -78,17 +78,17 @@ export abstract class FinancierApi {
     return true;
   }
 
-  static async AddPieceComptable(piece: PieceSaveDTO): Promise<number> {
+  static async addPieceComptable(piece: PieceSaveDTO): Promise<number> {
     const response = await api.AcQuaCore.post<number>(`/Financier/AddPieceComptable`, piece);
     return response.data;
   }
 
-  static async UpdatePieceComptable(piece: PieceSaveDTO): Promise<number> {
+  static async updatePieceComptable(piece: PieceSaveDTO): Promise<number> {
     const response = await api.AcQuaCore.put<number>(`/Financier/UpdatePieceComptable`, piece);
     return response.data;
   }
 
-  static async ChangeNumero(periode: string, journal: number, oldNumero: number, newNumero: number): Promise<boolean> {
+  static async changeNumero(periode: string, journal: number, oldNumero: number, newNumero: number): Promise<boolean> {
     await api.AcQuaCore.put(
       `/Financier/ChangementNumero?periode=${periode}&numeroJournal=${journal}&ancienNumeroPiece=${oldNumero}&nouveauNumeroPiece=${newNumero}`
     );

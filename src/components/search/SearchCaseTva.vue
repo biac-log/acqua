@@ -37,7 +37,7 @@ import { AgGridVue } from 'ag-grid-vue';
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { CaseTva } from '@/models/CaseTva';
 import { GridOptions, ICellRenderer, GridApi } from 'ag-grid-community';
-import { CaseTvaApi } from '../../api/CaseTvaApi';
+import CaseTvaApi from '@/api/CaseTvaApi';
 
 @Component({
   name: 'SearchCaseTva',
@@ -127,7 +127,6 @@ export default class extends Vue {
     const KEY_DOWN = 40;
     const KEY_LEFT = 37;
     const KEY_RIGHT = 39;
-
     switch (params.key) {
       case KEY_DOWN:
         previousCell = params.previousCellPosition;

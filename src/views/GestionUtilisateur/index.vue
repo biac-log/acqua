@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>
         Utilisateurs
-        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click="OpenUtilisateur()">
+        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click="openUtilisateur()">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
@@ -27,7 +27,7 @@
           :search="search"
           :loading="isLoading"
           fixed-header
-          @click:row="OpenUtilisateur"
+          @click:row="openUtilisateur"
           sort-by="ID"
           :footer-props="{ 'items-per-page-options': [10, 100, 500] }"
           :items-per-page="10"
@@ -94,11 +94,11 @@ export default class extends Vue {
   ];
 
   mounted() {
-    this.LoadUtilisateurs();
+    this.loadUtilisateurs();
   }
 
   @Watch('exclureInactifs')
-  private async LoadUtilisateurs() {
+  private async loadUtilisateurs() {
     try {
       this.utilisateurs = [];
       this.isLoading = true;
@@ -116,7 +116,7 @@ export default class extends Vue {
     }
   }
 
-  private OpenUtilisateur(utilisateur: Utilisateur) {
+  private openUtilisateur(utilisateur: Utilisateur) {
     (this.$refs.UtilisateurEdition as UtilisateurEditionVue)
       .open(utilisateur, this.applications)
       .then((resp) => {

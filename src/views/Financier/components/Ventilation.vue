@@ -71,7 +71,7 @@
                 :hide-details="readonly"
                 :rules="referenceRules"
                 @change="loadPieceComptable(reference)"
-                @keydown.ctrl.f.prevent="OpenSearchEcheancier()"
+                @keydown.ctrl.f.prevent="openSearchEcheancier()"
                 validate-on-blur
                 dense
               >
@@ -83,8 +83,8 @@
                         small
                         v-show="!readonly"
                         :disabled="readonly"
-                        @click="OpenSearchEcheancier()"
-                        @keydown.enter.prevent.stop="OpenSearchEcheancier()"
+                        @click="openSearchEcheancier()"
+                        @keydown.enter.prevent.stop="openSearchEcheancier()"
                         tabindex="-1"
                         v-on="on"
                       >
@@ -178,7 +178,7 @@
                 validate-on-blur
                 @keypress.enter="loadCaseTva"
                 @change="loadCaseTvaAsync"
-                @keydown.ctrl.f.prevent="OpenSearchCaseTva()"
+                @keydown.ctrl.f.prevent="openSearchCaseTva()"
                 dense
               >
                 <template v-slot:append>
@@ -188,8 +188,8 @@
                         icon
                         small
                         :disabled="readonly"
-                        @click="OpenSearchCaseTva()"
-                        @keydown.enter.prevent.stop="OpenSearchCaseTva()"
+                        @click="openSearchCaseTva()"
+                        @keydown.enter.prevent.stop="openSearchCaseTva()"
                         tabindex="-1"
                         v-on="on"
                       >
@@ -323,16 +323,16 @@ import { TypeCompte, Devise, TypeMouvement, getTypesMouvements } from '@/models/
 import SearchCaseTvaVue from '@/components/search/SearchCaseTva.vue';
 import SearchEcheancierVue from './SearchEcheancier.vue';
 import SearchDossierVue from '@/components/search/SearchDossier.vue';
-import CompteGeneralSearch from '../../../models/Compte/CompteGeneralSearch';
-import { Ventilation, Journal, PieceAchatVente } from '../../../models/Financier';
-import { FinancierApi } from '../../../api/FinancierApi';
-import { CaseTvaApi } from '@/api/CaseTvaApi';
+import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
+import { Ventilation, Journal, PieceAchatVente } from '@/models/Financier';
+import { FinancierApi } from '@/api/FinancierApi';
+import CaseTvaApi from '@/api/CaseTvaApi';
 import { CaseTva } from '@/models/CaseTva';
-import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
-import CompteSearch from '../../../models/Compte/CompteSearch';
-import { EcheancierElement } from '../../../models/Echeancier';
+import { CompteDeTier } from '@/models/Compte/CompteDeTier';
+import { CompteSearch } from '@/models/Compte/CompteSearch';
+import { EcheancierElement } from '@/models/Echeancier';
 import { Reglement } from '@/models/Financier/Get/Reglement';
-import { DeviseApi } from '@/api/DeviseApi';
+import DeviseApi from '@/api/DeviseApi';
 import { DateTime } from '@/models/DateTime';
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import AutocompleteComptesVue from './comptes/AutocompleteComptes.vue';
@@ -506,7 +506,7 @@ export default class VentilationVue extends Vue {
     this.natureCompte = ventilation.natureCompte;
 
     if (this.caseTva) {
-      this.caseTva.Refresh(ventilation.caseTva);
+      this.caseTva.refresh(ventilation.caseTva);
     }
   }
   //#endregion
@@ -651,7 +651,7 @@ export default class VentilationVue extends Vue {
 
   //* Init de la ventiliation depuis L'échéancier *//
   //#region Echeancier
-  private OpenSearchEcheancier(): void {
+  private openSearchEcheancier(): void {
     if ((this.typesComptesSelected.id == 'C' || this.typesComptesSelected.id == 'F') && this.numeroCompte) {
       (this.$refs.searchEcheancierDialog as SearchEcheancierVue)
         .open(this.typesComptesSelected.id, this.numeroCompte, `${this.numeroCompte} ${this.nomCompte}`)
@@ -740,7 +740,7 @@ export default class VentilationVue extends Vue {
           //this.calculMontant();
         }
       } else {
-        this.caseTva.Refresh();
+        this.caseTva.refresh();
         this.caseTva = new CaseTva();
       }
     } catch (err) {
@@ -751,7 +751,7 @@ export default class VentilationVue extends Vue {
     }
   }
 
-  private OpenSearchCaseTva(): void {
+  private openSearchCaseTva(): void {
     (this.$refs.caseTvaDialog as SearchCaseTvaVue)
       .open(this.numeroJournal)
       .then((caseTva) => {
@@ -764,7 +764,7 @@ export default class VentilationVue extends Vue {
       });
   }
 
-  private GetModel(): Ventilation {
+  private getModel(): Ventilation {
     const ventilation = new Ventilation();
     ventilation.numeroVentilation = this.numeroVentilation;
     ventilation.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : '';
@@ -791,7 +791,7 @@ export default class VentilationVue extends Vue {
     this.$nextTick(() => {
       if (this.isValid) {
         this.ventilationIsSelected = false;
-        this.resolve(this.GetModel());
+        this.resolve(this.getModel());
       }
     });
   }

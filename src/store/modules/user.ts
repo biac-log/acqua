@@ -3,7 +3,7 @@ import { Token } from '@/models/Login/Token';
 import store from '@/store/index';
 import { Utilisateur } from '@/models/Login/Utilisateur';
 import { UserLogin } from '@/models/Login/UserLogin';
-import { JsonObject, JsonProperty, JsonConvert } from 'json2typescript';
+import { JsonConvert } from 'json2typescript';
 import jwtDecode from 'jwt-decode';
 import api from '@/api/AxiosApi';
 
@@ -24,7 +24,7 @@ class User extends VuexModule implements IUserState {
   public username = '';
 
   @Mutation
-  private SET_TOKEN(resp: Token): void {
+  private setToken(resp: Token): void {
     const dateExpire: string = (resp.expires_in * 1000 + Date.now()).toString();
     localStorage.setItem('user-token', resp.value);
     localStorage.setItem('token-expire', dateExpire);
@@ -34,18 +34,18 @@ class User extends VuexModule implements IUserState {
   }
 
   @Mutation
-  private SET_USER(user: Utilisateur): void {
+  private setUser(user: Utilisateur): void {
     this.utilisateur = user;
     this.username = user.NomPrenom;
   }
 
   @Mutation
-  private LOGIN_FAIL(): void {
+  private loginFail(): void {
     this.status = 'error';
   }
 
   @Mutation
-  private RESET_TOKEN(): void {
+  private resetToken(): void {
     localStorage.removeItem('user-token');
     this.token = '';
     localStorage.removeItem('token-expire');
@@ -53,21 +53,21 @@ class User extends VuexModule implements IUserState {
   }
 
   @Action({ rawError: true })
-  public Login(userInfo: UserLogin): Promise<any> {
+  public login(userInfo: UserLogin): Promise<any> {
     userInfo.takePermissions = true;
     userInfo.application = 'ACQUA';
     return new Promise((resolve, reject) => {
       api.Authentication.post<Token>('/Authentication/LoginApp', userInfo)
         .then((resp) => {
-          this.SET_TOKEN(resp.data);
+          this.setToken(resp.data);
           const tokenDecode = jwtDecode(resp.data.value);
           const jsonConvert: JsonConvert = new JsonConvert();
           const user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
-          this.SET_USER(user);
+          this.setUser(user);
           resolve(resp);
         })
         .catch((err) => {
-          this.LOGIN_FAIL();
+          this.loginFail();
           let errorMessage = "Impossible de se connecter au serveur d'authentification";
           if (err.response && err.response.status === 400) {
             errorMessage = err.response.data.Message;
@@ -78,24 +78,24 @@ class User extends VuexModule implements IUserState {
   }
 
   @Action
-  public LoadUser() {
+  public loadUser() {
     return new Promise((resolve, reject) => {
       try {
         const tokenDecode = jwtDecode(this.token);
         const jsonConvert: JsonConvert = new JsonConvert();
         const user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
-        this.SET_USER(user);
+        this.setUser(user);
         resolve();
       } catch (err) {
-        this.RESET_TOKEN();
+        this.resetToken();
         reject();
       }
     });
   }
 
   @Action
-  public Logout() {
-    this.RESET_TOKEN();
+  public logout() {
+    this.resetToken();
     api.reset();
   }
 }

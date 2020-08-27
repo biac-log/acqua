@@ -10,7 +10,7 @@
       @keyup.enter="$event.target.select()"
       @focus="$event.target.select()"
       @change="numeroCompteChangeAsync"
-      @keydown.ctrl.f.prevent="OpenSearchCompte()"
+      @keydown.ctrl.f.prevent="openSearchCompte()"
       :hide-details="readonly"
       :filled="readonly"
       :readonly="readonly"
@@ -29,8 +29,8 @@
               small
               v-show="!readonly"
               :disabled="readonly"
-              @click="OpenSearchCompte()"
-              @keydown.enter.prevent.stop="OpenSearchCompte()"
+              @click="openSearchCompte()"
+              @keydown.enter.prevent.stop="openSearchCompte()"
               tabindex="4"
               v-on="on"
             >
@@ -56,8 +56,8 @@
 import { Component, Vue, PropSync, Watch, Ref } from 'vue-property-decorator';
 import SearchCompteTierVue from './SearchCompteTier.vue';
 import SearchCompteGeneralVue from './SearchCompteGeneral.vue';
-import { CompteApi } from '@/api/CompteApi';
-import CompteGeneralSearch from '@/models/Compte/CompteGeneralSearch';
+import CompteApi from '@/api/CompteApi';
+import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 
 @Component({
   name: 'AutocompleteComptes',
@@ -90,7 +90,7 @@ export default class extends Vue {
     if (numero && numero != '0') {
       const compteToSelect = {
         numero: numero ? numero : '',
-        nom: nom,
+        nom,
         numeroNom: `${nom} ${nom}`
       };
       this.comptesSearch = [];
@@ -174,15 +174,15 @@ export default class extends Vue {
     }
   }
 
-  private OpenSearchCompte(): void {
+  private openSearchCompte(): void {
     if (this.typeCompte) {
       this.comboboxCompte.blur();
-      if (this.typeCompte == 'G' || this.typeCompte == 'Z') this.OpenSearchCompteGeneral();
-      else this.OpenSearchCompteTier();
+      if (this.typeCompte == 'G' || this.typeCompte == 'Z') this.openSearchCompteGeneral();
+      else this.openSearchCompteTier();
     }
   }
 
-  private OpenSearchCompteGeneral() {
+  private openSearchCompteGeneral() {
     if (this.typeCompte) {
       this.comboboxCompte.blur();
       this.searchCompteGeneralDialog
@@ -197,7 +197,7 @@ export default class extends Vue {
     }
   }
 
-  private OpenSearchCompteTier(): void {
+  private openSearchCompteTier(): void {
     if (this.typeCompte) {
       this.comboboxCompte.blur();
       this.searchCompteTierDialog

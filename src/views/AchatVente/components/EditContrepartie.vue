@@ -38,7 +38,7 @@
                 @keyup.enter="$event.target.select()"
                 @focus="$event.target.select()"
                 @change="numeroCompteChange"
-                @keydown.ctrl.f.prevent="OpenSearchCompte()"
+                @keydown.ctrl.f.prevent="openSearchCompte()"
                 :hide-details="readonly"
                 :filled="readonly"
                 :readonly="readonly"
@@ -57,8 +57,8 @@
                         small
                         v-show="!readonly"
                         :disabled="readonly"
-                        @click="OpenSearchCompte()"
-                        @keydown.enter.prevent.stop="OpenSearchCompte()"
+                        @click="openSearchCompte()"
+                        @keydown.enter.prevent.stop="openSearchCompte()"
                         v-on="on"
                         tabindex="-1"
                       >
@@ -301,14 +301,14 @@
 <script lang="ts">
 import { Component, Vue, PropSync, Watch, Ref } from 'vue-property-decorator';
 import { PieceComptableContrepartie, TypeCompte, TypeMouvement, getTypesMouvements } from '@/models/AchatVente';
-import { AchatVenteApi } from '@/api/AchatVenteApi';
-import { CompteApi } from '@/api/CompteApi';
+import AchatVenteApi from '@/api/AchatVenteApi';
+import CompteApi from '@/api/CompteApi';
 import SearchCompteContrepartieVue from './SearchCompteContrepartie.vue';
 import SearchCaseTvaVue from '@/components/search/SearchCaseTva.vue';
-import CompteGeneralSearch from '../../../models/Compte/CompteGeneralSearch';
+import { CompteGeneralSearch } from '../../../models/Compte/CompteGeneralSearch';
 import { Devise } from '@/models/Devise/Devise';
 import GridContrepartiesVue from './GridContreparties.vue';
-import { CaseTvaApi } from '../../../api/CaseTvaApi';
+import CaseTvaApi from '../../../api/CaseTvaApi';
 import { CaseTva } from '@/models/CaseTva';
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossier.vue';
@@ -491,7 +491,7 @@ export default class extends Vue {
           ? contrepartie.montantDevise.toDecimalString(this.devisesSelected.typeDevise == 'E' ? 0 : 2)
           : '';
     this.numeroCaseTva = contrepartie.caseTva.numeroCase ? contrepartie.caseTva.numeroCase.toString() : '';
-    this.caseTva.Refresh(contrepartie.caseTva);
+    this.caseTva.refresh(contrepartie.caseTva);
     this.libelleCaseTva = contrepartie.caseTva.libelleCase;
 
     this.ventileDevise = ventileDevise;
@@ -528,7 +528,7 @@ export default class extends Vue {
         });
     }
   }
-  private OpenSearchCompte(): void {
+  private openSearchCompte(): void {
     if (this.typesComptesSelected) {
       (this.$refs.numeroCompte as any).blur();
       (this.$refs.compteDialog as SearchCompteContrepartieVue)
@@ -634,7 +634,7 @@ export default class extends Vue {
           this.tvaLoading = false;
         });
     } else {
-      this.caseTva.Refresh();
+      this.caseTva.refresh();
       this.caseTva = new CaseTva();
     }
   }
@@ -653,7 +653,7 @@ export default class extends Vue {
       });
   }
 
-  private GetModel(): PieceComptableContrepartie {
+  private getModel(): PieceComptableContrepartie {
     const contrepartie = new PieceComptableContrepartie();
     contrepartie.typeCompte = this.typesComptesSelected ? this.typesComptesSelected.id : '';
     contrepartie.numeroCompte = +this.numeroCompte;
@@ -674,7 +674,7 @@ export default class extends Vue {
     this.$nextTick(() => {
       if (this.isValid) {
         this.dialog = false;
-        this.resolve(this.GetModel());
+        this.resolve(this.getModel());
       }
     });
   }

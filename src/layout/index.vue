@@ -52,7 +52,7 @@ import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { AppMain } from './components';
 import { UserModule } from '@/store/modules/user';
-import { Route, RouteConfig } from 'vue-router';
+import { RouteConfig } from 'vue-router';
 import { PermissionModule } from '@/store/modules/permissions';
 
 @Component({
@@ -98,7 +98,7 @@ export default class extends Vue {
   }
 
   private logout() {
-    UserModule.Logout();
+    UserModule.logout();
     this.$router.push('/login');
   }
 }

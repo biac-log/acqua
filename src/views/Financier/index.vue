@@ -17,7 +17,7 @@
               :loading="periodeIsLoading"
               :hint="periodeSelected.libellePeriode"
               :rules="periodesRules"
-              @change="LoadPiecesComptables"
+              @change="loadPiecesComptables"
             ></v-select>
           </v-col>
           <v-col cols="12" xs="12" md="6" lg="3">
@@ -33,7 +33,7 @@
               return-object
               persistent-hint
               :rules="journalRules"
-              @change="LoadPiecesComptables"
+              @change="loadPiecesComptables"
               required
             >
             </v-select>
@@ -65,7 +65,7 @@
         :search="search"
         :loading="isLoadingPieces"
         :options.sync="options"
-        @click:row="OpenPieceComptable"
+        @click:row="openPieceComptable"
         :server-items-length="totalItems"
       >
         <template v-slot:[`item.pieceEquilibree`]="{ item }">
@@ -164,11 +164,11 @@ export default class extends Vue {
   private isLoadingPieces = false;
 
   mounted() {
-    this.LoadPeriodes();
-    this.LoadJournaux();
+    this.loadPeriodes();
+    this.loadJournaux();
   }
 
-  private async LoadPeriodes() {
+  private async loadPeriodes() {
     try {
       this.periodeIsLoading = true;
       const periodes = await FinancierApi.getPeriodes();
@@ -180,7 +180,7 @@ export default class extends Vue {
     }
   }
 
-  private async LoadJournaux() {
+  private async loadJournaux() {
     try {
       this.journauxIsLoading = true;
       const journaux = await FinancierApi.getJournaux();
@@ -194,12 +194,12 @@ export default class extends Vue {
 
   @Watch('options')
   onOptionsChanged() {
-    this.LoadPiecesComptables();
+    this.loadPiecesComptables();
   }
 
-  private async OpenPieceComptable(entete: EntetePieceComptable) {
+  private async openPieceComptable(entete: EntetePieceComptable) {
     this.refDialogPiece
-      .Open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
+      .open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
       .then((resp) => {
         if (resp) {
           Vue.set(
@@ -221,7 +221,7 @@ export default class extends Vue {
 
   private createNewPieceComptable() {
     this.refDialogPiece
-      .OpenNew(this.periodeSelected, this.journalSelected)
+      .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
         this.displayAddResult(resp);
         this.piecesComptables.unshift(resp);
@@ -249,7 +249,7 @@ export default class extends Vue {
       });
   }
 
-  private async LoadPiecesComptables() {
+  private async loadPiecesComptables() {
     try {
       if (this.periodeSelected.typePeriodeComptable && this.journalSelected.numero) {
         const { sortBy, sortDesc, page, itemsPerPage } = this.options;

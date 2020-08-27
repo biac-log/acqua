@@ -10,7 +10,7 @@
       @keyup.enter="$event.target.select()"
       @focus="$event.target.select()"
       @change="dossierChangeAsync"
-      @keydown.ctrl.f.prevent="OpenSearchDossier()"
+      @keydown.ctrl.f.prevent="openSearchDossier()"
       :filled="readonly"
       :hide-details="disabled || readonly"
       :readonly="isReadonly"
@@ -29,8 +29,8 @@
               icon
               small
               :disabled="disabled || readonly"
-              @click="OpenSearchDossier()"
-              @keydown.enter.prevent.stop="OpenSearchDossier()"
+              @click="openSearchDossier()"
+              @keydown.enter.prevent.stop="openSearchDossier()"
               v-on="on"
             >
               <v-icon>mdi-magnify</v-icon>
@@ -53,7 +53,7 @@
 <script lang="ts">
 import { Component, Vue, Watch, Ref, PropSync, Prop } from 'vue-property-decorator';
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
-import { DossierApi } from '@/api/DossierApi';
+import DossierApi from '@/api/DossierApi';
 import SearchDossierVue from '@/components/search/SearchDossier.vue';
 
 @Component({ components: { SearchDossierVue } })
@@ -96,7 +96,7 @@ export default class AutoCompleteDossierVue extends Vue {
     }
   }
 
-  private OpenSearchDossier(): void {
+  private openSearchDossier(): void {
     this.dossierComponent.blur();
     this.searchDossierDialog
       .open()

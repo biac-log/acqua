@@ -4,6 +4,7 @@
     @keydown.alt.enter.stop="sendExtrait()"
     @click:outside="close()"
     @keydown.esc.stop="close()"
+    @keydown.f2.stop="modifierPiece()"
     @keydown.107.prevent.stop="createVentilation"
     @keydown.46.prevent.stop="deleteExtrait"
   >
@@ -17,7 +18,7 @@
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" @click="ModifierPiece" v-on="on">
+              <v-btn class="mr-5" color="success" @click="modifierPiece" v-on="on">
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
@@ -106,12 +107,12 @@
                         >
                         <span v-if="journal.devise && journal.devise.id != 1">
                           Ventiler devise :
-                          <b
-                            >{{ ventileDevise | numberToStringEvenZero }}
-                            {{ journal.devise ? journal.devise.libelle : 'EUR' }}</b
-                          >
-                          - Ventiler base : <b>{{ ventileBase | numberToStringEvenZero }} EUR</b></span
-                        >
+                          <b>
+                            {{ ventileDevise | numberToStringEvenZero }}
+                            {{ journal.devise ? journal.devise.libelle : 'EUR' }}
+                          </b>
+                          - Ventiler base : <b>{{ ventileBase | numberToStringEvenZero }} EUR</b>
+                        </span>
                       </v-card-title>
                     </v-toolbar>
                     <v-data-table
@@ -192,7 +193,7 @@ import { FinancierApi } from '@/api/FinancierApi';
 import VentilationVue from './Ventilation.vue';
 import { Reglement } from '@/models/Financier/Get/Reglement';
 import { DateTime } from '@/models/DateTime';
-import { DeviseApi } from '@/api/DeviseApi';
+import DeviseApi from '@/api/DeviseApi';
 
 @Component({
   name: 'Extrait',
@@ -449,7 +450,7 @@ export default class extends Vue {
     return ventileDevise.toComptaString(this.journal.devise.typeDevise == 'E' ? 0 : 2).toNumber();
   }
 
-  private GetModel(): Extrait {
+  private getModel(): Extrait {
     const extrait = new Extrait();
     extrait.numeroExtrait = this.numeroExtrait;
     extrait.typeCompte = 'G';
@@ -471,7 +472,7 @@ export default class extends Vue {
     this.$nextTick(() => {
       if (this.isValid) {
         this.dialog = false;
-        this.resolve(this.GetModel());
+        this.resolve(this.getModel());
       }
     });
   }
@@ -483,7 +484,7 @@ export default class extends Vue {
     }
   }
 
-  private ModifierPiece() {
+  private modifierPiece() {
     this.readonly = false;
     (this.$refs.montant as any)?.focus();
   }

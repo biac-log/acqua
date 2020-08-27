@@ -6,10 +6,10 @@
     width="80%"
     :persistent="!readonly || saveLoading || deleteLoading"
     @click:outside="closeDialog"
-    @keydown.f2="ModifierPiece"
-    @keydown.46.prevent.stop="DeletePiece"
+    @keydown.f2.stop="modifierPiece()"
+    @keydown.46.prevent.stop="deletePiece"
     @keydown.107.prevent.stop="createExtrait"
-    @keydown.esc.prevent="CancelEdit()"
+    @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="savePiece()"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
@@ -24,7 +24,7 @@
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" :disabled="isLoading" @click="ModifierPiece" v-on="on">
+              <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierPiece" v-on="on">
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
@@ -37,7 +37,7 @@
                 class="mr-10"
                 color="error"
                 :disabled="saveLoading"
-                @click="DeletePiece"
+                @click="deletePiece"
                 :loading="deleteLoading"
               >
                 <v-icon left>mdi-delete</v-icon>Supprimer
@@ -113,7 +113,7 @@
                 class="ma-2 pr-4 align-self-start"
                 text
                 tabindex="-1"
-                @click="DeletePiece()"
+                @click="deletePiece()"
                 :disabled="saveLoading"
                 :loading="deleteLoading"
               >
@@ -154,8 +154,9 @@
                 class="ma-2 mt-0 pr-4 align-self-start"
                 tile
                 outlined
-                @click="CancelEdit()"
+                @click="cancelEdit()"
                 tabindex="-1"
+                :disabled="deleteLoading"
               >
                 <v-icon left>mdi-close</v-icon> Annuler
               </v-btn>
@@ -254,7 +255,7 @@ export default class PieceComptableVue extends Vue {
   }
 
   private hash = '';
-  public async OpenNew(periode: PeriodeComptable, journal: Journal): Promise<EntetePieceComptable> {
+  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<EntetePieceComptable> {
     this.dialog = true;
     this.reset();
     this.periode = periode;
@@ -275,7 +276,7 @@ export default class PieceComptableVue extends Vue {
     });
   }
 
-  public Open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<EntetePieceComptable> {
+  public open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<EntetePieceComptable> {
     this.dialog = true;
     this.readonly = true;
     this.periode = periode;
@@ -368,7 +369,7 @@ export default class PieceComptableVue extends Vue {
     this.soldeActuel = (this.soldeInitial.toNumber() + sumDebit - sumCredit).toComptaString();
   }
 
-  private DeletePiece() {
+  private deletePiece() {
     this.confirmDialog
       .open(
         'Suppression',
@@ -404,7 +405,7 @@ export default class PieceComptableVue extends Vue {
     (this.$refs.form as any).validate();
     this.$nextTick(async () => {
       if (this.isValid) {
-        const pieceToSave = this.GetModelToSave();
+        const pieceToSave = this.getModelToSave();
         if (pieceToSave.numeroPiece == 0) this.addPiece(pieceToSave);
         else this.updatePiece(pieceToSave);
       }
@@ -414,10 +415,10 @@ export default class PieceComptableVue extends Vue {
   private addPiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
     this.readonly = true;
-    FinancierApi.AddPieceComptable(piece)
+    FinancierApi.addPieceComptable(piece)
       .then((numeroPiece) => {
         this.numeroPiece = numeroPiece.toString();
-        this.resolve(this.GetModelForGrid());
+        this.resolve(this.getModelForGrid());
         (this.$refs.form as any).resetValidation();
         this.dialog = false;
         this.reset();
@@ -434,9 +435,9 @@ export default class PieceComptableVue extends Vue {
   private updatePiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
     this.readonly = true;
-    FinancierApi.UpdatePieceComptable(piece)
+    FinancierApi.updatePieceComptable(piece)
       .then(() => {
-        this.resolve(this.GetModelForGrid());
+        this.resolve(this.getModelForGrid());
         this.dialog = false;
         this.reset();
       })
@@ -449,7 +450,7 @@ export default class PieceComptableVue extends Vue {
       });
   }
 
-  private GetModelToSave(): PieceSaveDTO {
+  private getModelToSave(): PieceSaveDTO {
     const pieceToSave: PieceSaveDTO = new PieceSaveDTO();
     if (this.forcerNumero && this.numeroToForce) pieceToSave.numeroPiece = +this.numeroPiece;
 
@@ -491,7 +492,7 @@ export default class PieceComptableVue extends Vue {
     return pieceToSave;
   }
 
-  private GetModelForGrid(): EntetePieceComptable {
+  private getModelForGrid(): EntetePieceComptable {
     const entetePieceComptable = new EntetePieceComptable();
     entetePieceComptable.numeroJournal = this.journal.numero;
     entetePieceComptable.numeroPiece = this.numeroPiece.toNumber();
@@ -506,14 +507,15 @@ export default class PieceComptableVue extends Vue {
     return entetePieceComptable;
   }
 
-  private ModifierPiece() {
+  private modifierPiece() {
     if (!this.pieceIsLoading) {
       this.readonly = false;
       (this.$refs.refDatePiece as DatePicker).focus();
     }
   }
 
-  private CancelEdit() {
+  private cancelEdit() {
+    if (this.deleteLoading || this.saveLoading) return;
     this.readonly = true;
     if (this.numeroPiece.toNumber() == 0) this.closeDialog();
     else if (this.oldPiece) {

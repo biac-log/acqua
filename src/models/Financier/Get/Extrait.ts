@@ -1,4 +1,4 @@
-import { Ventilation, VentilationDTO } from './Ventilation';
+import { Ventilation } from './Ventilation';
 import _ from 'lodash';
 export class ExtraitDTO {
   numeroExtrait = 0;

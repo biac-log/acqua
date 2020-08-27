@@ -43,8 +43,8 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import CompteGeneralSearch from '@/models/Compte/CompteGeneralSearch';
-import { CompteApi } from '@/api/CompteApi';
+import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
+import CompteApi from '@/api/CompteApi';
 import { GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
 import { AgGridVue } from 'ag-grid-vue';
 

@@ -1,5 +1,3 @@
-import { DateTime } from '@/models/DateTime';
-
 export class SearchFournisseurDTO {
   public Type = '';
   public Numero = 0;

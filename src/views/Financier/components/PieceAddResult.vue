@@ -152,7 +152,7 @@ export default class extends Vue {
 
   private saveNewNumero() {
     this.numeroLoading = true;
-    FinancierApi.ChangeNumero(this.periode, this.journal, this.numero, this.nouveauNumero.toNumber())
+    FinancierApi.changeNumero(this.periode, this.journal, this.numero, this.nouveauNumero.toNumber())
       .then(() => {
         this.numero = this.nouveauNumero.toNumber();
         this.$nextTick(() => (this.$refs.btnClose as any)?.$el?.focus());

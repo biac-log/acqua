@@ -1,7 +1,7 @@
 import { DossierSearch, DossierSearchDTO } from '@/models/Dossier/DossierSearch';
 import api from './AxiosApi';
 
-export abstract class DossierApi {
+export default abstract class DossierApi {
   static async getAll(): Promise<DossierSearch[]> {
     const response = await api.AcQuaCore.get<DossierSearchDTO[]>(`/Dossier/GetAllDossiers`);
     return response.data.map((d) => new DossierSearch(d));

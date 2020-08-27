@@ -2,7 +2,7 @@ import { DateTime } from '@/models/DateTime';
 import { Devise, DeviseDTO } from '@/models/Devise/Devise';
 import api from './AxiosApi';
 
-export abstract class DeviseApi {
+export default abstract class DeviseApi {
   static async getAllDevises(): Promise<Devise[]> {
     const response = await api.AcQuaCore.get<DeviseDTO[]>(`/Devise/GetDevises`);
     return response.data.map((dev) => new Devise(dev));

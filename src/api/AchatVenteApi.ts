@@ -10,16 +10,16 @@ import {
   EntetePieceComptable,
   Statut,
   Journal,
-  JournalDTO
+  JournalDTO,
+  PieceComptableSaveDTO
 } from '@/models/AchatVente';
-import CompteGeneralSearch from '@/models/Compte/CompteGeneralSearch';
-import { PieceComptableSaveDTO } from '@/models/AchatVente';
+import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import { DateTime } from '@/models/DateTime';
 import { PaginationResult } from '@/models/PaginationResult';
 import { Pagination } from '@/models/Pagination';
 import api from '@/api/AxiosApi';
 
-export abstract class AchatVenteApi {
+export default class AchatVenteApi {
   static async getPeriodes(): Promise<PeriodeComptable[]> {
     const responseCourante = await api.AcQuaCore.get<PeriodeComptableDTO>(`/AchatVente/GetPeriodeCourante`);
     const responsePrecedente = await api.AcQuaCore.get<PeriodeComptableDTO>(`/AchatVente/GetPeriodePrecedente`);
@@ -34,7 +34,7 @@ export abstract class AchatVenteApi {
     return response.data.map((journal) => new Journal(journal));
   }
 
-  static async GetEntetePiecesComptables(
+  static async getEntetePiecesComptables(
     numeroJournal: number,
     periode: string,
     pagination: Pagination
@@ -64,12 +64,12 @@ export abstract class AchatVenteApi {
 
   static async getTypesComptes(): Promise<TypeCompte[]> {
     const response = await api.AcQuaCore.get<TypeCompteDTO[]>(`/AchatVente/GetTypesCompteContreparties`);
-    return response.data.map((TypeCompteDTO) => new TypeCompte(TypeCompteDTO));
+    return response.data.map((dto) => new TypeCompte(dto));
   }
 
   static async getComptesContreparties(): Promise<CompteContrepartieSearch[]> {
     const response = await api.AcQuaCore.get<CompteContrepartieSearchDTO[]>(`/AchatVente/GetTypesCompteContreparties`);
-    return response.data.map((TypeCompteDTO) => new CompteContrepartieSearch(TypeCompteDTO));
+    return response.data.map((dto) => new CompteContrepartieSearch(dto));
   }
 
   static async getAllStatut(): Promise<Statut[]> {
@@ -88,31 +88,31 @@ export abstract class AchatVenteApi {
     return response.data;
   }
 
-  static async AddPiece(pieceComptable: PieceComptableSaveDTO): Promise<number> {
+  static async addPiece(pieceComptable: PieceComptableSaveDTO): Promise<number> {
     const response = await api.AcQuaCore.post<number>(`/AchatVente/AddPieceComptable`, pieceComptable);
     return response.data;
   }
 
-  static async UpdatePiece(pieceComptable: PieceComptableSaveDTO): Promise<PieceComptableSaveDTO> {
+  static async updatePiece(pieceComptable: PieceComptableSaveDTO): Promise<PieceComptableSaveDTO> {
     const response = await api.AcQuaCore.put<PieceComptableSaveDTO>(`/AchatVente/UpdatePieceComptable`, pieceComptable);
     return response.data;
   }
 
-  static async DeletePiece(periode: string, journal: number, piece: number): Promise<any> {
+  static async deletePiece(periode: string, journal: number, piece: number): Promise<any> {
     const response = await api.AcQuaCore.delete<any>(
       `/AchatVente/DeletePieceComptable?periode=${periode}&journal=${journal}&piece=${piece}`
     );
     return response.data;
   }
 
-  static async ValidateLibelle(libelle: string, typeComte: string, numeroCompte: string | number): Promise<boolean> {
+  static async validateLibelle(libelle: string, typeComte: string, numeroCompte: string | number): Promise<boolean> {
     const response = await api.AcQuaCore.get<boolean>(
       `/AchatVente/IsReferenceExiste?typeCompte=${typeComte}&numeroCompte=${numeroCompte}&reference=${libelle}`
     );
     return response.data;
   }
 
-  static async ChangeNumero(periode: string, journal: number, oldNumero: number, newNumero: number): Promise<boolean> {
+  static async changeNumero(periode: string, journal: number, oldNumero: number, newNumero: number): Promise<boolean> {
     await api.AcQuaCore.put(
       `/AchatVente/ChangementNumero?periode=${periode}&numeroJournal=${journal}&ancienNumeroPiece=${oldNumero}&nouveauNumeroPiece=${newNumero}`
     );

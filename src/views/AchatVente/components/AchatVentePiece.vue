@@ -7,7 +7,7 @@
       :persistent="!piecereadonly"
       eager
       @keydown.f2="ModifierPiece"
-      @keydown.46.prevent.stop="DeletePiece"
+      @keydown.46.prevent.stop="deletePiece"
       @keydown.107.prevent.stop="createContrepartie"
       @keydown.alt.enter="savePiece()"
       @click:outside.stop="closeDialog()"
@@ -38,7 +38,7 @@
                   color="error"
                   :disabled="saveLoading"
                   v-show="piecereadonly"
-                  @click="DeletePiece"
+                  @click="deletePiece"
                   :loading="deleteIsLoading"
                   v-on="on"
                 >
@@ -73,7 +73,7 @@
                       @keyup.enter="$event.target.select()"
                       @focus="$event.target.select()"
                       @change="numeroCompteTierChange"
-                      @keydown.ctrl.f.prevent="OpenSearchCompte()"
+                      @keydown.ctrl.f.prevent="openSearchCompte()"
                       :hide-details="piecereadonly"
                       :filled="piecereadonly"
                       :readonly="piecereadonly"
@@ -91,8 +91,8 @@
                               v-show="!piecereadonly"
                               v-on="on"
                               :disabled="piecereadonly || saveLoading"
-                              @click="OpenSearchCompte()"
-                              @keydown.enter.prevent.stop="OpenSearchCompte()"
+                              @click="openSearchCompte()"
+                              @keydown.enter.prevent.stop="openSearchCompte()"
                               tabindex="-1"
                             >
                               <v-icon>mdi-magnify</v-icon>
@@ -346,7 +346,7 @@
                   tabindex="-1"
                   :disabled="saveLoading"
                   v-if="numeroPiece"
-                  @click="DeletePiece()"
+                  @click="deletePiece()"
                   :loading="deleteIsLoading"
                   v-on="on"
                 >
@@ -438,17 +438,17 @@ import {
   PieceComptableContrepartieSaveDTO,
   PieceComptableSaveDTO
 } from '@/models/AchatVente';
-import CompteSearch from '@/models/Compte/CompteSearch';
+import { CompteSearch } from '@/models/Compte/CompteSearch';
 import SearchCompteTier from './SearchCompteTier.vue';
 import Confirm from '@/components/Confirm.vue';
 import DatePicker from '@/components/DatePicker.vue';
-import { CompteApi } from '@/api/CompteApi';
-import { AchatVenteApi } from '@/api/AchatVenteApi';
+import CompteApi from '@/api/CompteApi';
+import AchatVenteApi from '@/api/AchatVenteApi';
 import GridContreparties from './GridContreparties.vue';
 import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import { DateTime } from '../../../models/DateTime';
-import { DeviseApi } from '@/api/DeviseApi';
+import DeviseApi from '@/api/DeviseApi';
 import { Devise } from '@/models/Devise/Devise';
 import { DialogActionResult } from '@/models/DialogResult';
 
@@ -596,7 +596,7 @@ export default class extends Vue {
     this.typeCompte = journal.typeCompteChar;
     if (entete) {
       this.numeroPiece = entete.codePiece ? entete.codePiece.toString() : '';
-      this.GetPiece();
+      this.getPiece();
     }
   }
 
@@ -646,12 +646,12 @@ export default class extends Vue {
     (this.$refs.form as any).resetValidation();
   }
 
-  private async GetPiece() {
+  private async getPiece() {
     this.errorMessage = '';
     this.pieceLoading = true;
     try {
       const pieceComptable = await AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece);
-      this.SetPiece(pieceComptable);
+      this.setPiece(pieceComptable);
     } catch (err) {
       this.errorMessage = displayAxiosError(err);
     } finally {
@@ -659,7 +659,7 @@ export default class extends Vue {
     }
   }
 
-  private SetPiece(pieceComptable: PieceComptable) {
+  private setPiece(pieceComptable: PieceComptable) {
     this.contreparties = pieceComptable.contreparties;
 
     this.numeroCompteTier = pieceComptable.compteTiersNumero.toString();
@@ -737,7 +737,7 @@ export default class extends Vue {
     }
   }
 
-  private OpenSearchCompte(): void {
+  private openSearchCompte(): void {
     if (this.piecereadonly) return;
     this.autocompleteCompteTier.blur();
     (this.$refs.compteDialog as SearchCompteTier)
@@ -811,7 +811,7 @@ export default class extends Vue {
 
   private validateLibelle() {
     if (!this.piecereadonly && this.libelle && this.libelle != this.libelleFromInit) {
-      AchatVenteApi.ValidateLibelle(this.libelle, this.typeCompte, this.numeroCompteTier).then((isUsed) => {
+      AchatVenteApi.validateLibelle(this.libelle, this.typeCompte, this.numeroCompteTier).then((isUsed) => {
         if (isUsed) {
           this.libelleWarningMessage = 'Attention, ce libellé est déjà utilisé par une autre pièce';
           (this.$refs.confirmLibellelDialog as Confirm)
@@ -937,7 +937,7 @@ export default class extends Vue {
     (this.$refs.form as any).validate();
     this.$nextTick(async () => {
       if (this.isValid && (await this.confirmEquilibre())) {
-        const pieceToSave = this.GetModelToSave();
+        const pieceToSave = this.getModelToSave();
         if (pieceToSave.numeroPiece == 0) this.addPiece(pieceToSave);
         else this.updatePiece();
       }
@@ -970,12 +970,12 @@ export default class extends Vue {
     this.saveLoading = true;
     this.piecereadonly = true;
     this.errorMessage = '';
-    AchatVenteApi.AddPiece(piece)
+    AchatVenteApi.addPiece(piece)
       .then((numeroPiece) => {
         this.numeroPiece = numeroPiece.toString();
         this.resolve({
           action: DialogActionResult.Create,
-          data: this.GetModelForGrid()
+          data: this.getModelForGrid()
         });
         (this.$refs.form as any).resetValidation();
         this.dialog = false;
@@ -993,13 +993,13 @@ export default class extends Vue {
   private updatePiece() {
     this.saveLoading = true;
     this.errorMessage = '';
-    const pieceComptaToSave = this.GetModelToSave();
+    const pieceComptaToSave = this.getModelToSave();
     this.piecereadonly = true;
-    AchatVenteApi.UpdatePiece(pieceComptaToSave)
+    AchatVenteApi.updatePiece(pieceComptaToSave)
       .then(() => {
         this.resolve({
           action: DialogActionResult.Update,
-          data: this.GetModelForGrid()
+          data: this.getModelForGrid()
         });
         this.dialog = false;
         this.resetForm();
@@ -1014,11 +1014,11 @@ export default class extends Vue {
   }
 
   private deleteIsLoading = false;
-  private DeletePiece() {
+  private deletePiece() {
     this.autocompleteCompteTier?.blur();
-    this.$nextTick(() => this.OpenConfirmDelete());
+    this.$nextTick(() => this.openConfirmDelete());
   }
-  private OpenConfirmDelete() {
+  private openConfirmDelete() {
     this.confirmDialog
       .open(
         'Suppression',
@@ -1029,12 +1029,12 @@ export default class extends Vue {
       .then((resp) => {
         if (resp) {
           this.deleteIsLoading = true;
-          AchatVenteApi.DeletePiece(this.periode.typePeriodeComptable, this.journal.numero, +this.numeroPiece)
+          AchatVenteApi.deletePiece(this.periode.typePeriodeComptable, this.journal.numero, +this.numeroPiece)
             .then(() => {
               this.dialog = false;
               this.resolve({
                 action: DialogActionResult.Delete,
-                data: this.GetModelForGrid()
+                data: this.getModelForGrid()
               });
             })
             .catch((err) => {
@@ -1052,7 +1052,7 @@ export default class extends Vue {
       });
   }
 
-  private GetModelToSave(): PieceComptableSaveDTO {
+  private getModelToSave(): PieceComptableSaveDTO {
     const pieceComptaSave: PieceComptableSaveDTO = new PieceComptableSaveDTO();
     if (this.forcerNumero && this.numeroToForce) pieceComptaSave.numeroPiece = +this.numeroPiece;
 
@@ -1093,7 +1093,7 @@ export default class extends Vue {
     return pieceComptaSave;
   }
 
-  private GetModelForGrid(): EntetePieceComptable {
+  private getModelForGrid(): EntetePieceComptable {
     const entete = new EntetePieceComptable();
     entete.codeJournal = this.journal.numero;
     entete.codePiece = this.numeroPiece.toNumber();

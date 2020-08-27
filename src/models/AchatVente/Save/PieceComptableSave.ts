@@ -1,4 +1,4 @@
-import { PieceComptableContrepartie, PieceComptableContrepartieSaveDTO } from '..';
+import { PieceComptableContrepartieSaveDTO } from '..';
 
 export interface IPieceComptableSave {
   periode: string;

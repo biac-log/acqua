@@ -1,9 +1,9 @@
-import CompteSearch, { CompteSearchDTO } from '@/models/Compte/CompteSearch';
-import CompteGeneralSearch, { CompteGeneralSearchDTO } from '@/models/Compte/CompteGeneralSearch';
+import { CompteSearchDTO, CompteSearch } from '@/models/Compte/CompteSearch';
+import { CompteGeneralSearchDTO, CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import { CompteDeTierDTO, CompteDeTier } from '@/models/Compte/CompteDeTier';
 import api from '@/api/AxiosApi';
 
-export abstract class CompteApi {
+export default abstract class CompteApi {
   static async getComptesTiers(type: string): Promise<CompteSearch[]> {
     const response = await api.AcQuaCore.get<CompteSearchDTO[]>(`Compte/GetAllComptesDeTiers?typeCompte=${type}`);
     return response.data.map((CompteSearchDTO) => new CompteSearch(CompteSearchDTO));

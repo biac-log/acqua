@@ -265,7 +265,7 @@ import { Utilisateur } from '@/models/GestionUtilisateur/Utilisateur';
 import { Permission } from '@/models/GestionUtilisateur/Permission';
 import ImageUploader from '@/components/imageUploader/imageUploader.vue';
 import { GestionUtilisateurApi } from '@/api/GestionUtilisateurApi';
-import { DepartementApi } from '@/api/DepartementApi';
+import DepartementApi from '@/api/DepartementApi';
 import GridApplications from './GridApplications.vue';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import { Application } from '../../../models/GestionUtilisateur/Application';
@@ -320,10 +320,10 @@ export default class extends Vue {
 
   private isErrorLoading = false;
   mounted() {
-    this.LoadDepartements();
+    this.loadDepartements();
   }
 
-  private async LoadDepartements() {
+  private async loadDepartements() {
     try {
       const departements = await DepartementApi.getDepartements();
       this.departements = departements.map((e) => e.Nom);
@@ -337,7 +337,7 @@ export default class extends Vue {
     this.dialog = true;
     this.utilisateurReadonly = !!utilisateur;
     this.applications = apps;
-    this.SetUtilisateur(utilisateur);
+    this.setUtilisateur(utilisateur);
     // this.$nextTick(() => (this.$refs.numeroCompteTier as any)?.focus());
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -345,7 +345,7 @@ export default class extends Vue {
     });
   }
 
-  private SetUtilisateur(utilisateur: Utilisateur) {
+  private setUtilisateur(utilisateur: Utilisateur) {
     this.utilisateur = utilisateur ? utilisateur : new Utilisateur();
     this.numeroUtilisateur = utilisateur?.ID;
 
@@ -391,7 +391,7 @@ export default class extends Vue {
   private save() {
     this.saveLoading = true;
     this.errorMessage = '';
-    const model = this.GetModelToSave();
+    const model = this.getModelToSave();
     this.utilisateurReadonly = true;
     GestionUtilisateurApi.save(model)
       .then((resp) => {
@@ -407,7 +407,7 @@ export default class extends Vue {
       });
   }
 
-  private GetModelToSave(): Utilisateur {
+  private getModelToSave(): Utilisateur {
     this.utilisateur.ID = this.code;
     this.utilisateur.NomPrenom = this.nomPrenom;
     this.utilisateur.MotDePasseApollo = this.motDePasse;
@@ -429,7 +429,7 @@ export default class extends Vue {
   private cancelEdit() {
     if (this.utilisateur.ID) {
       this.utilisateurReadonly = true;
-      this.SetUtilisateur(this.utilisateur);
+      this.setUtilisateur(this.utilisateur);
     } else this.closeDialog();
   }
 

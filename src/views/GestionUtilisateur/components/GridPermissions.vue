@@ -100,7 +100,7 @@ export default class extends Vue {
     this.applicationId = application.Id;
     this.applicationNom = application.Nom;
     this.utilisateur = utilisateur;
-    this.LoadPermissions();
+    this.loadPermissions();
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -108,7 +108,7 @@ export default class extends Vue {
     });
   }
 
-  private LoadPermissions() {
+  private loadPermissions() {
     try {
       this.permissions = [];
       this.selected = [];
@@ -122,7 +122,7 @@ export default class extends Vue {
           });
         } else {
           this.permissions = resp;
-          this.GivePermissions();
+          this.givePermissions();
         }
       });
     } catch (err) {
@@ -132,7 +132,7 @@ export default class extends Vue {
     }
   }
 
-  private GivePermissions() {
+  private givePermissions() {
     this.permissions.forEach((permission) => {
       if (this.permissionsUtilisateur.find((e) => e.Id === permission.Id)) this.selected.push(permission);
     });

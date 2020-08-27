@@ -106,7 +106,7 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync } from 'vue-property-decorator';
-import { AchatVenteApi } from '@/api/AchatVenteApi';
+import AchatVenteApi from '@/api/AchatVenteApi';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 
 @Component({
@@ -152,12 +152,12 @@ export default class extends Vue {
 
   private saveNewNumero() {
     this.numeroLoading = true;
-    AchatVenteApi.ChangeNumero(this.periode, this.journal, this.numero, this.nouveauNumero.toNumber())
+    AchatVenteApi.changeNumero(this.periode, this.journal, this.numero, this.nouveauNumero.toNumber())
       .then(() => {
         this.numero = this.nouveauNumero.toNumber();
         this.$nextTick(() => (this.$refs.btnClose as any)?.$el?.focus());
       })
-      .catch((err) => {
+      .catch((err: any) => {
         this.errorMessage = displayAxiosError(err);
       })
       .finally(() => {

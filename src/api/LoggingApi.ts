@@ -55,18 +55,18 @@ export abstract class LoggingApi {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
       logging.exceptionType = err.response.status.toString();
-      logging.descriptionLongue += '\n Response data : \n' + JSON.stringify(err.response.data);
-      logging.descriptionLongue += '\n Response headers : \n' + JSON.stringify(err.response.headers);
+      logging.descriptionLongue += `\n Response data : \n${JSON.stringify(err.response.data)}`;
+      logging.descriptionLongue += `\n Response headers : \n${JSON.stringify(err.response.headers)}`;
     } else if (err.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
       // http.ClientRequest in node.js
-      logging.descriptionLongue += '\n Request : ' + JSON.stringify(err.request);
+      logging.descriptionLongue += `\n Request : ${JSON.stringify(err.request)}`;
     } else {
       // Something happened in setting up the request that triggered an Error
-      logging.descriptionLongue += '\n' + err.message;
+      logging.descriptionLongue += `\n${err.message}`;
     }
     logging.fonction = `${err.config?.method?.toString()} ${err.config?.url?.toString()}`;
-    logging.descriptionLongue += '\n Request config : \n' + JSON.stringify(err.config);
+    logging.descriptionLongue += `\n Request config : \n${JSON.stringify(err.config)}`;
   }
 }

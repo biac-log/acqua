@@ -24,7 +24,7 @@ export class CaseTva extends CaseTvaDTO {
     Object.assign(this, dto || new CaseTvaDTO());
   }
 
-  public Refresh(dto?: CaseTvaDTO) {
+  public refresh(dto?: CaseTvaDTO) {
     Object.assign(this, dto || new CaseTvaDTO());
   }
 

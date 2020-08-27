@@ -14,7 +14,7 @@ export class CompteSearchDTO implements ICompteSearch {
   libelleCase = '';
 }
 
-export default class CompteSearch extends CompteSearchDTO {
+export class CompteSearch extends CompteSearchDTO {
   constructor(dto: CompteSearchDTO) {
     super();
     Object.assign(this, dto);

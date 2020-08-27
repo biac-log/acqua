@@ -40,7 +40,7 @@ export default class extends Vue {
     // to an app update being available.
     // The new service worker is installed, but not yet active.
     // Store the ServiceWorkerRegistration instance for later use.
-    const h = this.$createElement;
+    this.$createElement;
     this.registration = (e as CustomEvent).detail;
     this.snackbar = true;
   }

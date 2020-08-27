@@ -58,12 +58,12 @@
 <script lang="ts">
 import { Component, Vue, PropSync, Watch } from 'vue-property-decorator';
 import { PieceComptableContrepartie, Journal } from '@/models/AchatVente';
-import { AchatVenteApi } from '@/api/AchatVenteApi';
 import EditContrepartieVue from './EditContrepartie.vue';
-import { CompteApi } from '@/api/CompteApi';
 import { Devise } from '@/models/Devise/Devise';
-import { CaseTvaApi } from '@/api/CaseTvaApi';
 import { DateTime } from '@/models/DateTime';
+import CaseTvaApi from '@/api/CaseTvaApi';
+import CompteApi from '@/api/CompteApi';
+import AchatVenteApi from '@/api/AchatVenteApi';
 
 @Component({
   name: 'GridContreparties',

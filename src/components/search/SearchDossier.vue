@@ -45,7 +45,7 @@
 import { AgGridVue } from 'ag-grid-vue';
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
-import { DossierApi } from '@/api/DossierApi';
+import DossierApi from '@/api/DossierApi';
 import { GridOptions, GridApi } from 'ag-grid-community';
 
 @Component({
