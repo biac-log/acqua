@@ -101,7 +101,7 @@
                 ref="searchEcheancierDialog"
               ></SearchEcheancierVue>
             </v-col>
-            <v-col cols="3" v-if="typesComptesSelected.id == 'G'">
+            <v-col cols="3" v-if="typesComptesSelected.id == 'G' && dossierIsEnabled">
               <AutoCompleteDossierVue
                 ref="dossierComponent"
                 :disabled.sync="dossierIsDisabled"
@@ -110,7 +110,7 @@
               >
               </AutoCompleteDossierVue>
             </v-col>
-            <v-col cols="4" v-if="typesComptesSelected.id == 'G'">
+            <v-col cols="4" v-if="typesComptesSelected.id == 'G' && dossierIsEnabled">
               <v-text-field
                 label="Nom Dossier"
                 v-model="nomDossier"
@@ -122,7 +122,7 @@
                 dense
               ></v-text-field>
             </v-col>
-            <v-col cols="5">
+            <v-col :cols="columnLibelleSize">
               <v-text-field
                 ref="libelle"
                 label="Libellé"
@@ -337,6 +337,7 @@ import { DateTime } from '@/models/DateTime';
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import AutocompleteComptesVue from './comptes/AutocompleteComptes.vue';
 import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossier.vue';
+import { ApplicationModule } from '@/store/modules/application';
 
 @Component({
   components: {
@@ -359,6 +360,13 @@ export default class VentilationVue extends Vue {
   @PropSync('VentileBase') public ventileBase!: number;
   @PropSync('VentileDevise') public ventileDevise!: number;
   @PropSync('Reglement') public reglement!: Reglement;
+
+  get dossierIsEnabled() {
+    return ApplicationModule.parametre.modeDossier;
+  }
+  get columnLibelleSize() {
+    return this.typesComptesSelected.id != 'G' || this.dossierIsEnabled ? 5 : 12;
+  }
 
   private dialog = false;
   private ventilationIsSelected = false;
