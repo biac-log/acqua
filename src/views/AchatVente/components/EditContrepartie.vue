@@ -208,7 +208,7 @@
               </v-text-field>
             </v-col>
           </v-row>
-          <v-row dense v-if="typesComptesSelected.id == 'G'">
+          <v-row dense v-if="typesComptesSelected.id == 'G' && dossierIsEnabled">
             <v-col cols="2">
               <AutoCompleteDossierVue
                 ref="dossierComponent"
@@ -314,6 +314,7 @@ import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossier.vue';
 import { DateTime } from '@/models/DateTime';
 import { AxiosError } from 'axios';
+import { ApplicationModule } from '@/store/modules/application';
 
 @Component({
   name: 'EditContrepartie',
@@ -330,6 +331,10 @@ export default class extends Vue {
   @PropSync('isReadOnly') public readonly!: boolean;
   @PropSync('DatePiece') private datePiece!: DateTime;
   @PropSync('TauxDevise') private tauxDevise!: string;
+
+  get dossierIsEnabled() {
+    return ApplicationModule.parametre.modeDossier;
+  }
 
   private dialog = false;
   private isNew = true;
@@ -681,7 +686,6 @@ export default class extends Vue {
 
   private idDossier = '';
   private nomDossier = '';
-  private dossierIsDisabled = false;
   private dossierChange(dossier: DossierSearch) {
     this.idDossier = dossier.idDossier;
     this.nomDossier = dossier.nom;

@@ -122,7 +122,7 @@ import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
 import { PeriodeComptable, EntetePieceComptable, Journal } from '@/models/AchatVente';
 import AchatVentePieceVue from './components/AchatVentePiece.vue';
 import PieceAddResultVue from './components/PieceAddResult.vue';
-import AchatVenteApi from '@/api/AchatVenteApi';
+import AchatVenteApi from '../../api/AchatVenteApi';
 import { Pagination } from '@/models/Pagination';
 import { DialogActionResult } from '@/models/DialogResult';
 

@@ -1,17 +1,10 @@
-export interface ICompteSearch {
-  numero: number;
-  nom: string;
-  raisonSocial: string;
-  adresse: string;
-}
-
-export class CompteSearchDTO implements ICompteSearch {
+export class CompteSearchDTO {
   numero = 0;
   nom = '';
   raisonSocial = '';
   adresse = '';
-  numeroCase = 0;
-  libelleCase = '';
+  codeTVAIntracommunautaire = '';
+  compteBloque = false;
 }
 
 export class CompteSearch extends CompteSearchDTO {
@@ -28,7 +21,7 @@ export class CompteSearch extends CompteSearchDTO {
     return `${this.numero ? this.numero : ''} ${this.nom}`.trim();
   }
 
-  get caseTvaDisplay() {
-    return `${this.numeroCase ? this.numeroCase : ''} ${this.libelleCase ? this.libelleCase : ''}`;
+  get compteBloqueDisplay() {
+    return this.compteBloque ? 'Bloqué' : '';
   }
 }

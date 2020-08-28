@@ -8,12 +8,17 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import ServiceWorkerUpdatePopup from '@/components/ServiceWorkerUpdatePopup.vue';
+import { ApplicationModule } from '@/store/modules/application';
 
 @Component({
   name: 'App',
   components: { ServiceWorkerUpdatePopup }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  mounted() {
+    ApplicationModule.initParametre();
+  }
+}
 </script>
 
 <style lang="scss">
