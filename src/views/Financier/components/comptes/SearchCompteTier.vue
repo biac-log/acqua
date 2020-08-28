@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    width="1000"
+    width="1100"
     v-model="dialog"
     @click:outside="close()"
     @keydown.esc="close()"
@@ -63,7 +63,8 @@ export default class extends Vue {
     { headerName: 'Numéro', field: 'numero', filter: true, width: 120 },
     { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
     { headerName: 'Raison sociale', field: 'raisonSocial', filter: true, width: 140 },
-    { headerName: 'Adresse', field: 'adresse', filter: true, flex: 1 }
+    { headerName: 'Adresse', field: 'adresse', filter: true, flex: 1 },
+    { headerName: 'Bloqué', field: 'compteBloqueDisplay', filter: true, width: 100 }
   ];
 
   private resolve!: any;
@@ -79,7 +80,10 @@ export default class extends Vue {
     overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
     pagination: true,
     paginationAutoPageSize: true,
-    onRowDoubleClicked: this.rowDoubleClick
+    onRowDoubleClicked: this.rowDoubleClick,
+    getRowStyle(params: any) {
+      if (params.node.data.compteBloque) return { 'background-color': '#ffd6cc' };
+    }
   };
 
   public open(typeToLoad: string): Promise<CompteSearch> {
