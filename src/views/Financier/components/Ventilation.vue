@@ -122,7 +122,7 @@
                 dense
               ></v-text-field>
             </v-col>
-            <v-col :cols="columnLibelleSize">
+            <v-col :cols="this.typesComptesSelected.id != 'G' || this.dossierIsEnabled ? 5 : 12">
               <v-text-field
                 ref="libelle"
                 label="Libellé"
@@ -363,9 +363,6 @@ export default class VentilationVue extends Vue {
 
   get dossierIsEnabled() {
     return ApplicationModule.parametre.modeDossier;
-  }
-  get columnLibelleSize() {
-    return this.typesComptesSelected.id != 'G' || this.dossierIsEnabled ? 5 : 12;
   }
 
   private dialog = false;
