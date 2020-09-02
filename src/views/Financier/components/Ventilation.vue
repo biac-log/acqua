@@ -124,7 +124,7 @@
             </v-col>
             <v-col :cols="this.typesComptesSelected.id != 'G' || this.dossierIsEnabled ? 5 : 12">
               <v-text-field
-                ref="libelle"
+                ref="libelleComponent"
                 label="Libellé"
                 v-model="libelle"
                 counter
@@ -536,7 +536,7 @@ export default class VentilationVue extends Vue {
       this.numeroCompte = compte.numero.toString();
       this.natureCompte = compte.nature;
       this.setCompteGeneralCaseTvaAsync(compte);
-      if (this.typesComptesSelected?.id == 'G' && (compte.nature == 'R' || compte.nature == 'C')) {
+      if (this.typesComptesSelected?.id == 'G' && (compte.nature == 'R' || compte.nature == 'C') && this.dossierIsEnabled) {
         this.dossierIsDisabled = false;
         this.dossierComponent?.focus();
       } else {
