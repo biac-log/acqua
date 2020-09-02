@@ -32,6 +32,7 @@
               @click="openSearchDossier()"
               @keydown.enter.prevent.stop="openSearchDossier()"
               v-on="on"
+              tabindex="-1"
             >
               <v-icon>mdi-magnify</v-icon>
             </v-btn>

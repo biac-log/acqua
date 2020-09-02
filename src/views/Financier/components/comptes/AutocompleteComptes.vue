@@ -31,7 +31,7 @@
               :disabled="readonly"
               @click="openSearchCompte()"
               @keydown.enter.prevent.stop="openSearchCompte()"
-              tabindex="4"
+              tabindex="-1"
               v-on="on"
             >
               <v-icon>mdi-magnify</v-icon>
