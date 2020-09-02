@@ -176,10 +176,12 @@
                 :loading="tvaLoading"
                 :disabled="typesComptesSelected.id != 'G'"
                 validate-on-blur
-                @keypress.enter="loadCaseTva"
+                @keypress.enter="loadCaseTvaAsync"
                 @change="loadCaseTvaAsync"
                 @keydown.ctrl.f.prevent="openSearchCaseTva()"
                 dense
+                :error="numeroCaseTvaError != ''"
+                :error-messages="numeroCaseTvaError"
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -405,8 +407,9 @@ export default class VentilationVue extends Vue {
 
   private caseTva: CaseTva = new CaseTva();
   private numeroCaseTva = '';
+  private numeroCaseTvaError = '';
   private numeroCaseTvaRules: any = [
-    (v: string) => !v || (v.isInt() && v.toNumber() != 0 && this.caseTva?.libelleCase) || 'Numero invalide'
+    (v: string) => !v || (v.isInt() && v.toNumber() != 0) || 'Numéro invalide'
   ];
 
   private tauxCase = 0;
@@ -735,13 +738,14 @@ export default class VentilationVue extends Vue {
     try {
       if (this.readonly) return;
       this.tvaLoading = true;
-      if (this.numeroCaseTva?.isInt()) {
+      if (this.numeroCaseTva?.isInt() && this.numeroCaseTva) {
         this.tvaLoading = true;
         this.errorMessage = '';
         const caseTva = await CaseTvaApi.getCaseTVA(this.numeroCaseTva, this.numeroJournal);
         if (caseTva) {
           this.numeroCaseTva = caseTva.numeroCase.toString();
           this.caseTva = caseTva;
+          this.numeroCaseTvaError = '';
           //this.calculMontant();
         }
       } else {
@@ -750,6 +754,7 @@ export default class VentilationVue extends Vue {
       }
     } catch (err) {
       this.caseTva = new CaseTva();
+      this.numeroCaseTvaError = "Numéro invalide";
       if (err.request.status != 505) this.errorMessage = err.request.response;
     } finally {
       this.tvaLoading = false;
@@ -762,6 +767,7 @@ export default class VentilationVue extends Vue {
       .then((caseTva) => {
         this.numeroCaseTva = caseTva.numeroCase.toString();
         this.caseTva = caseTva;
+        this.numeroCaseTvaError = '';
         this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
       })
       .catch(() => {
@@ -824,6 +830,7 @@ export default class VentilationVue extends Vue {
   }
 
   public close() {
+    this.numeroCaseTvaError = '';
     if (this.ventilationIsSelected) {
       this.ventilationIsSelected = false;
       if (this.reject) this.reject();
