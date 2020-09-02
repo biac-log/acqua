@@ -526,7 +526,7 @@ export default class VentilationVue extends Vue {
       this.loadPieceComptable(compte);
       this.dossierIsDisabled = true;
       this.natureCompte = '';
-      this.dossierComponent.resetDossier();
+      this.dossierComponent?.resetDossier();
       this.$nextTick(() => (this.$refs.montant as any)?.focus());
     } else if (compte instanceof CompteGeneralSearch) {
       this.nomCompte = compte.nom;
@@ -538,7 +538,7 @@ export default class VentilationVue extends Vue {
         this.dossierComponent?.focus();
       } else {
         this.dossierIsDisabled = true;
-        this.dossierComponent.resetDossier();
+        this.dossierComponent?.resetDossier();
         this.$nextTick(() => (this.$refs.montant as any)?.focus());
       }
     } else if (compte instanceof CompteSearch || compte instanceof CompteDeTier) {
@@ -546,7 +546,7 @@ export default class VentilationVue extends Vue {
       this.numeroCompte = compte.numero.toString();
       this.dossierIsDisabled = true;
       this.natureCompte = '';
-      this.dossierComponent.resetDossier();
+      this.dossierComponent?.resetDossier();
       this.$nextTick(() => (this.$refs.reference as any)?.focus());
     }
   }

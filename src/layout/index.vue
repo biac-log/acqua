@@ -77,7 +77,7 @@
           :search-input.sync="search"
           item-text="name"
           item-value="name"
-          label="Recherche"
+          label="Naviguer vers"
           @change="setRoute"
           append-icon=""
           return-object

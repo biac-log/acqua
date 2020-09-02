@@ -49,7 +49,7 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-card-text>
+        <v-card-text class="pb-0">
           <v-col cols="12" class="pr-5">
             <v-row fill-height no-gutters>
               <v-col cols="12" x-lg="5" lg="12">
@@ -185,6 +185,28 @@
         <Confirm ref="confirmDialog"></Confirm>
       </v-card>
     </v-form>
+    <v-dialog v-model="datePieceDialog" width="300">
+      <v-card>
+        <v-card-title primary-title>
+          Nouvelle pièce
+        </v-card-title>
+        <v-card-text>
+          <DatePicker
+            ref="refDatePieceDialog"
+            name="datePiece"
+            label="Date pièce"
+            :date.sync="datePiece"
+            :readonly.sync="readonly"
+            :filled="readonly"
+            :rules.sync="datePieceRules"
+          ></DatePicker>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="success" @click="datePieceDialog = false">Valider</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-dialog>
 </template>
 
@@ -210,6 +232,7 @@ export default class PieceComptableVue extends Vue {
   @Ref() gridExtraits!: ExtraitsVue;
   @Ref() confirmDialog!: Confirm;
   @Ref() refDatePiece!: DatePicker;
+  @Ref() refDatePieceDialog!: DatePicker;
   @Ref() warningMessage!: AlertMessageVue;
 
   private dialog = false;
@@ -224,6 +247,7 @@ export default class PieceComptableVue extends Vue {
   private numeroPiece = '';
   private libelleCompte = '';
 
+  private datePieceDialog = false;
   private datePiece: DateTime = new DateTime();
   private datePieceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
@@ -257,6 +281,7 @@ export default class PieceComptableVue extends Vue {
   private hash = '';
   public async openNew(periode: PeriodeComptable, journal: Journal): Promise<EntetePieceComptable> {
     this.dialog = true;
+    this.$nextTick(() => (this.datePieceDialog = true));
     this.reset();
     this.periode = periode;
     this.journal = journal;
@@ -269,7 +294,8 @@ export default class PieceComptableVue extends Vue {
     else if (today.isAfter(this.periode.dateFin)) this.datePiece = this.periode.dateFin;
     else this.datePiece = today;
 
-    this.$nextTick(() => (this.$refs.refDatePiece as DatePicker).focus());
+    this.focusDatePiece();
+
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -510,8 +536,15 @@ export default class PieceComptableVue extends Vue {
   private modifierPiece() {
     if (!this.pieceIsLoading) {
       this.readonly = false;
-      (this.$refs.refDatePiece as DatePicker).focus();
+      if (this.datePieceDialog) this.refDatePieceDialog.focus();
+      else this.refDatePiece.focus();
     }
+  }
+
+  @Watch('datePieceDialog')
+  private focusDatePiece() {
+    if (this.datePieceDialog) this.refDatePieceDialog.focus();
+    else this.refDatePiece.focus();
   }
 
   private cancelEdit() {
