@@ -347,7 +347,7 @@ export default class extends Vue {
   }
 
   private montantBaseToString(params: ValueFormatterParams): string {
-    if (params.value) return `${(params.value as number).toComptaString(2)} USD`;
+    if (params.value) return `${(params.value as number).toComptaString(2)} EUR`;
     else return '';
   }
 
