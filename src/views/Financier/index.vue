@@ -150,11 +150,11 @@ export default class extends Vue {
     { text: '', value: 'pieceEquilibree', width: 50 },
     { text: 'Numéro pièce', value: 'numeroPiece' },
     { text: 'Date pièce', value: 'datePieceDate' },
-    { text: 'Libelle', value: 'libelle' },
-    { text: 'Solde initiale', value: 'soldeInitiale', align: 'end' },
+    { text: 'Libellé', value: 'libelle' },
+    { text: 'Solde initial', value: 'soldeInitiale', align: 'end' },
     { text: 'Débit', value: 'totalDebit', align: 'end' },
     { text: 'Crédit', value: 'totalCredit', align: 'end' },
-    { text: 'Solde finale', value: 'soldeFinale', align: 'end' }
+    { text: 'Solde final', value: 'soldeFinale', align: 'end' }
   ];
 
   private search = '';
