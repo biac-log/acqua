@@ -9,6 +9,9 @@ export class EcheancierDTO {
   codePays = '';
   localite = '';
   solde = 0;
+  numeroTelephone = '';
+  conditionPaiement = '';
+  montantEchu = 0;
   elements: EcheancierElement[] = [];
 }
 
@@ -22,5 +25,13 @@ export class Echeancier extends EcheancierDTO {
         this.elements.push(new EcheancierElement(element));
       });
     }
+  }
+
+  get soldeDisplay(): string {
+    return this.solde.toDecimalString();
+  }
+
+  get montantEchuDisplay(): string {
+    return this.montantEchu.toDecimalString();
   }
 }

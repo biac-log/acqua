@@ -27,15 +27,60 @@
           autocomplete="off"
         ></v-text-field>
       </v-card-title>
+      <v-card-text>
+        <v-row>
+          <v-col cols="2">
+            <v-text-field
+              label="Solde"
+              v-model="allEcheanciers.soldeDisplay"
+              filled
+              hide-details
+              tabindex="-1"
+              readonly
+              dense
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              label="Numéro tél."
+              v-model="allEcheanciers.numeroTelephone"
+              filled
+              hide-details
+              tabindex="-1"
+              readonly
+              dense
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              label="Montant échu"
+              v-model="allEcheanciers.montantEchuDisplay"
+              filled
+              hide-details
+              tabindex="-1"
+              readonly
+              dense
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
+              label="Condition paiement"
+              v-model="allEcheanciers.conditionPaiement"
+              filled
+              hide-details
+              tabindex="-1"
+              readonly
+              dense
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-card-text>
+
       <v-card-text class="pb-0">
         <v-row dense class="ml-1">
           <v-btn small color="primary" @click="detailIsVisible = !detailIsVisible">
-            <template v-if="detailIsVisible">
-              Voir les pièces principales
-            </template>
-            <template v-else>
-              Voir le détail
-            </template>
+            <template v-if="detailIsVisible">Voir les pièces principales</template>
+            <template v-else>Voir le détail</template>
           </v-btn>
           <v-checkbox
             label="Uniquement les pièces non soldées"
@@ -48,7 +93,14 @@
             <v-radio label="Montant compta" value="base"></v-radio>
           </v-radio-group>
           <v-spacer></v-spacer>
-          <div class="text-h6">Reste à ventiler : <b :class="resteAVentile > 0 ? 'amountPositive' : 'amountNull'">{{ resteAVentile | numberToStringEvenZero }}</b></div>
+          <div class="text-h6">
+            Reste à ventiler :
+            <b :class="resteAVentile > 0 ? 'amountPositive' : 'amountNull'">
+              {{
+              resteAVentile | numberToStringEvenZero
+              }}
+            </b>
+          </div>
         </v-row>
         <v-row>
           <v-col cols="12">
@@ -60,20 +112,29 @@
               :rowData="echeanciers"
               :gridOptions="gridOptions"
               @selection-changed="calculAVentile"
-            >
-            </AgGridVue>
+            ></AgGridVue>
           </v-col>
         </v-row>
       </v-card-text>
-      <v-card-actions>        
+      <v-card-actions>
         <v-spacer></v-spacer>
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" @click="sendEcheancier" v-on="on">
-              <v-icon left>mdi-check</v-icon> Valider
+            <v-btn
+              ref="btnValidate"
+              class="ma-2 pr-4"
+              tile
+              color="success"
+              @click="sendEcheancier"
+              v-on="on"
+            >
+              <v-icon left>mdi-check</v-icon>Valider
             </v-btn>
           </template>
-          <span>Valider la sélection <span class="shortcutTooltip">enter</span></span>
+          <span>
+            Valider la sélection
+            <span class="shortcutTooltip">enter</span>
+          </span>
         </v-tooltip>
       </v-card-actions>
     </v-card>
@@ -106,7 +167,7 @@ export default class extends Vue {
   private filtreEcheancier = '';
   private isLoading = false;
   private echeanciers: EcheancierElement[] = [];
-  private allEcheanciers?: Echeancier;
+  private allEcheanciers = new Echeancier();
   private headersEcheanciers = [
     {
       headerName: 'Piece',
@@ -171,7 +232,7 @@ export default class extends Vue {
       hide: true
     },
     { headerName: 'Rappel', field: 'rappel', filter: true, width: 100, type: 'numericColumn' },
-    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150 },
+    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150 }
   ];
 
   private resolve!: any;
@@ -253,6 +314,7 @@ export default class extends Vue {
       this.isLoading = true;
       EcheancierApi.getEcheancierForCompteTiers(this.typeLoad, this.numeroEcheancierToLoad)
         .then((resp) => {
+          console.dir(resp);
           this.allEcheanciers = resp;
           this.refreshGridElements();
         })
@@ -428,15 +490,10 @@ export default class extends Vue {
 </script>
 
 <style scoped>
-  .amountPositive {
-    color: orange;
-  }
-  .amountNull {
-    color: green;
-  }
-  /* .ventilateAmountLeft {
-    font-size: 18px;
-font-weight: bold;
-padding-top: 0px;
-  } */
+.amountPositive {
+  color: orange;
+}
+.amountNull {
+  color: green;
+}
 </style>
