@@ -10,7 +10,6 @@ export class EcheancierElementDTO {
   libelle = '';
   dateEcheance = '';
   rappel = 0;
-  echu = '';
   soldeDevise = 0;
   soldeBase = 0;
   montantDevise = 0;
