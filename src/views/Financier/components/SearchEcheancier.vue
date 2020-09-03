@@ -47,6 +47,8 @@
             <v-radio label="Montant devise" value="devise"></v-radio>
             <v-radio label="Montant compta" value="base"></v-radio>
           </v-radio-group>
+          <v-spacer></v-spacer>
+          <div class="text-h6">Reste à ventiler : <b :class="resteAVentile > 0 ? 'amountPositive' : 'amountNull'">{{ resteAVentile | numberToStringEvenZero }}</b></div>
         </v-row>
         <v-row>
           <v-col cols="12">
@@ -63,10 +65,7 @@
           </v-col>
         </v-row>
       </v-card-text>
-      <v-card-actions>
-        <span class="ml-5"
-          >Reste à ventiler : <b>{{ resteAVentile | numberToStringEvenZero }}</b></span
-        >
+      <v-card-actions>        
         <v-spacer></v-spacer>
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
@@ -173,7 +172,6 @@ export default class extends Vue {
     },
     { headerName: 'Rappel', field: 'rappel', filter: true, width: 100, type: 'numericColumn' },
     { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150 },
-    { headerName: 'Dépassement', field: 'echu', filter: true, flex: 1 }
   ];
 
   private resolve!: any;
@@ -198,9 +196,7 @@ export default class extends Vue {
       }
     },
     getRowStyle(params: any) {
-      if (params.node.data.isLastRow && params.node.data.echu)
-        return { 'border-bottom': '1px solid black', 'background-color': '#ffd6cc' };
-      else if (params.node.data.isLastRow) return { 'border-bottom': '1px solid black' };
+      if (params.node.data.isLastRow) return { 'border-bottom': '1px solid black' };
     },
     isRowSelectable(rowNode) {
       return rowNode.data ? rowNode.data.isPiecePrincipale : false;
@@ -431,4 +427,16 @@ export default class extends Vue {
 }
 </script>
 
-<style></style>
+<style scoped>
+  .amountPositive {
+    color: orange;
+  }
+  .amountNull {
+    color: green;
+  }
+  /* .ventilateAmountLeft {
+    font-size: 18px;
+font-weight: bold;
+padding-top: 0px;
+  } */
+</style>
