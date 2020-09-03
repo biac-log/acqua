@@ -185,7 +185,7 @@
         <Confirm ref="confirmDialog"></Confirm>
       </v-card>
     </v-form>
-    <v-dialog v-model="datePieceDialog" width="300">
+    <v-dialog v-model="datePieceDialog" width="300" eager style="z-index: 999999999999999999">
       <v-card>
         <v-card-title primary-title>
           Nouvelle pièce
@@ -199,6 +199,7 @@
             :readonly.sync="readonly"
             :filled="readonly"
             :rules.sync="datePieceRules"
+            autofocus
           ></DatePicker>
         </v-card-text>
         <v-card-actions>
@@ -543,7 +544,7 @@ export default class PieceComptableVue extends Vue {
 
   @Watch('datePieceDialog')
   private focusDatePiece() {
-    if (this.datePieceDialog) this.refDatePieceDialog.focus();
+    if (this.datePieceDialog) this.$nextTick(() => this.refDatePieceDialog.focus());
     else this.refDatePiece.focus();
   }
 
