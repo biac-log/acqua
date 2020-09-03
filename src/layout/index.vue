@@ -149,8 +149,6 @@ export default class extends Vue {
           });
         }
       });
-
-    console.log(this.routesDisplay);
   }
 
   get routes() {
