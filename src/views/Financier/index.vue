@@ -224,24 +224,20 @@ export default class extends Vue {
       .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
         this.displayAddResult(resp);
-        this.piecesComptables.unshift(resp);
+        this.journalSelected.numeroDernierePiece = parseInt(resp);
+        this.loadPiecesComptables();
       })
       .finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
       });
   }
 
-  private displayAddResult(piece: EntetePieceComptable) {
+  private displayAddResult(numeroPiece: string) {
     (this.$refs.PieceAddResultVue as PieceAddResultVue)
-      .open(piece.numeroJournal, piece.numeroPiece, this.periodeSelected.typePeriodeComptable)
+      .open(this.journalSelected.numero, parseInt(numeroPiece), this.periodeSelected.typePeriodeComptable)
       .then((numero) => {
-        if (piece.numeroPiece != numero) {
-          piece.numeroPiece = numero;
-          Vue.set(
-            this.piecesComptables,
-            this.piecesComptables.findIndex((e) => e == piece),
-            piece
-          );
+        if (parseInt(numeroPiece) != numero) {
+          this.loadPiecesComptables();
         }
       })
       .finally(() => {

@@ -279,7 +279,7 @@ export default class PieceComptableVue extends Vue {
   }
 
   private hash = '';
-  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<EntetePieceComptable> {
+  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<string> {
     this.dialog = true;
     this.$nextTick(() => (this.datePieceDialog = true));
     this.reset();
@@ -444,7 +444,7 @@ export default class PieceComptableVue extends Vue {
     FinancierApi.addPieceComptable(piece)
       .then((numeroPiece) => {
         this.numeroPiece = numeroPiece.toString();
-        this.resolve(this.getModelForGrid());
+        this.resolve(numeroPiece);
         (this.$refs.form as any).resetValidation();
         this.dialog = false;
         this.reset();
@@ -463,7 +463,7 @@ export default class PieceComptableVue extends Vue {
     this.readonly = true;
     FinancierApi.updatePieceComptable(piece)
       .then(() => {
-        this.resolve(this.getModelForGrid());
+        this.resolve(piece.numeroPiece);
         this.dialog = false;
         this.reset();
       })
@@ -518,20 +518,20 @@ export default class PieceComptableVue extends Vue {
     return pieceToSave;
   }
 
-  private getModelForGrid(): EntetePieceComptable {
-    const entetePieceComptable = new EntetePieceComptable();
-    entetePieceComptable.numeroJournal = this.journal.numero;
-    entetePieceComptable.numeroPiece = this.numeroPiece.toNumber();
-    entetePieceComptable.soldeInitiale = this.soldeInitial.toNumber();
-    entetePieceComptable.totalDebit = _.sum(this.extraits.map((m) => m.montantDebit.toNumber()));
-    entetePieceComptable.totalCredit = _.sum(this.extraits.map((m) => m.montantCredit.toNumber()));
-    entetePieceComptable.soldeFinale = this.soldeActuel.toNumber();
-    entetePieceComptable.pieceEquilibree = true;
-    entetePieceComptable.libelleDevise = this.journal.devise.libelle;
-    entetePieceComptable.datePiece = this.datePiece.toString();
-    entetePieceComptable.libelle = this.journal.libelle;
-    return entetePieceComptable;
-  }
+  // private getModelForGrid(): EntetePieceComptable {
+  //   const entetePieceComptable = new EntetePieceComptable();
+  //   entetePieceComptable.numeroJournal = this.journal.numero;
+  //   entetePieceComptable.numeroPiece = this.numeroPiece.toNumber();
+  //   entetePieceComptable.soldeInitiale = this.soldeInitial.toNumber();
+  //   entetePieceComptable.totalDebit = _.sum(this.extraits.map((m) => m.montantDebit.toNumber()));
+  //   entetePieceComptable.totalCredit = _.sum(this.extraits.map((m) => m.montantCredit.toNumber()));
+  //   entetePieceComptable.soldeFinale = this.soldeActuel.toNumber();
+  //   entetePieceComptable.pieceEquilibree = true;
+  //   entetePieceComptable.libelleDevise = this.journal.devise.libelle;
+  //   entetePieceComptable.datePiece = this.datePiece.toString();
+  //   entetePieceComptable.libelle = this.journal.libelle;
+  //   return entetePieceComptable;
+  // }
 
   private modifierPiece() {
     if (!this.pieceIsLoading) {
