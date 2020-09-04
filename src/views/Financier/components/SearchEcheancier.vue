@@ -10,7 +10,7 @@
   >
     <v-card :loading="isLoading">
       <v-card-title>
-        Échéancier {{ nomCompte }}
+        Échéancier : {{ nomCompte }}
         <v-btn color="primary" fab small class="ml-5" @click="refreshEcheancier">
           <v-icon>mdi-refresh</v-icon>
         </v-btn>

@@ -662,7 +662,7 @@ export default class VentilationVue extends Vue {
   private openSearchEcheancier(): void {
     if ((this.typesComptesSelected.id == 'C' || this.typesComptesSelected.id == 'F') && this.numeroCompte) {
       (this.$refs.searchEcheancierDialog as SearchEcheancierVue)
-        .open(this.typesComptesSelected.id, this.numeroCompte, `${this.numeroCompte} ${this.nomCompte}`)
+        .open(this.typesComptesSelected.id, this.numeroCompte, `${this.numeroCompte} - ${this.nomCompte}`)
         .then((elements) => {
           this.initFromEcheancier(elements);
           this.$nextTick(() => (this.$refs.montant as any)?.focus());
