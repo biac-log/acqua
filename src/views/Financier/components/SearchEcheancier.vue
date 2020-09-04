@@ -117,7 +117,7 @@
           </v-col>
         </v-row>
       </v-card-text>
-      <v-card-actions>
+      <v-card-actions class="pb-0 pt-0">
         <v-spacer></v-spacer>
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
