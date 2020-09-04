@@ -24,11 +24,20 @@
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierPiece" v-on="on">
+              <v-btn
+                class="mr-5"
+                color="success"
+                :disabled="isLoading"
+                @click="modifierPiece"
+                v-on="on"
+              >
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
-            <span>Modifier la pièce <span class="shortcutTooltip">F2</span></span>
+            <span>
+              Modifier la pièce
+              <span class="shortcutTooltip">F2</span>
+            </span>
           </v-tooltip>
           <v-tooltip v-if="readonly" top open-delay="500">
             <template v-slot:activator="{ on }">
@@ -43,20 +52,29 @@
                 <v-icon left>mdi-delete</v-icon>Supprimer
               </v-btn>
             </template>
-            <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
+            <span>
+              Supprimer la pièce
+              <span class="shortcutTooltip">del</span>
+            </span>
           </v-tooltip>
           <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
-        <v-card-text class="pb-0">
+        <v-card-text class="pb-0 pt-0">
           <v-col cols="12" class="pr-5">
             <v-row fill-height no-gutters>
+              <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
               <v-col cols="12" x-lg="5" lg="12">
                 <v-row dense>
                   <v-col cols="4">
-                    <v-text-field v-model="libelleCompte" label="Compte" :filled="readonly" readonly tabindex="-1">
-                    </v-text-field>
+                    <v-text-field
+                      v-model="libelleCompte"
+                      label="Compte"
+                      :filled="readonly"
+                      readonly
+                      tabindex="-1"
+                    ></v-text-field>
                   </v-col>
                   <v-col cols="3">
                     <v-text-field
@@ -67,7 +85,12 @@
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3">
-                    <v-text-field label="Solde actuel" v-model="soldeActuel" :filled="readonly" readonly></v-text-field>
+                    <v-text-field
+                      label="Solde actuel"
+                      v-model="soldeActuel"
+                      :filled="readonly"
+                      readonly
+                    ></v-text-field>
                   </v-col>
                   <v-col cols="2">
                     <DatePicker
@@ -99,9 +122,6 @@
           <v-row dense>
             <ExtraitVue ref="refExtraitVue" :isReadOnly.sync="readonly" :DatePiece.sync="datePiece"></ExtraitVue>
           </v-row>
-          <v-col cols="12">
-            <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
-          </v-col>
         </v-card-text>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
@@ -116,11 +136,12 @@
                 @click="deletePiece()"
                 :disabled="saveLoading"
                 :loading="deleteLoading"
-              >
-                Supprimer
-              </v-btn>
+              >Supprimer</v-btn>
             </template>
-            <span>Supprimer la pièce <span class="shortcutTooltip">del</span></span>
+            <span>
+              Supprimer la pièce
+              <span class="shortcutTooltip">del</span>
+            </span>
           </v-tooltip>
           <v-spacer></v-spacer>
           <v-btn
@@ -130,9 +151,7 @@
             tabindex="-1"
             v-if="!numeroPiece && !forcerNumero"
             @click="forcerNumero = true"
-          >
-            Forcer le numéro de pièce</v-btn
-          >
+          >Forcer le numéro de pièce</v-btn>
           <v-text-field
             label="Numéro pièce"
             v-model="numeroToForce"
@@ -158,10 +177,13 @@
                 tabindex="-1"
                 :disabled="deleteLoading"
               >
-                <v-icon left>mdi-close</v-icon> Annuler
+                <v-icon left>mdi-close</v-icon>Annuler
               </v-btn>
             </template>
-            <span>Annuler les modifications <span class="shortcutTooltip">esc</span></span>
+            <span>
+              Annuler les modifications
+              <span class="shortcutTooltip">esc</span>
+            </span>
           </v-tooltip>
 
           <v-tooltip top open-delay="500">
@@ -179,7 +201,10 @@
                 <v-icon left>mdi-content-save</v-icon>Sauvegarder
               </v-btn>
             </template>
-            <span>Sauvegarder la pièce <span class="shortcutTooltip">alt + enter</span></span>
+            <span>
+              Sauvegarder la pièce
+              <span class="shortcutTooltip">alt + enter</span>
+            </span>
           </v-tooltip>
         </v-card-actions>
         <Confirm ref="confirmDialog"></Confirm>
@@ -187,9 +212,7 @@
     </v-form>
     <v-dialog v-model="datePieceDialog" width="300" eager style="z-index: 999999999999999999">
       <v-card>
-        <v-card-title primary-title>
-          Nouvelle pièce
-        </v-card-title>
+        <v-card-title primary-title>Nouvelle pièce</v-card-title>
         <v-card-text>
           <DatePicker
             ref="refDatePieceDialog"
