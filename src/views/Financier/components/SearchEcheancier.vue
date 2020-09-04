@@ -314,7 +314,6 @@ export default class extends Vue {
       this.isLoading = true;
       EcheancierApi.getEcheancierForCompteTiers(this.typeLoad, this.numeroEcheancierToLoad)
         .then((resp) => {
-          console.dir(resp);
           this.allEcheanciers = resp;
           this.refreshGridElements();
         })
