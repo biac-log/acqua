@@ -112,6 +112,7 @@
               :rowData="echeanciers"
               :gridOptions="gridOptions"
               @selection-changed="calculAVentile"
+              @grid-ready="onGridReady"
             ></AgGridVue>
           </v-col>
         </v-row>
@@ -294,7 +295,7 @@ export default class extends Vue {
     this.nomCompte = nomCompte;
     this.calculAVentile();
     this.loadEcheancier(typeToLoad, numeroEcheancierToLoad);
-
+    
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -477,6 +478,10 @@ export default class extends Vue {
       this.reinitGrid();
       this.resolve(comptes);
     }
+  }
+
+  private onGridReady() {
+    (this.gridOptions.api as GridApi).sizeColumnsToFit();
   }
 
   private close() {
