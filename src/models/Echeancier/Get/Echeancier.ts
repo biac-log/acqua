@@ -12,6 +12,7 @@ export class EcheancierDTO {
   numeroTelephone = '';
   conditionPaiement = '';
   montantEchu = 0;
+  montantNonEchu = 0;
   elements: EcheancierElement[] = [];
 }
 
@@ -33,5 +34,8 @@ export class Echeancier extends EcheancierDTO {
 
   get montantEchuDisplay(): string {
     return this.montantEchu.toDecimalString();
+  }
+  get montantNonEchuDisplay(): string {
+    return this.montantNonEchu.toDecimalString();
   }
 }

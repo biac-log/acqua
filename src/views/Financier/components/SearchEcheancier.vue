@@ -64,6 +64,17 @@
           </v-col>
           <v-col cols="2">
             <v-text-field
+              label="Montant non échu"
+              v-model="allEcheanciers.montantNonEchuDisplay"
+              filled
+              hide-details
+              tabindex="-1"
+              readonly
+              dense
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2">
+            <v-text-field
               label="Condition paiement"
               v-model="allEcheanciers.conditionPaiement"
               filled
