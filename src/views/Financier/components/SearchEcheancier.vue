@@ -400,7 +400,7 @@ export default class extends Vue {
   }
 
   private montantDeviseToString(params: ValueFormatterParams): string {
-    if (params.value) return `${(params.value as number).toComptaString(2)} ${params.data.libelleDevise}`;
+    if (params.value) return `${(params.value as number).montantNegatifString(2)} ${params.data.libelleDevise}`;
     else return '';
   }
 

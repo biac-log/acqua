@@ -2,6 +2,7 @@ interface Number {
   toDecimalString(nbDecimal?: number): string;
   toIntString(): string;
   toComptaString(nbDecimal?: number): string;
+  montantNegatifString(nbDecimal?: number): string;
 }
 
 interface String {
@@ -32,6 +33,19 @@ Number.prototype.toComptaString = function(nbDecimal = 2) {
       return `${Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
         Math.abs(+this)
       )}-`;
+  }
+};
+
+Number.prototype.montantNegatifString = function(nbDecimal = 2) {
+  if (!nbDecimal) nbDecimal = 2;
+  if (!this) return '';
+  else {
+    if (+this >= 0)
+      return Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(+this));
+    else
+      return `-${Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+        Math.abs(+this)
+      )}`;
   }
 };
 
