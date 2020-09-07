@@ -4,9 +4,10 @@ import { PaginationResult } from '@/models/PaginationResult';
 import api from './AxiosApi';
 
 export abstract class FournisseurApi {
-  static async getSearchFournisseurs(): Promise<SearchFournisseur[]> {
-    const response = await api.AcQuaCore.get<SearchFournisseurDTO[]>(`Fournisseur/GetSearchFournisseurs`);
-    return response.data.map((searchFDTO) => new SearchFournisseur(searchFDTO));
+  static async getSearchFournisseurs(pagination: Pagination): Promise<PaginationResult<SearchFournisseur[]>> {
+    const response = await api.AcQuaCore.get<PaginationResult<SearchFournisseurDTO[]>>(`Fournisseur/GetSearchFournisseurs?page=${pagination.page}&limit=${pagination.limit}`);
+    return response.data;
+    // return response.data.map((searchFDTO) => new SearchFournisseur(searchFDTO));:
   }
 
   static async GetEntetePiecesComptables(pagination: Pagination): Promise<PaginationResult<SearchFournisseur>> {

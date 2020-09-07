@@ -21,11 +21,30 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { FournisseurApi } from '@/api/FournisseurApi';
+import { Pagination } from '@/models/Pagination';
+import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
 
 @Component({
   name: 'Fournisseurs'
 })
-export default class extends Vue {}
+export default class extends Vue {
+  private fournisseurs: SearchFournisseur[] = []
+
+  mounted() {
+    this.loadFournisseurs();
+  }
+
+  private async loadFournisseurs(){
+    const pagination = new Pagination();
+    pagination.page = 1;
+    pagination.limit = 15;
+    const fournisseursResult = await FournisseurApi.getSearchFournisseurs(pagination);
+    fournisseursResult.items.forEach(element => {
+      this.fournisseurs.push(element); // This raises an error, but actually it works .. 
+    });
+  }
+}
 </script>
 
 <style scopped></style>
