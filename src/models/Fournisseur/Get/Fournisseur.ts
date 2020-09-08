@@ -1,6 +1,6 @@
 export class FournisseurDTO {
     public type = '';
-    public numero = '';
+    public numero = 0;
     public nom = '';
     public matchCode = '';
     public solde = 0;

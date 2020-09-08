@@ -9,7 +9,7 @@
             outlined
             persistent-hint
             required
-            :items="fournisseurTypes"            
+            :items="fournisseurTypes"
           ></v-select>
         </v-col>
       </v-row>
@@ -34,20 +34,25 @@
         :loading="isLoadingFournisseurs"
         :options.sync="options"
         :server-items-length="totalItems"
+        @click:row="openFournisseur"
       ></v-data-table>
     </v-card>
+    <FournisseurVue ref="fournisseurDialog" />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue, Ref, Watch } from 'vue-property-decorator';
 import { FournisseurApi } from '@/api/FournisseurApi';
 import { Pagination } from '@/models/Pagination';
 import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
+import FournisseurVue from './components/Fournisseur.vue';
 
 @Component({
-  name: 'Fournisseurs'
+  name: 'Fournisseurs',
+  components: { FournisseurVue }
 })
+
 export default class extends Vue {
   private search = '';
   private options: any = {};
@@ -63,7 +68,9 @@ export default class extends Vue {
     { text: 'Adresse', value: 'adresse' }
   ];
 
-  private fournisseurTypes = ["F","J","D"];
+  private fournisseurTypes = ['F', 'J', 'D'];
+
+  @Ref() readonly fournisseurDialog!: FournisseurVue;
 
   mounted() {
     this.loadFournisseurs();
@@ -87,7 +94,7 @@ export default class extends Vue {
     pagination.sortDesc = sortDesc[0];
     pagination.page = page;
     pagination.limit = itemsPerPage;
-    
+
     this.isLoadingFournisseurs = true;
     const fournisseursResult = await FournisseurApi.getSearchFournisseurs(pagination);
     this.fournisseurs = [];
@@ -97,6 +104,10 @@ export default class extends Vue {
     this.totalItems = fournisseursResult.totalCount;
 
     this.isLoadingFournisseurs = false;
+  }
+
+  private async openFournisseur(SearchFournisseur: SearchFournisseur) {
+    this.fournisseurDialog.open(SearchFournisseur);
   }
 }
 </script>
