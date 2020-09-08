@@ -5,9 +5,14 @@ import api from './AxiosApi';
 
 export abstract class FournisseurApi {
   static async getSearchFournisseurs(pagination: Pagination): Promise<PaginationResult<SearchFournisseur[]>> {
-    const response = await api.AcQuaCore.get<PaginationResult<SearchFournisseurDTO[]>>(`Fournisseur/GetSearchFournisseurs?page=${pagination.page}&limit=${pagination.limit}`);
+    let sortString = '';
+    if(pagination.sortBy) {
+      sortString = `&sortBy=${pagination.sortBy.trim().replace(/^\w/, (c) => c.toUpperCase())}`;
+      if(pagination.sortDesc) sortString = sortString + "&sortByAsc=true";
+    }
+
+    const response = await api.AcQuaCore.get<PaginationResult<SearchFournisseurDTO[]>>(`Fournisseur/GetSearchFournisseurs?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}` + sortString);
     return response.data;
-    // return response.data.map((searchFDTO) => new SearchFournisseur(searchFDTO));:
   }
 
   static async GetEntetePiecesComptables(pagination: Pagination): Promise<PaginationResult<SearchFournisseur>> {
