@@ -25,4 +25,8 @@ export class Fournisseur extends FournisseurDTO {
         super();
         Object.assign(this, dto || new FournisseurDTO());
     }
+
+    get displayName(): string {
+        return `${this.numero} - ${this.nom}`.trim();
+    }
 }
