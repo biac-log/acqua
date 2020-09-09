@@ -51,6 +51,7 @@
 import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
 import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
 import { Fournisseur } from '@/models/Fournisseur/Get/Fournisseur';
+import { FournisseurApi } from '@/api/FournisseurApi';
 
 @Component({
   name: 'FournisseurVue'
@@ -60,6 +61,7 @@ export default class FournisseurVue extends Vue {
 
   private saveLoading = false;
   private deleteLoading = false;
+  private getLoading = false;
   get isLoading() {
     return this.saveLoading || this.deleteLoading;
   }
@@ -69,20 +71,25 @@ export default class FournisseurVue extends Vue {
   public open(searchFournisseur: SearchFournisseur) {
     this.display = true;
 
-    // TODO : retrieve all the datas from the API
     const fournisseur = new Fournisseur();
-    fournisseur.type = searchFournisseur.type;
     fournisseur.numero = searchFournisseur.numero;
-    fournisseur.matchCode = searchFournisseur.matchCode;
     fournisseur.nom = searchFournisseur.nom;
-    fournisseur.solde = searchFournisseur.solde;
-    fournisseur.adresse = searchFournisseur.adresse;
 
-    this.fournisseur = fournisseur;
+    this.loadFournisseur(searchFournisseur.numero);
   }
 
   private closeDialog() {
-    this.display = true;
+    this.display = false;
+  }
+
+  private async loadFournisseur(numero: number) {
+    this.getLoading = true;
+
+    const fournisseurDTO = await FournisseurApi.getFournisseurByNumero(numero);
+
+    this.fournisseur = new Fournisseur(fournisseurDTO);
+
+    this.getLoading = false;
   }
 
   private modifierFournisseur() {
