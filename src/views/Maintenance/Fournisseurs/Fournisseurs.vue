@@ -1,19 +1,5 @@
 <template>
   <div>
-    <v-card class="mb-5">
-      <v-row align="start" justify="start" class="pl-5 pr-5">
-        <v-col cols="12" xs="12" md="4" lg="2">
-          <v-select
-            autofocus
-            label="Type de fournisseur"
-            outlined
-            persistent-hint
-            required
-            :items="fournisseurTypes"
-          ></v-select>
-        </v-col>
-      </v-row>
-    </v-card>
     <v-card>
       <v-card-title>
         Fournisseurs
