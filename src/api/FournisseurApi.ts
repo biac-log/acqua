@@ -5,14 +5,14 @@ import api from './AxiosApi';
 import { FournisseurDTO } from '@/models/Fournisseur/Get/Fournisseur';
 
 export abstract class FournisseurApi {
-  static async getSearchFournisseurs(pagination: Pagination): Promise<PaginationResult<SearchFournisseur[]>> {
+  static async getSearchFournisseurs(pagination: Pagination): Promise<PaginationResult<SearchFournisseurDTO>> {
     let sortString = '';
     if(pagination.sortBy) {
       sortString = `&sortBy=${pagination.sortBy.trim().replace(/^\w/, (c) => c.toUpperCase())}`;
       if(pagination.sortDesc) sortString = sortString + "&sortByAsc=true";
     }
 
-    const response = await api.AcQuaCore.get<PaginationResult<SearchFournisseurDTO[]>>(`Fournisseur/GetSearchFournisseurs?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}` + sortString);
+    const response = await api.AcQuaCore.get<PaginationResult<SearchFournisseurDTO>>(`Fournisseur/GetSearchFournisseurs?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}` + sortString);
     return response.data;
   }
 

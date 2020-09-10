@@ -72,10 +72,6 @@ export default class extends Vue {
 
   @Ref() readonly fournisseurDialog!: FournisseurVue;
 
-  mounted() {
-    this.loadFournisseurs();
-  }
-
   @Watch('options')
   onOptionsChanged() {
     this.loadFournisseurs();
@@ -98,9 +94,11 @@ export default class extends Vue {
     this.isLoadingFournisseurs = true;
     const fournisseursResult = await FournisseurApi.getSearchFournisseurs(pagination);
     this.fournisseurs = [];
-    fournisseursResult.items.forEach((element) => {
-      this.fournisseurs.push(element); // This raises an error, but actually it works ..
-    });
+
+    fournisseursResult.items.forEach((element: SearchFournisseur) => {
+      this.fournisseurs.push(element);
+    }); 
+
     this.totalItems = fournisseursResult.totalCount;
 
     this.isLoadingFournisseurs = false;
