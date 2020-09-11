@@ -264,6 +264,7 @@
         </v-row>
       </v-card-text>
       <v-card-actions v-if="!readonly">
+        <v-spacer />
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
@@ -282,7 +283,6 @@
             <span class="shortcutTooltip">del</span>
           </span>
         </v-tooltip>
-        <v-spacer></v-spacer>
 
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
@@ -329,6 +329,7 @@ export default class FournisseurVue extends Vue {
   }
 
   private fournisseur: Fournisseur = new Fournisseur();
+  private fournisseurBase: Fournisseur = new Fournisseur(); // Used for the reset method
   private rules = Fournisseur.rules; // Rules are declared wwithin the model
 
   private readonly = true;
@@ -354,6 +355,7 @@ export default class FournisseurVue extends Vue {
     const fournisseurDTO = await FournisseurApi.getFournisseurByNumero(numero);
 
     this.fournisseur = new Fournisseur(fournisseurDTO);
+    this.fournisseurBase = new Fournisseur(fournisseurDTO);
 
     this.getLoading = false;
   }
@@ -373,8 +375,8 @@ export default class FournisseurVue extends Vue {
   }
 
   private cancelEdit() {
+    this.fournisseur = this.fournisseurBase;
     this.readonly = true;
-    // TODO : Reset field values
   }
 }
 </script>
