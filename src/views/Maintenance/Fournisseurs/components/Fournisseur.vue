@@ -45,7 +45,7 @@
       </v-toolbar>
       <v-progress-linear :active="isLoading" indeterminate top color="primary accent-4"></v-progress-linear>
       <v-card-text>
-        <v-row justify="center" dense>
+        <v-row justify="center" dense class="pt-5">
           <v-col cols="3" class="pr-5">
             <v-row dense>
               <v-col cols="6" class="pb-0 pt-0">
@@ -54,7 +54,8 @@
                   label="Numéro"
                   v-model="fournisseur.numero"
                   :filled="readonly"
-                  :disabled="readonly"
+                  disabled
+                  readonly
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -64,6 +65,8 @@
                   v-model="fournisseur.raisonSociale"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="11"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -73,6 +76,9 @@
                   v-model="fournisseur.nom"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="23"
+                  :rules="rules.nom"
                 />
               </v-col>
 
@@ -83,6 +89,8 @@
                   v-model="fournisseur.matchCode"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="23"
                 />
               </v-col>
             </v-row>
@@ -96,6 +104,8 @@
                   v-model="fournisseur.adresseLigne1"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="35"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -105,6 +115,8 @@
                   v-model="fournisseur.adresseLigne2"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="35"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
@@ -114,6 +126,8 @@
                   v-model="fournisseur.codePostal"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="8"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
@@ -123,6 +137,8 @@
                   v-model="fournisseur.localité"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="30"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
@@ -132,6 +148,8 @@
                   v-model="fournisseur.codePays"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="3"
                 />
               </v-col>
             </v-row>
@@ -145,6 +163,8 @@
                   v-model="fournisseur.numeroTelephone"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="14"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -154,6 +174,8 @@
                   v-model="fournisseur.contact1"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="30"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -163,6 +185,8 @@
                   v-model="fournisseur.téléfax"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="14"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -172,6 +196,8 @@
                   v-model="fournisseur.contact2"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="30"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -181,6 +207,8 @@
                   v-model="fournisseur.gsm"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="14"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -190,6 +218,8 @@
                   v-model="fournisseur.contact3"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="30"
                 />
               </v-col>
             </v-row>
@@ -203,6 +233,8 @@
                   v-model="fournisseur.commentaire1"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="20"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -212,6 +244,8 @@
                   v-model="fournisseur.commentaire2"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="20"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -221,6 +255,8 @@
                   v-model="fournisseur.commmentaire3"
                   :filled="readonly"
                   :disabled="readonly"
+                  :counter="!readonly"
+                  maxlength="20"
                 />
               </v-col>
             </v-row>
@@ -228,7 +264,7 @@
         </v-row>
       </v-card-text>
       <v-card-actions v-if="!readonly">
-        <v-tooltip v-if="numeroPiece" top open-delay="500">
+        <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
               color="error"
@@ -236,13 +272,13 @@
               class="ma-2 pr-4 align-self-start"
               text
               tabindex="-1"
-              @click="deleteFournisseur()"
+              @click="cancelEdit()"
               :disabled="saveLoading"
               :loading="deleteLoading"
-            >Supprimer</v-btn>
+            >Annuler</v-btn>
           </template>
           <span>
-            Supprimer la pièce
+            Annuler les modifications
             <span class="shortcutTooltip">del</span>
           </span>
         </v-tooltip>
@@ -293,6 +329,7 @@ export default class FournisseurVue extends Vue {
   }
 
   private fournisseur: Fournisseur = new Fournisseur();
+  private rules = Fournisseur.rules; // Rules are declared wwithin the model
 
   private readonly = true;
 
@@ -333,6 +370,11 @@ export default class FournisseurVue extends Vue {
 
   private saveFournisseur() {
     console.log('save');
+  }
+
+  private cancelEdit() {
+    this.readonly = true;
+    // TODO : Reset field values
   }
 }
 </script>
