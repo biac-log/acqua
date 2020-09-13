@@ -300,7 +300,7 @@
             </v-btn>
           </template>
           <span>
-            Sauvegarder la pièce
+            Sauvegarder le fournisseur
             <span class="shortcutTooltip">alt + enter</span>
           </span>
         </v-tooltip>
@@ -370,8 +370,10 @@ export default class FournisseurVue extends Vue {
     console.log('delete');
   }
 
-  private saveFournisseur() {
-    console.log('save');
+  private async saveFournisseur() {
+    this.saveLoading = true;
+
+    await FournisseurApi.UpdateFournisseur(this.fournisseur.numero, this.fournisseur);
   }
 
   private cancelEdit() {

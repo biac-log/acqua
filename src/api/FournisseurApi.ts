@@ -3,6 +3,7 @@ import { Pagination } from '@/models/Pagination';
 import { PaginationResult } from '@/models/PaginationResult';
 import api from './AxiosApi';
 import { FournisseurDTO } from '@/models/Fournisseur/Get/Fournisseur';
+import { UpdateFournisseurDTO } from '@/models/Fournisseur/UpdateFournisseur';
 
 export abstract class FournisseurApi {
   static async getSearchFournisseurs(pagination: Pagination): Promise<PaginationResult<SearchFournisseurDTO>> {
@@ -27,5 +28,10 @@ export abstract class FournisseurApi {
       `/AchatVente/GetEntetePiecesComptables?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}&SortBy=${pagination.sortBy}&SortByAsc=${pagination.sortDesc}`
     );
     return response.data;
+  }
+
+  static async UpdateFournisseur(numero: number, updatedFournisseur: UpdateFournisseurDTO): Promise<boolean> {
+    const response = await api.AcQuaCore.put<UpdateFournisseurDTO>(`Fournisseur/${numero}`, updatedFournisseur);
+    return true;
   }
 }
