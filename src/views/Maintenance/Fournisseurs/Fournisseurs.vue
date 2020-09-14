@@ -3,6 +3,16 @@
     <v-card>
       <v-card-title>
         Fournisseurs
+        <v-btn
+          ref="btnAdd"
+          color="warning"
+          small
+          fab
+          class="ml-5"
+          @click.stop="addFournisseur"
+        >
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -92,6 +102,10 @@ export default class extends Vue {
 
   private async openFournisseur(SearchFournisseur: SearchFournisseur) {
     this.fournisseurDialog.open(SearchFournisseur);
+  }
+
+  private addFournisseur() {
+    this.fournisseurDialog.openNew(this.fournisseurs[0].numero + 1); //TODO : retrieve correct number
   }
 }
 </script>
