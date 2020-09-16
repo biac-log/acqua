@@ -56,7 +56,6 @@
                   label="Numéro"
                   v-model="fournisseur.numero"
                   :filled="readonly"
-                  disabled
                   readonly
                 />
               </v-col>
@@ -66,7 +65,7 @@
                   label="Raison sociale"
                   v-model="fournisseur.raisonSociale"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="11"
                 />
@@ -78,7 +77,7 @@
                   ref="inputNom"
                   v-model="fournisseur.nom"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="23"
                   :rules="rules.nom"
@@ -91,7 +90,7 @@
                   label="Match code"
                   v-model="fournisseur.matchCode"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="23"
                 />
@@ -106,7 +105,7 @@
                   label="Adresse"
                   v-model="fournisseur.adresseLigne1"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="35"
                 />
@@ -117,7 +116,7 @@
                   label="Complément d'adresse"
                   v-model="fournisseur.adresseLigne2"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="35"
                 />
@@ -128,7 +127,7 @@
                   label="Code Postal"
                   v-model="fournisseur.codePostal"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="8"
                 />
@@ -139,7 +138,7 @@
                   label="Localité"
                   v-model="fournisseur.localité"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="30"
                 />
@@ -150,7 +149,7 @@
                   label="Pays"
                   v-model="fournisseur.codePays"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="3"
                 />
@@ -165,7 +164,7 @@
                   label="Téléphone"
                   v-model="fournisseur.numeroTelephone"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="14"
                 />
@@ -176,7 +175,7 @@
                   label="Contact 1"
                   v-model="fournisseur.contact1"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="30"
                 />
@@ -187,7 +186,7 @@
                   label="Fax"
                   v-model="fournisseur.téléfax"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="14"
                 />
@@ -198,7 +197,7 @@
                   label="Contact 2"
                   v-model="fournisseur.contact2"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="30"
                 />
@@ -209,7 +208,7 @@
                   label="GSM"
                   v-model="fournisseur.gsm"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="14"
                 />
@@ -220,7 +219,7 @@
                   label="Contact 3"
                   v-model="fournisseur.contact3"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="30"
                 />
@@ -235,7 +234,7 @@
                   label="Commentaire 1"
                   v-model="fournisseur.commentaire1"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="20"
                 />
@@ -246,7 +245,7 @@
                   label="Commentaire 2"
                   v-model="fournisseur.commentaire2"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="20"
                 />
@@ -257,7 +256,7 @@
                   label="Commmentaire 3"
                   v-model="fournisseur.commmentaire3"
                   :filled="readonly"
-                  :disabled="readonly"
+                  readonly
                   :counter="!readonly"
                   maxlength="20"
                 />
@@ -439,5 +438,7 @@ get isLoading() {
 </script>
 
 <style scoped>
-
+  .v-input input {
+    color: rgba(0, 0, 0, 0.87);
+  }
 </style>
