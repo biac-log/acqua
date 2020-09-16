@@ -2,9 +2,9 @@
   <v-dialog v-model="display" @click:outside="closeDialog">
     <v-card>
       <v-toolbar color="primary" dark flat>
-        <v-card-title>{{fournisseur.displayName}}</v-card-title>
+        <v-card-title>{{newRecord ? "Nouveau fournisseur" : fournisseur.displayName}}</v-card-title>
         <v-spacer></v-spacer>
-        <v-tooltip v-if="readonly" top open-delay="500">
+        <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
               class="mr-5"
@@ -21,7 +21,7 @@
             <span class="shortcutTooltip">F2</span>
           </span>
         </v-tooltip>
-        <v-tooltip v-if="readonly" top open-delay="500">
+        <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
               v-on="on"
@@ -45,6 +45,8 @@
       </v-toolbar>
       <v-progress-linear :active="isLoading" indeterminate top color="primary accent-4"></v-progress-linear>
       <v-card-text>
+        <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning"/>
+        <AlertMessageVue ref="successMessage" class="alertMessage" type="success"/>
         <v-row justify="center" dense class="pt-5">
           <v-col cols="3" class="pr-5">
             <v-row dense>
@@ -73,6 +75,7 @@
                 <v-text-field
                   dense
                   label="Nom"
+                  ref="inputNom"
                   v-model="fournisseur.nom"
                   :filled="readonly"
                   :disabled="readonly"
@@ -313,18 +316,30 @@
 import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
 import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
 import { Fournisseur } from '@/models/Fournisseur/Get/Fournisseur';
+import { UpdateFournisseur } from '@/models/Fournisseur/UpdateFournisseur';
 import { FournisseurApi } from '@/api/FournisseurApi';
+import { displayAxiosError } from '@/utils/ErrorMethods';
+import AlertMessageVue from '@/components/AlertMessage.vue';
 
 @Component({
-  name: 'FournisseurVue'
+  name: 'FournisseurVue',
+  components: { AlertMessageVue }
 })
 export default class FournisseurVue extends Vue {
+  @Ref() readonly inputNom: any;
+  @Ref() alertMessage!: AlertMessageVue;
+  @Ref() successMessage!: AlertMessageVue;
+
   private display = false;
+
+  private resolve: any;
+  private reject: any;
 
   private saveLoading = false;
   private deleteLoading = false;
   private getLoading = false;
-  get isLoading() {
+
+get isLoading() {
     return this.saveLoading || this.deleteLoading || this.getLoading;
   }
 
@@ -333,20 +348,39 @@ export default class FournisseurVue extends Vue {
   private rules = Fournisseur.rules; // Rules are declared wwithin the model
 
   private readonly = true;
+  private newRecord = false;
 
   public open(searchFournisseur: SearchFournisseur) {
-    this.display = true;
-
     const fournisseur = new Fournisseur();
     fournisseur.numero = searchFournisseur.numero;
     fournisseur.nom = searchFournisseur.nom;
 
+    this.display = true;
+    this.newRecord = false;
+
     this.loadFournisseur(searchFournisseur.numero);
+  }
+
+  public openNew(numero: number): Promise<void> {
+    this.readonly = false;
+    this.fournisseur = new Fournisseur();
+    this.fournisseurBase = new Fournisseur();
+    this.newRecord = true;
+
+    this.display = true;
+    this.$nextTick(() => (this.inputNom as any).focus());
+
+    return new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
   }
 
   private closeDialog() {
     this.display = false;
     this.readonly = true;
+    this.alertMessage.clear();
+    this.successMessage.clear();
   }
 
   private async loadFournisseur(numero: number) {
@@ -373,19 +407,37 @@ export default class FournisseurVue extends Vue {
   private async saveFournisseur() {
     this.saveLoading = true;
 
-    await FournisseurApi.UpdateFournisseur(this.fournisseur.numero, this.fournisseur);
+    if (this.newRecord) {
+      await FournisseurApi.CreateFournisseur(this.fournisseur)
+        .then((numeroFournisseur) => {
+          this.resolve(numeroFournisseur);
+          this.fournisseur = this.fournisseurBase;
+          this.closeDialog();
+        })
+        .catch((err) => {
+          this.alertMessage.show(
+            'Une erreur est survenue lors de la sauvegarde du fournisseur',
+            displayAxiosError(err)
+          );
+          this.readonly = false;
+        })
+        .finally(() => {
+          this.saveLoading = false;
+        });
+    } else {
+      await FournisseurApi.UpdateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase).then(() => {
+        this.successMessage.show('Le fournisseur a été mis à jour avec succès.', '');
+      }).finally(() => this.saveLoading = false);
+    }
   }
 
   private cancelEdit() {
     this.fournisseur = this.fournisseurBase;
-    this.readonly = true;
+    if (!this.newRecord) this.readonly = true;
   }
 }
 </script>
 
 <style scoped>
-fieldset {
-  padding-right: 10px;
-  padding-left: 10px;
-}
+
 </style>

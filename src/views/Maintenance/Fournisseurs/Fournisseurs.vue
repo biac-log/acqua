@@ -3,14 +3,7 @@
     <v-card>
       <v-card-title>
         Fournisseurs
-        <v-btn
-          ref="btnAdd"
-          color="warning"
-          small
-          fab
-          class="ml-5"
-          @click.stop="addFournisseur"
-        >
+        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click.stop="addFournisseur">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
@@ -48,7 +41,6 @@ import FournisseurVue from './components/Fournisseur.vue';
   name: 'Fournisseurs',
   components: { FournisseurVue }
 })
-
 export default class extends Vue {
   private search = '';
   private options: any = {};
@@ -57,14 +49,11 @@ export default class extends Vue {
   private fournisseurs: SearchFournisseur[] = [];
   private headers = [
     { text: 'Numéro', value: 'numero' },
-    { text: 'Type', value: 'type' },
     { text: 'Nom', value: 'nom' },
     { text: 'Match Code', value: 'matchCode' },
     { text: 'Solde', value: 'solde' },
     { text: 'Adresse', value: 'adresse' }
   ];
-
-  private fournisseurTypes = ['F', 'J', 'D'];
 
   @Ref() readonly fournisseurDialog!: FournisseurVue;
 
@@ -93,7 +82,7 @@ export default class extends Vue {
 
     fournisseursResult.items.forEach((element: SearchFournisseur) => {
       this.fournisseurs.push(element);
-    }); 
+    });
 
     this.totalItems = fournisseursResult.totalCount;
 
@@ -105,7 +94,7 @@ export default class extends Vue {
   }
 
   private addFournisseur() {
-    this.fournisseurDialog.openNew(this.fournisseurs[0].numero + 1); //TODO : retrieve correct number
+    this.fournisseurDialog.openNew(this.fournisseurs[0].numero + 1).then(() => this.loadFournisseurs()); //TODO : retrieve correct number
   }
 }
 </script>

@@ -35,8 +35,12 @@ export abstract class FournisseurApi {
     return response.data;
   }
 
-  static async UpdateFournisseur(numero: number, updatedFournisseur: UpdateFournisseurDTO): Promise<boolean> {
-    const response = await api.AcQuaCore.put<UpdateFournisseurDTO>(`Fournisseur/${numero}`, updatedFournisseur);
+  static async UpdateFournisseur(updatedFournisseur: UpdateFournisseurDTO, oldFournisseur: FournisseurDTO): Promise<boolean> {
+    const data = {
+      "updatedFournisseur": updatedFournisseur,
+      "oldFournisseur": oldFournisseur
+    };
+    const response = await api.AcQuaCore.put<UpdateFournisseurDTO>(`Fournisseur`, data);
     return true;
   }
 }

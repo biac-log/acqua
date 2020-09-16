@@ -1,4 +1,5 @@
 export class UpdateFournisseurDTO {
+    public numero = 0;
     public nom = '';
     public matchCode = '';
     public adresseLigne1 = '';
