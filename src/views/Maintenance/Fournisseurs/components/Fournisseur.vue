@@ -45,39 +45,31 @@
       </v-toolbar>
       <v-progress-linear :active="isLoading" indeterminate top color="primary accent-4"></v-progress-linear>
       <v-card-text>
-        <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning"/>
-        <AlertMessageVue ref="successMessage" class="alertMessage" type="success"/>
+        <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
+        <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-row justify="center" dense class="pt-5">
           <v-col cols="3" class="pr-5">
             <v-row dense>
               <v-col cols="6" class="pb-0 pt-0">
-                <v-text-field
-                  dense
-                  label="Numéro"
-                  v-model="fournisseur.numero"
-                  :filled="readonly"
-                  readonly
-                />
+                <v-text-field label="Numéro" v-model="fournisseur.numero" :filled="readonly" readonly />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Raison sociale"
                   v-model="fournisseur.raisonSociale"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="11"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Nom"
                   ref="inputNom"
                   v-model="fournisseur.nom"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="23"
                   :rules="rules.nom"
@@ -86,11 +78,10 @@
 
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Match code"
                   v-model="fournisseur.matchCode"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="23"
                 />
@@ -101,55 +92,50 @@
             <v-row dense>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Adresse"
                   v-model="fournisseur.adresseLigne1"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="35"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Complément d'adresse"
                   v-model="fournisseur.adresseLigne2"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="35"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Code Postal"
                   v-model="fournisseur.codePostal"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="8"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Localité"
                   v-model="fournisseur.localité"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Pays"
                   v-model="fournisseur.codePays"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="3"
                 />
@@ -160,66 +146,60 @@
             <v-row dense>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Téléphone"
                   v-model="fournisseur.numeroTelephone"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="14"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Contact 1"
                   v-model="fournisseur.contact1"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Fax"
                   v-model="fournisseur.téléfax"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="14"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Contact 2"
                   v-model="fournisseur.contact2"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="GSM"
                   v-model="fournisseur.gsm"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="14"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Contact 3"
                   v-model="fournisseur.contact3"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
                 />
@@ -230,33 +210,30 @@
             <v-row dense>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Commentaire 1"
                   v-model="fournisseur.commentaire1"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Commentaire 2"
                   v-model="fournisseur.commentaire2"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
-                  dense
                   label="Commmentaire 3"
                   v-model="fournisseur.commmentaire3"
                   :filled="readonly"
-                  readonly
+                  :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
                 />
@@ -338,7 +315,7 @@ export default class FournisseurVue extends Vue {
   private deleteLoading = false;
   private getLoading = false;
 
-get isLoading() {
+  get isLoading() {
     return this.saveLoading || this.deleteLoading || this.getLoading;
   }
 
@@ -424,9 +401,11 @@ get isLoading() {
           this.saveLoading = false;
         });
     } else {
-      await FournisseurApi.UpdateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase).then(() => {
-        this.successMessage.show('Le fournisseur a été mis à jour avec succès.', '');
-      }).finally(() => this.saveLoading = false);
+      await FournisseurApi.UpdateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase)
+        .then(() => {
+          this.successMessage.show('Le fournisseur a été mis à jour avec succès.', '');
+        })
+        .finally(() => (this.saveLoading = false));
     }
   }
 
@@ -438,7 +417,7 @@ get isLoading() {
 </script>
 
 <style scoped>
-  .v-input input {
-    color: rgba(0, 0, 0, 0.87);
-  }
+.v-input input {
+  color: rgba(0, 0, 0, 0.87);
+}
 </style>
