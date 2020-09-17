@@ -2,7 +2,7 @@
   <v-dialog v-model="display" @click:outside="closeDialog">
     <v-card>
       <v-toolbar color="primary" dark flat>
-        <v-card-title>{{newRecord ? "Nouveau fournisseur" : fournisseur.displayName}}</v-card-title>
+        <v-card-title>{{ newRecord ? 'Nouveau fournisseur' : fournisseur.displayName }}</v-card-title>
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
@@ -312,7 +312,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
+import { Component, Vue, Ref } from 'vue-property-decorator';
 import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
 import { Fournisseur } from '@/models/Fournisseur/Get/Fournisseur';
 import { UpdateFournisseur } from '@/models/Fournisseur/UpdateFournisseur';
@@ -333,7 +333,7 @@ export default class FournisseurVue extends Vue {
 
   private resolve: any;
   private reject: any;
-  private reloadOnClose: boolean = false;
+  private reloadOnClose = false;
 
   private saveLoading = false;
   private deleteLoading = false;
@@ -415,7 +415,7 @@ export default class FournisseurVue extends Vue {
     this.saveLoading = true;
 
     if (this.newRecord) {
-      await FournisseurApi.CreateFournisseur(this.fournisseur)
+      await FournisseurApi.createFournisseur(this.fournisseur)
         .then((numeroFournisseur) => {
           this.resolve(numeroFournisseur);
           this.fournisseur = this.fournisseurBase;
@@ -432,7 +432,7 @@ export default class FournisseurVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-      await FournisseurApi.UpdateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase)
+      await FournisseurApi.updateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase)
         .then(() => {
           this.successMessage.show('Le fournisseur a été mis à jour avec succès.', '');
           this.resolve(true);

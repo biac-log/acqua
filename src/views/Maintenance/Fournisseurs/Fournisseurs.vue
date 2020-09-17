@@ -47,7 +47,7 @@ export default class extends Vue {
   private totalItems = 0;
   private isLoadingFournisseurs = false;
   private fournisseurs: SearchFournisseur[] = [];
-  private nextNumero: number = 0;
+  private nextNumero = 0;
   private headers = [
     { text: 'Numéro', value: 'numero' },
     { text: 'Nom', value: 'nom' },

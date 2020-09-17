@@ -8,23 +8,25 @@ import { UpdateFournisseurDTO } from '@/models/Fournisseur/UpdateFournisseur';
 export abstract class FournisseurApi {
   static async getSearchFournisseurs(pagination: Pagination): Promise<PaginationResult<SearchFournisseurDTO>> {
     let sortString = '';
-    if(pagination.sortBy) {
+    if (pagination.sortBy) {
       sortString = `&sortBy=${pagination.sortBy.trim().replace(/^\w/, (c) => c.toUpperCase())}`;
-      if(pagination.sortDesc) sortString = sortString + "&sortByAsc=true";
+      if (pagination.sortDesc) sortString = `${sortString}&sortByAsc=true`;
     }
 
-    const response = await api.AcQuaCore.get<PaginationResult<SearchFournisseurDTO>>(`Fournisseur/GetSearchFournisseurs?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}` + sortString);
+    const response = await api.AcQuaCore.get<PaginationResult<SearchFournisseurDTO>>(
+      `Fournisseur/GetSearchFournisseurs?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}${sortString}`
+    );
     return response.data;
   }
 
-  static async getFournisseurByNumero(numero: number): Promise<FournisseurDTO>{
+  static async getFournisseurByNumero(numero: number): Promise<FournisseurDTO> {
     const response = await api.AcQuaCore.get<FournisseurDTO>(`Fournisseur/${numero}`);
 
     return response.data;
   }
 
   static async getNextNumero(): Promise<number> {
-    const response = await api.AcQuaCore.get<number>("Fournisseur/Numero/Next");
+    const response = await api.AcQuaCore.get<number>('Fournisseur/Numero/Next');
 
     return response.data;
   }
@@ -36,17 +38,20 @@ export abstract class FournisseurApi {
     return response.data;
   }
 
-  static async CreateFournisseur(newFournisseur: UpdateFournisseurDTO): Promise<number> {
+  static async createFournisseur(newFournisseur: UpdateFournisseurDTO): Promise<number> {
     const response = await api.AcQuaCore.post<number>(`Fournisseur`, newFournisseur);
     return response.data;
   }
 
-  static async UpdateFournisseur(updatedFournisseur: UpdateFournisseurDTO, oldFournisseur: FournisseurDTO): Promise<boolean> {
+  static async updateFournisseur(
+    updatedFournisseur: UpdateFournisseurDTO,
+    oldFournisseur: FournisseurDTO
+  ): Promise<boolean> {
     const data = {
-      "updatedFournisseur": updatedFournisseur,
-      "oldFournisseur": oldFournisseur
+      updatedFournisseur: updatedFournisseur,
+      oldFournisseur: oldFournisseur
     };
-    const response = await api.AcQuaCore.put<UpdateFournisseurDTO>(`Fournisseur`, data);
+    await api.AcQuaCore.put<UpdateFournisseurDTO>(`Fournisseur`, data);
     return true;
   }
 }
