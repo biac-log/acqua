@@ -23,6 +23,12 @@ export abstract class FournisseurApi {
     return response.data;
   }
 
+  static async getNextNumero(): Promise<number> {
+    const response = await api.AcQuaCore.get<number>("Fournisseur/Numero/Next");
+
+    return response.data;
+  }
+
   static async GetEntetePiecesComptables(pagination: Pagination): Promise<PaginationResult<SearchFournisseur>> {
     const response = await api.AcQuaCore.get<PaginationResult<SearchFournisseur>>(
       `/AchatVente/GetEntetePiecesComptables?Page=${pagination.page}&Limit=${pagination.limit}&Term=${pagination.terms}&SortBy=${pagination.sortBy}&SortByAsc=${pagination.sortDesc}`

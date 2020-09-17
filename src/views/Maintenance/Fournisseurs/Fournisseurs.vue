@@ -47,6 +47,7 @@ export default class extends Vue {
   private totalItems = 0;
   private isLoadingFournisseurs = false;
   private fournisseurs: SearchFournisseur[] = [];
+  private nextNumero: number = 0;
   private headers = [
     { text: 'Numéro', value: 'numero' },
     { text: 'Nom', value: 'nom' },
@@ -65,6 +66,10 @@ export default class extends Vue {
   @Watch('search')
   onSearchChanged() {
     this.loadFournisseurs();
+  }
+
+  mounted() {
+    this.getNextNumero();
   }
 
   private async loadFournisseurs() {
@@ -91,12 +96,21 @@ export default class extends Vue {
 
   private async openFournisseur(SearchFournisseur: SearchFournisseur) {
     this.fournisseurDialog.open(SearchFournisseur).then((reloadOnClose: boolean) => {
-      if(reloadOnClose) this.loadFournisseurs();
+      if (reloadOnClose) this.loadFournisseurs();
     });
   }
 
   private addFournisseur() {
-    this.fournisseurDialog.openNew(this.fournisseurs[0].numero + 1).then(() => this.loadFournisseurs()); //TODO : retrieve correct number
+    this.fournisseurDialog.openNew(this.nextNumero).then((numero: number) => {
+      this.nextNumero = numero + 1;
+      this.loadFournisseurs();
+    });
+  }
+
+  private async getNextNumero() {
+    const number = await FournisseurApi.getNextNumero();
+
+    this.nextNumero = number;
   }
 }
 </script>

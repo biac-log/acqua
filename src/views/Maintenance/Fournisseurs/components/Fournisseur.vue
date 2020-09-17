@@ -52,7 +52,7 @@
             <v-row dense>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
-                  label="Numéro"
+                  :label="newRecord ? 'Numéro prédit' : 'Numéro'"
                   v-model="fournisseur.numero"
                   :filled="readonly"
                   readonly
@@ -366,11 +366,13 @@ export default class FournisseurVue extends Vue {
     });
   }
 
-  public openNew(numero: number): Promise<void> {
+  public openNew(numero: number): Promise<number> {
     this.readonly = false;
     this.fournisseur = new Fournisseur();
     this.fournisseurBase = new Fournisseur();
     this.newRecord = true;
+
+    this.fournisseur.numero = numero;
 
     this.display = true;
     this.$nextTick(() => (this.inputNom as any).focus());
