@@ -4,6 +4,7 @@ import { PaginationResult } from '@/models/PaginationResult';
 import api from './AxiosApi';
 import { FournisseurDTO } from '@/models/Fournisseur/Get/Fournisseur';
 import { UpdateFournisseurDTO } from '@/models/Fournisseur/UpdateFournisseur';
+import { FournisseurParamsDTO } from '@/models/Fournisseur/Get/FournisseurParams';
 
 export abstract class FournisseurApi {
   static async getSearchFournisseurs(pagination: Pagination): Promise<PaginationResult<SearchFournisseurDTO>> {
@@ -25,8 +26,8 @@ export abstract class FournisseurApi {
     return response.data;
   }
 
-  static async getNextNumero(): Promise<number> {
-    const response = await api.AcQuaCore.get<number>('Fournisseur/Numero/Next');
+  static async getParams(): Promise<FournisseurParamsDTO> {
+    const response = await api.AcQuaCore.get<FournisseurParamsDTO>('Fournisseur/Params/Get');
 
     return response.data;
   }

@@ -35,6 +35,7 @@ import { Component, Vue, Ref, Watch } from 'vue-property-decorator';
 import { FournisseurApi } from '@/api/FournisseurApi';
 import { Pagination } from '@/models/Pagination';
 import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
+import { FournisseurParams } from '@/models/Fournisseur/Get/FournisseurParams'
 import FournisseurVue from './components/Fournisseur.vue';
 
 @Component({
@@ -47,7 +48,7 @@ export default class extends Vue {
   private totalItems = 0;
   private isLoadingFournisseurs = false;
   private fournisseurs: SearchFournisseur[] = [];
-  private nextNumero = 0;
+  private fournisseurParams!: FournisseurParams;
   private headers = [
     { text: 'Numéro', value: 'numero' },
     { text: 'Nom', value: 'nom' },
@@ -69,7 +70,7 @@ export default class extends Vue {
   }
 
   mounted() {
-    this.getNextNumero();
+    this.getParams();
   }
 
   private async loadFournisseurs() {
@@ -101,16 +102,16 @@ export default class extends Vue {
   }
 
   private addFournisseur() {
-    this.fournisseurDialog.openNew(this.nextNumero).then((numero: number) => {
-      this.nextNumero = numero + 1;
+    this.fournisseurDialog.openNew(this.fournisseurParams.nextNumero).then((numero: number) => {
+      this.fournisseurParams.nextNumero = numero + 1;
       this.loadFournisseurs();
     });
   }
 
-  private async getNextNumero() {
-    const number = await FournisseurApi.getNextNumero();
+  private async getParams() {
+    const params = await FournisseurApi.getParams();
 
-    this.nextNumero = number;
+    this.fournisseurParams = params;
   }
 }
 </script>
