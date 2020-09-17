@@ -56,6 +56,7 @@
                   v-model="fournisseur.numero"
                   :filled="readonly"
                   readonly
+                  tabindex="-1"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -66,10 +67,12 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="11"
+                  tabindex="2"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
+                  :autofocus="!readonly"
                   label="Nom"
                   ref="inputNom"
                   v-model="fournisseur.nom"
@@ -77,6 +80,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="23"
+                  tabindex="1"
                 />
               </v-col>
 
@@ -88,6 +92,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="23"
+                  tabindex="2"
                 />
               </v-col>
             </v-row>
@@ -102,6 +107,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="35"
+                  tabindex="3"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -112,6 +118,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="35"
+                  tabindex="4"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
@@ -122,6 +129,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="8"
+                  tabindex="5"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
@@ -132,6 +140,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
+                  tabindex="6"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
@@ -142,6 +151,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="3"
+                  tabindex="7"
                 />
               </v-col>
             </v-row>
@@ -156,6 +166,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="14"
+                  tabindex="8"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -166,6 +177,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
+                  tabindex="11"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -176,6 +188,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="14"
+                  tabindex="9"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -186,6 +199,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
+                  tabindex="12"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -196,6 +210,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="14"
+                  tabindex="10"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -206,6 +221,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
+                  tabindex="13"
                 />
               </v-col>
             </v-row>
@@ -220,6 +236,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
+                  tabindex="14"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -230,6 +247,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
+                  tabindex="15"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -240,6 +258,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
+                  tabindex="16"
                 />
               </v-col>
             </v-row>
@@ -277,6 +296,7 @@
               :loading="saveLoading"
               :disabled="deleteLoading"
               @click="saveFournisseur()"
+              tabindex="17"
             >
               <v-icon left>mdi-content-save</v-icon>Sauvegarder
             </v-btn>
