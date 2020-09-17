@@ -51,7 +51,12 @@
           <v-col cols="3" class="pr-5">
             <v-row dense>
               <v-col cols="6" class="pb-0 pt-0">
-                <v-text-field label="Numéro" v-model="fournisseur.numero" :filled="readonly" readonly />
+                <v-text-field
+                  label="Numéro"
+                  v-model="fournisseur.numero"
+                  :filled="readonly"
+                  readonly
+                />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
@@ -72,7 +77,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="23"
-                  :rules="rules.nom"
                 />
               </v-col>
 
@@ -230,8 +234,8 @@
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
-                  label="Commmentaire 3"
-                  v-model="fournisseur.commmentaire3"
+                  label="Commentaire 3"
+                  v-model="fournisseur.commentaire3"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -247,20 +251,19 @@
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
-              color="error"
-              v-on="on"
-              class="ma-2 pr-4 align-self-start"
-              text
-              tabindex="-1"
-              @click="cancelEdit()"
+              color="blue darken-1"
+              class="ma-2 mt-0 pr-4 align-self-start"
               :disabled="saveLoading"
-              :loading="deleteLoading"
-            >Annuler</v-btn>
+              tile
+              outlined
+              @click="cancelEdit()"
+              tabindex="-1"
+              v-on="on"
+            >
+              <v-icon left>mdi-close</v-icon>Annuler
+            </v-btn>
           </template>
-          <span>
-            Annuler les modifications
-            <span class="shortcutTooltip">del</span>
-          </span>
+          <span>Annuler les modifications</span>
         </v-tooltip>
 
         <v-tooltip top open-delay="500">
@@ -310,6 +313,7 @@ export default class FournisseurVue extends Vue {
 
   private resolve: any;
   private reject: any;
+  private reloadOnClose: boolean = false;
 
   private saveLoading = false;
   private deleteLoading = false;
@@ -321,20 +325,25 @@ export default class FournisseurVue extends Vue {
 
   private fournisseur: Fournisseur = new Fournisseur();
   private fournisseurBase: Fournisseur = new Fournisseur(); // Used for the reset method
-  private rules = Fournisseur.rules; // Rules are declared wwithin the model
 
   private readonly = true;
   private newRecord = false;
 
-  public open(searchFournisseur: SearchFournisseur) {
+  public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
     const fournisseur = new Fournisseur();
     fournisseur.numero = searchFournisseur.numero;
     fournisseur.nom = searchFournisseur.nom;
 
     this.display = true;
     this.newRecord = false;
+    this.reloadOnClose = false;
 
     this.loadFournisseur(searchFournisseur.numero);
+
+    return new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
   }
 
   public openNew(numero: number): Promise<void> {
@@ -404,6 +413,7 @@ export default class FournisseurVue extends Vue {
       await FournisseurApi.UpdateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase)
         .then(() => {
           this.successMessage.show('Le fournisseur a été mis à jour avec succès.', '');
+          this.resolve(true);
         })
         .finally(() => (this.saveLoading = false));
     }

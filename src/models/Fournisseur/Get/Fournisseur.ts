@@ -29,22 +29,4 @@ export class Fournisseur extends FournisseurDTO {
     get displayName(): string {
         return `${this.numero} - ${this.nom}`.trim();
     }
-
-    public static rules = {
-        "nom": [
-            (v: string) => !!v || 'Nom requis.',
-        ],
-        "adresseLigne1": [
-            (v: string) => !!v || 'Adresse requise.',
-        ],
-        "codePostal": [
-            (v: string) => !!v || 'Code postal requis.',
-        ],
-        "codePays": [
-            (v: string) => !!v || 'Code pays requis.',
-        ],
-        "localite": [
-            (v: string) => !!v || 'Localité requise.',
-        ],
-    };
 }

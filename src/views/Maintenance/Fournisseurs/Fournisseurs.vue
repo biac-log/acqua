@@ -90,7 +90,9 @@ export default class extends Vue {
   }
 
   private async openFournisseur(SearchFournisseur: SearchFournisseur) {
-    this.fournisseurDialog.open(SearchFournisseur);
+    this.fournisseurDialog.open(SearchFournisseur).then((reloadOnClose: boolean) => {
+      if(reloadOnClose) this.loadFournisseurs();
+    });
   }
 
   private addFournisseur() {
