@@ -102,7 +102,7 @@ export default class extends Vue {
   }
 
   private addFournisseur() {
-    this.fournisseurDialog.openNew(this.fournisseurParams.nextNumero).then((numero: number) => {
+    this.fournisseurDialog.openNew(this.fournisseurParams).then((numero: number) => {
       this.fournisseurParams.nextNumero = numero + 1;
       this.loadFournisseurs();
     });
@@ -111,7 +111,7 @@ export default class extends Vue {
   private async getParams() {
     const params = await FournisseurApi.getParams();
 
-    this.fournisseurParams = params;
+    this.fournisseurParams = new FournisseurParams(params);
   }
 }
 </script>

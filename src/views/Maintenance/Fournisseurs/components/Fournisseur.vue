@@ -264,6 +264,47 @@
             </v-row>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col cols="3">
+            <v-combobox
+              ref="autocompleteCompteAssocie"
+              label="Compte associé"
+              v-model="compteAssocieSelected"
+              :hide-details="readonly"
+              :filled="readonly"
+              :readonly="readonly"
+              :items="compteAssocieItems"
+              hide-selected
+              item-text="nom"
+              item-value="numero"
+              hide-no-data
+              auto-select-first
+            >
+              <template v-slot:append>
+                <v-tooltip top open-delay="500" open-on-hover>
+                  <template v-slot:activator="{ on }">
+                    <v-btn
+                      icon
+                      small
+                      v-show="!readonly"
+                      v-on="on"
+                      :disabled="readonly || saveLoading"
+                      tabindex="-1"
+                    >
+                      <v-icon>mdi-magnify</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>
+                    Rechercher un compte
+                    <span class="shortcutTooltip">CTRL+F</span>
+                  </span>
+                </v-tooltip>
+              </template>
+              <template v-slot:selection="{ item }">{{ item.numero }}</template>
+              <template v-slot:item="{ item }">{{ item.nom }}</template>
+            </v-combobox>
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-card-actions v-if="!readonly">
         <v-spacer />
@@ -319,6 +360,7 @@ import { UpdateFournisseur } from '@/models/Fournisseur/UpdateFournisseur';
 import { FournisseurApi } from '@/api/FournisseurApi';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
+import { FournisseurParams } from '@/models/Fournisseur/Get/FournisseurParams';
 
 @Component({
   name: 'FournisseurVue',
@@ -349,6 +391,12 @@ export default class FournisseurVue extends Vue {
   private readonly = true;
   private newRecord = false;
 
+  private comptesAssocieItems: { numero: number; nom: string }[] = [];
+  private compteAssocieSelected: { numero: number | string; nom: string } = {
+    numero: '',
+    nom: ''
+  };
+
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
     const fournisseur = new Fournisseur();
     fournisseur.numero = searchFournisseur.numero;
@@ -366,13 +414,19 @@ export default class FournisseurVue extends Vue {
     });
   }
 
-  public openNew(numero: number): Promise<number> {
+  public openNew(params: FournisseurParams): Promise<number> {
     this.readonly = false;
     this.fournisseur = new Fournisseur();
     this.fournisseurBase = new Fournisseur();
     this.newRecord = true;
 
-    this.fournisseur.numero = numero;
+    this.fournisseur.numero = params.nextNumero;
+    this.fournisseur.compteAssocie = params.compteAssocieDefaut;
+    if (this.comptesAssocieItems.length < 1)this.comptesAssocieItems.push({ numero: params.compteAssocieDefaut, nom: '' });
+    this.compteAssocieSelected = { numero: params.compteAssocieDefaut, nom: '' };
+
+    this.fournisseurBase.numero = params.nextNumero;
+    this.fournisseurBase.compteAssocie = params.compteAssocieDefaut;
 
     this.display = true;
     this.$nextTick(() => (this.inputNom as any).focus());
