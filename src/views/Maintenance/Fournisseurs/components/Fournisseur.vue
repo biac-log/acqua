@@ -266,6 +266,8 @@
         </v-row>
         <v-row>
           <v-col cols="3">
+            <v-row no-gutters>
+              <v-col cols="6" class="pr-2">
             <v-combobox
               ref="autocompleteCompteAssocie"
               label="Compte associé"
@@ -274,6 +276,7 @@
               :filled="readonly"
               :readonly="readonly"
               :items="compteAssocieItems"
+                  :search-input.sync="searchCompteAssocie"
               hide-selected
               item-text="nom"
               item-value="numero"
@@ -303,6 +306,11 @@
               <template v-slot:selection="{ item }">{{ item.numero }}</template>
               <template v-slot:item="{ item }">{{ item.nom }}</template>
             </v-combobox>
+          </v-col>
+              <v-col cols="6">
+                <v-text-field readonly v-model="compteAssocieSelected.nom" />
+              </v-col>
+        </v-row>
           </v-col>
         </v-row>
       </v-card-text>
@@ -361,6 +369,7 @@ import { FournisseurApi } from '@/api/FournisseurApi';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
 import { FournisseurParams } from '@/models/Fournisseur/Get/FournisseurParams';
+import CompteApi from '@/api/CompteApi';
 
 @Component({
   name: 'FournisseurVue',
@@ -391,11 +400,12 @@ export default class FournisseurVue extends Vue {
   private readonly = true;
   private newRecord = false;
 
-  private comptesAssocieItems: { numero: number; nom: string }[] = [];
+  private compteAssocieItems: { numero: number; nom: string }[] = [];
   private compteAssocieSelected: { numero: number | string; nom: string } = {
     numero: '',
     nom: ''
   };
+  private searchCompteAssocie = '';
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
     const fournisseur = new Fournisseur();
@@ -422,7 +432,8 @@ export default class FournisseurVue extends Vue {
 
     this.fournisseur.numero = params.nextNumero;
     this.fournisseur.compteAssocie = params.compteAssocieDefaut;
-    if (this.comptesAssocieItems.length < 1)this.comptesAssocieItems.push({ numero: params.compteAssocieDefaut, nom: '' });
+    if (this.compteAssocieItems.length < 1)
+      this.compteAssocieItems.push({ numero: params.compteAssocieDefaut, nom: '' });
     this.compteAssocieSelected = { numero: params.compteAssocieDefaut, nom: '' };
 
     this.fournisseurBase.numero = params.nextNumero;
@@ -499,11 +510,13 @@ export default class FournisseurVue extends Vue {
     this.fournisseur = this.fournisseurBase;
     if (!this.newRecord) this.readonly = true;
   }
+
+  @Watch('searchCompteAssocie')
+  private async watchSearchCompteAssocie() {
+    this.compteAssocieItems = await CompteApi.getComptesGeneraux('G'); // TODO : really implement search
+}
 }
 </script>
 
 <style scoped>
-.v-input input {
-  color: rgba(0, 0, 0, 0.87);
-}
 </style>
