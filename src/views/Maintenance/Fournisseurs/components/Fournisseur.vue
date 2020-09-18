@@ -268,49 +268,49 @@
           <v-col cols="3">
             <v-row no-gutters>
               <v-col cols="6" class="pr-2">
-            <v-combobox
-              ref="autocompleteCompteAssocie"
-              label="Compte associé"
-              v-model="compteAssocieSelected"
-              :hide-details="readonly"
-              :filled="readonly"
-              :readonly="readonly"
-              :items="compteAssocieItems"
+                <v-combobox
+                  ref="autocompleteCompteAssocie"
+                  label="Compte associé"
+                  v-model="compteAssocieSelected"
+                  :hide-details="readonly"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :items="compteAssocieItems"
                   :search-input.sync="searchCompteAssocie"
-              hide-selected
-              item-text="nom"
-              item-value="numero"
-              hide-no-data
-              auto-select-first
-            >
-              <template v-slot:append>
-                <v-tooltip top open-delay="500" open-on-hover>
-                  <template v-slot:activator="{ on }">
-                    <v-btn
-                      icon
-                      small
-                      v-show="!readonly"
-                      v-on="on"
-                      :disabled="readonly || saveLoading"
-                      tabindex="-1"
-                    >
-                      <v-icon>mdi-magnify</v-icon>
-                    </v-btn>
+                  hide-selected
+                  hide-no-data
+                  auto-select-first
+                  @keydown.ctrl.f.prevent="openSearchCompte('G')"
+                >
+                  <template v-slot:append>
+                    <v-tooltip top open-delay="500" open-on-hover>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          icon
+                          small
+                          v-show="!readonly"
+                          v-on="on"
+                          :disabled="readonly || saveLoading"
+                          tabindex="-1"
+                          @click.prevent="openSearchCompte('G')"
+                        >
+                          <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>
+                        Rechercher un compte
+                        <span class="shortcutTooltip">CTRL+F</span>
+                      </span>
+                    </v-tooltip>
                   </template>
-                  <span>
-                    Rechercher un compte
-                    <span class="shortcutTooltip">CTRL+F</span>
-                  </span>
-                </v-tooltip>
-              </template>
-              <template v-slot:selection="{ item }">{{ item.numero }}</template>
-              <template v-slot:item="{ item }">{{ item.nom }}</template>
-            </v-combobox>
-          </v-col>
+                  <template v-slot:selection="{ item }">{{ item.numero }}</template>
+                  <template v-slot:item="{ item }">{{ item.nom }}</template>
+                </v-combobox>
+              </v-col>
               <v-col cols="6">
                 <v-text-field readonly v-model="compteAssocieSelected.nom" />
               </v-col>
-        </v-row>
+            </v-row>
           </v-col>
         </v-row>
       </v-card-text>
@@ -357,11 +357,12 @@
         </v-tooltip>
       </v-card-actions>
     </v-card>
+    <SearchComptes ref="compteDialog"></SearchComptes>
   </v-dialog>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref } from 'vue-property-decorator';
+import { Component, Vue, Ref, Watch } from 'vue-property-decorator';
 import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
 import { Fournisseur } from '@/models/Fournisseur/Get/Fournisseur';
 import { UpdateFournisseur } from '@/models/Fournisseur/UpdateFournisseur';
@@ -369,16 +370,20 @@ import { FournisseurApi } from '@/api/FournisseurApi';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
 import { FournisseurParams } from '@/models/Fournisseur/Get/FournisseurParams';
+import SearchComptes from './SearchComptes.vue';
 import CompteApi from '@/api/CompteApi';
+import { CompteSearch } from '@/models/Compte/CompteSearch';
 
 @Component({
   name: 'FournisseurVue',
-  components: { AlertMessageVue }
+  components: { AlertMessageVue, SearchComptes }
 })
 export default class FournisseurVue extends Vue {
   @Ref() readonly inputNom: any;
   @Ref() alertMessage!: AlertMessageVue;
   @Ref() successMessage!: AlertMessageVue;
+  @Ref() readonly autocompleteCompteAssocie!: HTMLInputElement;
+  @Ref() readonly compteDialog!: SearchComptes;
 
   private display = false;
 
@@ -514,7 +519,16 @@ export default class FournisseurVue extends Vue {
   @Watch('searchCompteAssocie')
   private async watchSearchCompteAssocie() {
     this.compteAssocieItems = await CompteApi.getComptesGeneraux('G'); // TODO : really implement search
-}
+  }
+
+  private openSearchCompte(typeCompte: string) {
+    this.compteDialog.open(typeCompte).then((compte) => {
+        this.compteAssocieSelected = compte;
+      })
+      .catch(() => {
+        this.$nextTick(() => this.autocompleteCompteAssocie?.focus());
+      });;
+  }
 }
 </script>
 
