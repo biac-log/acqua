@@ -279,8 +279,10 @@
                   :search-input.sync="searchCompteAssocie"
                   hide-selected
                   hide-no-data
-                  auto-select-first
                   @keydown.ctrl.f.prevent="openSearchCompte('G')"
+                  item-text="nom"
+                  item-value="numero"
+                  :filter="filter"
                 >
                   <template v-slot:append>
                     <v-tooltip top open-delay="500" open-on-hover>
@@ -444,6 +446,8 @@ export default class FournisseurVue extends Vue {
     this.fournisseurBase.numero = params.nextNumero;
     this.fournisseurBase.compteAssocie = params.compteAssocieDefaut;
 
+    this.loadComptes();
+
     this.display = true;
     this.$nextTick(() => (this.inputNom as any).focus());
 
@@ -516,18 +520,47 @@ export default class FournisseurVue extends Vue {
     if (!this.newRecord) this.readonly = true;
   }
 
-  @Watch('searchCompteAssocie')
-  private async watchSearchCompteAssocie() {
-    this.compteAssocieItems = await CompteApi.getComptesGeneraux('G'); // TODO : really implement search
+  private async loadComptes() {
+    this.compteAssocieItems = await CompteApi.getComptesGeneraux('G');
+  }
+
+  @Watch("compteAssocieSelected")
+  private watchCompteAssocieSelected() {
+   if(this.compteAssocieSelected == null) {
+     this.compteAssocieSelected = {
+       "numero": "",
+       "nom": ""
+     };
+   }
+  }
+
+  private filter(item: any, queryText: string, itemText: string) {
+    if (item.header) return false;
+
+    const hasValue = (val: any) => (val != null ? val : '');
+
+    const text = hasValue(itemText);
+    const query = hasValue(queryText);
+
+    return (
+      text
+        .toString()
+        .toLowerCase()
+        .indexOf(query.toString().toLowerCase()) > -1
+    );
   }
 
   private openSearchCompte(typeCompte: string) {
-    this.compteDialog.open(typeCompte).then((compte) => {
+    if (this.readonly) return;
+    this.autocompleteCompteAssocie.blur();
+    this.compteDialog
+      .open(typeCompte)
+      .then((compte) => {
         this.compteAssocieSelected = compte;
       })
       .catch(() => {
         this.$nextTick(() => this.autocompleteCompteAssocie?.focus());
-      });;
+      });
   }
 }
 </script>
