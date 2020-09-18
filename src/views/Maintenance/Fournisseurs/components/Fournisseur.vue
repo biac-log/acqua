@@ -531,6 +531,8 @@ export default class FournisseurVue extends Vue {
        "numero": "",
        "nom": ""
      };
+   }else{
+     this.fournisseur.compteAssocie = this.compteAssocieSelected.numero as number;
    }
   }
 
