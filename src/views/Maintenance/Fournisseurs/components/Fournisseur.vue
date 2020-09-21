@@ -279,7 +279,7 @@
                   :search-input.sync="searchCompteAssocie"
                   hide-selected
                   hide-no-data
-                  @keydown.ctrl.f.prevent="openSearchCompte('G')"
+                  @keydown.ctrl.f.prevent="openSearchCompte('G', 'compteAssocie')"
                   item-text="nom"
                   item-value="numero"
                   :filter="filter"
@@ -294,7 +294,7 @@
                           v-on="on"
                           :disabled="readonly || saveLoading"
                           tabindex="-1"
-                          @click.prevent="openSearchCompte('G')"
+                          @click.prevent="openSearchCompte('G', 'compteAssocie')"
                         >
                           <v-icon>mdi-magnify</v-icon>
                         </v-btn>
@@ -310,7 +310,97 @@
                 </v-combobox>
               </v-col>
               <v-col cols="6">
-                <v-text-field readonly v-model="compteAssocieSelected.nom" />
+                <v-text-field readonly :filled="readonly" v-model="compteAssocieSelected.nom" />
+              </v-col>
+              <v-col cols="6" class="pr-2">
+                <v-combobox
+                  ref="autocompleteCompteVenteAchat"
+                  label="Compte Vente/Achat"
+                  v-model="compteVenteAchatSelected"
+                  :hide-details="readonly"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :items="compteVenteAchatItems"
+                  :search-input.sync="searchCompteVenteAchat"
+                  hide-selected
+                  hide-no-data
+                  @keydown.ctrl.f.prevent="openSearchCompte('G', 'compteVenteAchat')"
+                  item-text="nom"
+                  item-value="numero"
+                  :filter="filter"
+                >
+                  <template v-slot:append>
+                    <v-tooltip top open-delay="500" open-on-hover>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          icon
+                          small
+                          v-show="!readonly"
+                          v-on="on"
+                          :disabled="readonly || saveLoading"
+                          tabindex="-1"
+                          @click.prevent="openSearchCompte('G', 'compteVenteAchat')"
+                        >
+                          <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>
+                        Rechercher un compte
+                        <span class="shortcutTooltip">CTRL+F</span>
+                      </span>
+                    </v-tooltip>
+                  </template>
+                  <template v-slot:selection="{ item }">{{ item.numero }}</template>
+                  <template v-slot:item="{ item }">{{ item.nom }}</template>
+                </v-combobox>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field readonly :filled="readonly" v-model="compteVenteAchatSelected.nom" />
+              </v-col>
+              <v-col cols="6" class="pr-2">
+                <v-combobox
+                  ref="autocompleteCompteMaitre"
+                  label="Compte maître"
+                  v-model="compteMaitreSelected"
+                  :hide-details="readonly"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :items="compteMaitreItems"
+                  :search-input.sync="searchCompteMaitre"
+                  hide-selected
+                  hide-no-data
+                  @keydown.ctrl.f.prevent="openSearchCompte('C', 'compteMaitre')"
+                  item-text="nom"
+                  item-value="numero"
+                  :filter="filter"
+                >
+                  <template v-slot:append>
+                    <v-tooltip top open-delay="500" open-on-hover>
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          icon
+                          small
+                          v-show="!readonly"
+                          v-on="on"
+                          :disabled="readonly || saveLoading"
+                          tabindex="-1"
+                          @click.prevent="openSearchCompte('C', 'compteMaitre')"
+                        >
+                          <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>
+                        Rechercher un compte
+                        <span class="shortcutTooltip">CTRL+F</span>
+                      </span>
+                    </v-tooltip>
+                  </template>
+                  <template v-slot:selection="{ item }">{{ item.numero }}</template>
+                  <template v-slot:item="{ item }">{{ item.nom }}</template>
+                </v-combobox>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field readonly :filled="readonly" v-model="compteMaitreSelected.nom" />
               </v-col>
             </v-row>
           </v-col>
@@ -385,6 +475,8 @@ export default class FournisseurVue extends Vue {
   @Ref() alertMessage!: AlertMessageVue;
   @Ref() successMessage!: AlertMessageVue;
   @Ref() readonly autocompleteCompteAssocie!: HTMLInputElement;
+  @Ref() readonly autocompleteCompteMaitre!: HTMLInputElement;
+  @Ref() readonly autocompleteCompteVenteAchat!: HTMLInputElement;
   @Ref() readonly compteDialog!: SearchComptes;
 
   private display = false;
@@ -413,6 +505,23 @@ export default class FournisseurVue extends Vue {
     nom: ''
   };
   private searchCompteAssocie = '';
+  private comptesGeneraux: CompteSearch[] = [];
+
+  private compteMaitreItems: { numero: number; nom: string }[] = [];
+  private compteMaitreSelected: { numero: number | string; nom: string } = {
+    numero: '',
+    nom: ''
+  };
+  private searchCompteMaitre = '';
+  private comptesClients: CompteSearch[] = [];
+
+  private compteVenteAchatItems: { numero: number; nom: string }[] = [];
+  private compteVenteAchatSelected: { numero: number | string; nom: string } = {
+    numero: '',
+    nom: ''
+  };
+  private searchCompteVenteAchat = '';
+  // No need to declare the items, they're in comptesGeneraux
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
     const fournisseur = new Fournisseur();
@@ -431,25 +540,25 @@ export default class FournisseurVue extends Vue {
     });
   }
 
-  public openNew(params: FournisseurParams): Promise<number> {
+  public async openNew(params: FournisseurParams): Promise<number> {
     this.readonly = false;
     this.fournisseur = new Fournisseur();
     this.fournisseurBase = new Fournisseur();
     this.newRecord = true;
 
     this.fournisseur.numero = params.nextNumero;
-    this.fournisseur.compteAssocie = params.compteAssocieDefaut;
+    this.fournisseur.compteAssocie = params.numeroCompteAssocieDefaut;
     if (this.compteAssocieItems.length < 1)
-      this.compteAssocieItems.push({ numero: params.compteAssocieDefaut, nom: '' });
-    this.compteAssocieSelected = { numero: params.compteAssocieDefaut, nom: '' };
+      this.compteAssocieItems.push({ numero: params.numeroCompteAssocieDefaut, nom: params.nomCompteAssocieDefaut });
+    this.compteAssocieSelected = { numero: params.numeroCompteAssocieDefaut, nom: params.nomCompteAssocieDefaut };
 
     this.fournisseurBase.numero = params.nextNumero;
-    this.fournisseurBase.compteAssocie = params.compteAssocieDefaut;
-
-    this.loadComptes();
+    this.fournisseurBase.compteAssocie = params.numeroCompteAssocieDefaut;
 
     this.display = true;
     this.$nextTick(() => (this.inputNom as any).focus());
+
+    await this.loadComptes();
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -521,19 +630,59 @@ export default class FournisseurVue extends Vue {
   }
 
   private async loadComptes() {
-    this.compteAssocieItems = await CompteApi.getComptesGeneraux('G');
+    // Load the items and store them for the selection dialog
+    this.comptesGeneraux = await CompteApi.searchComptesGeneraux('G');
+    this.comptesClients = await CompteApi.getComptesTiers('C');
+
+    // Map the items for the comboboxes
+    this.compteAssocieItems = this.comptesGeneraux.map((c) => {
+      return { numero: c.numero, nom: c.nom };
+    });
+    this.compteMaitreItems = this.comptesClients.map((c) => {
+      return { numero: c.numero, nom: c.nom };
+    });
+    this.compteVenteAchatItems = this.comptesGeneraux.map((c) => {
+      return { numero: c.numero, nom: c.nom };
+    });
   }
 
-  @Watch("compteAssocieSelected")
+  // Prevent 'is undefined' when the input is empty
+  @Watch('compteAssocieSelected')
   private watchCompteAssocieSelected() {
-   if(this.compteAssocieSelected == null) {
-     this.compteAssocieSelected = {
-       "numero": "",
-       "nom": ""
-     };
-   }else{
-     this.fournisseur.compteAssocie = this.compteAssocieSelected.numero as number;
-   }
+    if (this.compteAssocieSelected == null) {
+      this.compteAssocieSelected = {
+        numero: '',
+        nom: ''
+      };
+    } else {
+      this.fournisseur.compteAssocie = this.compteAssocieSelected.numero as number;
+    }
+  }
+
+  // Prevent 'is undefined' when the input is empty
+  @Watch('compteMaitreSelected')
+  private watchCompteMaitreSelected() {
+    if (this.compteMaitreSelected == null) {
+      this.compteMaitreSelected = {
+        numero: '',
+        nom: ''
+      };
+    } else {
+      this.fournisseur.compteMaitre = this.compteMaitreSelected.numero as number;
+    }
+  }
+
+  // Prevent 'is undefined' when the input is empty
+  @Watch('compteVenteAchatSelected')
+  private watchCompteVenteAchatSelected() {
+    if (this.compteVenteAchatSelected == null) {
+      this.compteVenteAchatSelected = {
+        numero: '',
+        nom: ''
+      };
+    } else {
+      this.fournisseur.compteVenteAchat = this.compteVenteAchatSelected.numero as number;
+    }
   }
 
   private filter(item: any, queryText: string, itemText: string) {
@@ -552,16 +701,43 @@ export default class FournisseurVue extends Vue {
     );
   }
 
-  private openSearchCompte(typeCompte: string) {
+  private openSearchCompte(typeCompte: string, field: string) {
     if (this.readonly) return;
-    this.autocompleteCompteAssocie.blur();
+
+    let items: CompteSearch[] = []; // Items to pass to the selection dialog for the list, so we don't load them twice or more
+    let callback: (value: CompteSearch) => void;
+    let catchCallback: () => void;
+
+    switch (field) {
+      case 'compteAssocie':
+        items = this.comptesGeneraux;
+        this.autocompleteCompteAssocie.blur();
+        callback = (compte: CompteSearch) => (this.compteAssocieSelected = compte);
+        catchCallback = () => this.$nextTick(() => this.autocompleteCompteAssocie?.focus());
+        break;
+      case 'compteMaitre':
+        items = this.comptesClients;
+        this.autocompleteCompteMaitre.blur();
+        callback = (compte: CompteSearch) => (this.compteMaitreSelected = compte);
+        catchCallback = () => this.$nextTick(() => this.autocompleteCompteMaitre?.focus());
+        break;
+      case 'compteVenteAchat':
+        items = this.comptesGeneraux;
+        this.autocompleteCompteVenteAchat.blur();
+        callback = (compte: CompteSearch) => (this.compteVenteAchatSelected = compte);
+        catchCallback = () => this.$nextTick(() => this.autocompleteCompteVenteAchat?.focus());
+        break;
+      default:
+        break;
+    }
+
     this.compteDialog
-      .open(typeCompte)
+      .open(typeCompte, items)
       .then((compte) => {
-        this.compteAssocieSelected = compte;
+        callback(compte);
       })
       .catch(() => {
-        this.$nextTick(() => this.autocompleteCompteAssocie?.focus());
+        catchCallback();
       });
   }
 }

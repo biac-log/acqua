@@ -19,6 +19,8 @@ export class FournisseurDTO {
   public commentaire2 = '';
   public commentaire3 = '';
   public compteAssocie = 0;
+  public compteMaitre = 0;
+  public compteVenteAchat = 0;
 }
 
 export class Fournisseur extends FournisseurDTO {

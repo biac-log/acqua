@@ -18,6 +18,7 @@ export class UpdateFournisseurDTO {
   public commentaire2 = '';
   public commentaire3 = '';
   public compteAssocie = 0;
+  public compteMaitre = 0;
 }
 
 export class UpdateFournisseur extends UpdateFournisseurDTO {

@@ -1,6 +1,7 @@
 export class FournisseurParamsDTO {
   public nextNumero = 0;
-  public compteAssocieDefaut = 0;
+  public numeroCompteAssocieDefaut = 0;
+  public nomCompteAssocieDefaut = '';
 }
 
 export class FournisseurParams extends FournisseurParamsDTO {

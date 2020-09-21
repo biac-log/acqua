@@ -87,9 +87,10 @@ export default class extends Vue {
     }
   };
 
-  public open(typeToLoad: string): Promise<CompteSearch> {
+  public open(typeToLoad: string, items: CompteSearch[]): Promise<CompteSearch> {
     this.dialog = true;
-    this.loadComptes(typeToLoad);
+    
+    this.comptes = items;
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
