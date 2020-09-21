@@ -5,7 +5,7 @@
       <v-list dense>
         <v-list-item v-if="parentRoute" :key="previousName" @click="previous()">
           <v-list-item-action>
-            <v-icon>mdi-arrow-left</v-icon>
+            <v-icon>mdi-menu-left</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>{{ previousName }}</v-list-item-title>
@@ -36,32 +36,6 @@
         </template>
       </v-list>
     </v-navigation-drawer>
-
-    <!-- <v-navigation-drawer v-model="drawer" :mini-variant="mini" app>
-      <v-list dense>
-        <template v-for="route in routes">
-          <v-list-item link v-if="!route.children || route.children.length == 1" :key="route.title" :to="route">
-            <v-list-item-action>
-              <v-icon>{{ getOnlyChildren(route).meta.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>{{ getOnlyChildren(route).name }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-group v-else :prepend-icon="route.meta.icon" :key="route.meta.title">
-            <template v-slot:activator>
-              <v-list-item-title>{{ route.meta.title }}</v-list-item-title>
-            </template>
-            <v-list-item link v-for="children in route.children" :key="children.title" :to="children">
-              <v-list-item-title v-if="!mini" v-text="children.name" class="pl-14"></v-list-item-title>
-              <v-list-item-action>
-                <v-icon>{{ children.meta.icon }}</v-icon>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list-group>
-        </template>
-      </v-list>
-    </v-navigation-drawer> -->
 
     <v-app-bar app color="blue" dark>
       <v-app-bar-nav-icon @click.stop="mini = !mini">
@@ -187,7 +161,7 @@ export default class extends Vue {
   private searchItems: { name: string; icon: string; route: RouteConfig }[] = [];
   private routeSearch: { name: string; icon: string; route: RouteConfig } | null = null;
   private setRoute(item: { name: string; icon: string; route: RouteConfig }) {
-    this.$router.push(item.route.path);
+    this.$router.push(item.route);
     this.$nextTick(() => {
       this.search = '';
       this.routeSearch = null;
