@@ -107,9 +107,7 @@
           <div class="text-h6">
             Reste à ventiler :
             <b :class="resteAVentile > 0 ? 'amountPositive' : 'amountNull'">
-              {{
-              resteAVentile | numberToStringEvenZero
-              }}
+              {{ resteAVentile | numberToStringEvenZero }}
             </b>
           </div>
         </v-row>
@@ -132,14 +130,7 @@
         <v-spacer></v-spacer>
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn
-              ref="btnValidate"
-              class="ma-2 pr-4"
-              tile
-              color="success"
-              @click="sendEcheancier"
-              v-on="on"
-            >
+            <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" @click="sendEcheancier" v-on="on">
               <v-icon left>mdi-check</v-icon>Valider
             </v-btn>
           </template>
@@ -306,7 +297,7 @@ export default class extends Vue {
     this.nomCompte = nomCompte;
     this.calculAVentile();
     this.loadEcheancier(typeToLoad, numeroEcheancierToLoad);
-    
+
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;

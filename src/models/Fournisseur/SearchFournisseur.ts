@@ -1,10 +1,10 @@
 export class SearchFournisseurDTO {
-  public Type = '';
-  public Numero = 0;
-  public Nom = '';
-  public MatchCode = '';
-  public Solde = 0; // C'est un decimal, trouver nom en vue
-  public Adresse = '';
+  public type = '';
+  public numero = 0;
+  public nom = '';
+  public matchCode = '';
+  public solde = 0; // C'est un decimal, trouver nom en vue
+  public adresse = '';
 }
 
 export class SearchFournisseur extends SearchFournisseurDTO {

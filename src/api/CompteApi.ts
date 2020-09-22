@@ -30,6 +30,11 @@ export default abstract class CompteApi {
     return response.data.map((CompteSearchDTO) => new CompteGeneralSearch(CompteSearchDTO));
   }
 
+  static async searchComptesGeneraux(type: string): Promise<CompteSearch[]> {
+    const response = await api.AcQuaCore.get<CompteSearchDTO[]>(`Compte/GetAllComptesGeneraux?typeCompte=${type}`);
+    return response.data.map((CompteSearchDTO) => new CompteSearch(CompteSearchDTO));
+  }
+
   static async getCompteGeneral(type: string, numero: string): Promise<CompteGeneralSearch> {
     const response = await api.AcQuaCore.get<CompteGeneralSearchDTO>(
       `Compte/GetCompteGeneralById?typeCompte=${type}&numeroCompte=${numero}`
