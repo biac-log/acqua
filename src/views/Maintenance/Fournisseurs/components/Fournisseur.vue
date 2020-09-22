@@ -6,13 +6,7 @@
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn
-              class="mr-5"
-              color="success"
-              :disabled="isLoading"
-              @click="modifierFournisseur"
-              v-on="on"
-            >
+            <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierFournisseur" v-on="on">
               <v-icon left>mdi-pencil</v-icon>Modifier
             </v-btn>
           </template>
@@ -792,5 +786,4 @@ export default class FournisseurVue extends Vue {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -35,7 +35,7 @@ import { Component, Vue, Ref, Watch } from 'vue-property-decorator';
 import { FournisseurApi } from '@/api/FournisseurApi';
 import { Pagination } from '@/models/Pagination';
 import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
-import { FournisseurParams } from '@/models/Fournisseur/Get/FournisseurParams'
+import { FournisseurParams } from '@/models/Fournisseur/Get/FournisseurParams';
 import FournisseurVue from './components/Fournisseur.vue';
 
 @Component({

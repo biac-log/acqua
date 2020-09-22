@@ -24,13 +24,7 @@
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn
-                class="mr-5"
-                color="success"
-                :disabled="isLoading"
-                @click="modifierPiece"
-                v-on="on"
-              >
+              <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierPiece" v-on="on">
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
@@ -85,12 +79,7 @@
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3">
-                    <v-text-field
-                      label="Solde actuel"
-                      v-model="soldeActuel"
-                      :filled="readonly"
-                      readonly
-                    ></v-text-field>
+                    <v-text-field label="Solde actuel" v-model="soldeActuel" :filled="readonly" readonly></v-text-field>
                   </v-col>
                   <v-col cols="2">
                     <DatePicker
@@ -136,7 +125,8 @@
                 @click="deletePiece()"
                 :disabled="saveLoading"
                 :loading="deleteLoading"
-              >Supprimer</v-btn>
+                >Supprimer</v-btn
+              >
             </template>
             <span>
               Supprimer la pièce
@@ -151,7 +141,8 @@
             tabindex="-1"
             v-if="!numeroPiece && !forcerNumero"
             @click="forcerNumero = true"
-          >Forcer le numéro de pièce</v-btn>
+            >Forcer le numéro de pièce</v-btn
+          >
           <v-text-field
             label="Numéro pièce"
             v-model="numeroToForce"
