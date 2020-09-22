@@ -24,7 +24,11 @@
         :options.sync="options"
         :server-items-length="totalItems"
         @click:row="openFournisseur"
-      ></v-data-table>
+      >
+        <template v-slot:[`item.solde`]="{ item }">
+          <span>{{ item.solde | numberToComptaString }}</span>
+        </template>
+      </v-data-table>
     </v-card>
     <FournisseurVue ref="fournisseurDialog" />
   </div>
@@ -86,9 +90,11 @@ export default class extends Vue {
     const fournisseursResult = await FournisseurApi.getSearchFournisseurs(pagination);
     this.fournisseurs = [];
 
-    fournisseursResult.items.forEach((element: SearchFournisseur) => {
-      this.fournisseurs.push(element);
-    });
+    fournisseursResult.items
+      .map((f) => new SearchFournisseur(f))
+      .forEach((element: SearchFournisseur) => {
+        this.fournisseurs.push(element);
+      });
 
     this.totalItems = fournisseursResult.totalCount;
 
