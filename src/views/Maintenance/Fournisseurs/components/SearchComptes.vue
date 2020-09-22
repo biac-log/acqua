@@ -89,7 +89,7 @@ export default class extends Vue {
 
   public open(typeToLoad: string, items: CompteSearch[]): Promise<CompteSearch> {
     this.dialog = true;
-    
+
     this.comptes = items;
 
     return new Promise((resolve, reject) => {
@@ -108,7 +108,7 @@ export default class extends Vue {
   private refreshComptes() {
     if (this.typeLoad) {
       this.isLoading = true;
-      if(this.typeLoad == 'G') {
+      if (this.typeLoad == 'G') {
         CompteApi.searchComptesGeneraux(this.typeLoad)
           .then((resp) => {
             this.comptes = resp;
@@ -116,7 +116,7 @@ export default class extends Vue {
           .finally(() => {
             this.isLoading = false;
           });
-      }else{
+      } else {
         CompteApi.getComptesTiers(this.typeLoad)
           .then((resp) => {
             this.comptes = resp;

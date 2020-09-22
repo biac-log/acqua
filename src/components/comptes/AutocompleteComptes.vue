@@ -2,7 +2,7 @@
   <span>
     <v-combobox
       ref="comboboxCompte"
-      label="N° compte"
+      :label="label"
       v-model="numeroCompteSelected"
       :items="comptesSearch"
       :search-input.sync="searchCompte"
@@ -14,6 +14,7 @@
       :hide-details="readonly"
       :filled="readonly"
       :readonly="readonly"
+      :loading="compteLoading"
       validate-on-blur
       hide-selected
       item-text="numeroNom"
@@ -53,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Watch, Ref } from 'vue-property-decorator';
+import { Component, Vue, PropSync, Watch, Ref, Prop } from 'vue-property-decorator';
 import SearchCompteTierVue from './SearchCompteTier.vue';
 import SearchCompteGeneralVue from './SearchCompteGeneral.vue';
 import CompteApi from '@/api/CompteApi';
@@ -63,15 +64,14 @@ import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
   name: 'AutocompleteComptes',
   components: { SearchCompteTierVue, SearchCompteGeneralVue }
 })
-export default class extends Vue {
+export default class AutocompleteComptes extends Vue {
   @Ref() readonly comboboxCompte!: HTMLInputElement;
   @Ref() readonly searchCompteTierDialog!: SearchCompteTierVue;
   @Ref() readonly searchCompteGeneralDialog!: SearchCompteGeneralVue;
 
-  @PropSync('Readonly')
-  private readonly!: boolean;
-  @PropSync('TypeCompte')
-  private typeCompte!: string;
+  @PropSync('Readonly') private readonly!: boolean;
+  @PropSync('TypeCompte') private typeCompte!: string;
+  @Prop({ default: 'N° Compte' }) readonly label!: string;
   private compteLoading = false;
 
   private numeroCompte = '';
@@ -110,6 +110,7 @@ export default class extends Vue {
     else if (typeof value === 'string') {
       //Si on tappe un numéro sans passer pour l'aucomplete
       if (value.isInt() && value.length == 8 && (this.typeCompte == 'C' || this.typeCompte == 'F'))
+        //Si on entre un numero de facture
         this.$emit('Change', value);
       else {
         await this.loadCompteByString(value);
@@ -130,9 +131,8 @@ export default class extends Vue {
 
   private async loadCompteByString(value: string) {
     try {
-      this.compteLoading = true;
-    } catch {
       if (value) {
+        this.compteLoading = true;
         if (this.typeCompte == 'F' || this.typeCompte == 'C') {
           const compte = await CompteApi.getCompteDeTier(this.typeCompte, value);
           this.setCompte(compte);
@@ -229,10 +229,12 @@ export default class extends Vue {
   }
 
   public focus() {
+    console.log('focus');
     this.$nextTick(() => this.comboboxCompte?.focus());
   }
 
   public blur() {
+    console.log('blur');
     this.$nextTick(() => this.comboboxCompte?.blur());
   }
 
@@ -243,6 +245,7 @@ export default class extends Vue {
     this.numeroCompte = '';
     this.nomCompte = '';
     this.natureCompte = '';
+    this.$emit('Change', '');
   }
 }
 </script>

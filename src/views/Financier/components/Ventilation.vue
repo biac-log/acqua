@@ -337,7 +337,7 @@ import { Reglement } from '@/models/Financier/Get/Reglement';
 import DeviseApi from '@/api/DeviseApi';
 import { DateTime } from '@/models/DateTime';
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
-import AutocompleteComptesVue from './comptes/AutocompleteComptes.vue';
+import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossier.vue';
 import { ApplicationModule } from '@/store/modules/application';
 
@@ -352,8 +352,8 @@ import { ApplicationModule } from '@/store/modules/application';
 })
 export default class VentilationVue extends Vue {
   @Ref() readonly compteComponent!: AutocompleteComptesVue;
-  @Ref() readonly searchEcheancierDialog!: AutocompleteComptesVue;
-  @Ref() readonly caseTvaDialog!: AutocompleteComptesVue;
+  @Ref() readonly searchEcheancierDialog!: SearchEcheancierVue;
+  @Ref() readonly caseTvaDialog!: SearchCaseTvaVue;
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
 
   @PropSync('isReadOnly') public readonly!: boolean;
@@ -408,9 +408,7 @@ export default class VentilationVue extends Vue {
   private caseTva: CaseTva = new CaseTva();
   private numeroCaseTva = '';
   private numeroCaseTvaError = '';
-  private numeroCaseTvaRules: any = [
-    (v: string) => !v || (v.isInt() && v.toNumber() != 0) || 'Numéro invalide'
-  ];
+  private numeroCaseTvaRules: any = [(v: string) => !v || (v.isInt() && v.toNumber() != 0) || 'Numéro invalide'];
 
   private tauxCase = 0;
   private tvaLoading = false;
@@ -520,8 +518,9 @@ export default class VentilationVue extends Vue {
   //#endregion
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
-    this.compteComponent.blur();
-    if (
+    if (!compte) {
+      this.nomCompte = '';
+    } else if (
       typeof compte === 'string' &&
       (this.typesComptesSelected.id == 'C' || this.typesComptesSelected.id == 'F') &&
       compte.length == 8
@@ -530,18 +529,24 @@ export default class VentilationVue extends Vue {
       this.dossierIsDisabled = true;
       this.natureCompte = '';
       this.dossierComponent?.resetDossier();
+      this.compteComponent.blur();
       this.$nextTick(() => (this.$refs.montant as any)?.focus());
     } else if (compte instanceof CompteGeneralSearch) {
       this.nomCompte = compte.nom;
       this.numeroCompte = compte.numero.toString();
       this.natureCompte = compte.nature;
       this.setCompteGeneralCaseTvaAsync(compte);
-      if (this.typesComptesSelected?.id == 'G' && (compte.nature == 'R' || compte.nature == 'C') && this.dossierIsEnabled) {
+      if (
+        this.typesComptesSelected?.id == 'G' &&
+        (compte.nature == 'R' || compte.nature == 'C') &&
+        this.dossierIsEnabled
+      ) {
         this.dossierIsDisabled = false;
         this.dossierComponent?.focus();
       } else {
         this.dossierIsDisabled = true;
         this.dossierComponent?.resetDossier();
+        this.compteComponent.blur();
         this.$nextTick(() => (this.$refs.montant as any)?.focus());
       }
     } else if (compte instanceof CompteSearch || compte instanceof CompteDeTier) {
@@ -550,6 +555,7 @@ export default class VentilationVue extends Vue {
       this.dossierIsDisabled = true;
       this.natureCompte = '';
       this.dossierComponent?.resetDossier();
+      this.compteComponent.blur();
       this.$nextTick(() => (this.$refs.reference as any)?.focus());
     }
   }
@@ -754,7 +760,7 @@ export default class VentilationVue extends Vue {
       }
     } catch (err) {
       this.caseTva = new CaseTva();
-      this.numeroCaseTvaError = "Numéro invalide";
+      this.numeroCaseTvaError = 'Numéro invalide';
       if (err.request.status != 505) this.errorMessage = err.request.response;
     } finally {
       this.tvaLoading = false;

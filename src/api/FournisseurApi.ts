@@ -49,8 +49,8 @@ export abstract class FournisseurApi {
     oldFournisseur: FournisseurDTO
   ): Promise<boolean> {
     const data = {
-      updatedFournisseur: updatedFournisseur,
-      oldFournisseur: oldFournisseur
+      updatedFournisseur,
+      oldFournisseur
     };
     await api.AcQuaCore.put<UpdateFournisseurDTO>(`Fournisseur`, data);
     return true;
