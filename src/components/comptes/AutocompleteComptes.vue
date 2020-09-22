@@ -183,6 +183,7 @@ export default class AutocompleteComptes extends Vue {
   }
 
   private openSearchCompteGeneral() {
+    console.log('searchCompteG')
     if (this.typeCompte) {
       this.comboboxCompte.blur();
       this.searchCompteGeneralDialog
