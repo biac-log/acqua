@@ -313,6 +313,12 @@
                   maxlength="18"
                 />
               </v-col>
+              <v-col cols="6" class="pr-2">
+                <v-select label="Code devise" :items="devises" item-text="libelle" item-value="id" />
+              </v-col>
+              <v-col cols="6">
+                <v-select label="Code suivis" />
+              </v-col>
             </v-row>
           </v-col>
         </v-row>
@@ -379,6 +385,8 @@ import { CompteSearch } from '@/models/Compte/CompteSearch';
 import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import { CompteDeTier } from '@/models/Compte/CompteDeTier';
+import { Devise } from '@/models/Devise/Devise';
+import DeviseApi from '@/api/DeviseApi';
 
 @Component({
   name: 'FournisseurVue',
@@ -438,12 +446,20 @@ export default class FournisseurVue extends Vue {
   public codeAssujetti = 0;
   public intraCodePays = '';
   public intraIdentification = 0;
+  public codeDevise = 0;
 
   private readonly = true;
   private newRecord = false;
 
   private libellesAssujettis: LibelleTiers[] = [];
   private intraSaisieReadonly = true;
+
+  private devises: Devise[] = [];
+  private deviseSelected: Devise = new Devise();
+
+  mounted() {
+    this.getDevises();
+  }
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
     const fournisseur = new Fournisseur();
@@ -615,6 +631,12 @@ export default class FournisseurVue extends Vue {
       this.intraSaisieReadonly = false;
     }else{
       this.intraSaisieReadonly = true;
+    }
+  }
+
+  private async getDevises() {
+    if (this.devises.length <= 1) {
+      this.devises = await DeviseApi.getAllDevises();
     }
   }
 }

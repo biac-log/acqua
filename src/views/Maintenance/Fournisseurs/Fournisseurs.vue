@@ -119,6 +119,8 @@ export default class extends Vue {
 
     this.fournisseurParams = new FournisseurParams(params);
   }
+
+  
 }
 </script>
 

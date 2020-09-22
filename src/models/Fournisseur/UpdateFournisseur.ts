@@ -22,6 +22,7 @@ export class UpdateFournisseurDTO {
   public codeAssujetti = 0;
   public intraCodePays = '';
   public intraIdentification = 0;
+  public codeDevise = 0;
 }
 
 export class UpdateFournisseur extends UpdateFournisseurDTO {
