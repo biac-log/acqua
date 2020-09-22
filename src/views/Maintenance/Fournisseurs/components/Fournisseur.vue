@@ -2,7 +2,7 @@
   <v-dialog v-model="display" @click:outside="closeDialog">
     <v-card>
       <v-toolbar color="primary" dark flat>
-        <v-card-title>{{ newRecord ? 'Nouveau fournisseur' : fournisseur.displayName }}</v-card-title>
+        <v-card-title>{{ newRecord ? 'Nouveau fournisseur' : `${numero} - ${nom}` }}</v-card-title>
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
@@ -47,7 +47,7 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   :label="newRecord ? 'Numéro prédit' : 'Numéro'"
-                  v-model="fournisseur.numero"
+                  v-model="numero"
                   :filled="readonly"
                   readonly
                   tabindex="-1"
@@ -56,7 +56,7 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Raison sociale"
-                  v-model="fournisseur.raisonSociale"
+                  v-model="raisonSociale"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -69,7 +69,7 @@
                   :autofocus="!readonly"
                   label="Nom"
                   ref="inputNom"
-                  v-model="fournisseur.nom"
+                  v-model="nom"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -81,7 +81,7 @@
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Match code"
-                  v-model="fournisseur.matchCode"
+                  v-model="matchCode"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -96,7 +96,7 @@
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Adresse"
-                  v-model="fournisseur.adresseLigne1"
+                  v-model="adresseLigne1"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -107,7 +107,7 @@
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Complément d'adresse"
-                  v-model="fournisseur.adresseLigne2"
+                  v-model="adresseLigne2"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -118,7 +118,7 @@
               <v-col cols="4" class="pb-0 pt-0">
                 <v-text-field
                   label="Code Postal"
-                  v-model="fournisseur.codePostal"
+                  v-model="codePostal"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -129,7 +129,7 @@
               <v-col cols="4" class="pb-0 pt-0">
                 <v-text-field
                   label="Localité"
-                  v-model="fournisseur.localité"
+                  v-model="localité"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -140,7 +140,7 @@
               <v-col cols="4" class="pb-0 pt-0">
                 <v-text-field
                   label="Pays"
-                  v-model="fournisseur.codePays"
+                  v-model="codePays"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -155,7 +155,7 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Téléphone"
-                  v-model="fournisseur.numeroTelephone"
+                  v-model="numeroTelephone"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -166,7 +166,7 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Contact 1"
-                  v-model="fournisseur.contact1"
+                  v-model="contact1"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -177,7 +177,7 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Fax"
-                  v-model="fournisseur.téléfax"
+                  v-model="téléfax"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -188,7 +188,7 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Contact 2"
-                  v-model="fournisseur.contact2"
+                  v-model="contact2"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -199,7 +199,7 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="GSM"
-                  v-model="fournisseur.gsm"
+                  v-model="gsm"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -210,7 +210,7 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Contact 3"
-                  v-model="fournisseur.contact3"
+                  v-model="contact3"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -225,7 +225,7 @@
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Commentaire 1"
-                  v-model="fournisseur.commentaire1"
+                  v-model="commentaire1"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -236,7 +236,7 @@
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Commentaire 2"
-                  v-model="fournisseur.commentaire2"
+                  v-model="commentaire2"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -247,7 +247,7 @@
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Commentaire 3"
-                  v-model="fournisseur.commentaire3"
+                  v-model="commentaire3"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
@@ -403,7 +403,7 @@
               <v-col cols="12">
                 <v-select
                   label="Code assujetti"
-                  v-model="fournisseur.codeAssujetti"
+                  v-model="codeAssujetti"
                   :items="libellesAssujettis"
                   item-text="valeur"
                   item-value="code"
@@ -413,7 +413,7 @@
               <v-col cols="4" class="pr-2">
                 <v-text-field
                   label="Code Pays"
-                  v-model="fournisseur.codePays"
+                  v-model="codePays"
                   :filled="readonly || intraSaisieReadonly"
                   :readonly="readonly || intraSaisieReadonly"
                   :counter="!readonly"
@@ -524,6 +524,32 @@ export default class FournisseurVue extends Vue {
   private fournisseur: Fournisseur = new Fournisseur();
   private fournisseurBase: Fournisseur = new Fournisseur(); // Used for the reset method
 
+  /// Fournisseur model
+  public numero = 0;
+  public nom = '';
+  public matchCode = '';
+  public adresseLigne1 = '';
+  public adresseLigne2 = '';
+  public localité = '';
+  public raisonSociale = '';
+  public codePays = '';
+  public codePostal = '';
+  public contact1 = '';
+  public contact2 = '';
+  public contact3 = '';
+  public numeroTelephone = '';
+  public téléfax = '';
+  public gsm = '';
+  public commentaire1 = '';
+  public commentaire2 = '';
+  public commentaire3 = '';
+  public compteAssocie = 0;
+  public compteMaitre = 0;
+  public compteVenteAchat = 0;
+  public codeAssujetti = 0;
+  public intraCodePays = '';
+  public intraIdentification = 0;
+
   private readonly = true;
   private newRecord = false;
 
@@ -556,8 +582,9 @@ export default class FournisseurVue extends Vue {
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
     const fournisseur = new Fournisseur();
-    fournisseur.numero = searchFournisseur.numero;
-    fournisseur.nom = searchFournisseur.nom;
+
+    this.numero = searchFournisseur.numero;
+    this.nom = searchFournisseur.nom;
 
     this.display = true;
     this.newRecord = false;
@@ -573,12 +600,12 @@ export default class FournisseurVue extends Vue {
 
   public async openNew(params: FournisseurParams): Promise<number> {
     this.readonly = false;
-    this.fournisseur = new Fournisseur();
+    this.setFournisseur(new Fournisseur());
     this.fournisseurBase = new Fournisseur();
     this.newRecord = true;
 
-    this.fournisseur.numero = params.nextNumero;
-    this.fournisseur.compteAssocie = params.numeroCompteAssocieDefaut;
+    this.numero = params.nextNumero;
+    this.compteAssocie = params.numeroCompteAssocieDefaut;
     if (this.compteAssocieItems.length < 1)
       this.compteAssocieItems.push({ numero: params.numeroCompteAssocieDefaut, nom: params.nomCompteAssocieDefaut });
     this.compteAssocieSelected = { numero: params.numeroCompteAssocieDefaut, nom: params.nomCompteAssocieDefaut };
@@ -598,12 +625,40 @@ export default class FournisseurVue extends Vue {
     });
   }
 
+  private setFournisseur(fournisseur: Fournisseur) {
+    this.numero = fournisseur.numero;
+    this.nom =  fournisseur.nom;
+    this.matchCode =  fournisseur.matchCode;
+    this.adresseLigne1 =  fournisseur.adresseLigne1;
+    this.adresseLigne2 =  fournisseur.adresseLigne2;
+    this.localité =  fournisseur.localité;
+    this.raisonSociale =  fournisseur.raisonSociale;
+    this.codePays =  fournisseur.codePays;
+    this.codePostal =  fournisseur.codePostal;
+    this.contact1 =  fournisseur.contact1;
+    this.contact2 =  fournisseur.contact2;
+    this.contact3 =  fournisseur.contact3;
+    this.numeroTelephone =  fournisseur.numeroTelephone;
+    this.téléfax =  fournisseur.téléfax;
+    this.gsm =  fournisseur.gsm;
+    this.commentaire1 =  fournisseur.commentaire1;
+    this.commentaire2 =  fournisseur.commentaire2;
+    this.commentaire3 =  fournisseur.commentaire3;
+    this.compteAssocie = fournisseur.compteAssocie;
+    this.compteMaitre = fournisseur.compteMaitre;
+    this.compteVenteAchat = fournisseur.compteVenteAchat;
+    this.codeAssujetti = fournisseur.codeAssujetti;
+    this.intraCodePays =  fournisseur.intraCodePays;
+    this.intraIdentification = fournisseur.intraIdentification;
+  }
+
   private closeDialog() {
     this.display = false;
     this.readonly = true;
     this.intraSaisieReadonly = true;
     this.alertMessage.clear();
     this.successMessage.clear();
+    this.setFournisseur(new Fournisseur());
   }
 
   private async loadFournisseur(numero: number) {
@@ -611,7 +666,7 @@ export default class FournisseurVue extends Vue {
 
     const fournisseurDTO = await FournisseurApi.getFournisseurByNumero(numero);
 
-    this.fournisseur = new Fournisseur(fournisseurDTO);
+    this.setFournisseur(new Fournisseur(fournisseurDTO));
     this.fournisseurBase = new Fournisseur(fournisseurDTO);
 
     this.getLoading = false;
@@ -688,7 +743,7 @@ export default class FournisseurVue extends Vue {
         nom: ''
       };
     } else {
-      this.fournisseur.compteAssocie = this.compteAssocieSelected.numero as number;
+      this.compteAssocie = this.compteAssocieSelected.numero as number;
     }
   }
 
@@ -701,7 +756,7 @@ export default class FournisseurVue extends Vue {
         nom: ''
       };
     } else {
-      this.fournisseur.compteMaitre = this.compteMaitreSelected.numero as number;
+      this.compteMaitre = this.compteMaitreSelected.numero as number;
     }
   }
 
@@ -714,7 +769,7 @@ export default class FournisseurVue extends Vue {
         nom: ''
       };
     } else {
-      this.fournisseur.compteVenteAchat = this.compteVenteAchatSelected.numero as number;
+      this.compteVenteAchat = this.compteVenteAchatSelected.numero as number;
     }
   }
 
@@ -775,7 +830,7 @@ export default class FournisseurVue extends Vue {
   }
 
   private checkSaisieIntra() {
-    const libelle = this.libellesAssujettis.find((l) => l.code == this.fournisseur.codeAssujetti);
+    const libelle = this.libellesAssujettis.find((l) => l.code == this.codeAssujetti);
 
     if(libelle?.saisieIntra == "Y") {
       this.intraSaisieReadonly = false;
