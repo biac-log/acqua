@@ -404,6 +404,40 @@
               </v-col>
             </v-row>
           </v-col>
+          <v-col cols="3">
+            <v-row no-gutters>
+              <v-col cols="12">
+                <v-select
+                  label="Code assujetti"
+                  v-model="fournisseur.codeAssujetti"
+                  :items="libellesAssujettis"
+                  item-text="valeur"
+                  item-value="code"
+                  @change="checkSaisieIntra()"
+                />
+              </v-col>
+              <v-col cols="4" class="pr-2">
+                <v-text-field
+                  label="Code Pays"
+                  v-model="fournisseur.codePays"
+                  :filled="readonly || intraSaisieReadonly"
+                  :readonly="readonly || intraSaisieReadonly"
+                  :counter="!readonly"
+                  maxlength="2"
+                />
+              </v-col>
+              <v-col cols="8">
+                <v-text-field
+                  label="N° Intracommunautaire"
+                  v-model="intraIdentification"
+                  :filled="readonly || intraSaisieReadonly"
+                  :readonly="readonly || intraSaisieReadonly"
+                  :counter="!readonly"
+                  maxlength="18"
+                />
+              </v-col>
+            </v-row>
+          </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions v-if="!readonly">
@@ -461,7 +495,7 @@ import { UpdateFournisseur } from '@/models/Fournisseur/UpdateFournisseur';
 import { FournisseurApi } from '@/api/FournisseurApi';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
-import { FournisseurParams } from '@/models/Fournisseur/Get/FournisseurParams';
+import { FournisseurParams, LibelleTiers } from '@/models/Fournisseur/Get/FournisseurParams';
 import SearchComptes from './SearchComptes.vue';
 import CompteApi from '@/api/CompteApi';
 import { CompteSearch } from '@/models/Compte/CompteSearch';
@@ -523,6 +557,9 @@ export default class FournisseurVue extends Vue {
   private searchCompteVenteAchat = '';
   // No need to declare the items, they're in comptesGeneraux
 
+  private libellesAssujettis: LibelleTiers[] = [];
+  private intraSaisieReadonly = true;
+
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
     const fournisseur = new Fournisseur();
     fournisseur.numero = searchFournisseur.numero;
@@ -558,7 +595,8 @@ export default class FournisseurVue extends Vue {
     this.display = true;
     this.$nextTick(() => (this.inputNom as any).focus());
 
-    await this.loadComptes();
+    if (this.libellesAssujettis.length < 1) this.libellesAssujettis = params.libellesAssujettis;
+    if (this.comptesGeneraux.length < 1 && this.comptesClients.length < 1) await this.loadComptes(); // TODO : will change later with APA's refactor of autocomplete component
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -569,6 +607,7 @@ export default class FournisseurVue extends Vue {
   private closeDialog() {
     this.display = false;
     this.readonly = true;
+    this.intraSaisieReadonly = true;
     this.alertMessage.clear();
     this.successMessage.clear();
   }
@@ -739,6 +778,16 @@ export default class FournisseurVue extends Vue {
       .catch(() => {
         catchCallback();
       });
+  }
+
+  private checkSaisieIntra() {
+    const libelle = this.libellesAssujettis.find((l) => l.code == this.fournisseur.codeAssujetti);
+
+    if(libelle?.saisieIntra == "Y") {
+      this.intraSaisieReadonly = false;
+    }else{
+      this.intraSaisieReadonly = true;
+    }
   }
 }
 </script>

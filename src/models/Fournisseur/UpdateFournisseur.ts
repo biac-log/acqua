@@ -19,6 +19,9 @@ export class UpdateFournisseurDTO {
   public commentaire3 = '';
   public compteAssocie = 0;
   public compteMaitre = 0;
+  public codeAssujetti = 0;
+  public intraCodePays = '';
+  public intraIdentification = 0;
 }
 
 export class UpdateFournisseur extends UpdateFournisseurDTO {
