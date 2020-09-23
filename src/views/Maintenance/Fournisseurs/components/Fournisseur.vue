@@ -383,7 +383,16 @@
                   :counter="!readonly"
                 />
               </v-col>
-              
+              <v-col cols="12">
+                <v-text-field
+                  label="N° domiciliation"
+                  v-model="numeroDomiciliation"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  maxlength="12"
+                  :counter="!readonly"
+                />
+              </v-col>
             </v-row>
           </v-col>
         </v-row>
