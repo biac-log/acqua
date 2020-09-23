@@ -6,7 +6,13 @@
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierFournisseur" v-on="on">
+            <v-btn
+              class="mr-5"
+              color="success"
+              :disabled="isLoading"
+              @click="modifierFournisseur"
+              v-on="on"
+            >
               <v-icon left>mdi-pencil</v-icon>Modifier
             </v-btn>
           </template>
@@ -262,19 +268,34 @@
           <v-col cols="3">
             <v-row no-gutters>
               <v-col cols="6" class="pr-2">
-                <autocomplete-comptes-vue :readonly="readonly" TypeCompte="G" label="Compte associé" @Change="setCompteAssocie" />
+                <autocomplete-comptes-vue
+                  :readonly="readonly"
+                  TypeCompte="G"
+                  label="Compte associé"
+                  @Change="setCompteAssocie"
+                />
               </v-col>
               <v-col cols="6">
                 <v-text-field readonly :filled="readonly" v-model="nomCompteAssocie" />
               </v-col>
               <v-col cols="6" class="pr-2">
-                <autocomplete-comptes-vue :readonly="readonly" TypeCompte="C" label="Compte maître" @Change="setCompteMaitre" />
+                <autocomplete-comptes-vue
+                  :readonly="readonly"
+                  TypeCompte="C"
+                  label="Compte maître"
+                  @Change="setCompteMaitre"
+                />
               </v-col>
               <v-col cols="6">
                 <v-text-field readonly :filled="readonly" v-model="nomCompteMaitre" />
               </v-col>
               <v-col cols="6" class="pr-2">
-                <autocomplete-comptes-vue :readonly="readonly" TypeCompte="G" label="Compte vente/achat" @Change="setCompteVenteAchat" />
+                <autocomplete-comptes-vue
+                  :readonly="readonly"
+                  TypeCompte="G"
+                  label="Compte vente/achat"
+                  @Change="setCompteVenteAchat"
+                />
               </v-col>
               <v-col cols="6">
                 <v-text-field dense readonly :filled="readonly" v-model="nomCompteVenteAchat" />
@@ -291,6 +312,8 @@
                   item-text="valeur"
                   item-value="code"
                   @change="checkSaisieIntra()"
+                  readonly
+                  :filled="readonly"
                 />
               </v-col>
               <v-col cols="4" class="pr-2">
@@ -314,10 +337,24 @@
                 />
               </v-col>
               <v-col cols="6" class="pr-2">
-                <v-select label="Code devise" :items="devises" item-text="libelle" item-value="id" />
+                <v-select
+                  label="Code devise"
+                  readonly
+                  :filled="readonly"
+                  :items="devises"
+                  item-text="libelle"
+                  item-value="id"
+                />
               </v-col>
               <v-col cols="6">
-                <v-select label="Code suivis" :items="codeSuivis" item-text="valeur" item-value="code" />
+                <v-select
+                  label="Code suivis"
+                  readonly
+                  :filled="readonly"
+                  :items="codeSuivis"
+                  item-text="valeur"
+                  item-value="code"
+                />
               </v-col>
             </v-row>
           </v-col>
@@ -448,6 +485,10 @@ export default class FournisseurVue extends Vue {
   public intraIdentification = 0;
   public codeDevise = 0;
   public codeSuivi = 0;
+  public banAdr = '';
+  public banPays = '';
+  public banVille = '';
+  public banAgence = '';
 
   private readonly = true;
   private newRecord = false;
@@ -508,28 +549,28 @@ export default class FournisseurVue extends Vue {
 
   private setFournisseur(fournisseur: Fournisseur) {
     this.numero = fournisseur.numero;
-    this.nom =  fournisseur.nom;
-    this.matchCode =  fournisseur.matchCode;
-    this.adresseLigne1 =  fournisseur.adresseLigne1;
-    this.adresseLigne2 =  fournisseur.adresseLigne2;
-    this.localité =  fournisseur.localité;
-    this.raisonSociale =  fournisseur.raisonSociale;
-    this.codePays =  fournisseur.codePays;
-    this.codePostal =  fournisseur.codePostal;
-    this.contact1 =  fournisseur.contact1;
-    this.contact2 =  fournisseur.contact2;
-    this.contact3 =  fournisseur.contact3;
-    this.numeroTelephone =  fournisseur.numeroTelephone;
-    this.téléfax =  fournisseur.téléfax;
-    this.gsm =  fournisseur.gsm;
-    this.commentaire1 =  fournisseur.commentaire1;
-    this.commentaire2 =  fournisseur.commentaire2;
-    this.commentaire3 =  fournisseur.commentaire3;
+    this.nom = fournisseur.nom;
+    this.matchCode = fournisseur.matchCode;
+    this.adresseLigne1 = fournisseur.adresseLigne1;
+    this.adresseLigne2 = fournisseur.adresseLigne2;
+    this.localité = fournisseur.localité;
+    this.raisonSociale = fournisseur.raisonSociale;
+    this.codePays = fournisseur.codePays;
+    this.codePostal = fournisseur.codePostal;
+    this.contact1 = fournisseur.contact1;
+    this.contact2 = fournisseur.contact2;
+    this.contact3 = fournisseur.contact3;
+    this.numeroTelephone = fournisseur.numeroTelephone;
+    this.téléfax = fournisseur.téléfax;
+    this.gsm = fournisseur.gsm;
+    this.commentaire1 = fournisseur.commentaire1;
+    this.commentaire2 = fournisseur.commentaire2;
+    this.commentaire3 = fournisseur.commentaire3;
     this.compteAssocie = fournisseur.compteAssocie;
     this.compteMaitre = fournisseur.compteMaitre;
     this.compteVenteAchat = fournisseur.compteVenteAchat;
     this.codeAssujetti = fournisseur.codeAssujetti;
-    this.intraCodePays =  fournisseur.intraCodePays;
+    this.intraCodePays = fournisseur.intraCodePays;
     this.intraIdentification = fournisseur.intraIdentification;
   }
 
@@ -607,7 +648,7 @@ export default class FournisseurVue extends Vue {
       this.nomCompteAssocie = compte.nom;
     }
   }
-  
+
   private setCompteMaitre(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
     if (!compte) {
       this.compteMaitre = 0;
@@ -631,9 +672,9 @@ export default class FournisseurVue extends Vue {
   private checkSaisieIntra() {
     const libelle = this.libellesAssujettis.find((l) => l.code == this.codeAssujetti);
 
-    if(libelle?.saisieIntra == "Y") {
+    if (libelle?.saisieIntra == 'Y') {
       this.intraSaisieReadonly = false;
-    }else{
+    } else {
       this.intraSaisieReadonly = true;
     }
   }
