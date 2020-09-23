@@ -360,12 +360,24 @@
           </v-col>
           <v-col cols="3">
             <v-row>
-              <v-col cols="12">
+              <v-col cols="8">
                 <v-text-field
                   label="IBAN"
-                  v-model="iban"
+                  v-model="compte"
                   :filled="readonly"
                   :readonly="readonly"
+                />
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="BIC"
+                  v-model="bic"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  @blur="setBic"
+                  minlength="8"
+                  maxlength="11"
+                  :counter="!readonly"
                 />
               </v-col>
             </v-row>
@@ -439,7 +451,7 @@ import DeviseApi from '@/api/DeviseApi';
 
 @Component({
   name: 'FournisseurVue',
-  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue }
+  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue },
 })
 export default class FournisseurVue extends Vue {
   @Ref() readonly inputNom: any;
@@ -497,6 +509,7 @@ export default class FournisseurVue extends Vue {
   public intraIdentification = 0;
   public codeDevise = 0;
   public codeSuivi = 0;
+  public compte = '';
   public banAdr = '';
   public banPays = '';
   public banVille = '';
@@ -513,7 +526,7 @@ export default class FournisseurVue extends Vue {
 
   private codeSuivis: LibelleTiers[] = [];
 
-  public iban = '';
+  public bic = ''; 
 
   mounted() {
     this.getDevises();
@@ -696,6 +709,15 @@ export default class FournisseurVue extends Vue {
   private async getDevises() {
     if (this.devises.length <= 1) {
       this.devises = await DeviseApi.getAllDevises();
+    }
+  }
+
+  private setBic(){
+    if(this.bic.length > 0) {
+      this.banAdr = this.bic.substring(0,4);
+      this.banPays = this.bic.substring(4,6);
+      this.banVille = this.bic.substring(6,8);
+      this.banAgence = this.bic.substring(8);
     }
   }
 }
