@@ -358,6 +358,18 @@
               </v-col>
             </v-row>
           </v-col>
+          <v-col cols="3">
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  label="IBAN"
+                  v-model="iban"
+                  :filled="readonly"
+                  :readonly="readonly"
+                />
+              </v-col>
+            </v-row>
+          </v-col>
         </v-row>
       </v-card-text>
       <v-card-actions v-if="!readonly">
@@ -500,6 +512,8 @@ export default class FournisseurVue extends Vue {
   private deviseSelected: Devise = new Devise();
 
   private codeSuivis: LibelleTiers[] = [];
+
+  public iban = '';
 
   mounted() {
     this.getDevises();
