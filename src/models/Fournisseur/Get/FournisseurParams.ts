@@ -13,6 +13,7 @@ export class FournisseurParamsDTO {
   public numeroCompteAssocieDefaut = 0;
   public nomCompteAssocieDefaut = '';
   public libellesAssujettis: LibelleTiers[] = [];
+  public codeSuivis: LibelleTiers[] = [];
 }
 
 export class FournisseurParams extends FournisseurParamsDTO {

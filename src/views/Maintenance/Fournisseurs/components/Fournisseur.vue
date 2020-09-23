@@ -317,7 +317,7 @@
                 <v-select label="Code devise" :items="devises" item-text="libelle" item-value="id" />
               </v-col>
               <v-col cols="6">
-                <v-select label="Code suivis" />
+                <v-select label="Code suivis" :items="codeSuivis" item-text="valeur" item-value="code" />
               </v-col>
             </v-row>
           </v-col>
@@ -447,6 +447,7 @@ export default class FournisseurVue extends Vue {
   public intraCodePays = '';
   public intraIdentification = 0;
   public codeDevise = 0;
+  public codeSuivi = 0;
 
   private readonly = true;
   private newRecord = false;
@@ -456,6 +457,8 @@ export default class FournisseurVue extends Vue {
 
   private devises: Devise[] = [];
   private deviseSelected: Devise = new Devise();
+
+  private codeSuivis: LibelleTiers[] = [];
 
   mounted() {
     this.getDevises();
@@ -495,6 +498,7 @@ export default class FournisseurVue extends Vue {
     this.$nextTick(() => (this.inputNom as any).focus());
 
     if (this.libellesAssujettis.length < 1) this.libellesAssujettis = params.libellesAssujettis;
+    if (this.codeSuivis.length < 1) this.codeSuivis = params.codeSuivis;
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
