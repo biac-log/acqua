@@ -380,6 +380,9 @@
                   :counter="!readonly"
                 />
               </v-col>
+              <v-col cols="12">
+                <v-checkbox :readonly="readonly" v-model="operationsTriangulaires" label="Op. triangulaires ?" />
+              </v-col>
             </v-row>
           </v-col>
         </v-row>
@@ -508,12 +511,13 @@ export default class FournisseurVue extends Vue {
   public intraCodePays = '';
   public intraIdentification = 0;
   public codeDevise = 0;
-  public codeSuivi = 0;
+  public typeSuivis = 0;
   public compte = '';
   public banAdr = '';
   public banPays = '';
   public banVille = '';
   public banAgence = '';
+  public operationsTriangulaires = false;
 
   private readonly = true;
   private newRecord = false;
@@ -599,6 +603,14 @@ export default class FournisseurVue extends Vue {
     this.codeAssujetti = fournisseur.codeAssujetti;
     this.intraCodePays = fournisseur.intraCodePays;
     this.intraIdentification = fournisseur.intraIdentification;
+    this.codeDevise = fournisseur.codeDevise;
+    this.compte = fournisseur.compte;
+    this.banAdr = fournisseur.banAdr;
+    this.banPays = fournisseur.banPays;
+    this.banVille = fournisseur.banVille;
+    this.banAgence = fournisseur.banAgence;
+    this.typeSuivis = fournisseur.typeSuivis;
+    this.operationsTriangulaires = fournisseur.operationsTriangulaires;
   }
 
   private closeDialog() {

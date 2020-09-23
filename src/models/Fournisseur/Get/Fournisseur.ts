@@ -25,6 +25,13 @@ export class FournisseurDTO {
   public intraCodePays = '';
   public intraIdentification = 0;
   public codeDevise = 0;
+  public typeSuivis = 0;
+  public compte = '';
+  public banAdr = '';
+  public banPays = '';
+  public banVille = '';
+  public banAgence = '';
+  public operationsTriangulaires = false;
 }
 
 export class Fournisseur extends FournisseurDTO {
