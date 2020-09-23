@@ -304,7 +304,7 @@
           </v-col>
           <v-col cols="3">
             <v-row no-gutters>
-              <v-col cols="12">
+              <v-col cols="6">
                 <v-select
                   label="Code assujetti"
                   v-model="codeAssujetti"
@@ -312,9 +312,12 @@
                   item-text="valeur"
                   item-value="code"
                   @change="checkSaisieIntra()"
-                  readonly
+                  :readonly="readonly"
                   :filled="readonly"
                 />
+              </v-col>
+              <v-col cols="6">
+                <v-checkbox :readonly="readonly" v-model="operationsTriangulaires" label="Op. triangulaires ?" />
               </v-col>
               <v-col cols="4" class="pr-2">
                 <v-text-field
@@ -339,7 +342,7 @@
               <v-col cols="6" class="pr-2">
                 <v-select
                   label="Code devise"
-                  readonly
+                  :readonly="readonly"
                   :filled="readonly"
                   :items="devises"
                   item-text="libelle"
@@ -349,7 +352,7 @@
               <v-col cols="6">
                 <v-select
                   label="Code suivis"
-                  readonly
+                  :readonly="readonly"
                   :filled="readonly"
                   :items="codeSuivis"
                   item-text="valeur"
@@ -380,9 +383,7 @@
                   :counter="!readonly"
                 />
               </v-col>
-              <v-col cols="12">
-                <v-checkbox :readonly="readonly" v-model="operationsTriangulaires" label="Op. triangulaires ?" />
-              </v-col>
+              
             </v-row>
           </v-col>
         </v-row>
@@ -518,6 +519,7 @@ export default class FournisseurVue extends Vue {
   public banVille = '';
   public banAgence = '';
   public operationsTriangulaires = false;
+  public numeroDomiciliation = '';
 
   private readonly = true;
   private newRecord = false;
@@ -611,6 +613,7 @@ export default class FournisseurVue extends Vue {
     this.banAgence = fournisseur.banAgence;
     this.typeSuivis = fournisseur.typeSuivis;
     this.operationsTriangulaires = fournisseur.operationsTriangulaires;
+    this.numeroDomiciliation = fournisseur.numeroDomiciliation;
   }
 
   private closeDialog() {

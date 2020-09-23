@@ -32,6 +32,7 @@ export class FournisseurDTO {
   public banVille = '';
   public banAgence = '';
   public operationsTriangulaires = false;
+  public numeroDomiciliation = '';
 }
 
 export class Fournisseur extends FournisseurDTO {
