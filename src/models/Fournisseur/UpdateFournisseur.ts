@@ -32,6 +32,7 @@ export class UpdateFournisseurDTO {
   public banAgence = '';
   public operationsTriangulaires = false;
   public numeroDomiciliation = 0;
+  public codeVentilation = 0;
 }
 
 export class UpdateFournisseur extends UpdateFournisseurDTO {

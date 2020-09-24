@@ -393,7 +393,7 @@
                   :counter="!readonly"
                 />
               </v-col>
-              <v-col cols="12">
+              <v-col cols="6">
                 <v-text-field
                   label="N° domiciliation"
                   v-model="numeroDomiciliation"
@@ -401,6 +401,14 @@
                   :readonly="readonly"
                   maxlength="12"
                   :counter="!readonly"
+                />
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                  label="Code ventilation"
+                  v-model="codeVentilation"
+                  :filled="readonly"
+                  :readonly="readonly"
                 />
               </v-col>
             </v-row>
@@ -540,7 +548,8 @@ export default class FournisseurVue extends Vue {
   private banVille = '';
   private banAgence = '';
   private operationsTriangulaires = false;
-  private numeroDomiciliation = 0;
+  private numeroDomiciliation = '';
+  private codeVentilation = 0;
 
   private readonly = true;
   private newRecord = false;
@@ -634,7 +643,8 @@ export default class FournisseurVue extends Vue {
     this.banAgence = fournisseur.banAgence;
     this.typeSuivis = fournisseur.typeSuivis;
     this.operationsTriangulaires = fournisseur.operationsTriangulaires;
-    this.numeroDomiciliation = fournisseur.numeroDomiciliation as number;
+    this.numeroDomiciliation = fournisseur.numeroDomiciliation.toString();
+    this.codeVentilation = fournisseur.codeVentilation;
   }
 
   private mapFournisseur() {
@@ -671,7 +681,8 @@ export default class FournisseurVue extends Vue {
     this.fournisseur.banAgence = this.banAgence;
     this.fournisseur.typeSuivis = this.typeSuivis;
     this.fournisseur.operationsTriangulaires = this.operationsTriangulaires;
-    this.fournisseur.numeroDomiciliation = this.numeroDomiciliation as number;
+    this.fournisseur.numeroDomiciliation = parseInt(this.numeroDomiciliation);
+    this.fournisseur.codeVentilation = this.codeVentilation;
   }
 
   private closeDialog() {
@@ -690,6 +701,8 @@ export default class FournisseurVue extends Vue {
 
     this.setFournisseur(new Fournisseur(fournisseurDTO));
     this.fournisseurBase = new Fournisseur(fournisseurDTO);
+
+    this.getBic();
 
     this.getLoading = false;
   }
@@ -712,7 +725,7 @@ export default class FournisseurVue extends Vue {
     if (this.newRecord) {
       await FournisseurApi.createFournisseur(this.fournisseur)
         .then((numeroFournisseur) => {
-          this.resolve(numeroFournisseur);
+          this.fournisseurParams.nextNumero = numeroFournisseur + 1;
           this.fournisseur = this.fournisseurBase;
           this.closeDialog();
         })
@@ -726,7 +739,7 @@ export default class FournisseurVue extends Vue {
         .finally(() => {
           this.saveLoading = false;
         });
-    } else {
+    } else {      
       await FournisseurApi.updateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase)
         .then(() => {
           this.successMessage.show('Le fournisseur a été mis à jour avec succès.', '');
@@ -785,6 +798,10 @@ export default class FournisseurVue extends Vue {
     if (this.devises.length <= 1) {
       this.devises = await DeviseApi.getAllDevises();
     }
+  }
+
+  private getBic() {
+    this.bic = `${this.banAdr}${this.banPays}${this.banVille}${this.banAgence}`
   }
 
   private setBic(){
