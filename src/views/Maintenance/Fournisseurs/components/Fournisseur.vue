@@ -282,6 +282,7 @@
                   TypeCompte="G"
                   label="Compte associé"
                   @Change="setCompteAssocie"
+                  v-model="compteAssocie"
                 />
               </v-col>
               <v-col cols="6">
@@ -500,6 +501,7 @@ export default class FournisseurVue extends Vue {
 
   private fournisseur: Fournisseur = new Fournisseur();
   private fournisseurBase: Fournisseur = new Fournisseur(); // Used for the reset method
+  private fournisseurParams!: FournisseurParams;
 
   /// Fournisseur model
   private numero = 0;
@@ -555,6 +557,7 @@ export default class FournisseurVue extends Vue {
 
   mounted() {
     this.getDevises();
+    this.getParams();
   }
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
@@ -575,23 +578,21 @@ export default class FournisseurVue extends Vue {
     });
   }
 
-  public async openNew(params: FournisseurParams): Promise<number> {
+  public async openNew(): Promise<number> {
     this.readonly = false;
     this.setFournisseur(new Fournisseur());
     this.fournisseurBase = new Fournisseur();
     this.newRecord = true;
 
-    this.numero = params.nextNumero;
-    this.compteAssocie = params.numeroCompteAssocieDefaut;
+    this.numero = this.fournisseurParams.nextNumero;
+    this.compteAssocie = this.fournisseurParams.numeroCompteAssocieDefaut;
+    this.nomCompteAssocie = this.fournisseurParams.nomCompteAssocieDefaut;
 
-    this.fournisseurBase.numero = params.nextNumero;
-    this.fournisseurBase.compteAssocie = params.numeroCompteAssocieDefaut;
+    this.fournisseurBase.numero = this.fournisseurParams.nextNumero;
+    this.fournisseurBase.compteAssocie = this.fournisseurParams.numeroCompteAssocieDefaut;
 
     this.display = true;
-    this.$nextTick(() => (this.inputNom as any).focus());
-
-    if (this.libellesAssujettis.length < 1) this.libellesAssujettis = params.libellesAssujettis;
-    if (this.codeSuivis.length < 1) this.codeSuivis = params.codeSuivis;
+    this.$nextTick(() => (this.inputNom as any).focus());    
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -793,6 +794,15 @@ export default class FournisseurVue extends Vue {
       this.banVille = this.bic.substring(6,8);
       this.banAgence = this.bic.substring(8);
     }
+  }
+
+  private async getParams() {
+    const params = await FournisseurApi.getParams();
+
+    this.fournisseurParams = new FournisseurParams(params);
+
+    this.libellesAssujettis = this.fournisseurParams.libellesAssujettis;
+    this.codeSuivis = this.fournisseurParams.codeSuivis;
   }
 }
 </script>

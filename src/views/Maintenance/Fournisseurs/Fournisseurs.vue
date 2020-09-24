@@ -52,7 +52,6 @@ export default class extends Vue {
   private totalItems = 0;
   private isLoadingFournisseurs = false;
   private fournisseurs: SearchFournisseur[] = [];
-  private fournisseurParams!: FournisseurParams;
   private headers = [
     { text: 'Numéro', value: 'numero' },
     { text: 'Nom', value: 'nom' },
@@ -71,10 +70,6 @@ export default class extends Vue {
   @Watch('search')
   onSearchChanged() {
     this.loadFournisseurs();
-  }
-
-  mounted() {
-    this.getParams();
   }
 
   private async loadFournisseurs() {
@@ -108,19 +103,10 @@ export default class extends Vue {
   }
 
   private addFournisseur() {
-    this.fournisseurDialog.openNew(this.fournisseurParams).then((numero: number) => {
-      this.fournisseurParams.nextNumero = numero + 1;
+    this.fournisseurDialog.openNew().then((numero: number) => {
       this.loadFournisseurs();
     });
-  }
-
-  private async getParams() {
-    const params = await FournisseurApi.getParams();
-
-    this.fournisseurParams = new FournisseurParams(params);
-  }
-
-  
+  }  
 }
 </script>
 
