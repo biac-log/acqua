@@ -332,7 +332,7 @@
               <v-col cols="4" class="pr-2">
                 <v-text-field
                   label="Code Pays"
-                  v-model="codePays"
+                  v-model="intraCodePays"
                   :filled="readonly || intraSaisieReadonly"
                   :readonly="readonly || intraSaisieReadonly"
                   :counter="!readonly"
