@@ -14,6 +14,7 @@ export class UpdateFournisseurDTO {
   public numeroTelephone = '';
   public téléfax = '';
   public gsm = '';
+  public email = '';
   public commentaire1 = '';
   public commentaire2 = '';
   public commentaire3 = '';
@@ -21,7 +22,7 @@ export class UpdateFournisseurDTO {
   public compteMaitre = 0;
   public codeAssujetti = 0;
   public intraCodePays = '';
-  public intraIdentification = 0;
+  public intraIdentification = '';
   public codeDevise = 0;
   public typeSuivis = 0;
   public compte = '';
@@ -30,7 +31,7 @@ export class UpdateFournisseurDTO {
   public banVille = '';
   public banAgence = '';
   public operationsTriangulaires = false;
-  public numeroDomiciliation = '';
+  public numeroDomiciliation = 0;
 }
 
 export class UpdateFournisseur extends UpdateFournisseurDTO {

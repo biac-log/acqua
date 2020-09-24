@@ -224,6 +224,15 @@
                   tabindex="13"
                 />
               </v-col>
+              <v-col cols="6" class="pb-0 pt-0">
+                <v-text-field
+                  label="E-mail"
+                  v-model="email"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
+                />
+              </v-col>
             </v-row>
           </v-col>
           <v-col cols="3" class="pl-5">
@@ -493,42 +502,43 @@ export default class FournisseurVue extends Vue {
   private fournisseurBase: Fournisseur = new Fournisseur(); // Used for the reset method
 
   /// Fournisseur model
-  public numero = 0;
-  public nom = '';
-  public matchCode = '';
-  public adresseLigne1 = '';
-  public adresseLigne2 = '';
-  public localité = '';
-  public raisonSociale = '';
-  public codePays = '';
-  public codePostal = '';
-  public contact1 = '';
-  public contact2 = '';
-  public contact3 = '';
-  public numeroTelephone = '';
-  public téléfax = '';
-  public gsm = '';
-  public commentaire1 = '';
-  public commentaire2 = '';
-  public commentaire3 = '';
-  public compteAssocie = 0;
-  public nomCompteAssocie = '';
-  public compteMaitre = 0;
-  public nomCompteMaitre = '';
-  public compteVenteAchat = 0;
-  public nomCompteVenteAchat = '';
-  public codeAssujetti = 0;
-  public intraCodePays = '';
-  public intraIdentification = 0;
-  public codeDevise = 0;
-  public typeSuivis = 0;
-  public compte = '';
-  public banAdr = '';
-  public banPays = '';
-  public banVille = '';
-  public banAgence = '';
-  public operationsTriangulaires = false;
-  public numeroDomiciliation = '';
+  private numero = 0;
+  private nom = '';
+  private matchCode = '';
+  private adresseLigne1 = '';
+  private adresseLigne2 = '';
+  private localité = '';
+  private raisonSociale = '';
+  private codePays = '';
+  private codePostal = '';
+  private contact1 = '';
+  private contact2 = '';
+  private contact3 = '';
+  private numeroTelephone = '';
+  private téléfax = '';
+  private gsm = '';
+  private email = '';
+  private commentaire1 = '';
+  private commentaire2 = '';
+  private commentaire3 = '';
+  private compteAssocie = 0;
+  private nomCompteAssocie = '';
+  private compteMaitre = 0;
+  private nomCompteMaitre = '';
+  private compteVenteAchat = 0;
+  private nomCompteVenteAchat = '';
+  private codeAssujetti = 0;
+  private intraCodePays = '';
+  private intraIdentification = '';
+  private codeDevise = 0;
+  private typeSuivis = 0;
+  private compte = '';
+  private banAdr = '';
+  private banPays = '';
+  private banVille = '';
+  private banAgence = '';
+  private operationsTriangulaires = false;
+  private numeroDomiciliation = 0;
 
   private readonly = true;
   private newRecord = false;
@@ -605,6 +615,7 @@ export default class FournisseurVue extends Vue {
     this.numeroTelephone = fournisseur.numeroTelephone;
     this.téléfax = fournisseur.téléfax;
     this.gsm = fournisseur.gsm;
+    this.email = fournisseur.email;
     this.commentaire1 = fournisseur.commentaire1;
     this.commentaire2 = fournisseur.commentaire2;
     this.commentaire3 = fournisseur.commentaire3;
@@ -622,7 +633,44 @@ export default class FournisseurVue extends Vue {
     this.banAgence = fournisseur.banAgence;
     this.typeSuivis = fournisseur.typeSuivis;
     this.operationsTriangulaires = fournisseur.operationsTriangulaires;
-    this.numeroDomiciliation = fournisseur.numeroDomiciliation;
+    this.numeroDomiciliation = fournisseur.numeroDomiciliation as number;
+  }
+
+  private mapFournisseur() {
+    this.fournisseur.numero = this.numero;
+    this.fournisseur.nom = this.nom;
+    this.fournisseur.matchCode = this.matchCode;
+    this.fournisseur.adresseLigne1 = this.adresseLigne1;
+    this.fournisseur.adresseLigne2 = this.adresseLigne2;
+    this.fournisseur.localité = this.localité;
+    this.fournisseur.raisonSociale = this.raisonSociale;
+    this.fournisseur.codePays = this.codePays;
+    this.fournisseur.codePostal = this.codePostal;
+    this.fournisseur.contact1 = this.contact1;
+    this.fournisseur.contact2 = this.contact2;
+    this.fournisseur.contact3 = this.contact3;
+    this.fournisseur.numeroTelephone = this.numeroTelephone;
+    this.fournisseur.téléfax = this.téléfax;
+    this.fournisseur.gsm = this.gsm;
+    this.fournisseur.email = this.email;
+    this.fournisseur.commentaire1 = this.commentaire1;
+    this.fournisseur.commentaire2 = this.commentaire2;
+    this.fournisseur.commentaire3 = this.commentaire3;
+    this.fournisseur.compteAssocie = this.compteAssocie;
+    this.fournisseur.compteMaitre = this.compteMaitre;
+    this.fournisseur.compteVenteAchat = this.compteVenteAchat;
+    this.fournisseur.codeAssujetti = this.codeAssujetti;
+    this.fournisseur.intraCodePays = this.intraCodePays;
+    this.fournisseur.intraIdentification = this.intraIdentification;
+    this.fournisseur.codeDevise = this.codeDevise;
+    this.fournisseur.compte = this.compte;
+    this.fournisseur.banAdr = this.banAdr;
+    this.fournisseur.banPays = this.banPays;
+    this.fournisseur.banVille = this.banVille;
+    this.fournisseur.banAgence = this.banAgence;
+    this.fournisseur.typeSuivis = this.typeSuivis;
+    this.fournisseur.operationsTriangulaires = this.operationsTriangulaires;
+    this.fournisseur.numeroDomiciliation = this.numeroDomiciliation as number;
   }
 
   private closeDialog() {
@@ -657,6 +705,8 @@ export default class FournisseurVue extends Vue {
 
   private async saveFournisseur() {
     this.saveLoading = true;
+
+    this.mapFournisseur();
 
     if (this.newRecord) {
       await FournisseurApi.createFournisseur(this.fournisseur)
