@@ -69,7 +69,7 @@
                   maxlength="11"
                   tabindex="2"
                 />
-              </v-col>              
+              </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   :autofocus="!readonly"
@@ -271,11 +271,9 @@
               </v-col>
             </v-row>
           </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="3">
-            <v-row no-gutters>
-              <v-col cols="6" class="pr-2">
+          <v-col cols="6">
+            <v-row>
+              <v-col cols="3">
                 <autocomplete-comptes-vue
                   :readonly="readonly"
                   TypeCompte="G"
@@ -284,11 +282,6 @@
                   v-model="compteAssocie"
                   ref="autocompleteCompteAssocie"
                 />
-              </v-col>
-              <v-col cols="6">
-                <v-text-field readonly :filled="readonly" v-model="nomCompteAssocie" />
-              </v-col>
-              <v-col cols="6" class="pr-2">
                 <autocomplete-comptes-vue
                   :readonly="readonly"
                   TypeCompte="C"
@@ -296,11 +289,6 @@
                   @Change="setCompteMaitre"
                   ref="autocompleteCompteMaitre"
                 />
-              </v-col>
-              <v-col cols="6">
-                <v-text-field readonly :filled="readonly" v-model="nomCompteMaitre" />
-              </v-col>
-              <v-col cols="6" class="pr-2">
                 <autocomplete-comptes-vue
                   :readonly="readonly"
                   TypeCompte="G"
@@ -309,14 +297,71 @@
                   ref="autocompleteCompteVenteAchat"
                 />
               </v-col>
-              <v-col cols="6">
-                <v-text-field dense readonly :filled="readonly" v-model="nomCompteVenteAchat" />
+              <v-col cols="3">
+                <v-text-field readonly :filled="readonly" v-model="nomCompteAssocie" />
+                <v-text-field readonly :filled="readonly" v-model="nomCompteMaitre" />
+                <v-text-field readonly :filled="readonly" v-model="nomCompteVenteAchat" />
               </v-col>
-            </v-row>
-          </v-col>
-          <v-col cols="3">
-            <v-row no-gutters>
-              <v-col cols="6">
+              <v-col cols="3">
+                <v-text-field
+                  label="IBAN"
+                  v-model="compte"
+                  :filled="readonly"
+                  :readonly="readonly"
+                />
+                <v-select
+                  label="Code suivis"
+                  :readonly="readonly"
+                  :filled="readonly"
+                  :items="codeSuivis"
+                  item-text="valeur"
+                  item-value="code"
+                  v-model="typeSuivis"
+                />
+                <v-text-field
+                  label="N° domiciliation"
+                  v-model="numeroDomiciliation"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  maxlength="12"
+                  :counter="!readonly"
+                />
+              </v-col>
+              <v-col cols="3">
+                <v-text-field
+                  label="BIC"
+                  v-model="bic"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  @blur="setBic"
+                  minlength="8"
+                  maxlength="11"
+                  :counter="!readonly"
+                />
+                <v-text-field
+                  label="Code ventilation"
+                  v-model="codeVentilation"
+                  :filled="readonly"
+                  :readonly="readonly"
+                />
+                <v-checkbox
+                  :readonly="readonly"
+                  v-model="operationsTriangulaires"
+                  label="Op. triangulaires ?"
+                />
+              </v-col>
+              <v-col cols="3">
+                <v-select
+                  label="Code devise"
+                  :readonly="readonly"
+                  :filled="readonly"
+                  :items="devises"
+                  item-text="libelle"
+                  item-value="id"
+                  v-model="codeDevise"
+                />
+              </v-col>
+              <v-col cols="3">
                 <v-select
                   label="Code assujetti"
                   v-model="codeAssujetti"
@@ -328,14 +373,7 @@
                   :filled="readonly"
                 />
               </v-col>
-              <v-col cols="6">
-                <v-checkbox
-                  :readonly="readonly"
-                  v-model="operationsTriangulaires"
-                  label="Op. triangulaires ?"
-                />
-              </v-col>
-              <v-col cols="4" class="pr-2">
+              <v-col cols="2">
                 <v-text-field
                   label="Code Pays"
                   v-model="intraCodePays"
@@ -345,7 +383,7 @@
                   maxlength="2"
                 />
               </v-col>
-              <v-col cols="8">
+              <v-col cols="4">
                 <v-text-field
                   label="N° Intracommunautaire"
                   v-model="intraIdentification"
@@ -355,71 +393,10 @@
                   maxlength="18"
                 />
               </v-col>
-              <v-col cols="6" class="pr-2">
-                <v-select
-                  label="Code devise"
-                  :readonly="readonly"
-                  :filled="readonly"
-                  :items="devises"
-                  item-text="libelle"
-                  item-value="id"
-                  v-model="codeDevise"
-                />
-              </v-col>
-              <v-col cols="6">
-                <v-select
-                  label="Code suivis"
-                  :readonly="readonly"
-                  :filled="readonly"
-                  :items="codeSuivis"
-                  item-text="valeur"
-                  item-value="code"
-                  v-model="typeSuivis"
-                />
-              </v-col>
             </v-row>
           </v-col>
-          <v-col cols="3">
-            <v-row>
-              <v-col cols="8">
-                <v-text-field
-                  label="IBAN"
-                  v-model="compte"
-                  :filled="readonly"
-                  :readonly="readonly"
-                />
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  label="BIC"
-                  v-model="bic"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  @blur="setBic"
-                  minlength="8"
-                  maxlength="11"
-                  :counter="!readonly"
-                />
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  label="N° domiciliation"
-                  v-model="numeroDomiciliation"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  maxlength="12"
-                  :counter="!readonly"
-                />
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  label="Code ventilation"
-                  v-model="codeVentilation"
-                  :filled="readonly"
-                  :readonly="readonly"
-                />
-              </v-col>
-            </v-row>
+          <v-col cols="6">
+            <!-- Champs commercial -->
           </v-col>
         </v-row>
       </v-card-text>
@@ -659,7 +636,7 @@ export default class FournisseurVue extends Vue {
     this.banAgence = fournisseur.banAgence;
     this.typeSuivis = fournisseur.typeSuivis;
     this.operationsTriangulaires = fournisseur.operationsTriangulaires;
-    this.numeroDomiciliation = fournisseur.numeroDomiciliation == 0 ? "" : fournisseur.numeroDomiciliation.toString(); // Display empty instead of 0
+    this.numeroDomiciliation = fournisseur.numeroDomiciliation == 0 ? '' : fournisseur.numeroDomiciliation.toString(); // Display empty instead of 0
     this.codeVentilation = fournisseur.codeVentilation;
   }
 
