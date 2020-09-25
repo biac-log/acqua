@@ -20,8 +20,11 @@ export class FournisseurDTO {
   public commentaire2 = '';
   public commentaire3 = '';
   public compteAssocie = 0;
+  public nomCompteAssocie = '';
   public compteMaitre = 0;
+  public nomCompteMaitre = '';
   public compteVenteAchat = 0;
+  public nomCompteVenteAchat = '';
   public codeAssujetti = 0;
   public intraCodePays = '';
   public intraIdentification = '';

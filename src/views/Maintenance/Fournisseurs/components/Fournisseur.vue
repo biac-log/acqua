@@ -630,8 +630,11 @@ export default class FournisseurVue extends Vue {
     this.commentaire2 = fournisseur.commentaire2;
     this.commentaire3 = fournisseur.commentaire3;
     this.compteAssocie = fournisseur.compteAssocie;
+    this.nomCompteAssocie = fournisseur.nomCompteAssocie;
     this.compteMaitre = fournisseur.compteMaitre;
+    this.nomCompteMaitre = fournisseur.nomCompteMaitre;
     this.compteVenteAchat = fournisseur.compteVenteAchat;
+    this.nomCompteVenteAchat = fournisseur.nomCompteVenteAchat;
     this.codeAssujetti = fournisseur.codeAssujetti;
     this.intraCodePays = fournisseur.intraCodePays;
     this.intraIdentification = fournisseur.intraIdentification;
