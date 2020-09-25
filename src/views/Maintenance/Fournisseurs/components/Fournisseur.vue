@@ -607,10 +607,12 @@ export default class FournisseurVue extends Vue {
 
     this.fournisseurBase.numero = this.fournisseurParams.nextNumero;
     this.fournisseurBase.compteAssocie = this.fournisseurParams.numeroCompteAssocieDefaut;
-    this.autocompleteCompteAssocie.init(this.fournisseurParams.numeroCompteAssocieDefaut.toString(), this.fournisseurParams.nomCompteAssocieDefaut);
 
     this.display = true;
-    this.$nextTick(() => (this.inputNom as any).focus());
+    this.$nextTick(() => {
+      this.autocompleteCompteAssocie.init(this.fournisseurParams.numeroCompteAssocieDefaut.toString(), this.fournisseurParams.nomCompteAssocieDefaut);
+      (this.inputNom as any).focus()
+    });
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
