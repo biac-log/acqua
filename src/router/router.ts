@@ -75,6 +75,24 @@ export const asyncRoutes: RouteConfig[] = [
     ]
   },
   {
+    path: '/operationdiverse',
+    component: Layout,
+    redirect: 'operationdiverse/index',
+    meta: { roles: ['admin', 'ACQUAACHATVENTE'] },
+    children: [
+      {
+        path: 'index',
+        component: () => import(/* webpackChunkName: "achatvente" */ '@/views/OperationDiverse/index.vue'),
+        name: 'Operation diverse',
+        meta: {
+          title: 'Operation diverse',
+          icon: 'mdi-cake',
+          affix: true
+        }
+      }
+    ]
+  },
+  {
     path: '/maintenance',
     component: Layout,
     redirect: 'maintenance/fournisseurs',

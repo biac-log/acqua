@@ -112,7 +112,9 @@
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
-      <v-btn icon dark @click="snackbar = false"><v-icon>mdi-close</v-icon></v-btn>
+      <template v-slot:action="{ attrs }">
+        <v-btn icon dark @click="snackbar = false" v-bind="attrs"><v-icon>mdi-close</v-icon></v-btn>
+      </template>
     </v-snackbar>
   </v-container>
 </template>
