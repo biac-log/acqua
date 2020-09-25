@@ -610,8 +610,11 @@ export default class FournisseurVue extends Vue {
 
     this.display = true;
     this.$nextTick(() => {
-      this.autocompleteCompteAssocie.init(this.fournisseurParams.numeroCompteAssocieDefaut.toString(), this.fournisseurParams.nomCompteAssocieDefaut);
-      (this.inputNom as any).focus()
+      this.autocompleteCompteAssocie.init(
+        this.fournisseurParams.numeroCompteAssocieDefaut.toString(),
+        this.fournisseurParams.nomCompteAssocieDefaut
+      );
+      (this.inputNom as any).focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -760,6 +763,7 @@ export default class FournisseurVue extends Vue {
     } else {
       await FournisseurApi.updateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase)
         .then(() => {
+          this.readonly = true;
           this.successMessage.show('Le fournisseur a été mis à jour avec succès.', '');
           this.resolve(true);
         })
@@ -769,7 +773,11 @@ export default class FournisseurVue extends Vue {
 
   private cancelEdit() {
     this.fournisseur = this.fournisseurBase;
-    if (!this.newRecord) this.readonly = true;
+    if (this.newRecord) {
+      this.closeDialog();
+    } else {
+      this.readonly = true;
+    }
   }
 
   private setCompteAssocie(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
