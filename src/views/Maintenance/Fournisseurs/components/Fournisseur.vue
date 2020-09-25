@@ -69,8 +69,8 @@
                   maxlength="11"
                   tabindex="2"
                 />
-              </v-col>
-              <v-col cols="12" class="pb-0 pt-0">
+              </v-col>              
+              <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   :autofocus="!readonly"
                   label="Nom"
@@ -83,8 +83,7 @@
                   tabindex="1"
                 />
               </v-col>
-
-              <v-col cols="12" class="pb-0 pt-0">
+              <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Match code"
                   v-model="matchCode"
@@ -93,6 +92,15 @@
                   :counter="!readonly"
                   maxlength="23"
                   tabindex="2"
+                />
+              </v-col>
+              <v-col cols="12" class="pb-0 pt-0">
+                <v-text-field
+                  label="E-mail"
+                  v-model="email"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
                 />
               </v-col>
             </v-row>
@@ -222,15 +230,6 @@
                   :counter="!readonly"
                   maxlength="30"
                   tabindex="13"
-                />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
-                <v-text-field
-                  label="E-mail"
-                  v-model="email"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  :counter="!readonly"
                 />
               </v-col>
             </v-row>
