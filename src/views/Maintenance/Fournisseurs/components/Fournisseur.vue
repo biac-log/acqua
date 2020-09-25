@@ -283,6 +283,7 @@
                   label="Compte associé"
                   @Change="setCompteAssocie"
                   v-model="compteAssocie"
+                  ref="autocompleteCompteAssocie"
                 />
               </v-col>
               <v-col cols="6">
@@ -294,6 +295,7 @@
                   TypeCompte="C"
                   label="Compte maître"
                   @Change="setCompteMaitre"
+                  ref="autocompleteCompteMaitre"
                 />
               </v-col>
               <v-col cols="6">
@@ -305,6 +307,7 @@
                   TypeCompte="G"
                   label="Compte vente/achat"
                   @Change="setCompteVenteAchat"
+                  ref="autocompleteCompteVenteAchat"
                 />
               </v-col>
               <v-col cols="6">
@@ -327,7 +330,11 @@
                 />
               </v-col>
               <v-col cols="6">
-                <v-checkbox :readonly="readonly" v-model="operationsTriangulaires" label="Op. triangulaires ?" />
+                <v-checkbox
+                  :readonly="readonly"
+                  v-model="operationsTriangulaires"
+                  label="Op. triangulaires ?"
+                />
               </v-col>
               <v-col cols="4" class="pr-2">
                 <v-text-field
@@ -357,6 +364,7 @@
                   :items="devises"
                   item-text="libelle"
                   item-value="id"
+                  v-model="codeDevise"
                 />
               </v-col>
               <v-col cols="6">
@@ -367,6 +375,7 @@
                   :items="codeSuivis"
                   item-text="valeur"
                   item-value="code"
+                  v-model="typeSuivis"
                 />
               </v-col>
             </v-row>
@@ -482,16 +491,15 @@ import DeviseApi from '@/api/DeviseApi';
 
 @Component({
   name: 'FournisseurVue',
-  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue },
+  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue }
 })
 export default class FournisseurVue extends Vue {
   @Ref() readonly inputNom: any;
   @Ref() alertMessage!: AlertMessageVue;
   @Ref() successMessage!: AlertMessageVue;
-  @Ref() readonly autocompleteCompteAssocie!: AutocompleteComptesVue;
-  @Ref() readonly autocompleteCompteMaitre!: HTMLInputElement;
-  @Ref() readonly autocompleteCompteVenteAchat!: HTMLInputElement;
-  @Ref() readonly compteDialog!: SearchComptes;
+  @Ref() autocompleteCompteAssocie!: AutocompleteComptesVue;
+  @Ref() autocompleteCompteMaitre!: AutocompleteComptesVue;
+  @Ref() autocompleteCompteVenteAchat!: AutocompleteComptesVue;
 
   private display = false;
 
@@ -562,7 +570,7 @@ export default class FournisseurVue extends Vue {
 
   private codeSuivis: LibelleTiers[] = [];
 
-  public bic = ''; 
+  public bic = '';
 
   mounted() {
     this.getDevises();
@@ -599,9 +607,10 @@ export default class FournisseurVue extends Vue {
 
     this.fournisseurBase.numero = this.fournisseurParams.nextNumero;
     this.fournisseurBase.compteAssocie = this.fournisseurParams.numeroCompteAssocieDefaut;
+    this.autocompleteCompteAssocie.init(this.fournisseurParams.numeroCompteAssocieDefaut.toString(), this.fournisseurParams.nomCompteAssocieDefaut);
 
     this.display = true;
-    this.$nextTick(() => (this.inputNom as any).focus());    
+    this.$nextTick(() => (this.inputNom as any).focus());
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -708,6 +717,10 @@ export default class FournisseurVue extends Vue {
     this.getBic();
 
     this.getLoading = false;
+
+    this.autocompleteCompteAssocie.init(this.compteAssocie.toString(), '');
+    this.autocompleteCompteMaitre.init(this.compteMaitre.toString(), '');
+    this.autocompleteCompteVenteAchat.init(this.compteVenteAchat.toString(), '');
   }
 
   private modifierFournisseur() {
@@ -742,7 +755,7 @@ export default class FournisseurVue extends Vue {
         .finally(() => {
           this.saveLoading = false;
         });
-    } else {      
+    } else {
       await FournisseurApi.updateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase)
         .then(() => {
           this.successMessage.show('Le fournisseur a été mis à jour avec succès.', '');
@@ -804,14 +817,14 @@ export default class FournisseurVue extends Vue {
   }
 
   private getBic() {
-    this.bic = `${this.banAdr}${this.banPays}${this.banVille}${this.banAgence}`
+    this.bic = `${this.banAdr}${this.banPays}${this.banVille}${this.banAgence}`;
   }
 
-  private setBic(){
-    if(this.bic.length > 0) {
-      this.banAdr = this.bic.substring(0,4);
-      this.banPays = this.bic.substring(4,6);
-      this.banVille = this.bic.substring(6,8);
+  private setBic() {
+    if (this.bic.length > 0) {
+      this.banAdr = this.bic.substring(0, 4);
+      this.banPays = this.bic.substring(4, 6);
+      this.banVille = this.bic.substring(6, 8);
       this.banAgence = this.bic.substring(8);
     }
   }
