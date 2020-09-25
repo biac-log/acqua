@@ -660,7 +660,7 @@ export default class FournisseurVue extends Vue {
     this.banAgence = fournisseur.banAgence;
     this.typeSuivis = fournisseur.typeSuivis;
     this.operationsTriangulaires = fournisseur.operationsTriangulaires;
-    this.numeroDomiciliation = fournisseur.numeroDomiciliation.toString();
+    this.numeroDomiciliation = fournisseur.numeroDomiciliation == 0 ? "" : fournisseur.numeroDomiciliation.toString(); // Display empty instead of 0
     this.codeVentilation = fournisseur.codeVentilation;
   }
 
