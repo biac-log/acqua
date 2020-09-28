@@ -49,7 +49,29 @@
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-row justify="center" dense class="pt-5">
           <v-col cols="3" class="pr-5">
-            <v-row dense>
+            <v-row dense>              
+              <v-col cols="6" class="pb-0 pt-0">
+                <v-text-field
+                  :autofocus="!readonly"
+                  label="Nom"
+                  ref="inputNom"
+                  v-model="nom"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
+                  maxlength="23"
+                />
+              </v-col>
+              <v-col cols="6" class="pb-0 pt-0">
+                <v-text-field
+                  label="Match code"
+                  v-model="matchCode"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
+                  maxlength="23"
+                />
+              </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   :label="newRecord ? 'Numéro prédit' : 'Numéro'"
@@ -67,31 +89,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="11"
-                  tabindex="2"
-                />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
-                <v-text-field
-                  :autofocus="!readonly"
-                  label="Nom"
-                  ref="inputNom"
-                  v-model="nom"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="23"
-                  tabindex="1"
-                />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
-                <v-text-field
-                  label="Match code"
-                  v-model="matchCode"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="23"
-                  tabindex="2"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -115,7 +112,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="35"
-                  tabindex="3"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -126,7 +122,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="35"
-                  tabindex="4"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
@@ -137,7 +132,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="8"
-                  tabindex="5"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
@@ -148,7 +142,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
-                  tabindex="6"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
@@ -159,7 +152,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="3"
-                  tabindex="7"
                 />
               </v-col>
             </v-row>
@@ -174,7 +166,22 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="14"
-                  tabindex="8"
+                />
+                <v-text-field
+                  label="Fax"
+                  v-model="téléfax"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
+                  maxlength="14"
+                />
+                <v-text-field
+                  label="GSM"
+                  v-model="gsm"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
+                  maxlength="14"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
@@ -185,21 +192,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
-                  tabindex="11"
                 />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
-                <v-text-field
-                  label="Fax"
-                  v-model="téléfax"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="14"
-                  tabindex="9"
-                />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Contact 2"
                   v-model="contact2"
@@ -207,21 +200,7 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
-                  tabindex="12"
                 />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
-                <v-text-field
-                  label="GSM"
-                  v-model="gsm"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="14"
-                  tabindex="10"
-                />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Contact 3"
                   v-model="contact3"
@@ -229,7 +208,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
-                  tabindex="13"
                 />
               </v-col>
             </v-row>
@@ -244,7 +222,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
-                  tabindex="14"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -255,7 +232,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
-                  tabindex="15"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
@@ -266,7 +242,6 @@
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
-                  tabindex="16"
                 />
               </v-col>
             </v-row>
@@ -301,9 +276,9 @@
                 />
               </v-col>
               <v-col cols="3">
-                <v-text-field readonly :filled="readonly" v-model="nomCompteAssocie" />
-                <v-text-field readonly :filled="readonly" v-model="nomCompteMaitre" />
-                <v-text-field readonly :filled="readonly" v-model="nomCompteVenteAchat" />
+                <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteAssocie" />
+                <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteMaitre" />
+                <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteVenteAchat" />
               </v-col>
               <v-col cols="3">
                 <v-text-field
@@ -710,6 +685,7 @@ export default class FournisseurVue extends Vue {
   private modifierFournisseur() {
     if (!this.getLoading) {
       this.readonly = false;
+      this.$nextTick(() => this.inputNom.focus());
     }
   }
 
