@@ -281,6 +281,7 @@
                   @Change="setCompteAssocie"
                   v-model="compteAssocie"
                   ref="autocompleteCompteAssocie"
+                  :hideDetails="false"
                 />
                 <autocomplete-comptes-vue
                   :readonly="readonly"
@@ -288,6 +289,7 @@
                   label="Compte maître"
                   @Change="setCompteMaitre"
                   ref="autocompleteCompteMaitre"
+                  :hideDetails="false"
                 />
                 <autocomplete-comptes-vue
                   :readonly="readonly"
@@ -295,6 +297,7 @@
                   label="Compte vente/achat"
                   @Change="setCompteVenteAchat"
                   ref="autocompleteCompteVenteAchat"
+                  hideDetails="false"
                 />
               </v-col>
               <v-col cols="3">
