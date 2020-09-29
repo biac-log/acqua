@@ -1,3 +1,5 @@
+import { DateTime } from '@/models/DateTime';
+
 export class FournisseurDTO {
   public type = 'F';
   public numero = 0;
@@ -38,6 +40,30 @@ export class FournisseurDTO {
   public operationsTriangulaires = false;
   public numeroDomiciliation = 0;
   public codeVentilation = 0;
+  public codeRepresentant = 0;
+  public nomRepresentant = '';
+  public codeFamille = 0;
+  public nomFamille = '';
+  public codeSecteur = 0;
+  public nomSecteur = '';
+  public codeNace = 0;
+  public codeLangue = 0;
+  public libelleLangue = '';
+  public codePaiement = ''; // FinDeMois
+  public libellePaiement = '';
+  public nombreDeJoursPaiement = 0;
+  public escompte = 0;
+  public joursEscomptes = 0;
+  public limiteCredit = 0;
+  public codePrix = 0;
+  public libellePrix = '';
+  public tarif = '';
+  public codeRemise = 0;
+  public libelleRemise = '';
+  public remiseGlobaleDefaut = 0; 
+  public francoMontant = 0;
+  public fermetureDu = '';
+  public fermetureAu = '';
 }
 
 export class Fournisseur extends FournisseurDTO {
@@ -48,5 +74,25 @@ export class Fournisseur extends FournisseurDTO {
 
   get displayName(): string {
     return `${this.numero} - ${this.nom}`.trim();
+  }
+
+  private _fermetureDuDate?: DateTime;
+  get fermetureDuDate(): DateTime {
+    if (!this._fermetureDuDate) this._fermetureDuDate = new DateTime(this.fermetureDu);
+    return this._fermetureDuDate;
+  }
+  set fermetureDuDate(date: DateTime) {
+    this._fermetureDuDate = date;
+    this.fermetureDu = date.toUtc();
+  }
+
+  private _fermetureAuDate?: DateTime;
+  get fermetureAuDate(): DateTime {
+    if (!this._fermetureAuDate) this._fermetureAuDate = new DateTime(this.fermetureAu);
+    return this._fermetureAuDate;
+  }
+  set fermetureAuDate(date: DateTime) {
+    this._fermetureAuDate = date;
+    this.fermetureAu = date.toUtc();
   }
 }

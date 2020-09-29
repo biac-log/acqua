@@ -6,13 +6,7 @@
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn
-              class="mr-5"
-              color="success"
-              :disabled="isLoading"
-              @click="modifierFournisseur"
-              v-on="on"
-            >
+            <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierFournisseur" v-on="on">
               <v-icon left>mdi-pencil</v-icon>Modifier
             </v-btn>
           </template>
@@ -49,7 +43,7 @@
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-row justify="center" dense class="pt-5">
           <v-col cols="3" class="pr-5">
-            <v-row dense>              
+            <v-row dense>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   :autofocus="!readonly"
@@ -281,12 +275,7 @@
                 <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteVenteAchat" />
               </v-col>
               <v-col cols="3">
-                <v-text-field
-                  label="IBAN"
-                  v-model="compte"
-                  :filled="readonly"
-                  :readonly="readonly"
-                />
+                <v-text-field label="IBAN" v-model="compte" :filled="readonly" :readonly="readonly" />
                 <v-select
                   label="Code suivis"
                   :readonly="readonly"
@@ -322,11 +311,7 @@
                   :filled="readonly"
                   :readonly="readonly"
                 />
-                <v-checkbox
-                  :readonly="readonly"
-                  v-model="operationsTriangulaires"
-                  label="Op. triangulaires ?"
-                />
+                <v-checkbox :readonly="readonly" v-model="operationsTriangulaires" label="Op. triangulaires ?" />
               </v-col>
               <v-col cols="3">
                 <v-select
@@ -512,6 +497,30 @@ export default class FournisseurVue extends Vue {
   private operationsTriangulaires = false;
   private numeroDomiciliation = '';
   private codeVentilation = 0;
+  public codeRepresentant = 0;
+  public nomRepresentant = '';
+  public codeFamille = 0;
+  public nomFamille = '';
+  public codeSecteur = 0;
+  public nomSecteur = '';
+  public codeNace = 0;
+  public codeLangue = 0;
+  public libelleLangue = '';
+  public codePaiement = ''; // FinDeMois
+  public libellePaiement = '';
+  public nombreDeJoursPaiement = 0;
+  public escompte = 0;
+  public joursEscomptes = 0;
+  public limiteCredit = 0;
+  public codePrix = 0;
+  public libellePrix = '';
+  public tarif = '';
+  public codeRemise = 0;
+  public libelleRemise = '';
+  public remiseGlobaleDefaut = 0;
+  public francoMontant = 0;
+  public fermetureDu = '';
+  public fermetureAu = '';
 
   private readonly = true;
   private newRecord = false;
@@ -616,6 +625,30 @@ export default class FournisseurVue extends Vue {
     this.operationsTriangulaires = fournisseur.operationsTriangulaires;
     this.numeroDomiciliation = fournisseur.numeroDomiciliation == 0 ? '' : fournisseur.numeroDomiciliation.toString(); // Display empty instead of 0
     this.codeVentilation = fournisseur.codeVentilation;
+    this.codeRepresentant = fournisseur.codeRepresentant;
+    this.nomRepresentant = fournisseur.nomRepresentant;
+    this.codeFamille = fournisseur.codeFamille;
+    this.nomFamille = fournisseur.nomFamille;
+    this.codeSecteur = fournisseur.codeSecteur;
+    this.nomSecteur = fournisseur.nomSecteur;
+    this.codeNace = fournisseur.codeNace;
+    this.codeLangue = fournisseur.codeLangue;
+    this.libelleLangue = fournisseur.libelleLangue;
+    this.codePaiement = fournisseur.codePaiement;
+    this.libellePaiement = fournisseur.libellePaiement;
+    this.nombreDeJoursPaiement = fournisseur.nombreDeJoursPaiement;
+    this.escompte = fournisseur.escompte;
+    this.joursEscomptes = fournisseur.joursEscomptes;
+    this.limiteCredit = fournisseur.limiteCredit;
+    this.codePrix = fournisseur.codePrix;
+    this.libellePrix = fournisseur.libellePrix;
+    this.tarif = fournisseur.tarif;
+    this.codeRemise = fournisseur.codeRemise;
+    this.libelleRemise = fournisseur.libelleRemise;
+    this.remiseGlobaleDefaut = fournisseur.remiseGlobaleDefaut;
+    this.francoMontant = fournisseur.francoMontant;
+    this.fermetureDu = fournisseur.fermetureDu;
+    this.fermetureAu = fournisseur.fermetureAu;
   }
 
   private mapFournisseur() {
