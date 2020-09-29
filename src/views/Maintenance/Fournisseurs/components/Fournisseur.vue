@@ -241,7 +241,7 @@
             </v-row>
           </v-col>
           <v-col cols="6">
-            <v-row>
+            <v-row dense>
               <v-col cols="3">
                 <autocomplete-comptes-vue
                   :readonly="readonly"
@@ -358,8 +358,50 @@
               </v-col>
             </v-row>
           </v-col>
-          <v-col cols="6">
-            <!-- Champs commercial -->
+          <v-col cols="2">
+            <v-row dense>
+              <v-col cols="6"
+                ><v-text-field :filled="readonly" label="Représentant" />
+                <v-text-field :filled="readonly" label="Famille" />
+                <v-text-field :filled="readonly" label="Secteur" />
+              </v-col>
+              <v-col cols="6">
+                <v-text-field :filled="readonly" readonly />
+                <v-text-field :filled="readonly" readonly />
+                <v-text-field :filled="readonly" readonly />
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col cols="6"><v-text-field :filled="readonly" label="Langue"/></v-col>
+              <v-col cols="6"><v-text-field :filled="readonly" readonly/></v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="4">
+            <v-row dense>
+              <v-col cols="4">
+                <v-text-field :filled="readonly" label="Paiement" />
+                <v-text-field :filled="readonly" label="Escompte" />
+                <v-text-field :filled="readonly" label="Remise" />
+              </v-col>
+              <v-col cols="4">
+                <v-text-field :filled="readonly" label="# de jours" />
+                <v-text-field :filled="readonly" label="Jours" />
+                <v-text-field :filled="readonly" label="Remise Globale" />
+              </v-col>
+              <v-col cols="4">
+                <v-text-field :filled="readonly" label="NACE" />
+                <v-text-field :filled="readonly" label="Tarif" />
+                <v-text-field :filled="readonly" label="Port Franco" />
+              </v-col>
+            </v-row>
+            <v-row dense>
+              <v-col cols="8">
+                <v-text-field :filled="readonly" label="Fermeture" />
+              </v-col>
+              <v-col cols="4">
+                <v-text-field :filled="readonly" label="Limite de crédit" />
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-card-text>
