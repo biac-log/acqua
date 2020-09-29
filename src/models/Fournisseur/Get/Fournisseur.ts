@@ -15,12 +15,29 @@ export class FournisseurDTO {
   public numeroTelephone = '';
   public téléfax = '';
   public gsm = '';
+  public email = '';
   public commentaire1 = '';
   public commentaire2 = '';
   public commentaire3 = '';
   public compteAssocie = 0;
+  public nomCompteAssocie = '';
   public compteMaitre = 0;
+  public nomCompteMaitre = '';
   public compteVenteAchat = 0;
+  public nomCompteVenteAchat = '';
+  public codeAssujetti = 0;
+  public intraCodePays = '';
+  public intraIdentification = '';
+  public codeDevise = 0;
+  public typeSuivis = 0;
+  public compte = '';
+  public banAdr = '';
+  public banPays = '';
+  public banVille = '';
+  public banAgence = '';
+  public operationsTriangulaires = false;
+  public numeroDomiciliation = 0;
+  public codeVentilation = 0;
 }
 
 export class Fournisseur extends FournisseurDTO {

@@ -24,7 +24,11 @@
         :options.sync="options"
         :server-items-length="totalItems"
         @click:row="openFournisseur"
-      ></v-data-table>
+      >
+        <template v-slot:[`item.solde`]="{ item }">
+          <span>{{ item.solde | numberToComptaString }}</span>
+        </template>
+      </v-data-table>
     </v-card>
     <FournisseurVue ref="fournisseurDialog" />
   </div>
@@ -48,7 +52,6 @@ export default class extends Vue {
   private totalItems = 0;
   private isLoadingFournisseurs = false;
   private fournisseurs: SearchFournisseur[] = [];
-  private fournisseurParams!: FournisseurParams;
   private headers = [
     { text: 'Numéro', value: 'numero' },
     { text: 'Nom', value: 'nom' },
@@ -69,10 +72,6 @@ export default class extends Vue {
     this.loadFournisseurs();
   }
 
-  mounted() {
-    this.getParams();
-  }
-
   private async loadFournisseurs() {
     const { sortBy, sortDesc, page, itemsPerPage } = this.options;
     const pagination = new Pagination();
@@ -86,9 +85,11 @@ export default class extends Vue {
     const fournisseursResult = await FournisseurApi.getSearchFournisseurs(pagination);
     this.fournisseurs = [];
 
-    fournisseursResult.items.forEach((element: SearchFournisseur) => {
-      this.fournisseurs.push(element);
-    });
+    fournisseursResult.items
+      .map((f) => new SearchFournisseur(f))
+      .forEach((element: SearchFournisseur) => {
+        this.fournisseurs.push(element);
+      });
 
     this.totalItems = fournisseursResult.totalCount;
 
@@ -102,17 +103,10 @@ export default class extends Vue {
   }
 
   private addFournisseur() {
-    this.fournisseurDialog.openNew(this.fournisseurParams).then((numero: number) => {
-      this.fournisseurParams.nextNumero = numero + 1;
+    this.fournisseurDialog.openNew().then((numero: number) => {
       this.loadFournisseurs();
     });
-  }
-
-  private async getParams() {
-    const params = await FournisseurApi.getParams();
-
-    this.fournisseurParams = new FournisseurParams(params);
-  }
+  }  
 }
 </script>
 

@@ -2,11 +2,17 @@
   <v-dialog v-model="display" @click:outside="closeDialog">
     <v-card>
       <v-toolbar color="primary" dark flat>
-        <v-card-title>{{ newRecord ? 'Nouveau fournisseur' : fournisseur.displayName }}</v-card-title>
+        <v-card-title>{{ newRecord ? 'Nouveau fournisseur' : `${numero} - ${nom}` }}</v-card-title>
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierFournisseur" v-on="on">
+            <v-btn
+              class="mr-5"
+              color="success"
+              :disabled="isLoading"
+              @click="modifierFournisseur"
+              v-on="on"
+            >
               <v-icon left>mdi-pencil</v-icon>Modifier
             </v-btn>
           </template>
@@ -43,11 +49,33 @@
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-row justify="center" dense class="pt-5">
           <v-col cols="3" class="pr-5">
-            <v-row dense>
+            <v-row dense>              
+              <v-col cols="6" class="pb-0 pt-0">
+                <v-text-field
+                  :autofocus="!readonly"
+                  label="Nom"
+                  ref="inputNom"
+                  v-model="nom"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
+                  maxlength="23"
+                />
+              </v-col>
+              <v-col cols="6" class="pb-0 pt-0">
+                <v-text-field
+                  label="Match code"
+                  v-model="matchCode"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
+                  maxlength="23"
+                />
+              </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   :label="newRecord ? 'Numéro prédit' : 'Numéro'"
-                  v-model="fournisseur.numero"
+                  v-model="numero"
                   :filled="readonly"
                   readonly
                   tabindex="-1"
@@ -56,37 +84,20 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Raison sociale"
-                  v-model="fournisseur.raisonSociale"
+                  v-model="raisonSociale"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="11"
-                  tabindex="2"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
-                  :autofocus="!readonly"
-                  label="Nom"
-                  ref="inputNom"
-                  v-model="fournisseur.nom"
+                  label="E-mail"
+                  v-model="email"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
-                  maxlength="23"
-                  tabindex="1"
-                />
-              </v-col>
-
-              <v-col cols="12" class="pb-0 pt-0">
-                <v-text-field
-                  label="Match code"
-                  v-model="fournisseur.matchCode"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="23"
-                  tabindex="2"
                 />
               </v-col>
             </v-row>
@@ -96,56 +107,51 @@
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Adresse"
-                  v-model="fournisseur.adresseLigne1"
+                  v-model="adresseLigne1"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="35"
-                  tabindex="3"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Complément d'adresse"
-                  v-model="fournisseur.adresseLigne2"
+                  v-model="adresseLigne2"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="35"
-                  tabindex="4"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
                 <v-text-field
                   label="Code Postal"
-                  v-model="fournisseur.codePostal"
+                  v-model="codePostal"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="8"
-                  tabindex="5"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
                 <v-text-field
                   label="Localité"
-                  v-model="fournisseur.localité"
+                  v-model="localité"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
-                  tabindex="6"
                 />
               </v-col>
               <v-col cols="4" class="pb-0 pt-0">
                 <v-text-field
                   label="Pays"
-                  v-model="fournisseur.codePays"
+                  v-model="codePays"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="3"
-                  tabindex="7"
                 />
               </v-col>
             </v-row>
@@ -155,67 +161,53 @@
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Téléphone"
-                  v-model="fournisseur.numeroTelephone"
+                  v-model="numeroTelephone"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="14"
-                  tabindex="8"
+                />
+                <v-text-field
+                  label="Fax"
+                  v-model="téléfax"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
+                  maxlength="14"
+                />
+                <v-text-field
+                  label="GSM"
+                  v-model="gsm"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  :counter="!readonly"
+                  maxlength="14"
                 />
               </v-col>
               <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Contact 1"
-                  v-model="fournisseur.contact1"
+                  v-model="contact1"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
-                  tabindex="11"
                 />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
-                <v-text-field
-                  label="Fax"
-                  v-model="fournisseur.téléfax"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="14"
-                  tabindex="9"
-                />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Contact 2"
-                  v-model="fournisseur.contact2"
+                  v-model="contact2"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
-                  tabindex="12"
                 />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
-                <v-text-field
-                  label="GSM"
-                  v-model="fournisseur.gsm"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="14"
-                  tabindex="10"
-                />
-              </v-col>
-              <v-col cols="6" class="pb-0 pt-0">
                 <v-text-field
                   label="Contact 3"
-                  v-model="fournisseur.contact3"
+                  v-model="contact3"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="30"
-                  tabindex="13"
                 />
               </v-col>
             </v-row>
@@ -225,178 +217,164 @@
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Commentaire 1"
-                  v-model="fournisseur.commentaire1"
+                  v-model="commentaire1"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
-                  tabindex="14"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Commentaire 2"
-                  v-model="fournisseur.commentaire2"
+                  v-model="commentaire2"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
-                  tabindex="15"
                 />
               </v-col>
               <v-col cols="12" class="pb-0 pt-0">
                 <v-text-field
                   label="Commentaire 3"
-                  v-model="fournisseur.commentaire3"
+                  v-model="commentaire3"
                   :filled="readonly"
                   :readonly="readonly"
                   :counter="!readonly"
                   maxlength="20"
-                  tabindex="16"
                 />
               </v-col>
             </v-row>
           </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="3">
-            <v-row no-gutters>
-              <v-col cols="6" class="pr-2">
-                <v-combobox
-                  ref="autocompleteCompteAssocie"
+          <v-col cols="6">
+            <v-row>
+              <v-col cols="3">
+                <autocomplete-comptes-vue
+                  :readonly="readonly"
+                  TypeCompte="G"
                   label="Compte associé"
-                  v-model="compteAssocieSelected"
-                  :hide-details="readonly"
-                  :filled="readonly"
+                  @Change="setCompteAssocie"
+                  v-model="compteAssocie"
+                  ref="autocompleteCompteAssocie"
+                  :hideDetails="false"
+                />
+                <autocomplete-comptes-vue
                   :readonly="readonly"
-                  :items="compteAssocieItems"
-                  :search-input.sync="searchCompteAssocie"
-                  hide-selected
-                  hide-no-data
-                  @keydown.ctrl.f.prevent="openSearchCompte('G', 'compteAssocie')"
-                  item-text="nom"
-                  item-value="numero"
-                  :filter="filter"
-                >
-                  <template v-slot:append>
-                    <v-tooltip top open-delay="500" open-on-hover>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          icon
-                          small
-                          v-show="!readonly"
-                          v-on="on"
-                          :disabled="readonly || saveLoading"
-                          tabindex="-1"
-                          @click.prevent="openSearchCompte('G', 'compteAssocie')"
-                        >
-                          <v-icon>mdi-magnify</v-icon>
-                        </v-btn>
-                      </template>
-                      <span>
-                        Rechercher un compte
-                        <span class="shortcutTooltip">CTRL+F</span>
-                      </span>
-                    </v-tooltip>
-                  </template>
-                  <template v-slot:selection="{ item }">{{ item.numero }}</template>
-                  <template v-slot:item="{ item }">{{ item.nom }}</template>
-                </v-combobox>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field readonly :filled="readonly" v-model="compteAssocieSelected.nom" />
-              </v-col>
-              <v-col cols="6" class="pr-2">
-                <v-combobox
-                  ref="autocompleteCompteVenteAchat"
-                  label="Compte Vente/Achat"
-                  v-model="compteVenteAchatSelected"
-                  :hide-details="readonly"
-                  :filled="readonly"
-                  :readonly="readonly"
-                  :items="compteVenteAchatItems"
-                  :search-input.sync="searchCompteVenteAchat"
-                  hide-selected
-                  hide-no-data
-                  @keydown.ctrl.f.prevent="openSearchCompte('G', 'compteVenteAchat')"
-                  item-text="nom"
-                  item-value="numero"
-                  :filter="filter"
-                >
-                  <template v-slot:append>
-                    <v-tooltip top open-delay="500" open-on-hover>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          icon
-                          small
-                          v-show="!readonly"
-                          v-on="on"
-                          :disabled="readonly || saveLoading"
-                          tabindex="-1"
-                          @click.prevent="openSearchCompte('G', 'compteVenteAchat')"
-                        >
-                          <v-icon>mdi-magnify</v-icon>
-                        </v-btn>
-                      </template>
-                      <span>
-                        Rechercher un compte
-                        <span class="shortcutTooltip">CTRL+F</span>
-                      </span>
-                    </v-tooltip>
-                  </template>
-                  <template v-slot:selection="{ item }">{{ item.numero }}</template>
-                  <template v-slot:item="{ item }">{{ item.nom }}</template>
-                </v-combobox>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field readonly :filled="readonly" v-model="compteVenteAchatSelected.nom" />
-              </v-col>
-              <v-col cols="6" class="pr-2">
-                <v-combobox
-                  ref="autocompleteCompteMaitre"
+                  TypeCompte="C"
                   label="Compte maître"
-                  v-model="compteMaitreSelected"
-                  :hide-details="readonly"
+                  @Change="setCompteMaitre"
+                  ref="autocompleteCompteMaitre"
+                  :hideDetails="false"
+                />
+                <autocomplete-comptes-vue
+                  :readonly="readonly"
+                  TypeCompte="G"
+                  label="Compte vente/achat"
+                  @Change="setCompteVenteAchat"
+                  ref="autocompleteCompteVenteAchat"
+                  hideDetails="false"
+                />
+              </v-col>
+              <v-col cols="3">
+                <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteAssocie" />
+                <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteMaitre" />
+                <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteVenteAchat" />
+              </v-col>
+              <v-col cols="3">
+                <v-text-field
+                  label="IBAN"
+                  v-model="compte"
                   :filled="readonly"
                   :readonly="readonly"
-                  :items="compteMaitreItems"
-                  :search-input.sync="searchCompteMaitre"
-                  hide-selected
-                  hide-no-data
-                  @keydown.ctrl.f.prevent="openSearchCompte('C', 'compteMaitre')"
-                  item-text="nom"
-                  item-value="numero"
-                  :filter="filter"
-                >
-                  <template v-slot:append>
-                    <v-tooltip top open-delay="500" open-on-hover>
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          icon
-                          small
-                          v-show="!readonly"
-                          v-on="on"
-                          :disabled="readonly || saveLoading"
-                          tabindex="-1"
-                          @click.prevent="openSearchCompte('C', 'compteMaitre')"
-                        >
-                          <v-icon>mdi-magnify</v-icon>
-                        </v-btn>
-                      </template>
-                      <span>
-                        Rechercher un compte
-                        <span class="shortcutTooltip">CTRL+F</span>
-                      </span>
-                    </v-tooltip>
-                  </template>
-                  <template v-slot:selection="{ item }">{{ item.numero }}</template>
-                  <template v-slot:item="{ item }">{{ item.nom }}</template>
-                </v-combobox>
+                />
+                <v-select
+                  label="Code suivis"
+                  :readonly="readonly"
+                  :filled="readonly"
+                  :items="codeSuivis"
+                  item-text="valeur"
+                  item-value="code"
+                  v-model="typeSuivis"
+                />
+                <v-text-field
+                  label="N° domiciliation"
+                  v-model="numeroDomiciliation"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  maxlength="12"
+                  :counter="!readonly"
+                />
               </v-col>
-              <v-col cols="6">
-                <v-text-field readonly :filled="readonly" v-model="compteMaitreSelected.nom" />
+              <v-col cols="3">
+                <v-text-field
+                  label="BIC"
+                  v-model="bic"
+                  :filled="readonly"
+                  :readonly="readonly"
+                  @blur="setBic"
+                  minlength="8"
+                  maxlength="11"
+                  :counter="!readonly"
+                />
+                <v-text-field
+                  label="Code ventilation"
+                  v-model="codeVentilation"
+                  :filled="readonly"
+                  :readonly="readonly"
+                />
+                <v-checkbox
+                  :readonly="readonly"
+                  v-model="operationsTriangulaires"
+                  label="Op. triangulaires ?"
+                />
+              </v-col>
+              <v-col cols="3">
+                <v-select
+                  label="Code devise"
+                  :readonly="readonly"
+                  :filled="readonly"
+                  :items="devises"
+                  item-text="libelle"
+                  item-value="id"
+                  v-model="codeDevise"
+                />
+              </v-col>
+              <v-col cols="3">
+                <v-select
+                  label="Code assujetti"
+                  v-model="codeAssujetti"
+                  :items="libellesAssujettis"
+                  item-text="valeur"
+                  item-value="code"
+                  @change="checkSaisieIntra()"
+                  :readonly="readonly"
+                  :filled="readonly"
+                />
+              </v-col>
+              <v-col cols="2">
+                <v-text-field
+                  label="Code Pays"
+                  v-model="intraCodePays"
+                  :filled="readonly || intraSaisieReadonly"
+                  :readonly="readonly || intraSaisieReadonly"
+                  :counter="!readonly"
+                  maxlength="2"
+                />
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="N° Intracommunautaire"
+                  v-model="intraIdentification"
+                  :filled="readonly || intraSaisieReadonly"
+                  :readonly="readonly || intraSaisieReadonly"
+                  :counter="!readonly"
+                  maxlength="18"
+                />
               </v-col>
             </v-row>
+          </v-col>
+          <v-col cols="6">
+            <!-- Champs commercial -->
           </v-col>
         </v-row>
       </v-card-text>
@@ -455,23 +433,27 @@ import { UpdateFournisseur } from '@/models/Fournisseur/UpdateFournisseur';
 import { FournisseurApi } from '@/api/FournisseurApi';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
-import { FournisseurParams } from '@/models/Fournisseur/Get/FournisseurParams';
+import { FournisseurParams, LibelleTiers } from '@/models/Fournisseur/Get/FournisseurParams';
 import SearchComptes from './SearchComptes.vue';
 import CompteApi from '@/api/CompteApi';
 import { CompteSearch } from '@/models/Compte/CompteSearch';
+import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
+import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
+import { CompteDeTier } from '@/models/Compte/CompteDeTier';
+import { Devise } from '@/models/Devise/Devise';
+import DeviseApi from '@/api/DeviseApi';
 
 @Component({
   name: 'FournisseurVue',
-  components: { AlertMessageVue, SearchComptes }
+  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue }
 })
 export default class FournisseurVue extends Vue {
   @Ref() readonly inputNom: any;
   @Ref() alertMessage!: AlertMessageVue;
   @Ref() successMessage!: AlertMessageVue;
-  @Ref() readonly autocompleteCompteAssocie!: HTMLInputElement;
-  @Ref() readonly autocompleteCompteMaitre!: HTMLInputElement;
-  @Ref() readonly autocompleteCompteVenteAchat!: HTMLInputElement;
-  @Ref() readonly compteDialog!: SearchComptes;
+  @Ref() autocompleteCompteAssocie!: AutocompleteComptesVue;
+  @Ref() autocompleteCompteMaitre!: AutocompleteComptesVue;
+  @Ref() autocompleteCompteVenteAchat!: AutocompleteComptesVue;
 
   private display = false;
 
@@ -489,38 +471,71 @@ export default class FournisseurVue extends Vue {
 
   private fournisseur: Fournisseur = new Fournisseur();
   private fournisseurBase: Fournisseur = new Fournisseur(); // Used for the reset method
+  private fournisseurParams!: FournisseurParams;
+
+  /// Fournisseur model
+  private numero = 0;
+  private nom = '';
+  private matchCode = '';
+  private adresseLigne1 = '';
+  private adresseLigne2 = '';
+  private localité = '';
+  private raisonSociale = '';
+  private codePays = '';
+  private codePostal = '';
+  private contact1 = '';
+  private contact2 = '';
+  private contact3 = '';
+  private numeroTelephone = '';
+  private téléfax = '';
+  private gsm = '';
+  private email = '';
+  private commentaire1 = '';
+  private commentaire2 = '';
+  private commentaire3 = '';
+  private compteAssocie = 0;
+  private nomCompteAssocie = '';
+  private compteMaitre = 0;
+  private nomCompteMaitre = '';
+  private compteVenteAchat = 0;
+  private nomCompteVenteAchat = '';
+  private codeAssujetti = 0;
+  private intraCodePays = '';
+  private intraIdentification = '';
+  private codeDevise = 0;
+  private typeSuivis = 0;
+  private compte = '';
+  private banAdr = '';
+  private banPays = '';
+  private banVille = '';
+  private banAgence = '';
+  private operationsTriangulaires = false;
+  private numeroDomiciliation = '';
+  private codeVentilation = 0;
 
   private readonly = true;
   private newRecord = false;
 
-  private compteAssocieItems: { numero: number; nom: string }[] = [];
-  private compteAssocieSelected: { numero: number | string; nom: string } = {
-    numero: '',
-    nom: ''
-  };
-  private searchCompteAssocie = '';
-  private comptesGeneraux: CompteSearch[] = [];
+  private libellesAssujettis: LibelleTiers[] = [];
+  private intraSaisieReadonly = true;
 
-  private compteMaitreItems: { numero: number; nom: string }[] = [];
-  private compteMaitreSelected: { numero: number | string; nom: string } = {
-    numero: '',
-    nom: ''
-  };
-  private searchCompteMaitre = '';
-  private comptesClients: CompteSearch[] = [];
+  private devises: Devise[] = [];
+  private deviseSelected: Devise = new Devise();
 
-  private compteVenteAchatItems: { numero: number; nom: string }[] = [];
-  private compteVenteAchatSelected: { numero: number | string; nom: string } = {
-    numero: '',
-    nom: ''
-  };
-  private searchCompteVenteAchat = '';
-  // No need to declare the items, they're in comptesGeneraux
+  private codeSuivis: LibelleTiers[] = [];
+
+  public bic = '';
+
+  mounted() {
+    this.getDevises();
+    this.getParams();
+  }
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
     const fournisseur = new Fournisseur();
-    fournisseur.numero = searchFournisseur.numero;
-    fournisseur.nom = searchFournisseur.nom;
+
+    this.numero = searchFournisseur.numero;
+    this.nom = searchFournisseur.nom;
 
     this.display = true;
     this.newRecord = false;
@@ -534,25 +549,27 @@ export default class FournisseurVue extends Vue {
     });
   }
 
-  public async openNew(params: FournisseurParams): Promise<number> {
+  public async openNew(): Promise<number> {
     this.readonly = false;
-    this.fournisseur = new Fournisseur();
+    this.setFournisseur(new Fournisseur());
     this.fournisseurBase = new Fournisseur();
     this.newRecord = true;
 
-    this.fournisseur.numero = params.nextNumero;
-    this.fournisseur.compteAssocie = params.numeroCompteAssocieDefaut;
-    if (this.compteAssocieItems.length < 1)
-      this.compteAssocieItems.push({ numero: params.numeroCompteAssocieDefaut, nom: params.nomCompteAssocieDefaut });
-    this.compteAssocieSelected = { numero: params.numeroCompteAssocieDefaut, nom: params.nomCompteAssocieDefaut };
+    this.numero = this.fournisseurParams.nextNumero;
+    this.compteAssocie = this.fournisseurParams.numeroCompteAssocieDefaut;
+    this.nomCompteAssocie = this.fournisseurParams.nomCompteAssocieDefaut;
 
-    this.fournisseurBase.numero = params.nextNumero;
-    this.fournisseurBase.compteAssocie = params.numeroCompteAssocieDefaut;
+    this.fournisseurBase.numero = this.fournisseurParams.nextNumero;
+    this.fournisseurBase.compteAssocie = this.fournisseurParams.numeroCompteAssocieDefaut;
 
     this.display = true;
-    this.$nextTick(() => (this.inputNom as any).focus());
-
-    await this.loadComptes();
+    this.$nextTick(() => {
+      this.autocompleteCompteAssocie.init(
+        this.fournisseurParams.numeroCompteAssocieDefaut.toString(),
+        this.fournisseurParams.nomCompteAssocieDefaut
+      );
+      (this.inputNom as any).focus();
+    });
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -560,11 +577,92 @@ export default class FournisseurVue extends Vue {
     });
   }
 
+  private setFournisseur(fournisseur: Fournisseur) {
+    this.numero = fournisseur.numero;
+    this.nom = fournisseur.nom;
+    this.matchCode = fournisseur.matchCode;
+    this.adresseLigne1 = fournisseur.adresseLigne1;
+    this.adresseLigne2 = fournisseur.adresseLigne2;
+    this.localité = fournisseur.localité;
+    this.raisonSociale = fournisseur.raisonSociale;
+    this.codePays = fournisseur.codePays;
+    this.codePostal = fournisseur.codePostal;
+    this.contact1 = fournisseur.contact1;
+    this.contact2 = fournisseur.contact2;
+    this.contact3 = fournisseur.contact3;
+    this.numeroTelephone = fournisseur.numeroTelephone;
+    this.téléfax = fournisseur.téléfax;
+    this.gsm = fournisseur.gsm;
+    this.email = fournisseur.email;
+    this.commentaire1 = fournisseur.commentaire1;
+    this.commentaire2 = fournisseur.commentaire2;
+    this.commentaire3 = fournisseur.commentaire3;
+    this.compteAssocie = fournisseur.compteAssocie;
+    this.nomCompteAssocie = fournisseur.nomCompteAssocie;
+    this.compteMaitre = fournisseur.compteMaitre;
+    this.nomCompteMaitre = fournisseur.nomCompteMaitre;
+    this.compteVenteAchat = fournisseur.compteVenteAchat;
+    this.nomCompteVenteAchat = fournisseur.nomCompteVenteAchat;
+    this.codeAssujetti = fournisseur.codeAssujetti;
+    this.intraCodePays = fournisseur.intraCodePays;
+    this.intraIdentification = fournisseur.intraIdentification;
+    this.codeDevise = fournisseur.codeDevise;
+    this.compte = fournisseur.compte;
+    this.banAdr = fournisseur.banAdr;
+    this.banPays = fournisseur.banPays;
+    this.banVille = fournisseur.banVille;
+    this.banAgence = fournisseur.banAgence;
+    this.typeSuivis = fournisseur.typeSuivis;
+    this.operationsTriangulaires = fournisseur.operationsTriangulaires;
+    this.numeroDomiciliation = fournisseur.numeroDomiciliation == 0 ? '' : fournisseur.numeroDomiciliation.toString(); // Display empty instead of 0
+    this.codeVentilation = fournisseur.codeVentilation;
+  }
+
+  private mapFournisseur() {
+    this.fournisseur.numero = this.numero;
+    this.fournisseur.nom = this.nom;
+    this.fournisseur.matchCode = this.matchCode;
+    this.fournisseur.adresseLigne1 = this.adresseLigne1;
+    this.fournisseur.adresseLigne2 = this.adresseLigne2;
+    this.fournisseur.localité = this.localité;
+    this.fournisseur.raisonSociale = this.raisonSociale;
+    this.fournisseur.codePays = this.codePays;
+    this.fournisseur.codePostal = this.codePostal;
+    this.fournisseur.contact1 = this.contact1;
+    this.fournisseur.contact2 = this.contact2;
+    this.fournisseur.contact3 = this.contact3;
+    this.fournisseur.numeroTelephone = this.numeroTelephone;
+    this.fournisseur.téléfax = this.téléfax;
+    this.fournisseur.gsm = this.gsm;
+    this.fournisseur.email = this.email;
+    this.fournisseur.commentaire1 = this.commentaire1;
+    this.fournisseur.commentaire2 = this.commentaire2;
+    this.fournisseur.commentaire3 = this.commentaire3;
+    this.fournisseur.compteAssocie = this.compteAssocie;
+    this.fournisseur.compteMaitre = this.compteMaitre;
+    this.fournisseur.compteVenteAchat = this.compteVenteAchat;
+    this.fournisseur.codeAssujetti = this.codeAssujetti;
+    this.fournisseur.intraCodePays = this.intraCodePays;
+    this.fournisseur.intraIdentification = this.intraIdentification;
+    this.fournisseur.codeDevise = this.codeDevise;
+    this.fournisseur.compte = this.compte;
+    this.fournisseur.banAdr = this.banAdr;
+    this.fournisseur.banPays = this.banPays;
+    this.fournisseur.banVille = this.banVille;
+    this.fournisseur.banAgence = this.banAgence;
+    this.fournisseur.typeSuivis = this.typeSuivis;
+    this.fournisseur.operationsTriangulaires = this.operationsTriangulaires;
+    this.fournisseur.numeroDomiciliation = parseInt(this.numeroDomiciliation);
+    this.fournisseur.codeVentilation = this.codeVentilation;
+  }
+
   private closeDialog() {
     this.display = false;
     this.readonly = true;
+    this.intraSaisieReadonly = true;
     this.alertMessage.clear();
     this.successMessage.clear();
+    this.setFournisseur(new Fournisseur());
   }
 
   private async loadFournisseur(numero: number) {
@@ -572,15 +670,22 @@ export default class FournisseurVue extends Vue {
 
     const fournisseurDTO = await FournisseurApi.getFournisseurByNumero(numero);
 
-    this.fournisseur = new Fournisseur(fournisseurDTO);
+    this.setFournisseur(new Fournisseur(fournisseurDTO));
     this.fournisseurBase = new Fournisseur(fournisseurDTO);
 
+    this.getBic();
+
     this.getLoading = false;
+
+    this.autocompleteCompteAssocie.init(this.compteAssocie.toString(), '');
+    this.autocompleteCompteMaitre.init(this.compteMaitre.toString(), '');
+    this.autocompleteCompteVenteAchat.init(this.compteVenteAchat.toString(), '');
   }
 
   private modifierFournisseur() {
     if (!this.getLoading) {
       this.readonly = false;
+      this.$nextTick(() => this.inputNom.focus());
     }
   }
 
@@ -591,10 +696,12 @@ export default class FournisseurVue extends Vue {
   private async saveFournisseur() {
     this.saveLoading = true;
 
+    this.mapFournisseur();
+
     if (this.newRecord) {
       await FournisseurApi.createFournisseur(this.fournisseur)
         .then((numeroFournisseur) => {
-          this.resolve(numeroFournisseur);
+          this.fournisseurParams.nextNumero = numeroFournisseur + 1;
           this.fournisseur = this.fournisseurBase;
           this.closeDialog();
         })
@@ -611,6 +718,7 @@ export default class FournisseurVue extends Vue {
     } else {
       await FournisseurApi.updateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase)
         .then(() => {
+          this.readonly = true;
           this.successMessage.show('Le fournisseur a été mis à jour avec succès.', '');
           this.resolve(true);
         })
@@ -620,119 +728,79 @@ export default class FournisseurVue extends Vue {
 
   private cancelEdit() {
     this.fournisseur = this.fournisseurBase;
-    if (!this.newRecord) this.readonly = true;
-  }
-
-  private async loadComptes() {
-    // Load the items and store them for the selection dialog
-    this.comptesGeneraux = await CompteApi.searchComptesGeneraux('G');
-    this.comptesClients = await CompteApi.getComptesTiers('C');
-
-    // Map the items for the comboboxes
-    this.compteAssocieItems = this.comptesGeneraux.map((c) => {
-      return { numero: c.numero, nom: c.nom };
-    });
-    this.compteMaitreItems = this.comptesClients.map((c) => {
-      return { numero: c.numero, nom: c.nom };
-    });
-    this.compteVenteAchatItems = this.comptesGeneraux.map((c) => {
-      return { numero: c.numero, nom: c.nom };
-    });
-  }
-
-  // Prevent 'is undefined' when the input is empty
-  @Watch('compteAssocieSelected')
-  private watchCompteAssocieSelected() {
-    if (this.compteAssocieSelected == null) {
-      this.compteAssocieSelected = {
-        numero: '',
-        nom: ''
-      };
+    if (this.newRecord) {
+      this.closeDialog();
     } else {
-      this.fournisseur.compteAssocie = this.compteAssocieSelected.numero as number;
+      this.readonly = true;
     }
   }
 
-  // Prevent 'is undefined' when the input is empty
-  @Watch('compteMaitreSelected')
-  private watchCompteMaitreSelected() {
-    if (this.compteMaitreSelected == null) {
-      this.compteMaitreSelected = {
-        numero: '',
-        nom: ''
-      };
+  private setCompteAssocie(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
+    if (!compte) {
+      this.compteAssocie = 0;
+      this.nomCompteAssocie = '';
+    } else if (compte instanceof CompteSearch || compte instanceof CompteGeneralSearch) {
+      this.compteAssocie = compte.numero;
+      this.nomCompteAssocie = compte.nom;
+    }
+  }
+
+  private setCompteMaitre(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
+    if (!compte) {
+      this.compteMaitre = 0;
+      this.nomCompteMaitre = '';
+    } else if (compte instanceof CompteSearch || compte instanceof CompteDeTier) {
+      this.compteMaitre = compte.numero;
+      this.nomCompteMaitre = compte.nom;
+    }
+  }
+
+  private setCompteVenteAchat(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
+    if (!compte) {
+      this.compteVenteAchat = 0;
+      this.nomCompteVenteAchat = '';
+    } else if (compte instanceof CompteSearch || compte instanceof CompteGeneralSearch) {
+      this.compteVenteAchat = compte.numero;
+      this.nomCompteVenteAchat = compte.nom;
+    }
+  }
+
+  private checkSaisieIntra() {
+    const libelle = this.libellesAssujettis.find((l) => l.code == this.codeAssujetti);
+
+    if (libelle?.saisieIntra == 'Y') {
+      this.intraSaisieReadonly = false;
     } else {
-      this.fournisseur.compteMaitre = this.compteMaitreSelected.numero as number;
+      this.intraSaisieReadonly = true;
     }
   }
 
-  // Prevent 'is undefined' when the input is empty
-  @Watch('compteVenteAchatSelected')
-  private watchCompteVenteAchatSelected() {
-    if (this.compteVenteAchatSelected == null) {
-      this.compteVenteAchatSelected = {
-        numero: '',
-        nom: ''
-      };
-    } else {
-      this.fournisseur.compteVenteAchat = this.compteVenteAchatSelected.numero as number;
+  private async getDevises() {
+    if (this.devises.length <= 1) {
+      this.devises = await DeviseApi.getAllDevises();
     }
   }
 
-  private filter(item: any, queryText: string, itemText: string) {
-    if (item.header) return false;
-
-    const hasValue = (val: any) => (val != null ? val : '');
-
-    const text = hasValue(itemText);
-    const query = hasValue(queryText);
-
-    return (
-      text
-        .toString()
-        .toLowerCase()
-        .indexOf(query.toString().toLowerCase()) > -1
-    );
+  private getBic() {
+    this.bic = `${this.banAdr}${this.banPays}${this.banVille}${this.banAgence}`;
   }
 
-  private openSearchCompte(typeCompte: string, field: string) {
-    if (this.readonly) return;
-
-    let items: CompteSearch[] = []; // Items to pass to the selection dialog for the list, so we don't load them twice or more
-    let callback: (value: CompteSearch) => void;
-    let catchCallback: () => void;
-
-    switch (field) {
-      case 'compteAssocie':
-        items = this.comptesGeneraux;
-        this.autocompleteCompteAssocie.blur();
-        callback = (compte: CompteSearch) => (this.compteAssocieSelected = compte);
-        catchCallback = () => this.$nextTick(() => this.autocompleteCompteAssocie?.focus());
-        break;
-      case 'compteMaitre':
-        items = this.comptesClients;
-        this.autocompleteCompteMaitre.blur();
-        callback = (compte: CompteSearch) => (this.compteMaitreSelected = compte);
-        catchCallback = () => this.$nextTick(() => this.autocompleteCompteMaitre?.focus());
-        break;
-      case 'compteVenteAchat':
-        items = this.comptesGeneraux;
-        this.autocompleteCompteVenteAchat.blur();
-        callback = (compte: CompteSearch) => (this.compteVenteAchatSelected = compte);
-        catchCallback = () => this.$nextTick(() => this.autocompleteCompteVenteAchat?.focus());
-        break;
-      default:
-        break;
+  private setBic() {
+    if (this.bic.length > 0) {
+      this.banAdr = this.bic.substring(0, 4);
+      this.banPays = this.bic.substring(4, 6);
+      this.banVille = this.bic.substring(6, 8);
+      this.banAgence = this.bic.substring(8);
     }
+  }
 
-    this.compteDialog
-      .open(typeCompte, items)
-      .then((compte) => {
-        callback(compte);
-      })
-      .catch(() => {
-        catchCallback();
-      });
+  private async getParams() {
+    const params = await FournisseurApi.getParams();
+
+    this.fournisseurParams = new FournisseurParams(params);
+
+    this.libellesAssujettis = this.fournisseurParams.libellesAssujettis;
+    this.codeSuivis = this.fournisseurParams.codeSuivis;
   }
 }
 </script>

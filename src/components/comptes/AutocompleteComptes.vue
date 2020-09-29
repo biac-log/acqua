@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <div class="autocompleteCompte">
     <v-combobox
       ref="comboboxCompte"
       :label="label"
@@ -11,7 +11,7 @@
       @focus="$event.target.select()"
       @change="numeroCompteChangeAsync"
       @keydown.ctrl.f.prevent="openSearchCompte()"
-      :hide-details="readonly"
+      :hide-details="hideDetails && readonly"
       :filled="readonly"
       :readonly="readonly"
       :loading="compteLoading"
@@ -20,7 +20,6 @@
       item-text="numeroNom"
       item-value="numero"
       hide-no-data
-      dense
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">
@@ -50,7 +49,7 @@
     </v-combobox>
     <SearchCompteTierVue ref="searchCompteTierDialog"></SearchCompteTierVue>
     <SearchCompteGeneralVue ref="searchCompteGeneralDialog"></SearchCompteGeneralVue>
-  </span>
+  </div>
 </template>
 
 <script lang="ts">
@@ -72,6 +71,7 @@ export default class AutocompleteComptes extends Vue {
   @PropSync('Readonly') private readonly!: boolean;
   @PropSync('TypeCompte') private typeCompte!: string;
   @Prop({ default: 'N° Compte' }) readonly label!: string;
+  @Prop({ default: true }) hideDetails!: boolean;
   private compteLoading = false;
 
   private numeroCompte = '';
@@ -183,6 +183,7 @@ export default class AutocompleteComptes extends Vue {
   }
 
   private openSearchCompteGeneral() {
+    console.log('searchCompteG');
     if (this.typeCompte) {
       this.comboboxCompte.blur();
       this.searchCompteGeneralDialog
