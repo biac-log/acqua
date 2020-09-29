@@ -361,12 +361,12 @@
           <v-col cols="2">
             <v-row dense>
               <v-col cols="6"
-                ><v-text-field :filled="readonly" label="Représentant" />
+                ><autocomplete-code-vue ref="autocompleteCodeRepresentant" label="Représentant" :readonly.sync="readonly" typeCode="codeRepresentant" v-model="codeRepresentant" @select="selectRepresentant" />
                 <v-text-field :filled="readonly" label="Famille" />
                 <v-text-field :filled="readonly" label="Secteur" />
               </v-col>
               <v-col cols="6">
-                <v-text-field :filled="readonly" readonly />
+                <v-text-field :filled="readonly" readonly v-model="nomRepresentant" />
                 <v-text-field :filled="readonly" readonly />
                 <v-text-field :filled="readonly" readonly />
               </v-col>
@@ -465,6 +465,7 @@ import SearchComptes from './SearchComptes.vue';
 import CompteApi from '@/api/CompteApi';
 import { CompteSearch } from '@/models/Compte/CompteSearch';
 import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
+import AutocompleteCodeVue from '@/views/Maintenance/Fournisseurs/components/AutocompleteCode.vue';
 import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import { CompteDeTier } from '@/models/Compte/CompteDeTier';
 import { Devise } from '@/models/Devise/Devise';
@@ -472,7 +473,7 @@ import DeviseApi from '@/api/DeviseApi';
 
 @Component({
   name: 'FournisseurVue',
-  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue }
+  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue, AutocompleteCodeVue }
 })
 export default class FournisseurVue extends Vue {
   @Ref() readonly inputNom: any;
@@ -481,6 +482,7 @@ export default class FournisseurVue extends Vue {
   @Ref() autocompleteCompteAssocie!: AutocompleteComptesVue;
   @Ref() autocompleteCompteMaitre!: AutocompleteComptesVue;
   @Ref() autocompleteCompteVenteAchat!: AutocompleteComptesVue;
+  @Ref() autocompleteCodeRepresentant!: AutocompleteCodeVue;
 
   private display = false;
 
@@ -755,6 +757,7 @@ export default class FournisseurVue extends Vue {
     this.autocompleteCompteAssocie.init(this.compteAssocie.toString(), '');
     this.autocompleteCompteMaitre.init(this.compteMaitre.toString(), '');
     this.autocompleteCompteVenteAchat.init(this.compteVenteAchat.toString(), '');
+    this.autocompleteCodeRepresentant.init(fournisseurDTO.codeRepresentant.toString());
   }
 
   private modifierFournisseur() {
@@ -876,6 +879,11 @@ export default class FournisseurVue extends Vue {
 
     this.libellesAssujettis = this.fournisseurParams.libellesAssujettis;
     this.codeSuivis = this.fournisseurParams.codeSuivis;
+  }
+
+  private selectRepresentant(representant: {code: string | number; nom: string; }) {
+    this.codeRepresentant = representant.code as number;
+    this.nomRepresentant = representant.nom;
   }
 }
 </script>
