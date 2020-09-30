@@ -541,7 +541,7 @@ export default class FournisseurVue extends Vue {
   private operationsTriangulaires = false;
   private numeroDomiciliation = '';
   private codeVentilation = 0;
-  public codeRepresentant = 0;
+  public codeRepresentant = '';
   public nomRepresentant = '';
   public codeFamille = 0;
   public nomFamille = '';
@@ -669,7 +669,7 @@ export default class FournisseurVue extends Vue {
     this.operationsTriangulaires = fournisseur.operationsTriangulaires;
     this.numeroDomiciliation = fournisseur.numeroDomiciliation == 0 ? '' : fournisseur.numeroDomiciliation.toString(); // Display empty instead of 0
     this.codeVentilation = fournisseur.codeVentilation;
-    this.codeRepresentant = fournisseur.codeRepresentant;
+    this.codeRepresentant = fournisseur.codeRepresentant.toString();
     this.nomRepresentant = fournisseur.nomRepresentant;
     this.codeFamille = fournisseur.codeFamille;
     this.nomFamille = fournisseur.nomFamille;
@@ -881,8 +881,8 @@ export default class FournisseurVue extends Vue {
     this.codeSuivis = this.fournisseurParams.codeSuivis;
   }
 
-  private selectRepresentant(representant: {code: string | number; nom: string; }) {
-    this.codeRepresentant = representant.code as number;
+  private selectRepresentant(representant: {code: string; nom: string; }) {
+    this.codeRepresentant = representant.code;
     this.nomRepresentant = representant.nom;
   }
 }

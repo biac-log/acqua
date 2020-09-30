@@ -8,7 +8,7 @@
     :items="items"
     hide-selected
     item-text="numeroNom"
-    item-value="numero"
+    item-value="code"
     hide-no-data
     @keyup.enter="$event.target.select()"
     @focus="$event.target.select()"
@@ -34,7 +34,7 @@
       </v-tooltip>
     </template> -->
     <template v-slot:selection="{ item }">
-      {{ item.numero }}
+      {{ item.code }}
     </template>
     <template v-slot:item="{ item }">
       {{ item.numeroNom }}
@@ -64,7 +64,7 @@ export default class AutocompleteCodeVue extends Vue {
 
   public init(value: string) {
     this.codeSelected = {
-      code: value,
+      code: value != "0" ? value : "",
       numeroNom: `${value} - nom`,
       nom: 'nom'
     };
