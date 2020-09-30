@@ -378,17 +378,17 @@
           <v-col cols="4">
             <v-row dense>
               <v-col cols="4">
-                <v-text-field :filled="readonly" label="Paiement" />
-                <v-text-field :filled="readonly" label="Escompte" />
-                <v-text-field :filled="readonly" label="Remise" />
+                <v-text-field :filled="readonly" label="Paiement" v-model="codePaiement"/>
+                <v-text-field :filled="readonly" label="Escompte" v-model="escompte" />
+                <v-text-field :filled="readonly" label="Remise" v-model="codeRemise" />
               </v-col>
               <v-col cols="4">
-                <v-text-field :filled="readonly" label="# de jours" />
-                <v-text-field :filled="readonly" label="Jours" />
-                <v-text-field :filled="readonly" label="Remise Globale" />
+                <v-text-field :filled="readonly" label="# de jours" v-model="nombreDeJoursPaiement" />
+                <v-text-field :filled="readonly" label="Jours" v-model="joursEscomptes"/>
+                <v-text-field :filled="readonly" label="Remise Globale" v-model="remiseGlobaleDefaut" />
               </v-col>
               <v-col cols="4">
-                <v-text-field :filled="readonly" label="NACE" />
+                <v-text-field :filled="readonly" label="NACE" v-model="codeNace" maxlength="5" />
                 <v-text-field :filled="readonly" label="Tarif" />
                 <v-text-field :filled="readonly" label="Port Franco" />
               </v-col>
