@@ -48,6 +48,7 @@ import { CompteSearch } from '@/models/Compte/CompteSearch';
 import { GridOptions, GridApi } from 'ag-grid-community';
 import RepresentantApi from '@/api/RepresentantApi';
 import { Representant } from '@/models/Representant/Representant';
+import { CodeItem } from '@/models/CodeItem';
 
 @Component({
   name: 'SearchCompteTier',
@@ -94,7 +95,7 @@ export default class extends Vue {
     }
   };
 
-  public open(typeToLoad: string): Promise<{ code: string; numeroNom: string; nom: string }> {
+  public open(typeToLoad: string): Promise<CodeItem> {
     this.loadItems(typeToLoad);
     switch (typeToLoad) {
       case 'codeRepresentant':
@@ -251,11 +252,7 @@ export default class extends Vue {
     this.filtreItems = '';
     this.dialog = false;
     this.reinitGrid();
-    this.resolve({
-      code: item.code,
-      nom: item.nom,
-      numeroNom: `${item.code} - ${item.nom}`
-    });
+    this.resolve(new CodeItem(item.code, item.nom));
   }
 
   private close() {

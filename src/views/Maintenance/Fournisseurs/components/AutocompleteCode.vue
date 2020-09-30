@@ -49,6 +49,7 @@
 import { Component, Vue, Ref, Watch, Prop, PropSync } from 'vue-property-decorator';
 import RepresentantApi from '@/api/RepresentantApi';
 import SearchCode from '@/views/Maintenance/Fournisseurs/components/SearchCode.vue';
+import { CodeItem } from '@/models/CodeItem';
 
 @Component({
   name: 'AutocompleteCodeVue',
@@ -61,23 +62,15 @@ export default class AutocompleteCodeVue extends Vue {
 
   @Ref() private searchModal!: SearchCode;
 
-  private codeSelected: { code: string | number; numeroNom: string; nom: string } = {
-    code: '',
-    numeroNom: '',
-    nom: ''
-  };
-  private items: { code: string | number; numeroNom: string; nom: string }[] = [];
+  private codeSelected: CodeItem = new CodeItem(0, '');
+  private items: CodeItem[] = [];
   private searchCode = '';
 
   public init(value: string) {
-    this.codeSelected = {
-      code: value != '0' ? value : '',
-      numeroNom: `${value} - nom`,
-      nom: 'nom'
-    };
+    this.codeSelected = new CodeItem(value, "");
   }
 
-  private async codeChange(value: { code: string; numeroNom: string; nom: string }) {
+  private async codeChange(value: CodeItem) {
     this.codeSelected = value;
     this.$emit('select', value);
   }
@@ -89,13 +82,13 @@ export default class AutocompleteCodeVue extends Vue {
     } else {
       if (this.typeCode == 'codeRepresentant') {
         const representants = await RepresentantApi.searchRepresentantsByCode(parseInt(this.searchCode), 5);
-        this.items = representants.map((r) => ({ code: r.code, numeroNom: `${r.code} - ${r.nom}`, nom: r.nom }));
+        this.items = representants.map((r) => new CodeItem(r.code, r.nom));
       }
     }
   }
 
   private openSearch() {
-    this.searchModal.open(this.typeCode).then((value: { code: string; numeroNom: string; nom: string }) => {
+    this.searchModal.open(this.typeCode).then((value: CodeItem) => {
       this.codeSelected = value;
       this.$emit('select', value);
     });
