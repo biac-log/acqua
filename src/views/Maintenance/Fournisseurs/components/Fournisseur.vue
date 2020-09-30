@@ -372,8 +372,7 @@
               </v-col>
             </v-row>
             <v-row dense>
-              <v-col cols="6"><v-text-field :filled="readonly" label="Langue"/></v-col>
-              <v-col cols="6"><v-text-field :filled="readonly" readonly tabindex="-1" /></v-col>
+              <v-col cols="6"><v-select label="Langue" v-model="codeLangue" item-value="code" item-text="valeur" :items="codesLangues" :filled="readonly" :readonly="readonly" /></v-col>
             </v-row>
           </v-col>
           <v-col cols="4">
@@ -580,6 +579,8 @@ export default class FournisseurVue extends Vue {
   private deviseSelected: Devise = new Devise();
 
   private codeSuivis: LibelleTiers[] = [];
+
+  private codesLangues: LibelleTiers[] = [];
 
   public bic = '';
 
@@ -883,6 +884,7 @@ export default class FournisseurVue extends Vue {
 
     this.libellesAssujettis = this.fournisseurParams.libellesAssujettis;
     this.codeSuivis = this.fournisseurParams.codeSuivis;
+    this.codesLangues = this.fournisseurParams.langues;
   }
 
   private selectRepresentant(representant: {code: string; nom: string; }) {
