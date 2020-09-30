@@ -47,9 +47,11 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { GridOptions, GridApi } from 'ag-grid-community';
 import RepresentantApi from '@/api/RepresentantApi';
 import FamilleApi from '@/api/FamilleApi';
+import SecteurApi from '@/api/SecteurApi';
 import { Representant } from '@/models/Representant/Representant';
 import { CodeItem } from '@/models/CodeItem';
 import { Famille } from '@/models/Famille/Famille';
+import { Secteur } from '@/models/Secteur/Secteur';
 
 @Component({
   name: 'SearchCompteTier',
@@ -63,7 +65,7 @@ export default class extends Vue {
   private isLoading = false;
   private title = '';
   private itemsName = '';
-  private items: Representant[] | Famille[] = [];
+  private items: Representant[] | Famille[] | Secteur[] = [];
   private headersItems = [
     { headerName: '', field: '', filter: true, width: 120 },
     { headerName: '', field: '', filter: true, width: 300 },
@@ -79,6 +81,10 @@ export default class extends Vue {
   private headersFamilles = [
     { headerName: 'Famille', field: 'code', filter: true, width: 120 },
     { headerName: 'Nom', field: 'libelleF', filter: true, width: 300 },
+  ];
+  private headersSecteurs = [
+    { headerName: 'Code', field: 'codeSecteur', filter: true, width: 120 },
+    { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
   ];
 
   private resolve!: any;
@@ -112,6 +118,11 @@ export default class extends Vue {
         this.title = 'Familles';
         this.itemsName = 'familles';
         this.headersItems = this.headersFamilles;
+        break;
+      case 'codeSecteur':
+        this.title = 'Secteurs';
+        this.itemsName = 'secteurs';
+        this.headersItems = this.headersSecteurs;
         break;
 
       default:
@@ -147,6 +158,15 @@ export default class extends Vue {
           break;
         case 'codeFamille':
           FamilleApi.getAllFamilles('F')
+            .then((resp) => {
+              this.items = resp;
+            })
+            .finally(() => {
+              this.isLoading = false;
+            });
+          break;
+        case 'codeSecteur':
+          SecteurApi.getAllSecteurs()
             .then((resp) => {
               this.items = resp;
             })
@@ -267,11 +287,17 @@ export default class extends Vue {
     (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 
-  private sendItem(item: Representant) {
+  private sendItem(item: Representant | Famille | Secteur) {
     this.filtreItems = '';
     this.dialog = false;
     this.reinitGrid();
-    this.resolve(new CodeItem(item.code, item.nom));
+    if(item instanceof Representant) {
+      this.resolve(new CodeItem(item.code, item.nom));
+    }else if(item instanceof Famille) {
+      this.resolve(new CodeItem(item.famille, item.libelleF));
+    }else if(item instanceof Secteur) {
+      this.resolve(new CodeItem(item.codeSecteur, item.nom));
+    }
   }
 
   private close() {

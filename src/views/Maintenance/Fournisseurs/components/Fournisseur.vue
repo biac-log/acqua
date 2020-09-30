@@ -363,17 +363,17 @@
               <v-col cols="6"
                 ><autocomplete-code-vue ref="autocompleteCodeRepresentant" label="Représentant" :readonly.sync="readonly" typeCode="codeRepresentant" v-model="codeRepresentant" @select="selectRepresentant" />
                 <autocomplete-code-vue ref="autocompleteCodeFamille" label="Famille" :readonly.sync="readonly" typeCode="codeFamille" v-model="codeFamille" @select="selectFamille" />
-                <v-text-field :filled="readonly" label="Secteur" />
+                <autocomplete-code-vue ref="autocompleteCodeSecteur" label="Secteur" :readonly.sync="readonly" typeCode="codeSecteur" v-model="codeSecteur" @select="selectSecteur" />
               </v-col>
               <v-col cols="6">
-                <v-text-field :filled="readonly" readonly v-model="nomRepresentant" />
-                <v-text-field :filled="readonly" readonly v-model="nomFamille" />
-                <v-text-field :filled="readonly" readonly />
+                <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomRepresentant" />
+                <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomFamille" />
+                <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomSecteur" />
               </v-col>
             </v-row>
             <v-row dense>
               <v-col cols="6"><v-text-field :filled="readonly" label="Langue"/></v-col>
-              <v-col cols="6"><v-text-field :filled="readonly" readonly/></v-col>
+              <v-col cols="6"><v-text-field :filled="readonly" readonly tabindex="-1" /></v-col>
             </v-row>
           </v-col>
           <v-col cols="4">
@@ -486,6 +486,7 @@ export default class FournisseurVue extends Vue {
 
   @Ref() autocompleteCodeRepresentant!: AutocompleteCodeVue;
   @Ref() autocompleteCodeFamille!: AutocompleteCodeVue;
+  @Ref() autocompleteCodeSecteur!: AutocompleteCodeVue;
 
   private display = false;
 
@@ -548,7 +549,7 @@ export default class FournisseurVue extends Vue {
   public nomRepresentant = '';
   public codeFamille = '';
   public nomFamille = '';
-  public codeSecteur = 0;
+  public codeSecteur = '';
   public nomSecteur = '';
   public codeNace = 0;
   public codeLangue = 0;
@@ -892,6 +893,12 @@ export default class FournisseurVue extends Vue {
   private selectFamille(famille: {code: string; nom: string; }) {
     this.codeFamille = famille.code;
     this.nomFamille = famille.nom;
+  }
+
+  private selectSecteur(secteur: {code: string; nom: string; }) {
+    console.log(secteur);
+    this.codeSecteur = secteur.code;
+    this.nomSecteur = secteur.nom;
   }
 }
 </script>

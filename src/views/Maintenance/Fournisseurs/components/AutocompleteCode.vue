@@ -49,6 +49,7 @@
 import { Component, Vue, Ref, Watch, Prop, PropSync } from 'vue-property-decorator';
 import RepresentantApi from '@/api/RepresentantApi';
 import FamilleApi from '@/api/FamilleApi';
+import SecteurApi from '@/api/SecteurApi';
 import SearchCode from '@/views/Maintenance/Fournisseurs/components/SearchCode.vue';
 import { CodeItem } from '@/models/CodeItem';
 
@@ -87,6 +88,9 @@ export default class AutocompleteCodeVue extends Vue {
       }else if (this.typeCode == 'codeFamille'){
         const familles = await FamilleApi.searchFamillesByCode(parseInt(this.searchCode), 5, 'F');
         this.items = familles.map((r) => new CodeItem(r.famille, r.libelleF));
+      }else if (this.typeCode == 'codeSecteur'){
+        const secteurs = await SecteurApi.searchSecteursByCode(parseInt(this.searchCode), 5);
+        this.items = secteurs.map((r) => new CodeItem(r.codeSecteur, r.nom));
       }
     }
   }

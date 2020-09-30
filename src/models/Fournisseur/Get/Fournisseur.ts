@@ -44,7 +44,7 @@ export class FournisseurDTO {
   public nomRepresentant = '';
   public codeFamille = '';
   public nomFamille = '';
-  public codeSecteur = 0;
+  public codeSecteur = '';
   public nomSecteur = '';
   public codeNace = 0;
   public codeLangue = 0;
