@@ -42,7 +42,7 @@ export class FournisseurDTO {
   public codeVentilation = 0;
   public codeRepresentant = 0;
   public nomRepresentant = '';
-  public codeFamille = 0;
+  public codeFamille = '';
   public nomFamille = '';
   public codeSecteur = 0;
   public nomSecteur = '';

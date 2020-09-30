@@ -44,11 +44,12 @@
 <script lang="ts">
 import { AgGridVue } from 'ag-grid-vue';
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { CompteSearch } from '@/models/Compte/CompteSearch';
 import { GridOptions, GridApi } from 'ag-grid-community';
 import RepresentantApi from '@/api/RepresentantApi';
+import FamilleApi from '@/api/FamilleApi';
 import { Representant } from '@/models/Representant/Representant';
 import { CodeItem } from '@/models/CodeItem';
+import { Famille } from '@/models/Famille/Famille';
 
 @Component({
   name: 'SearchCompteTier',
@@ -62,7 +63,7 @@ export default class extends Vue {
   private isLoading = false;
   private title = '';
   private itemsName = '';
-  private items: Representant[] = [];
+  private items: Representant[] | Famille[] = [];
   private headersItems = [
     { headerName: '', field: '', filter: true, width: 120 },
     { headerName: '', field: '', filter: true, width: 300 },
@@ -74,6 +75,10 @@ export default class extends Vue {
     { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
     { headerName: 'Raison sociale', field: 'raisonSocial', filter: true, width: 140 },
     { headerName: 'Adresse', field: 'adresse', filter: true, flex: 1 }
+  ];
+  private headersFamilles = [
+    { headerName: 'Famille', field: 'code', filter: true, width: 120 },
+    { headerName: 'Nom', field: 'libelleF', filter: true, width: 300 },
   ];
 
   private resolve!: any;
@@ -103,6 +108,11 @@ export default class extends Vue {
         this.itemsName = 'représentants';
         this.headersItems = this.headersRepresentants;
         break;
+      case 'codeFamille':
+        this.title = 'Familles';
+        this.itemsName = 'familles';
+        this.headersItems = this.headersFamilles;
+        break;
 
       default:
         break;
@@ -128,6 +138,15 @@ export default class extends Vue {
       switch (this.typeLoad) {
         case 'codeRepresentant':
           RepresentantApi.getAllRepresentants()
+            .then((resp) => {
+              this.items = resp;
+            })
+            .finally(() => {
+              this.isLoading = false;
+            });
+          break;
+        case 'codeFamille':
+          FamilleApi.getAllFamilles('F')
             .then((resp) => {
               this.items = resp;
             })
