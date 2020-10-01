@@ -361,9 +361,30 @@
           <v-col cols="2">
             <v-row dense>
               <v-col cols="6"
-                ><autocomplete-code-vue ref="autocompleteCodeRepresentant" label="Représentant" :readonly.sync="readonly" typeCode="codeRepresentant" v-model="codeRepresentant" @select="selectRepresentant" />
-                <autocomplete-code-vue ref="autocompleteCodeFamille" label="Famille" :readonly.sync="readonly" typeCode="codeFamille" v-model="codeFamille" @select="selectFamille" />
-                <autocomplete-code-vue ref="autocompleteCodeSecteur" label="Secteur" :readonly.sync="readonly" typeCode="codeSecteur" v-model="codeSecteur" @select="selectSecteur" />
+                ><autocomplete-code-vue
+                  ref="autocompleteCodeRepresentant"
+                  label="Représentant"
+                  :readonly.sync="readonly"
+                  typeCode="codeRepresentant"
+                  v-model="codeRepresentant"
+                  @select="selectRepresentant"
+                />
+                <autocomplete-code-vue
+                  ref="autocompleteCodeFamille"
+                  label="Famille"
+                  :readonly.sync="readonly"
+                  typeCode="codeFamille"
+                  v-model="codeFamille"
+                  @select="selectFamille"
+                />
+                <autocomplete-code-vue
+                  ref="autocompleteCodeSecteur"
+                  label="Secteur"
+                  :readonly.sync="readonly"
+                  typeCode="codeSecteur"
+                  v-model="codeSecteur"
+                  @select="selectSecteur"
+                />
               </v-col>
               <v-col cols="6">
                 <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomRepresentant" />
@@ -372,35 +393,90 @@
               </v-col>
             </v-row>
             <v-row dense>
-              <v-col cols="4"><v-select :filled="readonly" label="Paiement" v-model="codePaiement" :items="codesPaiement" item-text="code" item-value="code" @change="changeCodePaiement" /></v-col>
-              <v-col cols="4"><v-text-field :filled="readonly" readonly tabindex="-1" v-model="libellePaiement" /></v-col>
-              <v-col cols="4"><v-text-field :filled="readonly" label="# de jours" v-model="nombreDeJoursPaiement" /></v-col>
+              <v-col cols="4"
+                ><v-select
+                  :filled="readonly"
+                  label="Paiement"
+                  v-model="codePaiement"
+                  :items="codesPaiement"
+                  item-text="code"
+                  item-value="code"
+                  @change="changeCodePaiement"
+              /></v-col>
+              <v-col cols="4"
+                ><v-text-field :filled="readonly" readonly tabindex="-1" v-model="libellePaiement"
+              /></v-col>
+              <v-col cols="4"
+                ><v-text-field :filled="readonly" label="# de jours" v-model="nombreDeJoursPaiement"
+              /></v-col>
             </v-row>
           </v-col>
           <v-col cols="4">
             <v-row dense>
               <v-col cols="4">
-                <v-select label="Langue" v-model="codeLangue" item-value="code" item-text="valeur" :items="codesLangues" :filled="readonly" :readonly="readonly" />
-                <v-text-field :filled="readonly" label="Escompte" v-model="escompte" append-icon="mdi-percent-outline" />
+                <v-select
+                  label="Langue"
+                  v-model="codeLangue"
+                  item-value="code"
+                  item-text="valeur"
+                  :items="codesLangues"
+                  :filled="readonly"
+                  :readonly="readonly"
+                />
+                <v-text-field
+                  :filled="readonly"
+                  label="Escompte"
+                  v-model="escompte"
+                  append-icon="mdi-percent-outline"
+                />
                 <v-text-field :filled="readonly" label="Remise" v-model="codeRemise" />
               </v-col>
               <v-col cols="4">
-                
-                <v-text-field :filled="readonly" label="Jours" v-model="joursEscomptes"/>
-                <v-text-field :filled="readonly" label="Remise Globale" v-model="remiseGlobaleDefaut" append-icon="mdi-percent-outline" />
+                <v-text-field :filled="readonly" label="Numéro prix" v-model="codePrix" />
+                <v-text-field :filled="readonly" label="Jours" v-model="joursEscomptes" />
+                <v-text-field
+                  :filled="readonly"
+                  label="Remise Globale"
+                  v-model="remiseGlobaleDefaut"
+                  append-icon="mdi-percent-outline"
+                />
               </v-col>
               <v-col cols="4">
                 <v-text-field :filled="readonly" label="NACE" v-model="codeNace" maxlength="5" />
-                <v-text-field :filled="readonly" label="Tarif" />
-                <v-text-field :filled="readonly" label="Port Franco" />
+                <v-text-field :filled="readonly" label="Tarif" v-model="tarif" maxlength="6" />
+                <v-text-field
+                  :filled="readonly"
+                  label="Port Franco"
+                  v-model="francoMontant"
+                  append-icon="mdi-currency-eur"
+                />
               </v-col>
             </v-row>
             <v-row dense>
-              <v-col cols="8">
-                <v-text-field :filled="readonly" label="Fermeture" />
-              </v-col>
               <v-col cols="4">
-                <v-text-field :filled="readonly" label="Limite de crédit" />
+                <date-picker
+                  ref="refFermetureDu"
+                  label="Fermeture du"
+                  :date.sync="fermetureDu"
+                  :readonly.sync="readonly"
+                  :filled="readonly"
+                />
+              </v-col>
+              <v-col cols="4"
+                ><date-picker
+                  ref="refFermetureAu"
+                  label="au"
+                  :date.sync="fermetureAu"
+                  :readonly.sync="readonly"
+                  :filled="readonly"
+              /></v-col>
+              <v-col cols="4">
+                <v-text-field
+                  :filled="readonly"
+                  label="Limite de crédit"
+                  v-model="limiteCredit"
+                  append-icon="mdi-currency-eur"
+                />
               </v-col>
             </v-row>
           </v-col>
@@ -471,10 +547,11 @@ import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import { CompteDeTier } from '@/models/Compte/CompteDeTier';
 import { Devise } from '@/models/Devise/Devise';
 import DeviseApi from '@/api/DeviseApi';
+import DatePicker from '@/components/DatePicker.vue';
 
 @Component({
   name: 'FournisseurVue',
-  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue, AutocompleteCodeVue }
+  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue, AutocompleteCodeVue, DatePicker }
 })
 export default class FournisseurVue extends Vue {
   @Ref() readonly inputNom: any;
@@ -892,23 +969,23 @@ export default class FournisseurVue extends Vue {
     this.codesPaiement = this.fournisseurParams.codePaiements;
   }
 
-  private selectRepresentant(representant: {code: string; nom: string; }) {
+  private selectRepresentant(representant: { code: string; nom: string }) {
     this.codeRepresentant = representant.code;
     this.nomRepresentant = representant.nom;
   }
 
-  private selectFamille(famille: {code: string; nom: string; }) {
+  private selectFamille(famille: { code: string; nom: string }) {
     this.codeFamille = famille.code;
     this.nomFamille = famille.nom;
   }
 
-  private selectSecteur(secteur: {code: string; nom: string; }) {
+  private selectSecteur(secteur: { code: string; nom: string }) {
     console.log(secteur);
     this.codeSecteur = secteur.code;
     this.nomSecteur = secteur.nom;
   }
 
-  private changeCodePaiement(){
+  private changeCodePaiement() {
     this.libellePaiement = this.codesPaiement.find((c) => c.code.toString() == this.codePaiement)?.valeur || '';
   }
 }
