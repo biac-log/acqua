@@ -755,11 +755,11 @@ export default class FournisseurVue extends Vue {
     this.operationsTriangulaires = fournisseur.operationsTriangulaires;
     this.numeroDomiciliation = fournisseur.numeroDomiciliation == 0 ? '' : fournisseur.numeroDomiciliation.toString(); // Display empty instead of 0
     this.codeVentilation = fournisseur.codeVentilation;
-    this.codeRepresentant = fournisseur.codeRepresentant.toString();
+    this.codeRepresentant = fournisseur.codeRepresentant == 0 ? '' : fournisseur.codeRepresentant.toString();
     this.nomRepresentant = fournisseur.nomRepresentant;
-    this.codeFamille = fournisseur.codeFamille.toString();
+    this.codeFamille = fournisseur.codeFamille == 0 ? '' : fournisseur.codeFamille.toString();
     this.nomFamille = fournisseur.nomFamille;
-    this.codeSecteur = fournisseur.codeSecteur;
+    this.codeSecteur = fournisseur.codeSecteur == 0 ? '' : fournisseur.codeSecteur.toString();
     this.nomSecteur = fournisseur.nomSecteur;
     this.codeNace = fournisseur.codeNace;
     this.codeLangue = fournisseur.codeLangue;
@@ -815,8 +815,26 @@ export default class FournisseurVue extends Vue {
     this.fournisseur.banAgence = this.banAgence;
     this.fournisseur.typeSuivis = this.typeSuivis;
     this.fournisseur.operationsTriangulaires = this.operationsTriangulaires;
-    this.fournisseur.numeroDomiciliation = parseInt(this.numeroDomiciliation);
+    this.fournisseur.numeroDomiciliation = this.numeroDomiciliation != "" ? parseInt(this.numeroDomiciliation) : 0;
     this.fournisseur.codeVentilation = this.codeVentilation;
+    this.fournisseur.codeRepresentant = this.codeRepresentant != "" ? parseInt(this.codeRepresentant) : 0;
+    this.fournisseur.codeFamille = this.codeFamille != "" ? parseInt(this.codeFamille) : 0;
+    this.fournisseur.codeSecteur = this.codeSecteur != "" ? parseInt(this.codeSecteur) : 0;
+    this.fournisseur.codeNace = this.codeNace;
+    this.fournisseur.codeLangue = this.codeLangue;
+    this.fournisseur.codePaiement = this.codePaiement;
+    this.fournisseur.nombreDeJoursPaiement = this.nombreDeJoursPaiement;
+    this.fournisseur.escompte = this.escompte;
+    this.fournisseur.joursEscomptes = this.joursEscomptes;
+    this.fournisseur.limiteCredit = this.limiteCredit;
+    this.fournisseur.codePrix = this.codePrix;
+    this.fournisseur.tarif = this.tarif;
+    this.fournisseur.codeRemise = this.codeRemise;
+    this.fournisseur.libelleRemise = this.libelleRemise;
+    this.fournisseur.remiseGlobaleDefaut = this.remiseGlobaleDefaut;
+    this.fournisseur.francoMontant = this.francoMontant;
+    this.fournisseur.fermetureDu = this.fermetureDu;
+    this.fournisseur.fermetureAu = this.fermetureAu;
   }
 
   private closeDialog() {
