@@ -15,6 +15,7 @@ export class FournisseurParamsDTO {
   public libellesAssujettis: LibelleTiers[] = [];
   public codeSuivis: LibelleTiers[] = [];
   public langues: LibelleTiers[] = [];
+  public codePaiements: LibelleTiers[] = [];
 }
 
 export class FournisseurParams extends FournisseurParamsDTO {

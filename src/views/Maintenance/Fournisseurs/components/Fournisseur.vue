@@ -372,20 +372,22 @@
               </v-col>
             </v-row>
             <v-row dense>
-              <v-col cols="6"><v-select label="Langue" v-model="codeLangue" item-value="code" item-text="valeur" :items="codesLangues" :filled="readonly" :readonly="readonly" /></v-col>
+              <v-col cols="4"><v-select :filled="readonly" label="Paiement" v-model="codePaiement" :items="codesPaiement" item-text="code" item-value="code" @change="changeCodePaiement" /></v-col>
+              <v-col cols="4"><v-text-field :filled="readonly" readonly tabindex="-1" v-model="libellePaiement" /></v-col>
+              <v-col cols="4"><v-text-field :filled="readonly" label="# de jours" v-model="nombreDeJoursPaiement" /></v-col>
             </v-row>
           </v-col>
           <v-col cols="4">
             <v-row dense>
               <v-col cols="4">
-                <v-text-field :filled="readonly" label="Paiement" v-model="codePaiement"/>
-                <v-text-field :filled="readonly" label="Escompte" v-model="escompte" />
+                <v-select label="Langue" v-model="codeLangue" item-value="code" item-text="valeur" :items="codesLangues" :filled="readonly" :readonly="readonly" />
+                <v-text-field :filled="readonly" label="Escompte" v-model="escompte" append-icon="mdi-percent-outline" />
                 <v-text-field :filled="readonly" label="Remise" v-model="codeRemise" />
               </v-col>
               <v-col cols="4">
-                <v-text-field :filled="readonly" label="# de jours" v-model="nombreDeJoursPaiement" />
+                
                 <v-text-field :filled="readonly" label="Jours" v-model="joursEscomptes"/>
-                <v-text-field :filled="readonly" label="Remise Globale" v-model="remiseGlobaleDefaut" />
+                <v-text-field :filled="readonly" label="Remise Globale" v-model="remiseGlobaleDefaut" append-icon="mdi-percent-outline" />
               </v-col>
               <v-col cols="4">
                 <v-text-field :filled="readonly" label="NACE" v-model="codeNace" maxlength="5" />
@@ -581,6 +583,8 @@ export default class FournisseurVue extends Vue {
   private codeSuivis: LibelleTiers[] = [];
 
   private codesLangues: LibelleTiers[] = [];
+
+  private codesPaiement: LibelleTiers[] = [];
 
   public bic = '';
 
@@ -885,6 +889,7 @@ export default class FournisseurVue extends Vue {
     this.libellesAssujettis = this.fournisseurParams.libellesAssujettis;
     this.codeSuivis = this.fournisseurParams.codeSuivis;
     this.codesLangues = this.fournisseurParams.langues;
+    this.codesPaiement = this.fournisseurParams.codePaiements;
   }
 
   private selectRepresentant(representant: {code: string; nom: string; }) {
@@ -901,6 +906,10 @@ export default class FournisseurVue extends Vue {
     console.log(secteur);
     this.codeSecteur = secteur.code;
     this.nomSecteur = secteur.nom;
+  }
+
+  private changeCodePaiement(){
+    this.libellePaiement = this.codesPaiement.find((c) => c.code.toString() == this.codePaiement)?.valeur || '';
   }
 }
 </script>
