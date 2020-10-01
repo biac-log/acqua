@@ -1,4 +1,5 @@
 import { DateTime } from '@/models/DateTime';
+import moment from 'moment';
 
 export class FournisseurDTO {
   public type = 'F';
@@ -76,23 +77,37 @@ export class Fournisseur extends FournisseurDTO {
     return `${this.numero} - ${this.nom}`.trim();
   }
 
-  private _fermetureDuDate?: DateTime;
-  get fermetureDuDate(): DateTime {
-    if (!this._fermetureDuDate) this._fermetureDuDate = new DateTime(this.fermetureDu);
-    return this._fermetureDuDate;
+  get fermetureDuDate(): Date {
+    return moment(this.fermetureDu).toDate();
   }
-  set fermetureDuDate(date: DateTime) {
-    this._fermetureDuDate = date;
-    this.fermetureDu = date.toUtc();
+  set fermetureDuDate(date: Date) {
+    this.fermetureDu = date.toISOString();
   }
 
-  private _fermetureAuDate?: DateTime;
-  get fermetureAuDate(): DateTime {
-    if (!this._fermetureAuDate) this._fermetureAuDate = new DateTime(this.fermetureAu);
-    return this._fermetureAuDate;
+  get fermetureAuDate(): Date {
+    return moment(this.fermetureAu).toDate();
   }
-  set fermetureAuDate(date: DateTime) {
-    this._fermetureAuDate = date;
-    this.fermetureAu = date.toUtc();
+  set fermetureAuDate(date: Date) {
+    this.fermetureAu = date.toISOString();
   }
+
+  // private _fermetureDuDate?: DateTime;
+  // get fermetureDuDate(): DateTime {
+  //   if (!this._fermetureDuDate) this._fermetureDuDate = new DateTime(this.fermetureDu);
+  //   return this._fermetureDuDate;
+  // }
+  // set fermetureDuDate(date: DateTime) {
+  //   this._fermetureDuDate = date;
+  //   this.fermetureDu = date.toUtc();
+  // }
+
+  // private _fermetureAuDate?: DateTime;
+  // get fermetureAuDate(): DateTime {
+  //   if (!this._fermetureAuDate) this._fermetureAuDate = new DateTime(this.fermetureAu);
+  //   return this._fermetureAuDate;
+  // }
+  // set fermetureAuDate(date: DateTime) {
+  //   this._fermetureAuDate = date;
+  //   this.fermetureAu = date.toUtc();
+  // }
 }

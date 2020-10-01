@@ -310,6 +310,7 @@
                   v-model="codeVentilation"
                   :filled="readonly"
                   :readonly="readonly"
+                  maxlength="1"
                 />
                 <v-checkbox :readonly="readonly" v-model="operationsTriangulaires" label="Op. triangulaires ?" />
               </v-col>
@@ -396,6 +397,7 @@
               <v-col cols="4"
                 ><v-select
                   :filled="readonly"
+                  :readonly="readonly"
                   label="Paiement"
                   v-model="codePaiement"
                   :items="codesPaiement"
@@ -455,20 +457,20 @@
             <v-row dense>
               <v-col cols="4">
                 <date-picker
-                  ref="refFermetureDu"
                   label="Fermeture du"
                   :date.sync="fermetureDu"
                   :readonly.sync="readonly"
                   :filled="readonly"
+                  :rules.sync="datePieceRules"
                 />
               </v-col>
               <v-col cols="4"
                 ><date-picker
-                  ref="refFermetureAu"
                   label="au"
                   :date.sync="fermetureAu"
                   :readonly.sync="readonly"
                   :filled="readonly"
+                  :rules.sync="datePieceRules"
               /></v-col>
               <v-col cols="4">
                 <v-text-field
@@ -623,29 +625,29 @@ export default class FournisseurVue extends Vue {
   private banAgence = '';
   private operationsTriangulaires = false;
   private numeroDomiciliation = '';
-  private codeVentilation = 0;
+  private codeVentilation = '';
   public codeRepresentant = '';
   public nomRepresentant = '';
   public codeFamille = '';
   public nomFamille = '';
   public codeSecteur = '';
   public nomSecteur = '';
-  public codeNace = 0;
+  public codeNace = '';
   public codeLangue = 0;
   public libelleLangue = '';
   public codePaiement = ''; // FinDeMois
   public libellePaiement = '';
-  public nombreDeJoursPaiement = 0;
-  public escompte = 0;
-  public joursEscomptes = 0;
-  public limiteCredit = 0;
-  public codePrix = 0;
+  public nombreDeJoursPaiement = '';
+  public escompte = '';
+  public joursEscomptes = '';
+  public limiteCredit = '';
+  public codePrix = '';
   public libellePrix = '';
   public tarif = '';
-  public codeRemise = 0;
+  public codeRemise = '';
   public libelleRemise = '';
-  public remiseGlobaleDefaut = 0;
-  public francoMontant = 0;
+  public remiseGlobaleDefaut = '';
+  public francoMontant = '';
   public fermetureDu = '';
   public fermetureAu = '';
 
@@ -758,30 +760,30 @@ export default class FournisseurVue extends Vue {
     this.banAgence = fournisseur.banAgence;
     this.typeSuivis = fournisseur.typeSuivis;
     this.operationsTriangulaires = fournisseur.operationsTriangulaires;
-    this.numeroDomiciliation = fournisseur.numeroDomiciliation == 0 ? '' : fournisseur.numeroDomiciliation.toString(); // Display empty instead of 0
-    this.codeVentilation = fournisseur.codeVentilation;
+    this.numeroDomiciliation = fournisseur.numeroDomiciliation == 0 ? '' : fournisseur.numeroDomiciliation.toIntString(); // Display empty instead of 0
+    this.codeVentilation = fournisseur.codeVentilation.toIntString();
     this.codeRepresentant = fournisseur.codeRepresentant == 0 ? '' : fournisseur.codeRepresentant.toString();
     this.nomRepresentant = fournisseur.nomRepresentant;
-    this.codeFamille = fournisseur.codeFamille == 0 ? '' : fournisseur.codeFamille.toString();
+    this.codeFamille = fournisseur.codeFamille == 0 ? '' : fournisseur.codeFamille.toIntString();
     this.nomFamille = fournisseur.nomFamille;
-    this.codeSecteur = fournisseur.codeSecteur == 0 ? '' : fournisseur.codeSecteur.toString();
+    this.codeSecteur = fournisseur.codeSecteur == 0 ? '' : fournisseur.codeSecteur.toIntString();
     this.nomSecteur = fournisseur.nomSecteur;
-    this.codeNace = fournisseur.codeNace;
+    this.codeNace = fournisseur.codeNace == 0 ? '' : fournisseur.codeNace.toIntString();
     this.codeLangue = fournisseur.codeLangue;
     this.libelleLangue = fournisseur.libelleLangue;
     this.codePaiement = fournisseur.codePaiement;
     this.libellePaiement = fournisseur.libellePaiement;
-    this.nombreDeJoursPaiement = fournisseur.nombreDeJoursPaiement;
-    this.escompte = fournisseur.escompte;
-    this.joursEscomptes = fournisseur.joursEscomptes;
-    this.limiteCredit = fournisseur.limiteCredit;
-    this.codePrix = fournisseur.codePrix;
+    this.nombreDeJoursPaiement = fournisseur.nombreDeJoursPaiement.toIntString();
+    this.escompte = fournisseur.escompte.toDecimalString();
+    this.joursEscomptes = fournisseur.joursEscomptes.toIntString();
+    this.limiteCredit = fournisseur.limiteCredit.toDecimalString();
+    this.codePrix = fournisseur.codePrix == 0 ? '' : fournisseur.codePrix.toIntString();
     this.libellePrix = fournisseur.libellePrix;
     this.tarif = fournisseur.tarif;
-    this.codeRemise = fournisseur.codeRemise;
+    this.codeRemise = fournisseur.codeRemise == 0 ? '' : fournisseur.codeRemise.toIntString();
     this.libelleRemise = fournisseur.libelleRemise;
-    this.remiseGlobaleDefaut = fournisseur.remiseGlobaleDefaut;
-    this.francoMontant = fournisseur.francoMontant;
+    this.remiseGlobaleDefaut = fournisseur.remiseGlobaleDefaut.toDecimalString();
+    this.francoMontant = fournisseur.francoMontant.toDecimalString();
     this.fermetureDu = fournisseur.fermetureDu;
     this.fermetureAu = fournisseur.fermetureAu;
   }
@@ -821,23 +823,23 @@ export default class FournisseurVue extends Vue {
     this.fournisseur.typeSuivis = this.typeSuivis;
     this.fournisseur.operationsTriangulaires = this.operationsTriangulaires;
     this.fournisseur.numeroDomiciliation = this.numeroDomiciliation != "" ? parseInt(this.numeroDomiciliation) : 0;
-    this.fournisseur.codeVentilation = this.codeVentilation;
+    this.fournisseur.codeVentilation = this.codeVentilation != "" ? parseInt(this.codeVentilation) : 0;
     this.fournisseur.codeRepresentant = this.codeRepresentant != "" ? parseInt(this.codeRepresentant) : 0;
     this.fournisseur.codeFamille = this.codeFamille != "" ? parseInt(this.codeFamille) : 0;
     this.fournisseur.codeSecteur = this.codeSecteur != "" ? parseInt(this.codeSecteur) : 0;
-    this.fournisseur.codeNace = this.codeNace;
+    this.fournisseur.codeNace = this.codeNace != "" ? parseInt(this.codeNace) : 0;
     this.fournisseur.codeLangue = this.codeLangue;
     this.fournisseur.codePaiement = this.codePaiement;
-    this.fournisseur.nombreDeJoursPaiement = this.nombreDeJoursPaiement;
-    this.fournisseur.escompte = this.escompte;
-    this.fournisseur.joursEscomptes = this.joursEscomptes;
-    this.fournisseur.limiteCredit = this.limiteCredit;
-    this.fournisseur.codePrix = this.codePrix;
+    this.fournisseur.nombreDeJoursPaiement = this.nombreDeJoursPaiement != "" ? parseInt(this.nombreDeJoursPaiement) : 0;
+    this.fournisseur.escompte = this.escompte != "" ? parseInt(this.escompte) : 0;
+    this.fournisseur.joursEscomptes = this.joursEscomptes != "" ? parseInt(this.joursEscomptes) : 0;
+    this.fournisseur.limiteCredit = this.limiteCredit != "" ? parseInt(this.limiteCredit) : 0;
+    this.fournisseur.codePrix = this.codePrix != "" ? parseInt(this.codePrix) : 0;
     this.fournisseur.tarif = this.tarif;
-    this.fournisseur.codeRemise = this.codeRemise;
+    this.fournisseur.codeRemise = this.codeRemise != "" ? parseInt(this.codeRemise) : 0;
     this.fournisseur.libelleRemise = this.libelleRemise;
-    this.fournisseur.remiseGlobaleDefaut = this.remiseGlobaleDefaut;
-    this.fournisseur.francoMontant = this.francoMontant;
+    this.fournisseur.remiseGlobaleDefaut = this.remiseGlobaleDefaut != "" ? parseInt(this.remiseGlobaleDefaut) : 0;
+    this.fournisseur.francoMontant = this.francoMontant != "" ? parseInt(this.francoMontant) : 0;
     this.fournisseur.fermetureDu = this.fermetureDu;
     this.fournisseur.fermetureAu = this.fermetureAu;
   }
@@ -867,6 +869,9 @@ export default class FournisseurVue extends Vue {
     this.autocompleteCompteMaitre.init(this.compteMaitre.toString(), '');
     this.autocompleteCompteVenteAchat.init(this.compteVenteAchat.toString(), '');
     this.autocompleteCodeRepresentant.init(fournisseurDTO.codeRepresentant.toString());
+    this.autocompleteCodeFamille.init(fournisseurDTO.codeFamille.toString());
+    this.autocompleteCodeSecteur.init(fournisseurDTO.codeSecteur.toString());
+    
   }
 
   private modifierFournisseur() {
