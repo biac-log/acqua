@@ -548,6 +548,7 @@ import { CompteDeTier } from '@/models/Compte/CompteDeTier';
 import { Devise } from '@/models/Devise/Devise';
 import DeviseApi from '@/api/DeviseApi';
 import DatePicker from '@/components/DatePicker.vue';
+import { DateTime } from '@/models/DateTime';
 
 @Component({
   name: 'FournisseurVue',
@@ -664,6 +665,10 @@ export default class FournisseurVue extends Vue {
   private codesPaiement: LibelleTiers[] = [];
 
   public bic = '';
+
+  private datePieceRules: any = [
+    (v: string) => DateTime.isValid(v) || 'Date invalide',
+  ];
 
   mounted() {
     this.getDevises();
