@@ -42,7 +42,7 @@
         <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-form ref="form" v-model="isValid" lazy-validation>
-          <v-row justify="center" dense class="pt-5">
+          <v-row dense class="pt-5">
             <v-col cols="3" class="pr-5">
               <v-row dense>
                 <v-col cols="6" class="pb-0 pt-0">
@@ -483,6 +483,54 @@
                 </v-col>
               </v-row>
             </v-col>
+            <v-col cols="3" dense>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-checkbox label="Livraison globale"></v-checkbox>
+                  <v-checkbox label="Facture certifiée"></v-checkbox>
+                </v-col>
+                <v-col cols="6">
+                  <v-checkbox label="Tenue back-orders"></v-checkbox>
+                  <v-checkbox label="Confirmation commande"></v-checkbox>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="3" dense>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-select label="Factures groupées"></v-select>
+                  <v-select label="Catégorie facturation"></v-select>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field label="# Copies factures"></v-text-field>
+                  <v-text-field label="Code formulaire"></v-text-field>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="3" dense>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-text-field label="Transporteur"></v-text-field>
+                  <v-text-field label="Tournées"></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field label="nom transporteur"></v-text-field>
+                  <v-text-field label="libellé tournées ?"></v-text-field>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="3" dense>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-text-field label="Période commandes"></v-text-field>
+                  <v-text-field label="Délai livraison"></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field label="Conditions transp."></v-text-field>
+                  <v-text-field label="Emission documents"></v-text-field>
+                </v-col>
+              </v-row>
+            </v-col>
           </v-row>
         </v-form>
       </v-card-text>
@@ -651,8 +699,8 @@ export default class FournisseurVue extends Vue {
   public libelleRemise = '';
   public remiseGlobaleDefaut = '';
   public francoMontant = '';
-   private fermetureDu: DateTime = new DateTime();
-   private fermetureAu: DateTime = new DateTime();
+  private fermetureDu: DateTime = new DateTime();
+  private fermetureAu: DateTime = new DateTime();
 
   private readonly = true;
   private newRecord = false;
@@ -673,9 +721,7 @@ export default class FournisseurVue extends Vue {
 
   private fermetureDuRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
 
-  private fermetureAuRules: any = [
-    (v: string) => DateTime.isValid(v) || 'Date invalide',
-  ];
+  private fermetureAuRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
 
   mounted() {
     this.getDevises();
