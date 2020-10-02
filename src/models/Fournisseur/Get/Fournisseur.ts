@@ -77,37 +77,23 @@ export class Fournisseur extends FournisseurDTO {
     return `${this.numero} - ${this.nom}`.trim();
   }
 
-  get fermetureDuDate(): Date {
-    return moment(this.fermetureDu).toDate();
+  private _fermetureDuDate?: DateTime;
+  get fermetureDuDate(): DateTime {
+    if (!this._fermetureDuDate) this._fermetureDuDate = new DateTime(this.fermetureDu);
+    return this._fermetureDuDate;
   }
-  set fermetureDuDate(date: Date) {
-    this.fermetureDu = date.toISOString();
-  }
-
-  get fermetureAuDate(): Date {
-    return moment(this.fermetureAu).toDate();
-  }
-  set fermetureAuDate(date: Date) {
-    this.fermetureAu = date.toISOString();
+  set fermetureDuDate(date: DateTime) {
+    this._fermetureDuDate = date;
+    this.fermetureDu = date.toUtc();
   }
 
-  // private _fermetureDuDate?: DateTime;
-  // get fermetureDuDate(): DateTime {
-  //   if (!this._fermetureDuDate) this._fermetureDuDate = new DateTime(this.fermetureDu);
-  //   return this._fermetureDuDate;
-  // }
-  // set fermetureDuDate(date: DateTime) {
-  //   this._fermetureDuDate = date;
-  //   this.fermetureDu = date.toUtc();
-  // }
-
-  // private _fermetureAuDate?: DateTime;
-  // get fermetureAuDate(): DateTime {
-  //   if (!this._fermetureAuDate) this._fermetureAuDate = new DateTime(this.fermetureAu);
-  //   return this._fermetureAuDate;
-  // }
-  // set fermetureAuDate(date: DateTime) {
-  //   this._fermetureAuDate = date;
-  //   this.fermetureAu = date.toUtc();
-  // }
+  private _fermetureAuDate?: DateTime;
+  get fermetureAuDate(): DateTime {
+    if (!this._fermetureAuDate) this._fermetureAuDate = new DateTime(this.fermetureAu);
+    return this._fermetureAuDate;
+  }
+  set fermetureAuDate(date: DateTime) {
+    this._fermetureAuDate = date;
+    this.fermetureAu = date.toUtc();
+  }
 }
