@@ -1000,6 +1000,18 @@ export default class FournisseurVue extends Vue {
     this.fournisseur.francoMontant = this.francoMontant != '' ? parseInt(this.francoMontant) : 0;
     this.fournisseur.fermetureDuDate = this.fermetureDu;
     this.fournisseur.fermetureAuDate = this.fermetureAu;
+    this.fournisseur.livraisonGlobale = this.livraisonGlobale;
+    this.fournisseur.tenueBackOrders = this.tenueBackOrders;
+    this.fournisseur.confirmationCommande = this.confirmationCommande;
+    this.fournisseur.documentCertifie = this.documentCertifie;
+    this.fournisseur.facturesGroupees = this.facturesGroupees;
+    this.fournisseur.categorieFacturation = this.categorieFacturation;
+    this.fournisseur.nombreExemplaireFacture = this.nombreExemplaireFacture != '' ? parseInt(this.nombreExemplaireFacture) : 0;
+    this.fournisseur.formulaire = this.formulaire;
+    this.fournisseur.transporteur = this.transporteur;
+    this.fournisseur.periodiciteCommande = this.periodiciteCommande != '' ? parseInt(this.periodiciteCommande) : 0;
+    this.fournisseur.delaiLivraison = this.delaiLivraison != '' ? parseInt(this.delaiLivraison) : 0;
+    this.fournisseur.conditionsTransport = this.conditionsTransport;
   }
 
   private closeDialog() {

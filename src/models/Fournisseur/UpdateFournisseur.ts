@@ -33,6 +33,19 @@ export class UpdateFournisseurDTO {
   public operationsTriangulaires = false;
   public numeroDomiciliation = 0;
   public codeVentilation = 0;
+  // Logistique
+  public livraisonGlobale = false;
+  public tenueBackOrders = false;
+  public confirmationCommande = false;
+  public documentCertifie = false;
+  public facturesGroupees = '';
+  public categorieFacturation = '';
+  public nombreExemplaireFacture = 0;
+  public formulaire = '';
+  public transporteur = 0;
+  public periodiciteCommande = 0;
+  public delaiLivraison = 0;
+  public conditionsTransport = '';
 }
 
 export class UpdateFournisseur extends UpdateFournisseurDTO {
