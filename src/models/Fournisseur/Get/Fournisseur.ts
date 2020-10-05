@@ -79,7 +79,7 @@ export class FournisseurDTO {
   public facturesGroupees = '';
   public categorieFacturation = '';
   public nombreExemplaireFacture = 0;
-  public formulaire = 0;
+  public formulaire = '';
   public transporteur = 0;
   public periodiciteCommande = 0;
   public delaiLivraison = 0;

@@ -431,27 +431,30 @@
                     label="Escompte"
                     v-model="escompte"
                     append-icon="mdi-percent-outline"
+                    :readonly="readonly"
                   />
-                  <v-text-field :filled="readonly" label="Remise" v-model="codeRemise" />
+                  <v-text-field :filled="readonly" label="Remise" v-model="codeRemise" :readonly="readonly" />
                 </v-col>
                 <v-col cols="4">
-                  <v-text-field :filled="readonly" label="Numéro prix" v-model="codePrix" />
-                  <v-text-field :filled="readonly" label="Jours" v-model="joursEscomptes" />
+                  <v-text-field :filled="readonly" label="Numéro prix" v-model="codePrix" :readonly="readonly" />
+                  <v-text-field :filled="readonly" label="Jours" v-model="joursEscomptes" :readonly="readonly" />
                   <v-text-field
                     :filled="readonly"
                     label="Remise Globale"
                     v-model="remiseGlobaleDefaut"
                     append-icon="mdi-percent-outline"
+                    :readonly="readonly"
                   />
                 </v-col>
                 <v-col cols="4">
-                  <v-text-field :filled="readonly" label="NACE" v-model="codeNace" maxlength="5" />
-                  <v-text-field :filled="readonly" label="Tarif" v-model="tarif" maxlength="6" />
+                  <v-text-field :filled="readonly" label="NACE" v-model="codeNace" maxlength="5" :readonly="readonly" />
+                  <v-text-field :filled="readonly" label="Tarif" v-model="tarif" maxlength="6" :readonly="readonly" />
                   <v-text-field
                     :filled="readonly"
                     label="Port Franco"
                     v-model="francoMontant"
                     append-icon="mdi-currency-eur"
+                    :readonly="readonly"
                   />
                 </v-col>
               </v-row>
@@ -479,6 +482,7 @@
                     label="Limite de crédit"
                     v-model="limiteCredit"
                     append-icon="mdi-currency-eur"
+                    :readonly="readonly"
                   />
                 </v-col>
               </v-row>
@@ -486,48 +490,108 @@
             <v-col cols="3" dense>
               <v-row dense>
                 <v-col cols="6">
-                  <v-checkbox label="Livraison globale"></v-checkbox>
-                  <v-checkbox label="Facture certifiée"></v-checkbox>
+                  <v-checkbox
+                    label="Livraison globale"
+                    v-model="livraisonGlobale"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-checkbox>
+                  <v-checkbox
+                    label="Facture certifiée"
+                    v-model="documentCertifie"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-checkbox>
                 </v-col>
                 <v-col cols="6">
-                  <v-checkbox label="Tenue back-orders"></v-checkbox>
-                  <v-checkbox label="Confirmation commande"></v-checkbox>
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="3" dense>
-              <v-row dense>
-                <v-col cols="6">
-                  <v-select label="Factures groupées"></v-select>
-                  <v-select label="Catégorie facturation"></v-select>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field label="# Copies factures"></v-text-field>
-                  <v-text-field label="Code formulaire"></v-text-field>
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="3" dense>
-              <v-row dense>
-                <v-col cols="6">
-                  <v-text-field label="Transporteur"></v-text-field>
-                  <v-text-field label="Tournées"></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field label="nom transporteur"></v-text-field>
-                  <v-text-field label="libellé tournées ?"></v-text-field>
+                  <v-checkbox
+                    label="Tenue back-orders"
+                    v-model="tenueBackOrders"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-checkbox>
+                  <v-checkbox
+                    label="Confirmation commande"
+                    v-model="confirmationCommande"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-checkbox>
                 </v-col>
               </v-row>
             </v-col>
             <v-col cols="3" dense>
               <v-row dense>
                 <v-col cols="6">
-                  <v-text-field label="Période commandes"></v-text-field>
-                  <v-text-field label="Délai livraison"></v-text-field>
+                  <v-select
+                    label="Factures groupées"
+                    v-model="facturesGroupees"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-select>
+                  <v-select
+                    label="Catégorie facturation"
+                    v-model="categorieFacturation"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-select>
                 </v-col>
                 <v-col cols="6">
-                  <v-text-field label="Conditions transp."></v-text-field>
-                  <v-text-field label="Emission documents"></v-text-field>
+                  <v-text-field
+                    label="# Copies factures"
+                    v-model="nombreExemplaireFacture"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-text-field>
+                  <v-text-field
+                    label="Code formulaire"
+                    v-model="formulaire"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="3" dense>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-text-field
+                    label="Transporteur"
+                    v-model="transporteur"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-text-field>
+                  <v-text-field label="Tournées" :filled="readonly" :readonly="readonly"></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field label="nom transporteur" :filled="readonly" :readonly="readonly"></v-text-field>
+                  <v-text-field label="libellé tournées ?" :filled="readonly" :readonly="readonly"></v-text-field>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="3" dense>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-text-field
+                    label="Période commandes"
+                    v-model="periodiciteCommande"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-text-field>
+                  <v-text-field
+                    label="Délai livraison"
+                    v-model="delaiLivraison"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    label="Conditions transp."
+                    v-model="conditionsTransport"
+                    :filled="readonly"
+                    :readonly="readonly"
+                  ></v-text-field>
+                  <v-text-field label="Emission documents" :filled="readonly" :readonly="readonly"></v-text-field>
                 </v-col>
               </v-row>
             </v-col>
@@ -707,11 +771,11 @@ export default class FournisseurVue extends Vue {
   private documentCertifie = false;
   private facturesGroupees = '';
   private categorieFacturation = '';
-  private nombreExemplaireFacture = 0;
-  private formulaire = 0;
+  private nombreExemplaireFacture = '';
+  private formulaire = '';
   private transporteur = 0;
-  private periodiciteCommande = 0;
-  private delaiLivraison = 0;
+  private periodiciteCommande = '';
+  private delaiLivraison = '';
   private conditionsTransport = '';
 
   private readonly = true;
@@ -856,11 +920,11 @@ export default class FournisseurVue extends Vue {
     this.documentCertifie = fournisseur.documentCertifie;
     this.facturesGroupees = fournisseur.facturesGroupees;
     this.categorieFacturation = fournisseur.categorieFacturation;
-    this.nombreExemplaireFacture = fournisseur.nombreExemplaireFacture;
+    this.nombreExemplaireFacture = fournisseur.nombreExemplaireFacture == 0 ? '' : fournisseur.nombreExemplaireFacture.toIntString();
     this.formulaire = fournisseur.formulaire;
     this.transporteur = fournisseur.transporteur;
-    this.periodiciteCommande = fournisseur.periodiciteCommande;
-    this.delaiLivraison = fournisseur.delaiLivraison;
+    this.periodiciteCommande = fournisseur.periodiciteCommande == 0 ? '' : fournisseur.periodiciteCommande.toIntString();
+    this.delaiLivraison = fournisseur.delaiLivraison == 0 ? '' : fournisseur.delaiLivraison.toIntString();
     this.conditionsTransport = fournisseur.conditionsTransport;
   }
 
