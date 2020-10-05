@@ -527,6 +527,9 @@
                     v-model="facturesGroupees"
                     :filled="readonly"
                     :readonly="readonly"
+                    :items="facturesGroupeesItems"
+                    item-value="code"
+                    item-text="valeur"
                   ></v-select>
                   <v-select
                     label="Catégorie facturation"
@@ -576,12 +579,14 @@
                     v-model="periodiciteCommande"
                     :filled="readonly"
                     :readonly="readonly"
+                    :suffix="readonly ? '' : 'semaines'"
                   ></v-text-field>
                   <v-text-field
                     label="Délai livraison"
                     v-model="delaiLivraison"
                     :filled="readonly"
                     :readonly="readonly"
+                    :suffix="readonly ? '' : 'jours'"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="6">
@@ -792,6 +797,13 @@ export default class FournisseurVue extends Vue {
   private codesLangues: LibelleTiers[] = [];
 
   private codesPaiement: LibelleTiers[] = [];
+
+  private facturesGroupeesItems: {code: string; valeur: string;}[] = [
+    {code: "N", valeur: "Jamais de regroupement"},
+    {code: "Y", valeur: "Toujours"},
+    {code: "A", valeur: "Par adresse de livraison"},
+    {code: "C", valeur: "Par commande"},
+  ];
 
   public bic = '';
 
