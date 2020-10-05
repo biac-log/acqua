@@ -2,6 +2,7 @@ import { DateTime } from '@/models/DateTime';
 import moment from 'moment';
 
 export class FournisseurDTO {
+  // Signalétique
   public type = 'F';
   public numero = 0;
   public nom = '';
@@ -22,6 +23,8 @@ export class FournisseurDTO {
   public commentaire1 = '';
   public commentaire2 = '';
   public commentaire3 = '';
+  
+  // Comptabilité
   public compteAssocie = 0;
   public nomCompteAssocie = '';
   public compteMaitre = 0;
@@ -41,6 +44,8 @@ export class FournisseurDTO {
   public operationsTriangulaires = false;
   public numeroDomiciliation = 0;
   public codeVentilation = 0;
+  
+  // Commercial
   public codeRepresentant = 0;
   public nomRepresentant = '';
   public codeFamille = 0;
@@ -65,6 +70,20 @@ export class FournisseurDTO {
   public francoMontant = 0;
   public fermetureDu = '';
   public fermetureAu = '';
+
+  // Logistique
+  public livraisonGlobale = false;
+  public tenueBackOrders = false;
+  public confirmationCommande = false;
+  public documentCertifie = false;
+  public facturesGroupees = '';
+  public categorieFacturation = '';
+  public nombreExemplaireFacture = 0;
+  public formulaire = 0;
+  public transporteur = 0;
+  public periodiciteCommande = 0;
+  public delaiLivraison = 0;
+  public conditionsTransport = '';
 }
 
 export class Fournisseur extends FournisseurDTO {
