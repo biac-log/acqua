@@ -8,6 +8,11 @@ export class LibelleTiers {
   }
 }
 
+export class Transporteur {
+  public id = 0;
+  public transportFR = '';
+}
+
 export class FournisseurParamsDTO {
   public nextNumero = 0;
   public numeroCompteAssocieDefaut = 0;
@@ -16,6 +21,7 @@ export class FournisseurParamsDTO {
   public codeSuivis: LibelleTiers[] = [];
   public langues: LibelleTiers[] = [];
   public codePaiements: LibelleTiers[] = [];
+  public transporteurs: Transporteur[] = [];
 }
 
 export class FournisseurParams extends FournisseurParamsDTO {

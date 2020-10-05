@@ -557,12 +557,15 @@
             <v-col cols="3" dense>
               <v-row dense>
                 <v-col cols="6">
-                  <v-text-field
+                  <v-select
                     label="Transporteur"
                     v-model="transporteur"
                     :filled="readonly"
                     :readonly="readonly"
-                  ></v-text-field>
+                    :items="transporteurs"
+                    item-text="transportFR"
+                    item-value="id"
+                  ></v-select>
                   <v-text-field label="Tournées" :filled="readonly" :readonly="readonly"></v-text-field>
                 </v-col>
                 <v-col cols="6">
@@ -658,7 +661,7 @@ import { UpdateFournisseur } from '@/models/Fournisseur/UpdateFournisseur';
 import { FournisseurApi } from '@/api/FournisseurApi';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
-import { FournisseurParams, LibelleTiers } from '@/models/Fournisseur/Get/FournisseurParams';
+import { FournisseurParams, LibelleTiers, Transporteur } from '@/models/Fournisseur/Get/FournisseurParams';
 import SearchComptes from './SearchComptes.vue';
 import CompteApi from '@/api/CompteApi';
 import { CompteSearch } from '@/models/Compte/CompteSearch';
@@ -804,6 +807,8 @@ export default class FournisseurVue extends Vue {
     {code: "A", valeur: "Par adresse de livraison"},
     {code: "C", valeur: "Par commande"},
   ];
+
+  private transporteurs: Transporteur[] = [];
 
   public bic = '';
 
@@ -1150,6 +1155,7 @@ export default class FournisseurVue extends Vue {
     this.codeSuivis = this.fournisseurParams.codeSuivis;
     this.codesLangues = this.fournisseurParams.langues;
     this.codesPaiement = this.fournisseurParams.codePaiements;
+    this.transporteurs = this.fournisseurParams.transporteurs;
   }
 
   private selectRepresentant(representant: { code: string; nom: string }) {
