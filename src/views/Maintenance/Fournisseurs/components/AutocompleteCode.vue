@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <div class="autocompleteCode">
     <v-combobox
       :label="label"
       :readonly="isReadonly"
@@ -14,6 +14,7 @@
       @keyup.enter="$event.target.select()"
       @focus="$event.target.select()"
       v-model="codeSelected"
+      :hide-details="hideDetails"
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">
@@ -42,7 +43,7 @@
       </template>
     </v-combobox>
     <search-code ref="searchModal" />
-  </span>
+  </div>
 </template>
 
 <script lang="ts">
@@ -61,6 +62,7 @@ export default class AutocompleteCodeVue extends Vue {
   @Prop() readonly label!: string;
   @PropSync('readonly') readonly isReadonly!: boolean;
   @Prop() private typeCode!: string;
+  @Prop({ default: true }) hideDetails!: boolean;
 
   @Ref() private searchModal!: SearchCode;
 
