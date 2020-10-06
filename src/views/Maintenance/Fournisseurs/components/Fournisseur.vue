@@ -42,697 +42,789 @@
         <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-form ref="form" v-model="isValid" lazy-validation>
-          <v-row dense class="pt-2">
-            <v-col cols="3" class="pr-5">
-              <v-row dense>
-                <v-col cols="6" class="pb-0 pt-0">
-                  <v-text-field
-                    :autofocus="!readonly"
-                    label="Nom"
-                    ref="inputNom"
-                    v-model="nom"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="23"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="6" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Match code"
-                    v-model="matchCode"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="23"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="6" class="pb-0 pt-0">
-                  <v-text-field
-                    :label="newRecord ? 'Numéro prédit' : 'Numéro'"
-                    v-model="numero"
-                    :filled="readonly"
-                    readonly
-                    tabindex="-1"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="6" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Raison sociale"
-                    v-model="raisonSociale"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="11"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="12" class="pb-0 pt-0">
-                  <v-text-field
-                    label="E-mail"
-                    v-model="email"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="3" class="pr-5 pl-5">
-              <v-row dense>
-                <v-col cols="12" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Adresse"
-                    v-model="adresseLigne1"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="35"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="12" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Complément d'adresse"
-                    v-model="adresseLigne2"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="35"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="4" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Code Postal"
-                    v-model="codePostal"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="8"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="4" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Localité"
-                    v-model="localité"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="30"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="4" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Pays"
-                    v-model="codePays"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="3"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="3" class="pr-5 pl-5">
-              <v-row dense>
-                <v-col cols="6" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Téléphone"
-                    v-model="numeroTelephone"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="14"
-                    dense
-                    hide-details
-                  />
-                  <v-text-field
-                    label="Fax"
-                    v-model="téléfax"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="14"
-                    dense
-                    hide-details
-                  />
-                  <v-text-field
-                    label="GSM"
-                    v-model="gsm"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="14"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="6" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Contact 1"
-                    v-model="contact1"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="30"
-                    dense
-                    hide-details
-                  />
-                  <v-text-field
-                    label="Contact 2"
-                    v-model="contact2"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="30"
-                    dense
-                    hide-details
-                  />
-                  <v-text-field
-                    label="Contact 3"
-                    v-model="contact3"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="30"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="3" class="pl-5">
-              <v-row dense>
-                <v-col cols="12" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Commentaire 1"
-                    v-model="commentaire1"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="20"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="12" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Commentaire 2"
-                    v-model="commentaire2"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="20"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="12" class="pb-0 pt-0">
-                  <v-text-field
-                    label="Commentaire 3"
-                    v-model="commentaire3"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :counter="!readonly"
-                    maxlength="20"
-                    dense
-                    hide-details
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="6">
-              <v-row dense>
-                <v-col cols="3">
-                  <autocomplete-comptes-vue
-                    :readonly="readonly"
-                    TypeCompte="G"
-                    label="Compte associé"
-                    @Change="setCompteAssocie"
-                    v-model="compteAssocie"
-                    ref="autocompleteCompteAssocie"
-                  />
-                  <autocomplete-comptes-vue
-                    :readonly="readonly"
-                    TypeCompte="C"
-                    label="Compte maître"
-                    @Change="setCompteMaitre"
-                    ref="autocompleteCompteMaitre"
-                  />
-                  <autocomplete-comptes-vue
-                    :readonly="readonly"
-                    TypeCompte="G"
-                    label="Compte vente/achat"
-                    @Change="setCompteVenteAchat"
-                    ref="autocompleteCompteVenteAchat"
-                  />
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteAssocie" hide-details />
-                  <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteMaitre" hide-details />
-                  <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteVenteAchat" hide-details />
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field label="IBAN" v-model="compte" :filled="readonly" :readonly="readonly" hide-details />
-                  <v-select
-                    label="Code suivis"
-                    :readonly="readonly"
-                    :filled="readonly"
-                    :items="codeSuivis"
-                    item-text="valeur"
-                    item-value="code"
-                    v-model="typeSuivis" hide-details
-                  />
-                  <v-text-field
-                    label="N° domiciliation"
-                    v-model="numeroDomiciliation"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    maxlength="12"
-                    :counter="!readonly" hide-details
-                  />
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field
-                    label="BIC"
-                    v-model="bic"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    @blur="setBic"
-                    minlength="8"
-                    maxlength="11"
-                    :counter="!readonly" hide-details
-                  />
-                  <v-text-field
-                    label="Code ventilation"
-                    v-model="codeVentilation"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    maxlength="1" hide-details
-                  />
-                  <v-checkbox :readonly="readonly" v-model="operationsTriangulaires" label="Op. triangulaires ?" hide-details />
-                </v-col>
-                <v-col cols="3">
-                  <v-select
-                    label="Code devise"
-                    :readonly="readonly"
-                    :filled="readonly"
-                    :items="devises"
-                    item-text="libelle"
-                    item-value="id"
-                    v-model="codeDevise" hide-details
-                  />
-                </v-col>
-                <v-col cols="3">
-                  <v-select
-                    label="Code assujetti"
-                    v-model="codeAssujetti"
-                    :items="libellesAssujettis"
-                    item-text="valeur"
-                    item-value="code"
-                    @change="checkSaisieIntra()"
-                    :readonly="readonly"
-                    :filled="readonly" hide-details
-                  />
-                </v-col>
-                <v-col cols="2">
-                  <v-text-field
-                    label="Code Pays"
-                    v-model="intraCodePays"
-                    :filled="readonly || intraSaisieReadonly"
-                    :readonly="readonly || intraSaisieReadonly"
-                    :counter="!readonly"
-                    maxlength="2" hide-details
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    label="N° Intracommunautaire"
-                    v-model="intraIdentification"
-                    :filled="readonly || intraSaisieReadonly"
-                    :readonly="readonly || intraSaisieReadonly"
-                    :counter="!readonly"
-                    maxlength="18" hide-details
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="2">
-              <v-row dense>
-                <v-col cols="6">
-                  <autocomplete-code-vue
-                    ref="autocompleteCodeRepresentant"
-                    label="Représentant"
-                    :readonly.sync="readonly"
-                    typeCode="codeRepresentant"
-                    v-model="codeRepresentant"
-                    @select="selectRepresentant"
-                  />
-                  <autocomplete-code-vue
-                    ref="autocompleteCodeFamille"
-                    label="Famille"
-                    :readonly.sync="readonly"
-                    typeCode="codeFamille"
-                    v-model="codeFamille"
-                    @select="selectFamille"
-                  />
-                  <autocomplete-code-vue
-                    ref="autocompleteCodeSecteur"
-                    label="Secteur"
-                    :readonly.sync="readonly"
-                    typeCode="codeSecteur"
-                    v-model="codeSecteur"
-                    @select="selectSecteur"
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomRepresentant" hide-details />
-                  <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomFamille" hide-details />
-                  <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomSecteur" hide-details />
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col cols="4">
-                  <v-select
-                    :filled="readonly"
-                    :readonly="readonly"
-                    label="Paiement"
-                    v-model="codePaiement"
-                    :items="codesPaiement"
-                    item-text="code"
-                    item-value="code"
-                    @change="changeCodePaiement" hide-details
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field :filled="readonly" readonly tabindex="-1" v-model="libellePaiement" hide-details />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field :filled="readonly" label="# de jours" v-model="nombreDeJoursPaiement" hide-details />
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="4">
-              <v-row dense>
-                <v-col cols="4">
-                  <v-select
-                    label="Langue"
-                    v-model="codeLangue"
-                    item-value="code"
-                    item-text="valeur"
-                    :items="codesLangues"
-                    :filled="readonly"
-                    :readonly="readonly" hide-details
-                  />
-                  <v-text-field
-                    :filled="readonly"
-                    label="Escompte"
-                    v-model="escompte"
-                    append-icon="mdi-percent-outline"
-                    :readonly="readonly" hide-details
-                  />
-                  <v-text-field :filled="readonly" label="Remise" v-model="codeRemise" :readonly="readonly" hide-details />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field :filled="readonly" label="Numéro prix" v-model="codePrix" :readonly="readonly" hide-details />
-                  <v-text-field :filled="readonly" label="Jours" v-model="joursEscomptes" :readonly="readonly"  hide-details/>
-                  <v-text-field
-                    :filled="readonly"
-                    label="Remise Globale"
-                    v-model="remiseGlobaleDefaut"
-                    append-icon="mdi-percent-outline"
-                    :readonly="readonly" hide-details
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field :filled="readonly" label="NACE" v-model="codeNace" maxlength="5" :readonly="readonly"  hide-details/>
-                  <v-text-field :filled="readonly" label="Tarif" v-model="tarif" maxlength="6" :readonly="readonly" hide-details />
-                  <v-text-field
-                    :filled="readonly"
-                    label="Port Franco"
-                    v-model="francoMontant"
-                    append-icon="mdi-currency-eur"
-                    :readonly="readonly" hide-details
-                  />
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col cols="4" class="datepicker-col">
-                  <date-picker
-                    label="Fermeture du"
-                    :date.sync="fermetureDu"
-                    :readonly.sync="readonly"
-                    :filled="readonly"
-                    :rules.sync="fermetureDuRules" hide-details
-                  />
-                </v-col>
-                <v-col cols="4" class="datepicker-col">
-                  <date-picker
-                    label="au"
-                    :date.sync="fermetureAu"
-                    :readonly.sync="readonly"
-                    :filled="readonly"
-                    :rules.sync="fermetureAuRules" hide-details
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    :filled="readonly"
-                    label="Limite de crédit"
-                    v-model="limiteCredit"
-                    append-icon="mdi-currency-eur"
-                    :readonly="readonly" hide-details
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
+          <fieldset id="signaletique">
+            <legend>Signalétique</legend>
+            <v-row dense class="pt-2">
+              <v-col cols="3" class="pr-5">
+                <v-row dense>
+                  <v-col cols="6" class="pb-0 pt-0">
+                    <v-text-field
+                      :autofocus="!readonly"
+                      label="Nom"
+                      ref="inputNom"
+                      v-model="nom"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="23"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="6" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Match code"
+                      v-model="matchCode"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="23"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="6" class="pb-0 pt-0">
+                    <v-text-field
+                      :label="newRecord ? 'Numéro prédit' : 'Numéro'"
+                      v-model="numero"
+                      :filled="readonly"
+                      readonly
+                      tabindex="-1"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="6" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Raison sociale"
+                      v-model="raisonSociale"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="11"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="12" class="pb-0 pt-0">
+                    <v-text-field
+                      label="E-mail"
+                      v-model="email"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="3" class="pr-5 pl-5">
+                <v-row dense>
+                  <v-col cols="12" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Adresse"
+                      v-model="adresseLigne1"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="35"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="12" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Complément d'adresse"
+                      v-model="adresseLigne2"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="35"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="4" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Code Postal"
+                      v-model="codePostal"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="8"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="4" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Localité"
+                      v-model="localité"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="30"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="4" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Pays"
+                      v-model="codePays"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="3"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="3" class="pr-5 pl-5">
+                <v-row dense>
+                  <v-col cols="6" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Téléphone"
+                      v-model="numeroTelephone"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="14"
+                      dense
+                      hide-details
+                    />
+                    <v-text-field
+                      label="Fax"
+                      v-model="téléfax"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="14"
+                      dense
+                      hide-details
+                    />
+                    <v-text-field
+                      label="GSM"
+                      v-model="gsm"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="14"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="6" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Contact 1"
+                      v-model="contact1"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="30"
+                      dense
+                      hide-details
+                    />
+                    <v-text-field
+                      label="Contact 2"
+                      v-model="contact2"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="30"
+                      dense
+                      hide-details
+                    />
+                    <v-text-field
+                      label="Contact 3"
+                      v-model="contact3"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="30"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="3" class="pl-5">
+                <v-row dense>
+                  <v-col cols="12" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Commentaire 1"
+                      v-model="commentaire1"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="20"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="12" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Commentaire 2"
+                      v-model="commentaire2"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="20"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="12" class="pb-0 pt-0">
+                    <v-text-field
+                      label="Commentaire 3"
+                      v-model="commentaire3"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :counter="!readonly"
+                      maxlength="20"
+                      dense
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </fieldset>
           <v-row dense>
-            <v-col cols="3" dense>
-              <v-row dense>
-                <v-col cols="6">
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-checkbox
-                        label="Livraison globale"
-                        v-model="livraisonGlobale"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        v-on="on"
-                        dense hide-details
-                      ></v-checkbox>
-                    </template>
-                    <span>Une livraison est effectuée si tous les articles d'une commande sont de stock</span>
-                  </v-tooltip>
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-checkbox
-                        label="Facture certifiée"
-                        v-model="documentCertifie"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        v-on="on"
-                        dense hide-details
-                      ></v-checkbox>
-                    </template>
-                    <span>Les factures émises reprendront une mention de CERTIFICATION</span>
-                  </v-tooltip>
-                </v-col>
-                <v-col cols="6">
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-checkbox
-                        label="Tenue back-orders"
-                        v-model="tenueBackOrders"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        v-on="on"
-                        dense hide-details
-                      ></v-checkbox>
-                    </template>
-                    <span>Gestion des back-orders</span>
-                  </v-tooltip>
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-checkbox
-                        label="Confirmation commande"
-                        v-model="confirmationCommande"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        v-on="on"
-                        dense hide-details
-                      ></v-checkbox>
-                    </template>
-                    <span>Les back-orders sont gérés dans des documents externes</span>
-                  </v-tooltip>
-                </v-col>
-              </v-row>
+            <v-col cols="6">
+              <fieldset id="comptabilite">
+                <legend>Comptabilité</legend>
+                <v-row dense>
+                  <v-col cols="3">
+                    <autocomplete-comptes-vue
+                      :readonly="readonly"
+                      TypeCompte="G"
+                      label="Compte associé"
+                      @Change="setCompteAssocie"
+                      v-model="compteAssocie"
+                      ref="autocompleteCompteAssocie"
+                    />
+                    <autocomplete-comptes-vue
+                      :readonly="readonly"
+                      TypeCompte="C"
+                      label="Compte maître"
+                      @Change="setCompteMaitre"
+                      ref="autocompleteCompteMaitre"
+                    />
+                    <autocomplete-comptes-vue
+                      :readonly="readonly"
+                      TypeCompte="G"
+                      label="Compte vente/achat"
+                      @Change="setCompteVenteAchat"
+                      ref="autocompleteCompteVenteAchat"
+                    />
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteAssocie" hide-details />
+                    <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteMaitre" hide-details />
+                    <v-text-field
+                      tabindex="-1"
+                      readonly
+                      :filled="readonly"
+                      v-model="nomCompteVenteAchat"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field label="IBAN" v-model="compte" :filled="readonly" :readonly="readonly" hide-details />
+                    <v-select
+                      label="Code suivis"
+                      :readonly="readonly"
+                      :filled="readonly"
+                      :items="codeSuivis"
+                      item-text="valeur"
+                      item-value="code"
+                      v-model="typeSuivis"
+                      hide-details
+                    />
+                    <v-text-field
+                      label="N° domiciliation"
+                      v-model="numeroDomiciliation"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      maxlength="12"
+                      :counter="!readonly"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field
+                      label="BIC"
+                      v-model="bic"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      @blur="setBic"
+                      minlength="8"
+                      maxlength="11"
+                      :counter="!readonly"
+                      hide-details
+                    />
+                    <v-text-field
+                      label="Code ventilation"
+                      v-model="codeVentilation"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      maxlength="1"
+                      hide-details
+                    />
+                    <v-checkbox
+                      :readonly="readonly"
+                      v-model="operationsTriangulaires"
+                      label="Op. triangulaires ?"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="3">
+                    <v-select
+                      label="Code devise"
+                      :readonly="readonly"
+                      :filled="readonly"
+                      :items="devises"
+                      item-text="libelle"
+                      item-value="id"
+                      v-model="codeDevise"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="3">
+                    <v-select
+                      label="Code assujetti"
+                      v-model="codeAssujetti"
+                      :items="libellesAssujettis"
+                      item-text="valeur"
+                      item-value="code"
+                      @change="checkSaisieIntra()"
+                      :readonly="readonly"
+                      :filled="readonly"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field
+                      label="Code Pays"
+                      v-model="intraCodePays"
+                      :filled="readonly || intraSaisieReadonly"
+                      :readonly="readonly || intraSaisieReadonly"
+                      :counter="!readonly"
+                      maxlength="2"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="4">
+                    <v-text-field
+                      label="N° Intracommunautaire"
+                      v-model="intraIdentification"
+                      :filled="readonly || intraSaisieReadonly"
+                      :readonly="readonly || intraSaisieReadonly"
+                      :counter="!readonly"
+                      maxlength="18"
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
+              </fieldset>
             </v-col>
-            <v-col cols="3" dense>
-              <v-row dense>
-                <v-col cols="6">
-                  <v-select
-                    label="Factures groupées"
-                    v-model="facturesGroupees"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :items="facturesGroupeesItems"
-                    item-value="code"
-                    item-text="valeur"
-                    dense hide-details
-                  ></v-select>
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-select
-                        label="Catégorie facturation"
-                        v-model="categorieFacturation"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        v-on="on"
-                        dense hide-details
-                      ></v-select>
-                    </template>
-                    <span
-                      >Ce code permet de regrouper les clients au niveau des lots de facturation
-                      (hebdomadaires/mensuels/...)</span
-                    >
-                  </v-tooltip>
-                </v-col>
-                <v-col cols="6">
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        label="# Copies factures"
-                        v-model="nombreExemplaireFacture"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        v-on="on"
-                        dense hide-details
-                      ></v-text-field>
-                    </template>
-                    <span>Nombre de copies de factures à éditer en plus de l'original</span>
-                  </v-tooltip>
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        label="Code formulaire"
-                        v-model="formulaire"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        v-on="on"
-                        dense hide-details
-                      ></v-text-field>
-                    </template>
-                    <span
-                      >Ce code permet de dissocier la présentation des documents externes (Notes de
-                      livraison/Factures/...)</span
-                    >
-                  </v-tooltip>
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="3" dense>
-              <v-row dense>
-                <v-col cols="6">
-                  <v-select
-                    label="Transporteur"
-                    v-model="transporteur"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :items="transporteurs"
-                    item-text="transportFR"
-                    item-value="id"
-                    dense hide-details
-                  ></v-select>
-                  <v-text-field label="Tournées" :filled="readonly" :readonly="readonly"
-                  dense hide-details></v-text-field>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field label="nom transporteur" :filled="readonly" :readonly="readonly"
-                  dense hide-details></v-text-field>
-                  <v-text-field label="libellé tournées ?" :filled="readonly" :readonly="readonly"
-                  dense hide-details></v-text-field>
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="3" dense>
-              <v-row dense>
-                <v-col cols="6">
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        label="Période commandes"
-                        v-model="periodiciteCommande"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        :suffix="readonly ? '' : 'semaines'"
-                        v-on="on"
-                        dense hide-details
-                      ></v-text-field>
-                    </template>
-                    <span>Nombre moyen de semaines entre deux commande</span>
-                  </v-tooltip>
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        label="Délai livraison"
-                        v-model="delaiLivraison"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        :suffix="readonly ? '' : 'jours'"
-                        v-on="on"
-                        dense hide-details
-                      ></v-text-field>
-                    </template>
-                    <span>Nombre moyen de jours de délai de livraison</span>
-                  </v-tooltip>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    label="Conditions transp."
-                    v-model="conditionsTransport"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    dense hide-details
-                  ></v-text-field>
-                  <v-tooltip top open-delay="500">
-                    <template v-slot:activator="{ on }">
-                      <v-text-field
-                        label="Emission documents"
-                        :filled="readonly"
-                        :readonly="readonly"
-                        v-on="on"
-                        dense hide-details
-                      ></v-text-field>
-                    </template>
-                    <span
-                      >Le contenu de cette zone permet de piloter l'envoi de documents par courrier, fax et e-mail</span
-                    >
-                  </v-tooltip>
-                </v-col>
-              </v-row>
+            <v-col cols="6">
+              <fieldset id="commercial">
+                <legend>Commercial</legend>
+                <v-row dense>
+                  <v-col cols="2">
+                    <autocomplete-code-vue
+                      ref="autocompleteCodeRepresentant"
+                      label="Représentant"
+                      :readonly.sync="readonly"
+                      typeCode="codeRepresentant"
+                      v-model="codeRepresentant"
+                      @select="selectRepresentant"
+                    />
+                    <autocomplete-code-vue
+                      ref="autocompleteCodeFamille"
+                      label="Famille"
+                      :readonly.sync="readonly"
+                      typeCode="codeFamille"
+                      v-model="codeFamille"
+                      @select="selectFamille"
+                    />
+                    <autocomplete-code-vue
+                      ref="autocompleteCodeSecteur"
+                      label="Secteur"
+                      :readonly.sync="readonly"
+                      typeCode="codeSecteur"
+                      v-model="codeSecteur"
+                      @select="selectSecteur"
+                    />
+                  </v-col>
+                  <v-col cols="4">
+                    <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomRepresentant" hide-details />
+                    <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomFamille" hide-details />
+                    <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomSecteur" hide-details />
+                  </v-col>
+                  <v-col cols="2">
+                    <v-select
+                      label="Langue"
+                      v-model="codeLangue"
+                      item-value="code"
+                      item-text="valeur"
+                      :items="codesLangues"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                    <v-text-field
+                      :filled="readonly"
+                      label="Escompte"
+                      v-model="escompte"
+                      append-icon="mdi-percent-outline"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                    <v-text-field
+                      :filled="readonly"
+                      label="Remise"
+                      v-model="codeRemise"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field
+                      :filled="readonly"
+                      label="Numéro prix"
+                      v-model="codePrix"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                    <v-text-field
+                      :filled="readonly"
+                      label="Jours"
+                      v-model="joursEscomptes"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                    <v-text-field
+                      :filled="readonly"
+                      label="Remise Globale"
+                      v-model="remiseGlobaleDefaut"
+                      append-icon="mdi-percent-outline"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field
+                      :filled="readonly"
+                      label="NACE"
+                      v-model="codeNace"
+                      maxlength="5"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                    <v-text-field
+                      :filled="readonly"
+                      label="Tarif"
+                      v-model="tarif"
+                      maxlength="6"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                    <v-text-field
+                      :filled="readonly"
+                      label="Port Franco"
+                      v-model="francoMontant"
+                      append-icon="mdi-currency-eur"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="2"
+                    ><v-select
+                      :filled="readonly"
+                      :readonly="readonly"
+                      label="Paiement"
+                      v-model="codePaiement"
+                      :items="codesPaiement"
+                      item-text="code"
+                      item-value="code"
+                      @change="changeCodePaiement"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="2"
+                    ><v-text-field :filled="readonly" readonly tabindex="-1" v-model="libellePaiement" hide-details
+                  /></v-col>
+                  <v-col cols="2"
+                    ><v-text-field :filled="readonly" label="# de jours" v-model="nombreDeJoursPaiement" hide-details
+                  /></v-col>
+                  <v-col cols="2" class="datepicker-col">
+                    <date-picker
+                      label="Fermeture du"
+                      :date.sync="fermetureDu"
+                      :readonly.sync="readonly"
+                      :filled="readonly"
+                      :rules.sync="fermetureDuRules"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="2" class="datepicker-col">
+                    <date-picker
+                      label="au"
+                      :date.sync="fermetureAu"
+                      :readonly.sync="readonly"
+                      :filled="readonly"
+                      :rules.sync="fermetureAuRules"
+                      hide-details
+                    />
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field
+                      :filled="readonly"
+                      label="Limite de crédit"
+                      v-model="limiteCredit"
+                      append-icon="mdi-currency-eur"
+                      :readonly="readonly"
+                      hide-details
+                    />
+                  </v-col>
+                </v-row>
+              </fieldset>
             </v-col>
           </v-row>
+          <fieldset id="logistique">
+            <legend>Logistique</legend>
+            <v-row dense>
+              <v-col cols="3" dense>
+                <v-row dense>
+                  <v-col cols="6">
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-checkbox
+                          label="Livraison globale"
+                          v-model="livraisonGlobale"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-checkbox>
+                      </template>
+                      <span>Une livraison est effectuée si tous les articles d'une commande sont de stock</span>
+                    </v-tooltip>
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-checkbox
+                          label="Facture certifiée"
+                          v-model="documentCertifie"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-checkbox>
+                      </template>
+                      <span>Les factures émises reprendront une mention de CERTIFICATION</span>
+                    </v-tooltip>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-checkbox
+                          label="Tenue back-orders"
+                          v-model="tenueBackOrders"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-checkbox>
+                      </template>
+                      <span>Gestion des back-orders</span>
+                    </v-tooltip>
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-checkbox
+                          label="Confirmation commande"
+                          v-model="confirmationCommande"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-checkbox>
+                      </template>
+                      <span>Les back-orders sont gérés dans des documents externes</span>
+                    </v-tooltip>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="3" dense>
+                <v-row dense>
+                  <v-col cols="6">
+                    <v-select
+                      label="Factures groupées"
+                      v-model="facturesGroupees"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :items="facturesGroupeesItems"
+                      item-value="code"
+                      item-text="valeur"
+                      dense
+                      hide-details
+                    ></v-select>
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-select
+                          label="Catégorie facturation"
+                          v-model="categorieFacturation"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-select>
+                      </template>
+                      <span
+                        >Ce code permet de regrouper les clients au niveau des lots de facturation
+                        (hebdomadaires/mensuels/...)</span
+                      >
+                    </v-tooltip>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          label="# Copies factures"
+                          v-model="nombreExemplaireFacture"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-text-field>
+                      </template>
+                      <span>Nombre de copies de factures à éditer en plus de l'original</span>
+                    </v-tooltip>
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          label="Code formulaire"
+                          v-model="formulaire"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-text-field>
+                      </template>
+                      <span
+                        >Ce code permet de dissocier la présentation des documents externes (Notes de
+                        livraison/Factures/...)</span
+                      >
+                    </v-tooltip>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="3" dense>
+                <v-row dense>
+                  <v-col cols="6">
+                    <v-select
+                      label="Transporteur"
+                      v-model="transporteur"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :items="transporteurs"
+                      item-text="transportFR"
+                      item-value="id"
+                      dense
+                      hide-details
+                    ></v-select>
+                    <v-text-field
+                      label="Tournées"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      dense
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      label="nom transporteur"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      dense
+                      hide-details
+                    ></v-text-field>
+                    <v-text-field
+                      label="libellé tournées ?"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      dense
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="3" dense>
+                <v-row dense>
+                  <v-col cols="6">
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          label="Période commandes"
+                          v-model="periodiciteCommande"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          :suffix="readonly ? '' : 'semaines'"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-text-field>
+                      </template>
+                      <span>Nombre moyen de semaines entre deux commande</span>
+                    </v-tooltip>
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          label="Délai livraison"
+                          v-model="delaiLivraison"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          :suffix="readonly ? '' : 'jours'"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-text-field>
+                      </template>
+                      <span>Nombre moyen de jours de délai de livraison</span>
+                    </v-tooltip>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      label="Conditions transp."
+                      v-model="conditionsTransport"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      dense
+                      hide-details
+                    ></v-text-field>
+                    <v-tooltip top open-delay="500">
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          label="Emission documents"
+                          :filled="readonly"
+                          :readonly="readonly"
+                          v-on="on"
+                          dense
+                          hide-details
+                        ></v-text-field>
+                      </template>
+                      <span
+                        >Le contenu de cette zone permet de piloter l'envoi de documents par courrier, fax et
+                        e-mail</span
+                      >
+                    </v-tooltip>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </fieldset>
         </v-form>
       </v-card-text>
       <v-card-actions v-if="!readonly">
@@ -1324,7 +1416,9 @@ export default class FournisseurVue extends Vue {
 </script>
 
 <style scoped>
-.v-input, .autocompleteCompte, .autocompleteCode {
+.v-input,
+.autocompleteCompte,
+.autocompleteCode {
   padding-top: 8px;
   padding-bottom: 8px;
 }
