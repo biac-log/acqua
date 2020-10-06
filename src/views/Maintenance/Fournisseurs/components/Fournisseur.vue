@@ -490,32 +490,56 @@
             <v-col cols="3" dense>
               <v-row dense>
                 <v-col cols="6">
-                  <v-checkbox
-                    label="Livraison globale"
-                    v-model="livraisonGlobale"
-                    :filled="readonly"
-                    :readonly="readonly"
-                  ></v-checkbox>
-                  <v-checkbox
-                    label="Facture certifiée"
-                    v-model="documentCertifie"
-                    :filled="readonly"
-                    :readonly="readonly"
-                  ></v-checkbox>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-checkbox
+                        label="Livraison globale"
+                        v-model="livraisonGlobale"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        v-on="on"
+                      ></v-checkbox>
+                    </template>
+                    <span>Une livraison est effectuée si tous les articles d'une commande sont de stock</span>
+                  </v-tooltip>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-checkbox
+                        label="Facture certifiée"
+                        v-model="documentCertifie"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        v-on="on"
+                      ></v-checkbox>
+                    </template>
+                    <span>Les factures émises reprendront une mention de CERTIFICATION</span>
+                  </v-tooltip>
                 </v-col>
                 <v-col cols="6">
-                  <v-checkbox
-                    label="Tenue back-orders"
-                    v-model="tenueBackOrders"
-                    :filled="readonly"
-                    :readonly="readonly"
-                  ></v-checkbox>
-                  <v-checkbox
-                    label="Confirmation commande"
-                    v-model="confirmationCommande"
-                    :filled="readonly"
-                    :readonly="readonly"
-                  ></v-checkbox>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-checkbox
+                        label="Tenue back-orders"
+                        v-model="tenueBackOrders"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        v-on="on"
+                      ></v-checkbox>
+                    </template>
+                    <span>Gestion des back-orders</span>
+                  </v-tooltip>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-checkbox
+                        label="Confirmation commande"
+                        v-model="confirmationCommande"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        v-on="on"
+                      ></v-checkbox>
+                    </template>
+                    <span>Les back-orders sont gérés dans des documents externes</span>
+                  </v-tooltip>
                 </v-col>
               </v-row>
             </v-col>
@@ -531,26 +555,50 @@
                     item-value="code"
                     item-text="valeur"
                   ></v-select>
-                  <v-select
-                    label="Catégorie facturation"
-                    v-model="categorieFacturation"
-                    :filled="readonly"
-                    :readonly="readonly"
-                  ></v-select>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-select
+                        label="Catégorie facturation"
+                        v-model="categorieFacturation"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        v-on="on"
+                      ></v-select>
+                    </template>
+                    <span
+                      >Ce code permet de regrouper les clients au niveau des lots de facturation
+                      (hebdomadaires/mensuels/...)</span
+                    >
+                  </v-tooltip>
                 </v-col>
                 <v-col cols="6">
-                  <v-text-field
-                    label="# Copies factures"
-                    v-model="nombreExemplaireFacture"
-                    :filled="readonly"
-                    :readonly="readonly"
-                  ></v-text-field>
-                  <v-text-field
-                    label="Code formulaire"
-                    v-model="formulaire"
-                    :filled="readonly"
-                    :readonly="readonly"
-                  ></v-text-field>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        label="# Copies factures"
+                        v-model="nombreExemplaireFacture"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <span>Nombre de copies de factures à éditer en plus de l'original</span>
+                  </v-tooltip>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        label="Code formulaire"
+                        v-model="formulaire"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <span
+                      >Ce code permet de dissocier la présentation des documents externes (Notes de
+                      livraison/Factures/...)</span
+                    >
+                  </v-tooltip>
                 </v-col>
               </v-row>
             </v-col>
@@ -577,20 +625,32 @@
             <v-col cols="3" dense>
               <v-row dense>
                 <v-col cols="6">
-                  <v-text-field
-                    label="Période commandes"
-                    v-model="periodiciteCommande"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :suffix="readonly ? '' : 'semaines'"
-                  ></v-text-field>
-                  <v-text-field
-                    label="Délai livraison"
-                    v-model="delaiLivraison"
-                    :filled="readonly"
-                    :readonly="readonly"
-                    :suffix="readonly ? '' : 'jours'"
-                  ></v-text-field>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        label="Période commandes"
+                        v-model="periodiciteCommande"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        :suffix="readonly ? '' : 'semaines'"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <span>Nombre moyen de semaines entre deux commande</span>
+                  </v-tooltip>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        label="Délai livraison"
+                        v-model="delaiLivraison"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        :suffix="readonly ? '' : 'jours'"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <span>Nombre moyen de jours de délai de livraison</span>
+                  </v-tooltip>
                 </v-col>
                 <v-col cols="6">
                   <v-text-field
@@ -599,7 +659,19 @@
                     :filled="readonly"
                     :readonly="readonly"
                   ></v-text-field>
-                  <v-text-field label="Emission documents" :filled="readonly" :readonly="readonly"></v-text-field>
+                  <v-tooltip top open-delay="500">
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        label="Emission documents"
+                        :filled="readonly"
+                        :readonly="readonly"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <span
+                      >Le contenu de cette zone permet de piloter l'envoi de documents par courrier, fax et e-mail</span
+                    >
+                  </v-tooltip>
                 </v-col>
               </v-row>
             </v-col>
@@ -801,11 +873,11 @@ export default class FournisseurVue extends Vue {
 
   private codesPaiement: LibelleTiers[] = [];
 
-  private facturesGroupeesItems: {code: string; valeur: string;}[] = [
-    {code: "N", valeur: "Jamais de regroupement"},
-    {code: "Y", valeur: "Toujours"},
-    {code: "A", valeur: "Par adresse de livraison"},
-    {code: "C", valeur: "Par commande"},
+  private facturesGroupeesItems: { code: string; valeur: string }[] = [
+    { code: 'N', valeur: 'Jamais de regroupement' },
+    { code: 'Y', valeur: 'Toujours' },
+    { code: 'A', valeur: 'Par adresse de livraison' },
+    { code: 'C', valeur: 'Par commande' }
   ];
 
   private transporteurs: Transporteur[] = [];
@@ -937,10 +1009,12 @@ export default class FournisseurVue extends Vue {
     this.documentCertifie = fournisseur.documentCertifie;
     this.facturesGroupees = fournisseur.facturesGroupees;
     this.categorieFacturation = fournisseur.categorieFacturation;
-    this.nombreExemplaireFacture = fournisseur.nombreExemplaireFacture == 0 ? '' : fournisseur.nombreExemplaireFacture.toIntString();
+    this.nombreExemplaireFacture =
+      fournisseur.nombreExemplaireFacture == 0 ? '' : fournisseur.nombreExemplaireFacture.toIntString();
     this.formulaire = fournisseur.formulaire;
     this.transporteur = fournisseur.transporteur;
-    this.periodiciteCommande = fournisseur.periodiciteCommande == 0 ? '' : fournisseur.periodiciteCommande.toIntString();
+    this.periodiciteCommande =
+      fournisseur.periodiciteCommande == 0 ? '' : fournisseur.periodiciteCommande.toIntString();
     this.delaiLivraison = fournisseur.delaiLivraison == 0 ? '' : fournisseur.delaiLivraison.toIntString();
     this.conditionsTransport = fournisseur.conditionsTransport;
   }
@@ -1006,7 +1080,8 @@ export default class FournisseurVue extends Vue {
     this.fournisseur.documentCertifie = this.documentCertifie;
     this.fournisseur.facturesGroupees = this.facturesGroupees;
     this.fournisseur.categorieFacturation = this.categorieFacturation;
-    this.fournisseur.nombreExemplaireFacture = this.nombreExemplaireFacture != '' ? parseInt(this.nombreExemplaireFacture) : 0;
+    this.fournisseur.nombreExemplaireFacture =
+      this.nombreExemplaireFacture != '' ? parseInt(this.nombreExemplaireFacture) : 0;
     this.fournisseur.formulaire = this.formulaire;
     this.fournisseur.transporteur = this.transporteur;
     this.fournisseur.periodiciteCommande = this.periodiciteCommande != '' ? parseInt(this.periodiciteCommande) : 0;
