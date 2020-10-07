@@ -44,8 +44,8 @@
         <v-form ref="form" v-model="isValid" lazy-validation>
           <fieldset id="signaletique">
             <legend>Signalétique</legend>
-            <v-row dense class="pt-2">
-              <v-col cols="3" class="pr-5">
+            <v-row dense>
+              <v-col cols="3" class="pr-3">
                 <v-row dense>
                   <v-col cols="6" class="pb-0 pt-0">
                     <v-text-field
@@ -109,7 +109,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" class="pr-5 pl-5">
+              <v-col cols="3" class="pr-3 pl-3">
                 <v-row dense>
                   <v-col cols="12" class="pb-0 pt-0">
                     <v-text-field
@@ -173,7 +173,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" class="pr-5 pl-5">
+              <v-col cols="3" class="pr-3 pl-3">
                 <v-row dense>
                   <v-col cols="6" class="pb-0 pt-0">
                     <v-text-field
@@ -241,7 +241,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" class="pl-5">
+              <v-col cols="3" class="pl-3">
                 <v-row dense>
                   <v-col cols="12" class="pb-0 pt-0">
                     <v-text-field
@@ -322,7 +322,7 @@
                       />
                     </div>
                   </v-col>
-                  <v-col cols="3" class="pb-0">
+                  <v-col cols="3" class="pb-0 pr-3">
                     <v-text-field
                       tabindex="-1"
                       readonly
@@ -345,7 +345,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3" class="pb-0">
+                  <v-col cols="3" class="pb-0 pl-3">
                     <v-text-field
                       label="IBAN"
                       v-model="compte"
@@ -413,7 +413,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3" class="pt-0">
+                  <v-col cols="3" class="pt-0 pr-3">
                     <v-select
                       label="Code assujetti"
                       v-model="codeAssujetti"
@@ -426,7 +426,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="2" class="pt-0">
+                  <v-col cols="2" class="pt-0 pl-3">
                     <v-text-field
                       label="Code Pays"
                       v-model="intraCodePays"
@@ -506,7 +506,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="4">
+                  <v-col cols="4" class="pr-3">
                     <v-text-field
                       :filled="readonly"
                       readonly
@@ -546,7 +546,7 @@
                       /></v-col>
                     </v-row>
                   </v-col>
-                  <v-col cols="2">
+                  <v-col cols="2" class="pl-3">
                     <v-select
                       label="Langue"
                       v-model="codeLangue"
@@ -668,11 +668,10 @@
                         <v-checkbox
                           label="Livraison globale"
                           v-model="livraisonGlobale"
-                          :filled="readonly"
                           :readonly="readonly"
                           v-on="on"
-                          dense
                           :hide-details="true"
+                          dense
                         ></v-checkbox>
                       </template>
                       <span>Une livraison est effectuée si tous les articles d'une commande sont de stock</span>
@@ -682,8 +681,6 @@
                         <v-checkbox
                           label="Facture certifiée"
                           v-model="documentCertifie"
-                          :filled="readonly"
-                          :readonly="readonly"
                           v-on="on"
                           dense
                           :hide-details="true"
@@ -698,7 +695,6 @@
                         <v-checkbox
                           label="Tenue back-orders"
                           v-model="tenueBackOrders"
-                          :filled="readonly"
                           :readonly="readonly"
                           v-on="on"
                           dense
@@ -712,7 +708,6 @@
                         <v-checkbox
                           label="Confirmation commande"
                           v-model="confirmationCommande"
-                          :filled="readonly"
                           :readonly="readonly"
                           v-on="on"
                           dense
@@ -726,7 +721,7 @@
               </v-col>
               <v-col cols="3" dense>
                 <v-row dense>
-                  <v-col cols="6">
+                  <v-col cols="6" class="pl-3">
                     <v-select
                       label="Factures groupées"
                       v-model="facturesGroupees"
@@ -756,7 +751,7 @@
                       >
                     </v-tooltip>
                   </v-col>
-                  <v-col cols="6">
+                  <v-col cols="6" class="pr-3">
                     <v-tooltip top open-delay="500">
                       <template v-slot:activator="{ on }">
                         <v-text-field
@@ -791,7 +786,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" dense>
+              <v-col cols="3" dense class="pl-3 pr-3">
                 <v-row dense>
                   <v-col cols="6">
                     <v-select
@@ -831,7 +826,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" dense>
+              <v-col cols="3" class="pl-3">
                 <v-row dense>
                   <v-col cols="6">
                     <v-tooltip top open-delay="500">
