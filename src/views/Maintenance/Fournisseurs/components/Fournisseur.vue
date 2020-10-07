@@ -299,7 +299,7 @@
                       <autocomplete-comptes-vue
                         :readonly="readonly"
                         TypeCompte="G"
-                        label="Compte associé"
+                        label="N° de compte associé"
                         @Change="setCompteAssocie"
                         v-model="compteAssocie"
                         ref="autocompleteCompteAssocie"
@@ -310,7 +310,7 @@
                     <autocomplete-comptes-vue
                       :readonly="readonly"
                       TypeCompte="C"
-                      label="Compte maître"
+                      label="N° de compte maître"
                       @Change="setCompteMaitre"
                       ref="autocompleteCompteMaitre"
                       :hide-details="readonly"
@@ -321,7 +321,7 @@
                       <autocomplete-comptes-vue
                         :readonly="readonly"
                         TypeCompte="G"
-                        label="Compte vente/achat"
+                        label="N° de compte vente/achat"
                         @Change="setCompteVenteAchat"
                         ref="autocompleteCompteVenteAchat"
                         :hide-details="readonly"
@@ -336,6 +336,7 @@
                       :filled="readonly"
                       v-model="nomCompteAssocie"
                       :hide-details="readonly"
+                      label="Nom du compte associé"
                     />
                     <v-text-field
                       tabindex="-1"
@@ -343,6 +344,7 @@
                       :filled="readonly"
                       v-model="nomCompteMaitre"
                       :hide-details="readonly"
+                      label="Nom du compte maître"
                     />
                     <v-text-field
                       tabindex="-1"
@@ -350,6 +352,7 @@
                       :filled="readonly"
                       v-model="nomCompteVenteAchat"
                       :hide-details="readonly"
+                      label="Nom du compte vente/achat"
                     />
                   </v-col>
                   <v-col cols="3" class="pb-0 pl-3">
@@ -470,7 +473,7 @@
                     <div :style="readonly ? '' : 'margin-top: -4px; margin-bottom: 8px;'">
                       <autocomplete-code-vue
                         ref="autocompleteCodeRepresentant"
-                        label="Représentant"
+                        label="Code représentant"
                         :readonly.sync="readonly"
                         typeCode="codeRepresentant"
                         v-model="codeRepresentant"
@@ -481,7 +484,7 @@
                     </div>
                     <autocomplete-code-vue
                       ref="autocompleteCodeFamille"
-                      label="Famille"
+                      label="Code famille"
                       :readonly.sync="readonly"
                       typeCode="codeFamille"
                       v-model="codeFamille"
@@ -493,7 +496,7 @@
                     <div :style="readonly ? '' : 'margin-top: 8px; margin-bottom: 12px;'">
                       <autocomplete-code-vue
                         ref="autocompleteCodeSecteur"
-                        label="Secteur"
+                        label="Code secteur"
                         :readonly.sync="readonly"
                         typeCode="codeSecteur"
                         v-model="codeSecteur"
@@ -522,6 +525,7 @@
                       tabindex="-1"
                       v-model="nomRepresentant"
                       :hide-details="readonly"
+                      label="Nom représentant"
                     />
                     <v-text-field
                       :filled="readonly"
@@ -529,6 +533,7 @@
                       tabindex="-1"
                       v-model="nomFamille"
                       :hide-details="readonly"
+                      label="Nom famille"
                     />
                     <v-text-field
                       :filled="readonly"
@@ -536,6 +541,7 @@
                       tabindex="-1"
                       v-model="nomSecteur"
                       :hide-details="readonly"
+                      label="Nom secteur"
                     />
                     <v-row dense>
                       <v-col cols="6" class="pt-0 pb-0"
@@ -549,7 +555,7 @@
                       <v-col cols="6" class="pt-0 pb-0"
                         ><v-text-field
                           :filled="readonly"
-                          label="# de jours"
+                          label="Nombre de jours"
                           v-model="nombreDeJoursPaiement"
                           :hide-details="readonly"
                           :rules="rules.nombreDeJoursPaiement"
@@ -1210,7 +1216,7 @@ export default class FournisseurVue extends Vue {
     this.compteVenteAchat = fournisseur.compteVenteAchat;
     this.nomCompteVenteAchat = fournisseur.nomCompteVenteAchat;
     this.codeAssujetti = fournisseur.codeAssujetti;
-    this.intraCodePays = fournisseur.intraCodePays;
+    this.intraCodePays = fournisseur.intraCodePays.toUpperCase();
     this.intraIdentification = fournisseur.intraIdentification;
     this.codeDevise = fournisseur.codeDevise;
     this.compte = fournisseur.compte;
