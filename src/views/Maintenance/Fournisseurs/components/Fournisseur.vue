@@ -15,7 +15,7 @@
             <span class="shortcutTooltip">F2</span>
           </span>
         </v-tooltip>
-        <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
+        <!-- <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
               v-on="on"
@@ -32,7 +32,7 @@
             Supprimer la pièce
             <span class="shortcutTooltip">del</span>
           </span>
-        </v-tooltip>
+        </v-tooltip> -->
         <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
           <v-icon>mdi-close</v-icon>
         </v-btn>
