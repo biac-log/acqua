@@ -44,17 +44,23 @@
     <v-card class="mt-5">
       <v-card-title>
         Pièces comptables
-        <!-- <v-btn
-          ref="btnAdd"
-          color="warning"
-          small
-          fab
-          class="ml-5"
-          :disabled="!searchIsValid"
-          @click.stop="createNewPieceComptable"
-        >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn> -->
+        <!-- <v-tooltip top open-delay="500">
+          <template v-slot:activator="{ on }">
+            <v-btn
+              ref="btnAdd"
+              color="warning"
+              small
+              fab
+              class="ml-5"
+              :disabled="!searchIsValid"
+              @click="openPieceComptable()"
+              v-on="on"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <span>Créer une nouvelle pièce <span class="shortcutTooltip">+</span></span>
+        </v-tooltip> -->
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -96,8 +102,8 @@
         </template>
       </v-data-table>
     </v-card>
-    <!-- <PieceComptableVue ref="refDialogPiece"></PieceComptableVue>
-    <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue> -->
+    <OperationDiverseVue ref="refDialogPiece"></OperationDiverseVue>
+    <!-- <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue> -->
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
@@ -114,15 +120,15 @@ import OperationDiverseApi from '@/api/OperationDiverseApi';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PeriodeComptable, Journal, EntetePieceComptable } from '@/models/OperationDiverse';
 import { Pagination } from '@/models/Pagination';
-// import PieceComptableVue from './components/PieceComptable.vue';
-// import PieceAddResultVue from './components/PieceAddResult.vue';
+import OperationDiverseVue from './components/OperationDiverse.vue';
+//import PieceAddResultVue from './components/PieceAddResult.vue';
 
 @Component({
-  name: 'OperationDiverse'
-  // components: { PieceComptableVue, PieceAddResultVue }
+  name: 'OperationDiverse',
+  components: { OperationDiverseVue }
 })
 export default class extends Vue {
-  // @Ref() readonly refDialogPiece!: PieceComptableVue;
+  @Ref() readonly refDialogPiece!: OperationDiverseVue;
   // @Ref() readonly PieceAddResultVue!: PieceAddResultVue;
   private searchIsValid = true;
 
@@ -186,25 +192,25 @@ export default class extends Vue {
   }
 
   private async openPieceComptable(entete: EntetePieceComptable) {
-    // this.refDialogPiece
-    //   .open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
-    //   .then((resp) => {
-    //     if (resp) {
-    //       Vue.set(
-    //         this.piecesComptables,
-    //         this.piecesComptables.findIndex((e) => e == entete),
-    //         resp
-    //       );
-    //       this.notifier(`Pièce numéro <b>${resp.codePieceDisplay}</b> mise à jour.`, 'success');
-    //     } else {
-    //       this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
-    //       this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimer.`, 'error');
-    //     }
-    //   })
-    //   .catch()
-    //   .finally(() => {
-    //     this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
-    //   });
+    this.refDialogPiece
+      .open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
+      .then((resp) => {
+        if (resp) {
+          Vue.set(
+            this.piecesComptables,
+            this.piecesComptables.findIndex((e) => e == entete),
+            resp
+          );
+          this.notifier(`Pièce numéro <b>${resp.codePieceDisplay}</b> mise à jour.`, 'success');
+        } else {
+          this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
+          this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimer.`, 'error');
+        }
+      })
+      .catch()
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any).$el.focus());
+      });
   }
 
   private createNewPieceComptable() {
