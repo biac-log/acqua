@@ -23,7 +23,7 @@ export class FournisseurDTO {
   public commentaire1 = '';
   public commentaire2 = '';
   public commentaire3 = '';
-  
+
   // Comptabilité
   public compteAssocie = 0;
   public nomCompteAssocie = '';
@@ -44,7 +44,7 @@ export class FournisseurDTO {
   public operationsTriangulaires = false;
   public numeroDomiciliation = 0;
   public codeVentilation = 0;
-  
+
   // Commercial
   public codeRepresentant = 0;
   public nomRepresentant = '';
@@ -66,7 +66,7 @@ export class FournisseurDTO {
   public tarif = '';
   public codeRemise = 0;
   public libelleRemise = '';
-  public remiseGlobaleDefaut = 0; 
+  public remiseGlobaleDefaut = 0;
   public francoMontant = 0;
   public fermetureDu = '';
   public fermetureAu = '';
@@ -114,5 +114,44 @@ export class Fournisseur extends FournisseurDTO {
   set fermetureAuDate(date: DateTime) {
     this._fermetureAuDate = date;
     this.fermetureAu = date.toUtc();
+  }
+
+  public static rules = {
+    "nom": [
+      (v: string) => !!v || 'Nom requis.',
+    ],
+    "email": [
+      (v: string) => !v || /\S+@\S+\.\S+/.test(v) || 'Adresse email invalide'
+    ],
+    "codeVentilation": [
+      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
+    ],
+    "nombreDeJoursPaiement": [
+      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
+    ],
+    "joursEscomptes": [
+      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
+    ],
+    "nombreExemplaireFacture": [
+      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
+    ],
+    "periodiciteCommande": [
+      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
+    ],
+    "delaiLivraison": [
+      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
+    ],
+    "escompte": [
+      (v: string) => !v || !!v.toNumber() || 'Nombre invalide'
+    ],
+    "remiseGlobaleDefaut": [
+      (v: string) => !v || !!v.toNumber() || 'Nombre invalide'
+    ],
+    "francoMontant": [
+      (v: string) => !v || !!v.toNumber() || 'Nombre invalide'
+    ],
+    "limiteCredit": [
+      (v: string) => !v || !!v.toNumber() || 'Nombre invalide'
+    ],
   }
 }

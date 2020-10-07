@@ -59,6 +59,8 @@
                       maxlength="23"
                       dense
                       :hide-details="readonly"
+                      :rules="rules.nom"
+                      validate-on-blur
                     />
                   </v-col>
                   <v-col cols="6" class="pb-0 pt-0">
@@ -105,6 +107,9 @@
                       :counter="!readonly"
                       dense
                       :hide-details="readonly"
+                      type="email"
+                      :rules="rules.email"
+                      validate-on-blur
                     />
                   </v-col>
                 </v-row>
@@ -289,7 +294,8 @@
                 <legend>Comptabilité</legend>
                 <v-row dense>
                   <v-col cols="3" class="pb-0">
-                    <div :class="readonly ? '' : 'autocomplete-edition'"> <!-- Not the best, but it corrects the alignments .. -->
+                    <div :class="readonly ? '' : 'autocomplete-edition'">
+                      <!-- Not the best, but it corrects the alignments .. -->
                       <autocomplete-comptes-vue
                         :readonly="readonly"
                         TypeCompte="G"
@@ -310,7 +316,8 @@
                       :hide-details="readonly"
                       :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                     />
-                    <div :style="readonly ? '' : 'margin-top: 8px;'"> <!-- Not the best, but it corrects the alignments .. -->
+                    <div :style="readonly ? '' : 'margin-top: 8px;'">
+                      <!-- Not the best, but it corrects the alignments .. -->
                       <autocomplete-comptes-vue
                         :readonly="readonly"
                         TypeCompte="G"
@@ -392,6 +399,8 @@
                       :readonly="readonly"
                       maxlength="1"
                       :hide-details="readonly"
+                      :rules="rules.codeVentilation"
+                      validate-on-blur
                     />
                     <v-checkbox
                       :readonly="readonly"
@@ -460,15 +469,15 @@
                   <v-col cols="2">
                     <div :style="readonly ? '' : 'margin-top: -4px; margin-bottom: 8px;'">
                       <autocomplete-code-vue
-                      ref="autocompleteCodeRepresentant"
-                      label="Représentant"
-                      :readonly.sync="readonly"
-                      typeCode="codeRepresentant"
-                      v-model="codeRepresentant"
-                      @select="selectRepresentant"
-                      :class="readonly ? 'autocompleteCode-spacing' : ''"
-                      :hide-details="readonly"
-                    />
+                        ref="autocompleteCodeRepresentant"
+                        label="Représentant"
+                        :readonly.sync="readonly"
+                        typeCode="codeRepresentant"
+                        v-model="codeRepresentant"
+                        @select="selectRepresentant"
+                        :class="readonly ? 'autocompleteCode-spacing' : ''"
+                        :hide-details="readonly"
+                      />
                     </div>
                     <autocomplete-code-vue
                       ref="autocompleteCodeFamille"
@@ -482,17 +491,17 @@
                       dense
                     />
                     <div :style="readonly ? '' : 'margin-top: 8px; margin-bottom: 12px;'">
-                    <autocomplete-code-vue
-                      ref="autocompleteCodeSecteur"
-                      label="Secteur"
-                      :readonly.sync="readonly"
-                      typeCode="codeSecteur"
-                      v-model="codeSecteur"
-                      @select="selectSecteur"
-                      :class="readonly ? 'autocompleteCode-spacing' : ''"
-                      :hide-details="readonly"
-                      dense
-                    />
+                      <autocomplete-code-vue
+                        ref="autocompleteCodeSecteur"
+                        label="Secteur"
+                        :readonly.sync="readonly"
+                        typeCode="codeSecteur"
+                        v-model="codeSecteur"
+                        @select="selectSecteur"
+                        :class="readonly ? 'autocompleteCode-spacing' : ''"
+                        :hide-details="readonly"
+                        dense
+                      />
                     </div>
                     <v-select
                       :filled="readonly"
@@ -543,6 +552,8 @@
                           label="# de jours"
                           v-model="nombreDeJoursPaiement"
                           :hide-details="readonly"
+                          :rules="rules.nombreDeJoursPaiement"
+                          validate-on-blur
                       /></v-col>
                     </v-row>
                   </v-col>
@@ -564,6 +575,8 @@
                       append-icon="mdi-percent-outline"
                       :readonly="readonly"
                       :hide-details="readonly"
+                      :rules="rules.escompte"
+                      validate-on-blur
                     />
                     <v-text-field
                       :filled="readonly"
@@ -580,6 +593,7 @@
                         :filled="readonly"
                         :rules.sync="fermetureDuRules"
                         :hide-details="readonly"
+                        validate-on-blur
                       />
                     </div>
                   </v-col>
@@ -597,6 +611,8 @@
                       v-model="joursEscomptes"
                       :readonly="readonly"
                       :hide-details="readonly"
+                      :rules="rules.codeVentilation"
+                      validate-on-blur
                     />
                     <v-text-field
                       :filled="readonly"
@@ -605,6 +621,8 @@
                       append-icon="mdi-percent-outline"
                       :readonly="readonly"
                       :hide-details="readonly"
+                      :rules="rules.remiseGlobaleDefaut"
+                      validate-on-blur
                     />
                     <div :class="readonly ? 'pt-2' : 'datepicker-edition'">
                       <date-picker
@@ -643,6 +661,8 @@
                       append-icon="mdi-currency-eur"
                       :readonly="readonly"
                       :hide-details="readonly"
+                      :rules="rules.francoMontant"
+                      validate-on-blur
                     />
                     <v-text-field
                       :filled="readonly"
@@ -651,6 +671,8 @@
                       append-icon="mdi-currency-eur"
                       :readonly="readonly"
                       :hide-details="readonly"
+                      :rules="rules.limiteCredit"
+                      validate-on-blur
                     />
                   </v-col>
                 </v-row>
@@ -762,6 +784,8 @@
                           v-on="on"
                           dense
                           :hide-details="readonly"
+                          :rules="rules.nombreExemplaireFacture"
+                          validate-on-blur
                         ></v-text-field>
                       </template>
                       <span>Nombre de copies de factures à éditer en plus de l'original</span>
@@ -840,6 +864,8 @@
                           v-on="on"
                           dense
                           :hide-details="readonly"
+                          :rules="rules.periodiciteCommande"
+                          validate-on-blur
                         ></v-text-field>
                       </template>
                       <span>Nombre moyen de semaines entre deux commande</span>
@@ -855,6 +881,8 @@
                           v-on="on"
                           dense
                           :hide-details="readonly"
+                          :rules="rules.delaiLivraison"
+                          validate-on-blur
                         ></v-text-field>
                       </template>
                       <span>Nombre moyen de jours de délai de livraison</span>
@@ -995,6 +1023,8 @@ export default class FournisseurVue extends Vue {
   private fournisseur: Fournisseur = new Fournisseur();
   private fournisseurBase: Fournisseur = new Fournisseur(); // Used for the reset method
   private fournisseurParams!: FournisseurParams;
+
+  private rules = Fournisseur.rules;
 
   /// Fournisseur model
   private numero = 0;
