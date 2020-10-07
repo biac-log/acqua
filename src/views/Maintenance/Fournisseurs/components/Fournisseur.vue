@@ -58,7 +58,7 @@
                       :counter="!readonly"
                       maxlength="23"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="6" class="pb-0 pt-0">
@@ -70,7 +70,7 @@
                       :counter="!readonly"
                       maxlength="23"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="6" class="pb-0 pt-0">
@@ -81,7 +81,7 @@
                       readonly
                       tabindex="-1"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="6" class="pb-0 pt-0">
@@ -93,7 +93,7 @@
                       :counter="!readonly"
                       maxlength="11"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="12" class="pb-0 pt-0">
@@ -104,7 +104,7 @@
                       :readonly="readonly"
                       :counter="!readonly"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                 </v-row>
@@ -120,7 +120,7 @@
                       :counter="!readonly"
                       maxlength="35"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="12" class="pb-0 pt-0">
@@ -132,7 +132,7 @@
                       :counter="!readonly"
                       maxlength="35"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="4" class="pb-0 pt-0">
@@ -144,7 +144,7 @@
                       :counter="!readonly"
                       maxlength="8"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="4" class="pb-0 pt-0">
@@ -156,7 +156,7 @@
                       :counter="!readonly"
                       maxlength="30"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="4" class="pb-0 pt-0">
@@ -168,7 +168,7 @@
                       :counter="!readonly"
                       maxlength="3"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                 </v-row>
@@ -184,7 +184,7 @@
                       :counter="!readonly"
                       maxlength="14"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       label="Fax"
@@ -194,7 +194,7 @@
                       :counter="!readonly"
                       maxlength="14"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       label="GSM"
@@ -204,7 +204,7 @@
                       :counter="!readonly"
                       maxlength="14"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="6" class="pb-0 pt-0">
@@ -216,7 +216,7 @@
                       :counter="!readonly"
                       maxlength="30"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       label="Contact 2"
@@ -226,7 +226,7 @@
                       :counter="!readonly"
                       maxlength="30"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       label="Contact 3"
@@ -236,7 +236,7 @@
                       :counter="!readonly"
                       maxlength="30"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                 </v-row>
@@ -252,7 +252,7 @@
                       :counter="!readonly"
                       maxlength="20"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="12" class="pb-0 pt-0">
@@ -264,7 +264,7 @@
                       :counter="!readonly"
                       maxlength="20"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="12" class="pb-0 pt-0">
@@ -276,7 +276,7 @@
                       :counter="!readonly"
                       maxlength="20"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                 </v-row>
@@ -296,6 +296,8 @@
                       @Change="setCompteAssocie"
                       v-model="compteAssocie"
                       ref="autocompleteCompteAssocie"
+                      :hide-details="readonly"
+                      :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                     />
                     <autocomplete-comptes-vue
                       :readonly="readonly"
@@ -303,6 +305,8 @@
                       label="Compte maître"
                       @Change="setCompteMaitre"
                       ref="autocompleteCompteMaitre"
+                      :hide-details="readonly"
+                      :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                     />
                     <autocomplete-comptes-vue
                       :readonly="readonly"
@@ -310,21 +314,41 @@
                       label="Compte vente/achat"
                       @Change="setCompteVenteAchat"
                       ref="autocompleteCompteVenteAchat"
+                      :hide-details="readonly"
+                      :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                     />
                   </v-col>
                   <v-col cols="3">
-                    <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteAssocie" hide-details />
-                    <v-text-field tabindex="-1" readonly :filled="readonly" v-model="nomCompteMaitre" hide-details />
+                    <v-text-field
+                      tabindex="-1"
+                      readonly
+                      :filled="readonly"
+                      v-model="nomCompteAssocie"
+                      :hide-details="readonly"
+                    />
+                    <v-text-field
+                      tabindex="-1"
+                      readonly
+                      :filled="readonly"
+                      v-model="nomCompteMaitre"
+                      :hide-details="readonly"
+                    />
                     <v-text-field
                       tabindex="-1"
                       readonly
                       :filled="readonly"
                       v-model="nomCompteVenteAchat"
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="3">
-                    <v-text-field label="IBAN" v-model="compte" :filled="readonly" :readonly="readonly" hide-details />
+                    <v-text-field
+                      label="IBAN"
+                      v-model="compte"
+                      :filled="readonly"
+                      :readonly="readonly"
+                      :hide-details="readonly"
+                    />
                     <v-select
                       label="Code suivis"
                       :readonly="readonly"
@@ -333,7 +357,7 @@
                       item-text="valeur"
                       item-value="code"
                       v-model="typeSuivis"
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       label="N° domiciliation"
@@ -342,7 +366,7 @@
                       :readonly="readonly"
                       maxlength="12"
                       :counter="!readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="3">
@@ -355,7 +379,7 @@
                       minlength="8"
                       maxlength="11"
                       :counter="!readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       label="Code ventilation"
@@ -363,13 +387,13 @@
                       :filled="readonly"
                       :readonly="readonly"
                       maxlength="1"
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-checkbox
                       :readonly="readonly"
                       v-model="operationsTriangulaires"
                       label="Op. triangulaires ?"
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="3">
@@ -381,7 +405,7 @@
                       item-text="libelle"
                       item-value="id"
                       v-model="codeDevise"
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="3">
@@ -394,29 +418,31 @@
                       @change="checkSaisieIntra()"
                       :readonly="readonly"
                       :filled="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="2">
                     <v-text-field
                       label="Code Pays"
                       v-model="intraCodePays"
-                      :filled="readonly || intraSaisieReadonly"
+                      :filled="readonly"
                       :readonly="readonly || intraSaisieReadonly"
+                      :disabled="intraSaisieReadonly"
                       :counter="!readonly"
                       maxlength="2"
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="4">
                     <v-text-field
                       label="N° Intracommunautaire"
                       v-model="intraIdentification"
-                      :filled="readonly || intraSaisieReadonly"
+                      :filled="readonly"
                       :readonly="readonly || intraSaisieReadonly"
+                      :disabled="intraSaisieReadonly"
                       :counter="!readonly"
                       maxlength="18"
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                 </v-row>
@@ -434,6 +460,8 @@
                       typeCode="codeRepresentant"
                       v-model="codeRepresentant"
                       @select="selectRepresentant"
+                      :class="readonly ? 'autocompleteCode-spacing' : ''"
+                      :hide-details="readonly"
                     />
                     <autocomplete-code-vue
                       ref="autocompleteCodeFamille"
@@ -442,6 +470,9 @@
                       typeCode="codeFamille"
                       v-model="codeFamille"
                       @select="selectFamille"
+                      :class="readonly ? 'autocompleteCode-spacing' : ''"
+                      :hide-details="readonly"
+                      dense
                     />
                     <autocomplete-code-vue
                       ref="autocompleteCodeSecteur"
@@ -450,12 +481,61 @@
                       typeCode="codeSecteur"
                       v-model="codeSecteur"
                       @select="selectSecteur"
+                      :class="readonly ? 'autocompleteCode-spacing' : ''"
+                      :hide-details="readonly"
+                      dense
+                    />
+                    <v-select
+                      :filled="readonly"
+                      :readonly="readonly"
+                      label="Paiement"
+                      v-model="codePaiement"
+                      :items="codesPaiement"
+                      item-text="code"
+                      item-value="code"
+                      @change="changeCodePaiement"
+                      :hide-details="readonly"
                     />
                   </v-col>
                   <v-col cols="4">
-                    <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomRepresentant" hide-details />
-                    <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomFamille" hide-details />
-                    <v-text-field :filled="readonly" readonly tabindex="-1" v-model="nomSecteur" hide-details />
+                    <v-text-field
+                      :filled="readonly"
+                      readonly
+                      tabindex="-1"
+                      v-model="nomRepresentant"
+                      :hide-details="readonly"
+                    />
+                    <v-text-field
+                      :filled="readonly"
+                      readonly
+                      tabindex="-1"
+                      v-model="nomFamille"
+                      :hide-details="readonly"
+                    />
+                    <v-text-field
+                      :filled="readonly"
+                      readonly
+                      tabindex="-1"
+                      v-model="nomSecteur"
+                      :hide-details="readonly"
+                    />
+                    <v-row dense>
+                      <v-col cols="6" class="pt-0 pb-0"
+                        ><v-text-field
+                          :filled="readonly"
+                          readonly
+                          tabindex="-1"
+                          v-model="libellePaiement"
+                          :hide-details="readonly"
+                      /></v-col>
+                      <v-col cols="6" class="pt-0 pb-0"
+                        ><v-text-field
+                          :filled="readonly"
+                          label="# de jours"
+                          v-model="nombreDeJoursPaiement"
+                          :hide-details="readonly"
+                      /></v-col>
+                    </v-row>
                   </v-col>
                   <v-col cols="2">
                     <v-select
@@ -466,7 +546,7 @@
                       :items="codesLangues"
                       :filled="readonly"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       :filled="readonly"
@@ -474,15 +554,25 @@
                       v-model="escompte"
                       append-icon="mdi-percent-outline"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       :filled="readonly"
                       label="Remise"
                       v-model="codeRemise"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
+                    <div :class="readonly ? 'pt-2' : 'datepicker-edition'">
+                      <date-picker
+                        label="Fermeture du"
+                        :date.sync="fermetureDu"
+                        :readonly.sync="readonly"
+                        :filled="readonly"
+                        :rules.sync="fermetureDuRules"
+                        :hide-details="readonly"
+                      />
+                    </div>
                   </v-col>
                   <v-col cols="2">
                     <v-text-field
@@ -490,14 +580,14 @@
                       label="Numéro prix"
                       v-model="codePrix"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       :filled="readonly"
                       label="Jours"
                       v-model="joursEscomptes"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       :filled="readonly"
@@ -505,8 +595,20 @@
                       v-model="remiseGlobaleDefaut"
                       append-icon="mdi-percent-outline"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
+                    <div :class="readonly ? 'pt-2' : 'datepicker-edition'">
+                      <date-picker
+                        id="fermetureAu"
+                        label="au"
+                        :date.sync="fermetureAu"
+                        :readonly.sync="readonly"
+                        :filled="readonly"
+                        :rules.sync="fermetureAuRules"
+                        :hide-details="readonly"
+                        class="pt-8"
+                      />
+                    </div>
                   </v-col>
                   <v-col cols="2">
                     <v-text-field
@@ -515,7 +617,7 @@
                       v-model="codeNace"
                       maxlength="5"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       :filled="readonly"
@@ -523,7 +625,7 @@
                       v-model="tarif"
                       maxlength="6"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                     <v-text-field
                       :filled="readonly"
@@ -531,56 +633,15 @@
                       v-model="francoMontant"
                       append-icon="mdi-currency-eur"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
-                  </v-col>
-                  <v-col cols="2"
-                    ><v-select
-                      :filled="readonly"
-                      :readonly="readonly"
-                      label="Paiement"
-                      v-model="codePaiement"
-                      :items="codesPaiement"
-                      item-text="code"
-                      item-value="code"
-                      @change="changeCodePaiement"
-                      hide-details
-                    />
-                  </v-col>
-                  <v-col cols="2"
-                    ><v-text-field :filled="readonly" readonly tabindex="-1" v-model="libellePaiement" hide-details
-                  /></v-col>
-                  <v-col cols="2"
-                    ><v-text-field :filled="readonly" label="# de jours" v-model="nombreDeJoursPaiement" hide-details
-                  /></v-col>
-                  <v-col cols="2" class="datepicker-col">
-                    <date-picker
-                      label="Fermeture du"
-                      :date.sync="fermetureDu"
-                      :readonly.sync="readonly"
-                      :filled="readonly"
-                      :rules.sync="fermetureDuRules"
-                      hide-details
-                    />
-                  </v-col>
-                  <v-col cols="2" class="datepicker-col">
-                    <date-picker
-                      label="au"
-                      :date.sync="fermetureAu"
-                      :readonly.sync="readonly"
-                      :filled="readonly"
-                      :rules.sync="fermetureAuRules"
-                      hide-details
-                    />
-                  </v-col>
-                  <v-col cols="2">
                     <v-text-field
                       :filled="readonly"
                       label="Limite de crédit"
                       v-model="limiteCredit"
                       append-icon="mdi-currency-eur"
                       :readonly="readonly"
-                      hide-details
+                      :hide-details="readonly"
                     />
                   </v-col>
                 </v-row>
@@ -602,7 +663,7 @@
                           :readonly="readonly"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="true"
                         ></v-checkbox>
                       </template>
                       <span>Une livraison est effectuée si tous les articles d'une commande sont de stock</span>
@@ -616,7 +677,7 @@
                           :readonly="readonly"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="true"
                         ></v-checkbox>
                       </template>
                       <span>Les factures émises reprendront une mention de CERTIFICATION</span>
@@ -632,7 +693,7 @@
                           :readonly="readonly"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="true"
                         ></v-checkbox>
                       </template>
                       <span>Gestion des back-orders</span>
@@ -646,7 +707,7 @@
                           :readonly="readonly"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="true"
                         ></v-checkbox>
                       </template>
                       <span>Les back-orders sont gérés dans des documents externes</span>
@@ -666,7 +727,7 @@
                       item-value="code"
                       item-text="valeur"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     ></v-select>
                     <v-tooltip top open-delay="500">
                       <template v-slot:activator="{ on }">
@@ -677,7 +738,7 @@
                           :readonly="readonly"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="readonly"
                         ></v-select>
                       </template>
                       <span
@@ -696,7 +757,7 @@
                           :readonly="readonly"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="readonly"
                         ></v-text-field>
                       </template>
                       <span>Nombre de copies de factures à éditer en plus de l'original</span>
@@ -710,7 +771,7 @@
                           :readonly="readonly"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="readonly"
                         ></v-text-field>
                       </template>
                       <span
@@ -733,14 +794,14 @@
                       item-text="transportFR"
                       item-value="id"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     ></v-select>
                     <v-text-field
                       label="Tournées"
                       :filled="readonly"
                       :readonly="readonly"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="6">
@@ -749,14 +810,14 @@
                       :filled="readonly"
                       :readonly="readonly"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     ></v-text-field>
                     <v-text-field
                       label="libellé tournées ?"
                       :filled="readonly"
                       :readonly="readonly"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -774,7 +835,7 @@
                           :suffix="readonly ? '' : 'semaines'"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="readonly"
                         ></v-text-field>
                       </template>
                       <span>Nombre moyen de semaines entre deux commande</span>
@@ -789,7 +850,7 @@
                           :suffix="readonly ? '' : 'jours'"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="readonly"
                         ></v-text-field>
                       </template>
                       <span>Nombre moyen de jours de délai de livraison</span>
@@ -802,7 +863,7 @@
                       :filled="readonly"
                       :readonly="readonly"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     ></v-text-field>
                     <v-tooltip top open-delay="500">
                       <template v-slot:activator="{ on }">
@@ -812,7 +873,7 @@
                           :readonly="readonly"
                           v-on="on"
                           dense
-                          hide-details
+                          :hide-details="readonly"
                         ></v-text-field>
                       </template>
                       <span
@@ -1256,6 +1317,7 @@ export default class FournisseurVue extends Vue {
     this.fournisseurBase = new Fournisseur(fournisseurDTO);
 
     this.getBic();
+    this.checkSaisieIntra();
 
     this.getLoading = false;
 
@@ -1417,14 +1479,27 @@ export default class FournisseurVue extends Vue {
 
 <style scoped>
 .v-input,
-.autocompleteCompte,
-.autocompleteCode {
-  padding-top: 8px;
-  padding-bottom: 8px;
+.autocompleteCompte-spacing,
+.autocompleteCode-spacing {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
 }
 
 .datepicker-col {
   margin-top: 8px;
   margin-bottom: 8px;
+}
+
+.datepicker-edition {
+  margin-top: -4px;
+}
+
+fieldset {
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
+v-input.edition {
+  padding-top: 0px !important;
 }
 </style>
