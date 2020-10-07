@@ -1537,4 +1537,9 @@ fieldset {
   margin-top: -4px;
   margin-bottom: 8px;
 }
+
+fieldset {
+  padding-left: 11px;
+  padding-right: 11px;
+}
 </style>
