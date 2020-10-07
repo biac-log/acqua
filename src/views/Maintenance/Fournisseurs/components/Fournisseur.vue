@@ -288,7 +288,7 @@
               <fieldset id="comptabilite">
                 <legend>Comptabilité</legend>
                 <v-row dense>
-                  <v-col cols="3">
+                  <v-col cols="3" class="pb-0">
                     <autocomplete-comptes-vue
                       :readonly="readonly"
                       TypeCompte="G"
@@ -318,7 +318,7 @@
                       :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                     />
                   </v-col>
-                  <v-col cols="3">
+                  <v-col cols="3" class="pb-0">
                     <v-text-field
                       tabindex="-1"
                       readonly
@@ -341,7 +341,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3">
+                  <v-col cols="3" class="pb-0">
                     <v-text-field
                       label="IBAN"
                       v-model="compte"
@@ -369,7 +369,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3">
+                  <v-col cols="3" class="pb-0">
                     <v-text-field
                       label="BIC"
                       v-model="bic"
@@ -396,7 +396,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3">
+                  <v-col cols="3" class="pt-0">
                     <v-select
                       label="Code devise"
                       :readonly="readonly"
@@ -408,7 +408,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3">
+                  <v-col cols="3" class="pt-0">
                     <v-select
                       label="Code assujetti"
                       v-model="codeAssujetti"
@@ -421,7 +421,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="2">
+                  <v-col cols="2" class="pt-0">
                     <v-text-field
                       label="Code Pays"
                       v-model="intraCodePays"
@@ -433,7 +433,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="4">
+                  <v-col cols="4" class="pt-0">
                     <v-text-field
                       label="N° Intracommunautaire"
                       v-model="intraIdentification"
