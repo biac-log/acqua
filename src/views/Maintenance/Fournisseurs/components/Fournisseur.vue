@@ -393,7 +393,8 @@
                       :readonly="readonly"
                       v-model="operationsTriangulaires"
                       label="Op. triangulaires ?"
-                      :hide-details="readonly"
+                      :hide-details="true"
+                      dense
                     />
                   </v-col>
                   <v-col cols="3" class="pt-0">
