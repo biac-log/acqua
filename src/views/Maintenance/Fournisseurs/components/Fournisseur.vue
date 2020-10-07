@@ -289,16 +289,18 @@
                 <legend>Comptabilité</legend>
                 <v-row dense>
                   <v-col cols="3" class="pb-0">
-                    <autocomplete-comptes-vue
-                      :readonly="readonly"
-                      TypeCompte="G"
-                      label="Compte associé"
-                      @Change="setCompteAssocie"
-                      v-model="compteAssocie"
-                      ref="autocompleteCompteAssocie"
-                      :hide-details="readonly"
-                      :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
-                    />
+                    <div :class="readonly ? '' : 'autocomplete-edition'"> <!-- Not the best, but it corrects the alignments .. -->
+                      <autocomplete-comptes-vue
+                        :readonly="readonly"
+                        TypeCompte="G"
+                        label="Compte associé"
+                        @Change="setCompteAssocie"
+                        v-model="compteAssocie"
+                        ref="autocompleteCompteAssocie"
+                        :hide-details="readonly"
+                        :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
+                      />
+                    </div>
                     <autocomplete-comptes-vue
                       :readonly="readonly"
                       TypeCompte="C"
@@ -308,15 +310,17 @@
                       :hide-details="readonly"
                       :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                     />
-                    <autocomplete-comptes-vue
-                      :readonly="readonly"
-                      TypeCompte="G"
-                      label="Compte vente/achat"
-                      @Change="setCompteVenteAchat"
-                      ref="autocompleteCompteVenteAchat"
-                      :hide-details="readonly"
-                      :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
-                    />
+                    <div :style="readonly ? '' : 'margin-top: 8px;'"> <!-- Not the best, but it corrects the alignments .. -->
+                      <autocomplete-comptes-vue
+                        :readonly="readonly"
+                        TypeCompte="G"
+                        label="Compte vente/achat"
+                        @Change="setCompteVenteAchat"
+                        ref="autocompleteCompteVenteAchat"
+                        :hide-details="readonly"
+                        :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
+                      />
+                    </div>
                   </v-col>
                   <v-col cols="3" class="pb-0">
                     <v-text-field
@@ -454,7 +458,8 @@
                 <legend>Commercial</legend>
                 <v-row dense>
                   <v-col cols="2">
-                    <autocomplete-code-vue
+                    <div :style="readonly ? '' : 'margin-top: -4px; margin-bottom: 8px;'">
+                      <autocomplete-code-vue
                       ref="autocompleteCodeRepresentant"
                       label="Représentant"
                       :readonly.sync="readonly"
@@ -464,6 +469,7 @@
                       :class="readonly ? 'autocompleteCode-spacing' : ''"
                       :hide-details="readonly"
                     />
+                    </div>
                     <autocomplete-code-vue
                       ref="autocompleteCodeFamille"
                       label="Famille"
@@ -475,6 +481,7 @@
                       :hide-details="readonly"
                       dense
                     />
+                    <div :style="readonly ? '' : 'margin-top: 8px; margin-bottom: 12px;'">
                     <autocomplete-code-vue
                       ref="autocompleteCodeSecteur"
                       label="Secteur"
@@ -486,6 +493,7 @@
                       :hide-details="readonly"
                       dense
                     />
+                    </div>
                     <v-select
                       :filled="readonly"
                       :readonly="readonly"
@@ -1500,7 +1508,8 @@ fieldset {
   padding-left: 5px;
 }
 
-v-input.edition {
-  padding-top: 0px !important;
+.autocomplete-edition {
+  margin-top: -4px;
+  margin-bottom: 8px;
 }
 </style>
