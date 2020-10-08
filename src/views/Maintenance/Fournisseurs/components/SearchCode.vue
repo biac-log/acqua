@@ -80,11 +80,11 @@ export default class extends Vue {
   ];
   private headersFamilles = [
     { headerName: 'Famille', field: 'code', filter: true, width: 120 },
-    { headerName: 'Nom', field: 'libelleF', filter: true, width: 300 },
+    { headerName: 'Nom', field: 'libelleF', filter: true, width: 300 }
   ];
   private headersSecteurs = [
     { headerName: 'Code', field: 'codeSecteur', filter: true, width: 120 },
-    { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
+    { headerName: 'Nom', field: 'nom', filter: true, width: 300 }
   ];
 
   private resolve!: any;
@@ -291,11 +291,11 @@ export default class extends Vue {
     this.filtreItems = '';
     this.dialog = false;
     this.reinitGrid();
-    if(item instanceof Representant) {
+    if (item instanceof Representant) {
       this.resolve(new CodeItem(item.code, item.nom));
-    }else if(item instanceof Famille) {
+    } else if (item instanceof Famille) {
       this.resolve(new CodeItem(item.famille, item.libelleF));
-    }else if(item instanceof Secteur) {
+    } else if (item instanceof Secteur) {
       this.resolve(new CodeItem(item.codeSecteur, item.nom));
     }
   }

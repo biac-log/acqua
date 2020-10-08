@@ -984,7 +984,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref, Watch } from 'vue-property-decorator';
+import { Component, Vue, Ref } from 'vue-property-decorator';
 import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
 import { Fournisseur } from '@/models/Fournisseur/Get/Fournisseur';
 import { UpdateFournisseur } from '@/models/Fournisseur/UpdateFournisseur';
@@ -993,7 +993,6 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
 import { FournisseurParams, LibelleTiers, Transporteur } from '@/models/Fournisseur/Get/FournisseurParams';
 import SearchComptes from './SearchComptes.vue';
-import CompteApi from '@/api/CompteApi';
 import { CompteSearch } from '@/models/Compte/CompteSearch';
 import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 import AutocompleteCodeVue from '@/views/Maintenance/Fournisseurs/components/AutocompleteCode.vue';
@@ -1157,8 +1156,6 @@ export default class FournisseurVue extends Vue {
   }
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
-    const fournisseur = new Fournisseur();
-
     this.numero = searchFournisseur.numero;
     this.nom = searchFournisseur.nom;
 

@@ -1,8 +1,8 @@
 export class FamilleDTO {
-    public type = '';
-    public famille = 0;
-    public libelleF = '';
-    public libelleN = '';
+  public type = '';
+  public famille = 0;
+  public libelleF = '';
+  public libelleN = '';
 }
 
 export class Famille extends FamilleDTO {

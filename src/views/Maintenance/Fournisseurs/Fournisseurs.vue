@@ -41,7 +41,6 @@ import { Component, Vue, Ref, Watch } from 'vue-property-decorator';
 import { FournisseurApi } from '@/api/FournisseurApi';
 import { Pagination } from '@/models/Pagination';
 import { SearchFournisseur } from '@/models/Fournisseur/SearchFournisseur';
-import { FournisseurParams } from '@/models/Fournisseur/Get/FournisseurParams';
 import FournisseurVue from './components/Fournisseur.vue';
 
 @Component({
@@ -105,7 +104,7 @@ export default class extends Vue {
       .then((reloadOnClose: boolean) => {
         if (reloadOnClose) this.loadFournisseurs();
       })
-      .catch(()=> console.log('caught'))
+      .catch(() => console.log('caught'))
       .finally(() => {
         this.$nextTick(() => (this.$refs.searchFocus as any).focus());
       });
@@ -114,10 +113,10 @@ export default class extends Vue {
   private addFournisseur() {
     this.fournisseurDialog
       .openNew()
-      .then((numero: number) => {
+      .then(() => {
         this.loadFournisseurs();
       })
-      .catch(()=> console.log('caught'))
+      .catch(() => console.log('caught'))
       .finally(() => {
         this.$nextTick(() => (this.$refs.searchFocus as any).focus());
       });

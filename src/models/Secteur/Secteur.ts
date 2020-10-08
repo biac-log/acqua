@@ -1,6 +1,6 @@
 export class SecteurDTO {
-    public codeSecteur = '';
-    public nom = '';
+  public codeSecteur = '';
+  public nom = '';
 }
 
 export class Secteur extends SecteurDTO {

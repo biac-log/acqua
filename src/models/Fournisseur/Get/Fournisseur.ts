@@ -1,5 +1,4 @@
 import { DateTime } from '@/models/DateTime';
-import moment from 'moment';
 
 export class FournisseurDTO {
   // Signalétique
@@ -117,41 +116,17 @@ export class Fournisseur extends FournisseurDTO {
   }
 
   public static rules = {
-    "nom": [
-      (v: string) => !!v || 'Nom requis.',
-    ],
-    "email": [
-      (v: string) => !v || /\S+@\S+\.\S+/.test(v) || 'Adresse email invalide'
-    ],
-    "codeVentilation": [
-      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
-    ],
-    "nombreDeJoursPaiement": [
-      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
-    ],
-    "joursEscomptes": [
-      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
-    ],
-    "nombreExemplaireFacture": [
-      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
-    ],
-    "periodiciteCommande": [
-      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
-    ],
-    "delaiLivraison": [
-      (v: string) => !v || !!v.isInt() || 'Nombre invalide'
-    ],
-    "escompte": [
-      (v: string) => !v || !!v.toNumber() || 'Nombre invalide'
-    ],
-    "remiseGlobaleDefaut": [
-      (v: string) => !v || !!v.toNumber() || 'Nombre invalide'
-    ],
-    "francoMontant": [
-      (v: string) => !v || !!v.toNumber() || 'Nombre invalide'
-    ],
-    "limiteCredit": [
-      (v: string) => !v || !!v.toNumber() || 'Nombre invalide'
-    ],
-  }
+    nom: [(v: string) => !!v || 'Nom requis.'],
+    email: [(v: string) => !v || /\S+@\S+\.\S+/.test(v) || 'Adresse email invalide'],
+    codeVentilation: [(v: string) => !v || !!v.isInt() || 'Nombre invalide'],
+    nombreDeJoursPaiement: [(v: string) => !v || !!v.isInt() || 'Nombre invalide'],
+    joursEscomptes: [(v: string) => !v || !!v.isInt() || 'Nombre invalide'],
+    nombreExemplaireFacture: [(v: string) => !v || !!v.isInt() || 'Nombre invalide'],
+    periodiciteCommande: [(v: string) => !v || !!v.isInt() || 'Nombre invalide'],
+    delaiLivraison: [(v: string) => !v || !!v.isInt() || 'Nombre invalide'],
+    escompte: [(v: string) => !v || !!v.toNumber() || 'Nombre invalide'],
+    remiseGlobaleDefaut: [(v: string) => !v || !!v.toNumber() || 'Nombre invalide'],
+    francoMontant: [(v: string) => !v || !!v.toNumber() || 'Nombre invalide'],
+    limiteCredit: [(v: string) => !v || !!v.toNumber() || 'Nombre invalide']
+  };
 }

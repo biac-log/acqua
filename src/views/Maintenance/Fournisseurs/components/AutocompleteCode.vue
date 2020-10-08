@@ -74,7 +74,7 @@ export default class AutocompleteCodeVue extends Vue {
   private searchCode = '';
 
   public init(value: string) {
-    this.codeSelected = new CodeItem(value, "");
+    this.codeSelected = new CodeItem(value, '');
   }
 
   private async codeChange(value: CodeItem) {
@@ -90,10 +90,10 @@ export default class AutocompleteCodeVue extends Vue {
       if (this.typeCode == 'codeRepresentant') {
         const representants = await RepresentantApi.searchRepresentantsByCode(parseInt(this.searchCode), 5);
         this.items = representants.map((r) => new CodeItem(r.code, r.nom));
-      }else if (this.typeCode == 'codeFamille'){
+      } else if (this.typeCode == 'codeFamille') {
         const familles = await FamilleApi.searchFamillesByCode(parseInt(this.searchCode), 5, 'F');
         this.items = familles.map((r) => new CodeItem(r.famille, r.libelleF));
-      }else if (this.typeCode == 'codeSecteur'){
+      } else if (this.typeCode == 'codeSecteur') {
         const secteurs = await SecteurApi.searchSecteursByCode(parseInt(this.searchCode), 5);
         this.items = secteurs.map((r) => new CodeItem(r.codeSecteur, r.nom));
       }
@@ -114,5 +114,4 @@ export default class AutocompleteCodeVue extends Vue {
 }
 </script>
 
-<style>
-</style>
+<style></style>

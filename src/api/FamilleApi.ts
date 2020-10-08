@@ -8,7 +8,9 @@ export default abstract class CompteApi {
   }
 
   static async searchFamillesByCode(code: number, nbrElement: number, type: string): Promise<Famille[]> {
-    const response = await api.AcQuaCore.get<FamilleDTO[]>(`familles?code=${code}&nbrElement=${nbrElement}&type=${type}`);
+    const response = await api.AcQuaCore.get<FamilleDTO[]>(
+      `familles?code=${code}&nbrElement=${nbrElement}&type=${type}`
+    );
     return response.data.map((FamilleDTO) => new Famille(FamilleDTO));
   }
 }

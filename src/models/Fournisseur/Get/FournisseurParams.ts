@@ -3,7 +3,7 @@ export class LibelleTiers {
   public valeur = '';
   public saisieIntra = '';
 
-   get displayName(): string {
+  get displayName(): string {
     return `${this.code} - ${this.valeur}`;
   }
 }
