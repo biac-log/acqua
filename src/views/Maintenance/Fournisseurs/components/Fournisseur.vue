@@ -362,6 +362,7 @@
                       :filled="readonly"
                       :readonly="readonly"
                       :hide-details="readonly"
+                      ref="ibanField"
                     />
                     <v-select
                       label="Code suivis"
@@ -516,6 +517,7 @@
                       item-value="code"
                       @change="changeCodePaiement"
                       :hide-details="readonly"
+                      ref="paiementField"
                     />
                   </v-col>
                   <v-col cols="4" class="pr-3">
@@ -1006,10 +1008,12 @@ export default class FournisseurVue extends Vue {
   @Ref() autocompleteCompteAssocie!: AutocompleteComptesVue;
   @Ref() autocompleteCompteMaitre!: AutocompleteComptesVue;
   @Ref() autocompleteCompteVenteAchat!: AutocompleteComptesVue;
+  @Ref() ibanField!: any;
 
   @Ref() autocompleteCodeRepresentant!: AutocompleteCodeVue;
   @Ref() autocompleteCodeFamille!: AutocompleteCodeVue;
   @Ref() autocompleteCodeSecteur!: AutocompleteCodeVue;
+  @Ref() paiementField!: any;
 
   private display = false;
   private isValid = true;
@@ -1432,6 +1436,7 @@ export default class FournisseurVue extends Vue {
     } else if (compte instanceof CompteSearch || compte instanceof CompteGeneralSearch) {
       this.compteAssocie = compte.numero;
       this.nomCompteAssocie = compte.nom;
+      this.$nextTick(() => (this.$refs.autocompleteCompteMaitre as AutocompleteComptesVue)?.focus());
     }
   }
 
@@ -1442,6 +1447,7 @@ export default class FournisseurVue extends Vue {
     } else if (compte instanceof CompteSearch || compte instanceof CompteDeTier) {
       this.compteMaitre = compte.numero;
       this.nomCompteMaitre = compte.nom;
+      this.$nextTick(() => (this.$refs.autocompleteCompteVenteAchat as AutocompleteComptesVue)?.focus());
     }
   }
 
@@ -1452,6 +1458,7 @@ export default class FournisseurVue extends Vue {
     } else if (compte instanceof CompteSearch || compte instanceof CompteGeneralSearch) {
       this.compteVenteAchat = compte.numero;
       this.nomCompteVenteAchat = compte.nom;
+      this.$nextTick(() => (this.$refs.ibanField as any)?.focus());
     }
   }
 
@@ -1499,16 +1506,25 @@ export default class FournisseurVue extends Vue {
   private selectRepresentant(representant: { code: string; nom: string }) {
     this.codeRepresentant = representant.code;
     this.nomRepresentant = representant.nom;
+    if(representant != null){
+      this.$nextTick(() => (this.autocompleteCodeFamille as any)?.focus());
+    }
   }
 
   private selectFamille(famille: { code: string; nom: string }) {
     this.codeFamille = famille.code;
     this.nomFamille = famille.nom;
+    if(famille != null){
+      this.$nextTick(() => (this.autocompleteCodeSecteur as any)?.focus());
+    }
   }
 
   private selectSecteur(secteur: { code: string; nom: string }) {
     this.codeSecteur = secteur.code;
-    this.nomSecteur = secteur.nom;
+    this.nomSecteur = secteur.nom
+    if(secteur != null){
+      this.$nextTick(() => (this.paiementField as any)?.focus());
+    }
   }
 
   private changeCodePaiement() {

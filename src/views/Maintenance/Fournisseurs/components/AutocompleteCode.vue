@@ -1,6 +1,7 @@
 <template>
   <div class="autocompleteCode">
     <v-combobox
+      ref="comboboxCode"
       :label="label"
       :readonly="isReadonly"
       :filled="isReadonly"
@@ -65,6 +66,7 @@ export default class AutocompleteCodeVue extends Vue {
   @Prop({ default: true }) hideDetails!: boolean;
 
   @Ref() private searchModal!: SearchCode;
+  @Ref() private comboboxCode!: any;
 
   private codeSelected: CodeItem = new CodeItem(0, '');
   private items: CodeItem[] = [];
@@ -102,6 +104,11 @@ export default class AutocompleteCodeVue extends Vue {
       this.codeSelected = value;
       this.$emit('select', value);
     });
+  }
+
+  public focus() {
+    console.log('focus');
+    this.$nextTick(() => this.comboboxCode?.focus());
   }
 }
 </script>
