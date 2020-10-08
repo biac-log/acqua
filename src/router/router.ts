@@ -122,7 +122,18 @@ export const asyncRoutes: RouteConfig[] = [
           icon: 'mdi-account-supervisor-circle',
           affix: true
         }
-      }
+      },
+      {
+        path: 'devises',
+        component: () =>
+          import(/* webpackChunkName: "devises" */ '@/views/Maintenance/Devises/index.vue'),
+        name: 'Devises',
+        meta: {
+          title: 'Devises',
+          icon: 'mdi-currency-eur',
+          affix: true
+        }
+      },
     ]
   },
   {
