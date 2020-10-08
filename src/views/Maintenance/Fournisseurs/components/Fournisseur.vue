@@ -1,5 +1,13 @@
 <template>
-  <v-dialog v-model="display" @click:outside="closeDialog">
+  <v-dialog
+    v-model="display"
+    @click:outside="closeDialog"
+    @keydown.f2.stop="modifierFournisseur"
+    @keydown.esc.prevent="cancelEdit()"
+    @keydown.alt.enter.stop="saveFournisseur()"
+    :persistent="!readonly || saveLoading || deleteLoading"
+    ref="fournisseurDialog"
+  >
     <v-card>
       <v-toolbar color="primary" dark flat>
         <v-card-title>{{ newRecord ? 'Nouveau fournisseur' : `${numero} - ${nom}` }}</v-card-title>
@@ -49,7 +57,7 @@
                 <v-row dense>
                   <v-col cols="6" class="pb-0 pt-0">
                     <v-text-field
-                      :autofocus="!readonly"
+                      autofocus
                       label="Nom"
                       ref="inputNom"
                       v-model="nom"
@@ -1014,6 +1022,7 @@ export default class FournisseurVue extends Vue {
   @Ref() autocompleteCodeFamille!: AutocompleteCodeVue;
   @Ref() autocompleteCodeSecteur!: AutocompleteCodeVue;
   @Ref() paiementField!: any;
+  @Ref() fournisseurDialog!: any;
 
   private display = false;
   private isValid = true;
@@ -1158,6 +1167,10 @@ export default class FournisseurVue extends Vue {
     this.reloadOnClose = false;
 
     this.loadFournisseur(searchFournisseur.numero);
+
+    this.$nextTick(() => {
+      (this.inputNom as any).focus();
+    });
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -1350,6 +1363,7 @@ export default class FournisseurVue extends Vue {
     this.alertMessage.clear();
     this.successMessage.clear();
     this.setFournisseur(new Fournisseur());
+    this.reject();
   }
 
   private async loadFournisseur(numero: number) {
@@ -1506,7 +1520,7 @@ export default class FournisseurVue extends Vue {
   private selectRepresentant(representant: { code: string; nom: string }) {
     this.codeRepresentant = representant.code;
     this.nomRepresentant = representant.nom;
-    if(representant != null){
+    if (representant != null) {
       this.$nextTick(() => (this.autocompleteCodeFamille as any)?.focus());
     }
   }
@@ -1514,15 +1528,15 @@ export default class FournisseurVue extends Vue {
   private selectFamille(famille: { code: string; nom: string }) {
     this.codeFamille = famille.code;
     this.nomFamille = famille.nom;
-    if(famille != null){
+    if (famille != null) {
       this.$nextTick(() => (this.autocompleteCodeSecteur as any)?.focus());
     }
   }
 
   private selectSecteur(secteur: { code: string; nom: string }) {
     this.codeSecteur = secteur.code;
-    this.nomSecteur = secteur.nom
-    if(secteur != null){
+    this.nomSecteur = secteur.nom;
+    if (secteur != null) {
       this.$nextTick(() => (this.paiementField as any)?.focus());
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container fluid @keydown.107.prevent="addFournisseur()">
     <v-card>
       <v-card-title>
         Fournisseurs
@@ -13,6 +13,8 @@
           label="Rechercher"
           single-line
           hide-details
+          autofocus
+          ref="searchFocus"
         ></v-text-field>
       </v-card-title>
 
@@ -31,7 +33,7 @@
       </v-data-table>
     </v-card>
     <FournisseurVue ref="fournisseurDialog" />
-  </div>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -61,6 +63,7 @@ export default class extends Vue {
   ];
 
   @Ref() readonly fournisseurDialog!: FournisseurVue;
+  @Ref() readonly searchFocus!: any;
 
   @Watch('options')
   onOptionsChanged() {
@@ -97,16 +100,28 @@ export default class extends Vue {
   }
 
   private async openFournisseur(SearchFournisseur: SearchFournisseur) {
-    this.fournisseurDialog.open(SearchFournisseur).then((reloadOnClose: boolean) => {
-      if (reloadOnClose) this.loadFournisseurs();
-    });
+    this.fournisseurDialog
+      .open(SearchFournisseur)
+      .then((reloadOnClose: boolean) => {
+        if (reloadOnClose) this.loadFournisseurs();
+      })
+      .catch(()=> console.log('caught'))
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.searchFocus as any).focus());
+      });
   }
 
   private addFournisseur() {
-    this.fournisseurDialog.openNew().then((numero: number) => {
-      this.loadFournisseurs();
-    });
-  }  
+    this.fournisseurDialog
+      .openNew()
+      .then((numero: number) => {
+        this.loadFournisseurs();
+      })
+      .catch(()=> console.log('caught'))
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.searchFocus as any).focus());
+      });
+  }
 }
 </script>
 

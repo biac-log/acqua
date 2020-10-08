@@ -105,7 +105,7 @@ export const asyncRoutes: RouteConfig[] = [
       {
         path: 'fournisseurs',
         component: () =>
-          import(/* webpackChunkName: "achatvente" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
+          import(/* webpackChunkName: "fournisseurs" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
         name: 'Fournisseurs',
         meta: {
           title: 'Fournisseurs',
@@ -116,7 +116,7 @@ export const asyncRoutes: RouteConfig[] = [
       {
         path: 'clients',
         component: () =>
-          import(/* webpackChunkName: "achatvente" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
+          import(/* webpackChunkName: "clients" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
         name: 'Clients',
         meta: {
           title: 'Clients',
