@@ -14,6 +14,7 @@
       hide-no-data
       @keyup.enter="$event.target.select()"
       @focus="$event.target.select()"
+      @keydown.ctrl.f.prevent="openSearch()"
       v-model="codeSelected"
       :hide-details="hideDetails"
     >
