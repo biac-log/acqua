@@ -39,4 +39,10 @@ export default abstract class DeviseApi {
     await api.AcQuaCore.put<DeviseMaintenanceDTO>(`devise`, data);
     return true;
   }
+
+  static async createDevise(newDevise: DeviseMaintenance): Promise<boolean> {
+    await api.AcQuaCore.post(`/devise`, newDevise);
+
+    return true;
+  }
 }

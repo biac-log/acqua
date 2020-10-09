@@ -102,7 +102,15 @@ export default class DevisesVue extends Vue {
   }
 
   private addDevise() {
-    console.log('addDevise');
+    this.deviseDialog
+      .openNew()
+      .then(() => {
+        this.loadDevises();
+      })
+      .catch(() => console.log('caught'))
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.searchFocus as any).focus());
+      });
   }
 
   private openDevise(devise: DeviseMaintenance) {

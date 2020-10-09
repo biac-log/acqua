@@ -250,19 +250,18 @@ export default class DeviseVue extends Vue {
 		this.mapDevise();
 
     if (this.newRecord) {
-      // await DeviseApi.createDevise(this.Devise)
-      //   .then((numeroDevise) => {
-      //     this.DeviseParams.nextNumero = numeroDevise + 1;
-      //     this.Devise = this.DeviseBase;
-      //     this.closeDialog();
-      //   })
-      //   .catch((err) => {
-      //     this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Devise', displayAxiosError(err));
-      //     this.readonly = false;
-      //   })
-      //   .finally(() => {
-      //     this.saveLoading = false;
-      //   });
+      await DeviseApi.createDevise(this.devise)
+        .then(() => {
+          this.devise = this.deviseBase;
+          this.closeDialog();
+        })
+        .catch((err) => {
+          this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Devise', displayAxiosError(err));
+          this.readonly = false;
+        })
+        .finally(() => {
+          this.saveLoading = false;
+        });
     } else {
       await DeviseApi.updateDevise(this.devise, this.deviseBase)
         .then(() => {
