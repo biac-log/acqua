@@ -20,11 +20,9 @@
 
       <v-data-table
         :headers="headers"
-        :items="devisesFiltered"
+        :items="devises"
         :search="search"
         :loading="isLoadingDevises"
-        :options.sync="options"
-        :server-items-length="totalItems"
         @click:row="openDevise"
       >
         <template v-slot:[`item.typeDevise`]="{ item }">
@@ -57,24 +55,11 @@ export default class DevisesVue extends Vue {
     this.loadDevises();
   }
 
-  @Watch('options')
-  onOptionsChanged() {
-    this.filterDevises();
-  }
-
-  @Watch('search')
-  onSearchChanged() {
-    this.filterDevises();
-  }
-
   private isLoadingDevises = false;
 
   private search = '';
-  private options: any = {};
-  private totalItems = 0;
   private isLoading = false;
   private devises: DeviseMaintenance[] = [];
-  private devisesFiltered: DeviseMaintenance[] = [];
   private headers = [
     { text: 'Id', value: 'id' },
     { text: 'Libelle', value: 'libelle' },
@@ -93,10 +78,6 @@ export default class DevisesVue extends Vue {
       .forEach((element: DeviseMaintenance) => {
         this.devises.push(element);
       });
-
-    this.filterDevises();
-
-    this.totalItems = devisesResult.totalCount;
 
     this.isLoadingDevises = false;
   }
@@ -123,20 +104,6 @@ export default class DevisesVue extends Vue {
       .finally(() => {
         this.$nextTick(() => (this.$refs.searchFocus as any).focus());
       });
-  }
-
-  private filterDevises() {
-    const { sortBy, sortDesc, page, itemsPerPage } = this.options;
-    if (this.search != '') {
-      this.devisesFiltered = this.devises.filter((d) => d.libelle.toLowerCase().includes(this.search.toLowerCase()));
-    } else {
-      this.devisesFiltered = this.devises;
-    }
-
-    const begin = page == 1 ? 0 : (page - 1) * itemsPerPage;
-    const end = begin + itemsPerPage;
-
-    this.devisesFiltered = this.devisesFiltered.slice(begin, end);
   }
 }
 </script>
