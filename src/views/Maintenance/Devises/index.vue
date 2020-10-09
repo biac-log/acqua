@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import DeviseApi from '@/api/DeviseApi';
-import { Devise } from '@/models/Devise/Devise';
+import { DeviseMaintenance } from '@/models/Devise/DeviseMaintenance';
 import { Pagination } from '@/models/Pagination';
 import { Component, Vue, Watch } from 'vue-property-decorator';
 
@@ -56,7 +56,7 @@ export default class DevisesVue extends Vue {
   private options: any = {};
   private totalItems = 0;
   private isLoading = false;
-  private devises: Devise[] = [];
+  private devises: DeviseMaintenance[] = [];
   private headers = [
     { text: 'Id', value: 'id' },
     { text: 'Libelle', value: 'libelle' },
@@ -77,8 +77,8 @@ export default class DevisesVue extends Vue {
     this.devises = [];
 
     devisesResult.items
-      .map((d) => new Devise(d))
-      .forEach((element: Devise) => {
+      .map((d) => new DeviseMaintenance(d))
+      .forEach((element: DeviseMaintenance) => {
         this.devises.push(element);
       });
 
