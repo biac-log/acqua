@@ -27,3 +27,9 @@ export const dateToString = (dateTime: Date | string, format = 'DD/MM/YYYY') => 
 export const dateTimeToString = (dateTime: DateTime, format: string) => {
   return dateTime.toString(format);
 };
+
+export const typeDeviseDisplay = (value: string) => {
+  if(value == "") return value;
+  
+  return value == "E" ? "Entier" : "Décimal";
+}

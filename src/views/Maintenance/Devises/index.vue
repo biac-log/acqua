@@ -27,6 +27,12 @@
         :server-items-length="totalItems"
         @click:row="openDevise"
       >
+        <template v-slot:[`item.typeDevise`]="{ item }">
+          <span>{{ item.typeDevise | typeDeviseDisplay }}</span>
+        </template>
+        <template v-slot:[`item.cee`]="{ item }">
+          <v-icon color="green">{{ item.cee ? 'mdi-check' : '' }}</v-icon>
+        </template>
       </v-data-table>
     </v-card>
   </v-container>
