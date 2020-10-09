@@ -52,6 +52,8 @@ export default class DevisesVue extends Vue {
     this.loadDevises();
   }
 
+  private isLoadingDevises = false;
+
   private search = '';
   private options: any = {};
   private totalItems = 0;
@@ -60,11 +62,12 @@ export default class DevisesVue extends Vue {
   private headers = [
     { text: 'Id', value: 'id' },
     { text: 'Libelle', value: 'libelle' },
-    { text: 'Type', value: 'type' },
+    { text: 'Type', value: 'typeDevise' },
     { text: 'CEE', value: 'cee' }
   ];
 
   private async loadDevises() {
+    this.isLoadingDevises = true;
     const { sortBy, sortDesc, page, itemsPerPage } = this.options;
     const pagination = new Pagination();
     pagination.terms = this.search;
@@ -83,6 +86,8 @@ export default class DevisesVue extends Vue {
       });
 
     this.totalItems = devisesResult.totalCount;
+
+    this.isLoadingDevises = false;
   }
 
   private addDevise() {
