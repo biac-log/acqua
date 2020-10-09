@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid @keydown.107.prevent="addDevise()">
     <v-card>
       <v-card-title>
         Devises

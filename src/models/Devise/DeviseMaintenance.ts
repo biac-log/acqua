@@ -17,4 +17,8 @@ export class DeviseMaintenance extends DeviseMaintenanceDTO {
     super();
     Object.assign(this, dto || new DeviseMaintenanceDTO());
   }
+
+  public static rules = {
+    libelle: [(v: string) => !!v || 'Libellé requis.'],
+  };
 }

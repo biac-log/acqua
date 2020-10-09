@@ -53,7 +53,7 @@
         <v-row justify="center">
           <v-col cols="6">
             <v-form ref="form" v-model="isValid" lazy-validation>
-              <v-text-field label="Libellé" v-model="libelle" :readonly="readonly" :filled="readonly"/>
+              <v-text-field label="Libellé" v-model="libelle" :readonly="readonly" :filled="readonly" maxlength="3" ref="deviseLabel" autofocus />
               <v-select label="Type" v-model="typeDevise" :items="typeItems" item-text="label" item-value="value" :readonly="readonly" :filled="readonly"></v-select>
               <v-checkbox label="CEE" v-model="cee" :readonly="readonly"/>
             </v-form>
@@ -117,7 +117,7 @@ import DeviseApi from '@/api/DeviseApi';
   components: { AlertMessageVue }
 })
 export default class DeviseVue extends Vue {
-  @Ref() readonly inputNom: any;
+  @Ref() readonly deviseLabel: any;
   @Ref() alertMessage!: AlertMessageVue;
   @Ref() successMessage!: AlertMessageVue;
 
@@ -142,13 +142,13 @@ export default class DeviseVue extends Vue {
   private devise: DeviseMaintenance = new DeviseMaintenance();
   private deviseBase: DeviseMaintenance = new DeviseMaintenance(); // Used for the reset method
 
-  //   private rules = Devise.rules;
-
   /// Devise model
   private id = 0;
   private libelle = '';
   private typeDevise = '';
   private cee = false;
+
+  private rules = DeviseMaintenance.rules;
 
   private readonly = true;
   private newRecord = false;
@@ -170,7 +170,7 @@ export default class DeviseVue extends Vue {
     this.reloadOnClose = false;
 
     this.$nextTick(() => {
-      // (this.inputNom as any).focus();
+      (this.deviseLabel as any).focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -187,7 +187,7 @@ export default class DeviseVue extends Vue {
 
     this.display = true;
     this.$nextTick(() => {
-      // (this.inputNom as any).focus();
+      (this.deviseLabel as any).focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -233,7 +233,7 @@ export default class DeviseVue extends Vue {
   private modifierDevise() {
     if (!this.getLoading) {
       this.readonly = false;
-      // this.$nextTick(() => this.inputNom.focus());
+      this.$nextTick(() => this.deviseLabel.focus());
     }
   }
 
