@@ -20,7 +20,7 @@
 
       <v-data-table
         :headers="headers"
-        :items="devises"
+        :items="devisesFiltered"
         :search="search"
         :loading="isLoadingDevises"
         :options.sync="options"
@@ -53,14 +53,18 @@ import DeviseVue from '@/views/Maintenance/Devises/Devise.vue';
 export default class DevisesVue extends Vue {
   @Ref() readonly deviseDialog!: DeviseVue;
 
+  mounted() {
+    this.loadDevises();
+  }
+
   @Watch('options')
   onOptionsChanged() {
-    this.loadDevises();
+    this.filterDevises();
   }
 
   @Watch('search')
   onSearchChanged() {
-    this.loadDevises();
+    this.filterDevises();
   }
 
   private isLoadingDevises = false;
@@ -70,6 +74,7 @@ export default class DevisesVue extends Vue {
   private totalItems = 0;
   private isLoading = false;
   private devises: DeviseMaintenance[] = [];
+  private devisesFiltered: DeviseMaintenance[] = [];
   private headers = [
     { text: 'Id', value: 'id' },
     { text: 'Libelle', value: 'libelle' },
@@ -79,15 +84,8 @@ export default class DevisesVue extends Vue {
 
   private async loadDevises() {
     this.isLoadingDevises = true;
-    const { sortBy, sortDesc, page, itemsPerPage } = this.options;
-    const pagination = new Pagination();
-    pagination.terms = this.search;
-    pagination.sortBy = sortBy[0];
-    pagination.sortDesc = sortDesc[0];
-    pagination.page = page;
-    pagination.limit = itemsPerPage;
 
-    const devisesResult = await DeviseApi.getAllDevisesPaged(pagination);
+    const devisesResult = await DeviseApi.getAllDevisesPaged();
     this.devises = [];
 
     devisesResult.items
@@ -95,6 +93,8 @@ export default class DevisesVue extends Vue {
       .forEach((element: DeviseMaintenance) => {
         this.devises.push(element);
       });
+
+    this.filterDevises();
 
     this.totalItems = devisesResult.totalCount;
 
@@ -123,6 +123,20 @@ export default class DevisesVue extends Vue {
       .finally(() => {
         this.$nextTick(() => (this.$refs.searchFocus as any).focus());
       });
+  }
+
+  private filterDevises() {
+    const { sortBy, sortDesc, page, itemsPerPage } = this.options;
+    if (this.search != '') {
+      this.devisesFiltered = this.devises.filter((d) => d.libelle.toLowerCase().includes(this.search.toLowerCase()));
+    } else {
+      this.devisesFiltered = this.devises;
+    }
+
+    const begin = page == 1 ? 0 : (page - 1) * itemsPerPage;
+    const end = begin + itemsPerPage;
+
+    this.devisesFiltered = this.devisesFiltered.slice(begin, end);
   }
 }
 </script>
