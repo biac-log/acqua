@@ -27,4 +27,16 @@ export default abstract class DeviseApi {
     const response = await api.AcQuaCore.get<number>(`/Devise/GetTaux?devise=${devise}&datePiece=${datePiece.toUtc()}`);
     return response.data;
   }
+
+  static async updateDevise(
+    updatedDevise: DeviseMaintenanceDTO,
+    oldDevise: DeviseMaintenanceDTO
+  ): Promise<boolean> {    
+    const data = {
+      updatedDevise,
+      oldDevise
+    };
+    await api.AcQuaCore.put<DeviseMaintenanceDTO>(`devise`, data);
+    return true;
+  }
 }

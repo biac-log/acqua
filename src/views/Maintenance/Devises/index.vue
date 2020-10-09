@@ -106,7 +106,15 @@ export default class DevisesVue extends Vue {
   }
 
   private openDevise(devise: DeviseMaintenance) {
-    this.deviseDialog.open(devise);
+    this.deviseDialog
+      .open(devise)
+      .then((reloadOnClose: boolean) => {
+        if (reloadOnClose) this.loadDevises();
+      })
+      .catch(() => console.log('caught'))
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.searchFocus as any).focus());
+      });
   }
 }
 </script>

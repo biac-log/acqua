@@ -160,7 +160,7 @@ export default class DeviseVue extends Vue {
 
   public open(devise: DeviseMaintenance): Promise<boolean> {
 		this.readonly = true;
-    this.devise = devise;
+		this.devise = new DeviseMaintenance();
     this.deviseBase = devise;
 
     this.setDevise(devise);
@@ -246,32 +246,32 @@ export default class DeviseVue extends Vue {
     if (!this.isValid) return false;
 
     this.saveLoading = true;
+		
+		this.mapDevise();
 
-    this.mapDevise();
-
-    // if (this.newRecord) {
-    //   await DeviseApi.createDevise(this.Devise)
-    //     .then((numeroDevise) => {
-    //       this.DeviseParams.nextNumero = numeroDevise + 1;
-    //       this.Devise = this.DeviseBase;
-    //       this.closeDialog();
-    //     })
-    //     .catch((err) => {
-    //       this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Devise', displayAxiosError(err));
-    //       this.readonly = false;
-    //     })
-    //     .finally(() => {
-    //       this.saveLoading = false;
-    //     });
-    // } else {
-    //   await DeviseApi.updateDevise(new UpdateDevise(this.Devise), this.DeviseBase)
-    //     .then(() => {
-    //       this.readonly = true;
-    //       this.successMessage.show('Le Devise a été mis à jour avec succès.', '');
-    //       this.resolve(true);
-    //     })
-    //     .finally(() => (this.saveLoading = false));
-    // }
+    if (this.newRecord) {
+      // await DeviseApi.createDevise(this.Devise)
+      //   .then((numeroDevise) => {
+      //     this.DeviseParams.nextNumero = numeroDevise + 1;
+      //     this.Devise = this.DeviseBase;
+      //     this.closeDialog();
+      //   })
+      //   .catch((err) => {
+      //     this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Devise', displayAxiosError(err));
+      //     this.readonly = false;
+      //   })
+      //   .finally(() => {
+      //     this.saveLoading = false;
+      //   });
+    } else {
+      await DeviseApi.updateDevise(this.devise, this.deviseBase)
+        .then(() => {
+          this.readonly = true;
+          this.successMessage.show('La devise a été mis à jour avec succès.', '');
+          this.resolve(true);
+        })
+        .finally(() => (this.saveLoading = false));
+    }
   }
 
   private cancelEdit() {
