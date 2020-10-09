@@ -19,7 +19,7 @@
             </v-btn>
           </template>
           <span>
-            Modifier la pièce
+            Modifier le fournisseur
             <span class="shortcutTooltip">F2</span>
           </span>
         </v-tooltip>

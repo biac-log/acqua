@@ -35,6 +35,7 @@
         </template>
       </v-data-table>
     </v-card>
+    <devise-vue ref="deviseDialog" />
   </v-container>
 </template>
 
@@ -42,12 +43,16 @@
 import DeviseApi from '@/api/DeviseApi';
 import { DeviseMaintenance } from '@/models/Devise/DeviseMaintenance';
 import { Pagination } from '@/models/Pagination';
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
+import DeviseVue from '@/views/Maintenance/Devises/Devise.vue';
 
 @Component({
-  name: 'DevisesVue'
+  name: 'DevisesVue',
+  components: { DeviseVue }
 })
 export default class DevisesVue extends Vue {
+  @Ref() readonly deviseDialog!: DeviseVue;
+
   @Watch('options')
   onOptionsChanged() {
     this.loadDevises();
@@ -100,8 +105,8 @@ export default class DevisesVue extends Vue {
     console.log('addDevise');
   }
 
-  private openDevise() {
-    console.log('openDevise');
+  private openDevise(devise: DeviseMaintenance) {
+    this.deviseDialog.open(devise);
   }
 }
 </script>
