@@ -50,14 +50,49 @@
       <v-card-text>
         <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
-        <v-row justify="center">
-          <v-col cols="6">
-            <v-form ref="form" v-model="isValid" lazy-validation>
-              <v-text-field label="Libellé" v-model="libelle" :readonly="readonly" :filled="readonly" maxlength="3" ref="deviseLabel" autofocus />
-              <v-select label="Type" v-model="typeDevise" :items="typeItems" item-text="label" item-value="value" :readonly="readonly" :filled="readonly"></v-select>
-            </v-form>
-          </v-col>
-        </v-row>
+        <v-form ref="form" v-model="isValid" lazy-validation>
+          <v-row justify="center" dense>
+            <v-col cols="6">
+              <v-select
+                label="Base"
+                v-model="base"
+                :items="devises"
+                item-text="libelle"
+                item-value="code"
+                :readonly="readonly"
+                :filled="readonly"
+                autofocus
+              ></v-select>
+            </v-col>
+            <v-col cols="6">
+              <v-select
+                label="Code"
+                v-model="code"
+                :items="devises"
+                item-text="libelle"
+                item-value="code"
+                :readonly="readonly"
+                :filled="readonly"
+              ></v-select>
+            </v-col>
+            <v-col cols="12"
+              ><date-picker
+                id="date"
+                label="Date"
+                :date.sync="date"
+                :readonly.sync="readonly"
+                :filled="readonly"
+                :rules.sync="dateRules"
+                :hide-details="readonly"
+            /></v-col>
+            <v-col cols="6"
+              ><v-text-field label="Com" v-model="com" :readonly="readonly" :filled="readonly"></v-text-field
+            ></v-col>
+            <v-col cols="6">
+              <v-text-field label="Tar" v-model="tar" :readonly="readonly" :filled="readonly"></v-text-field>
+            </v-col>
+          </v-row>
+        </v-form>
       </v-card-text>
       <v-card-actions v-if="!readonly">
         <v-spacer />
@@ -111,10 +146,13 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
 import TauxApi from '@/api/TauxApi';
 import { DateTime } from '@/models/DateTime';
+import { Devise } from '@/models/Financier';
+import DeviseApi from '@/api/DeviseApi';
+import DatePicker from '@/components/DatePicker.vue';
 
 @Component({
   name: 'TauxVue',
-  components: { AlertMessageVue }
+  components: { AlertMessageVue, DatePicker }
 })
 export default class TauxVue extends Vue {
   @Ref() readonly tauxLabel: any;
@@ -145,17 +183,25 @@ export default class TauxVue extends Vue {
   private base = '';
   private code = '';
   private date: DateTime = new DateTime();
-  private com = 0;
-  private tar = 0;
+  private com = '';
+  private tar = '';
 
   // private rules = DeviseMaintenance.rules;
+
+  private devises: Devise[] = [];
 
   private readonly = true;
   private newRecord = false;
 
+  private dateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
+
+  mounted() {
+    this.getDevises();
+  }
+
   public open(taux: Taux): Promise<boolean> {
-		this.readonly = true;
-		this.taux = new Taux();
+    this.readonly = true;
+    this.taux = new Taux();
     this.tauxBase = taux;
 
     this.setTaux(taux);
@@ -195,16 +241,16 @@ export default class TauxVue extends Vue {
     this.base = taux.base;
     this.code = taux.code;
     this.date = taux.dateDate;
-    this.com = taux.com;
-    this.tar = taux.tar;
+    this.com = taux.com.toIntString();
+    this.tar = taux.tar.toIntString();
   }
 
   private mapTaux() {
     this.taux.base = this.base;
     this.taux.code = this.code;
     this.taux.dateDate = this.date;
-    this.taux.com = this.com;
-    this.taux.tar = this.tar;
+    this.taux.com = this.com.toNumber();
+    this.taux.tar = this.tar.toNumber();
   }
 
   private closeDialog() {
@@ -243,13 +289,13 @@ export default class TauxVue extends Vue {
     if (!this.isValid) return false;
 
     this.saveLoading = true;
-		
-		this.mapTaux();
+
+    this.mapTaux();
 
     if (this.newRecord) {
-      /*  await DeviseApi.createDevise(this.devise)
+      await TauxApi.createTaux(this.taux)
         .then(() => {
-          this.devise = this.deviseBase;
+          this.taux = this.tauxBase;
           this.closeDialog();
         })
         .catch((err) => {
@@ -258,7 +304,7 @@ export default class TauxVue extends Vue {
         })
         .finally(() => {
           this.saveLoading = false;
-        }); */
+        });
     } else {
       /* await  DeviseApi.updateDevise(this.devise, this.deviseBase)
         .then(() => {
@@ -276,6 +322,12 @@ export default class TauxVue extends Vue {
       this.closeDialog();
     } else {
       this.readonly = true;
+    }
+  }
+
+  private async getDevises() {
+    if (this.devises.length <= 1) {
+      this.devises = await DeviseApi.getAllDevises();
     }
   }
 }
