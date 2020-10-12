@@ -134,6 +134,17 @@ export const asyncRoutes: RouteConfig[] = [
           affix: true
         }
       },
+      {
+        path: 'taux',
+        component: () =>
+          import(/* webpackChunkName: "taux" */ '@/views/Maintenance/Taux/index.vue'),
+        name: 'Taux',
+        meta: {
+          title: 'Taux',
+          icon: 'mdi-sack-percent',
+          affix: true
+        }
+      },
     ]
   },
   {
