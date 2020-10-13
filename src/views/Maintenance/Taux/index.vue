@@ -25,9 +25,9 @@
         :loading="isLoadingTaux"
         @click:row="openTaux"
       >
-        <!-- <template v-slot:[`item.cee`]="{ item }">
-          <v-icon color="green">{{ item.cee ? 'mdi-check' : '' }}</v-icon>
-        </template> -->
+        <template v-slot:[`item.date`]="{ item }">
+          <span>{{ item.date | dateToString }}</span>
+        </template>
       </v-data-table>
     </v-card>
     <taux-vue ref="tauxDialog" />
