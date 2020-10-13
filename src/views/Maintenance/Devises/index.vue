@@ -108,5 +108,4 @@ export default class DevisesVue extends Vue {
 }
 </script>
 
-<style>
-</style>
+<style></style>

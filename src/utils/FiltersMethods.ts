@@ -29,7 +29,7 @@ export const dateTimeToString = (dateTime: DateTime, format: string) => {
 };
 
 export const typeDeviseDisplay = (value: string) => {
-  if(value == "") return value;
-  
-  return value == "E" ? "Entier" : "Décimal";
-}
+  if (value == '') return value;
+
+  return value == 'E' ? 'Entier' : 'Décimal';
+};

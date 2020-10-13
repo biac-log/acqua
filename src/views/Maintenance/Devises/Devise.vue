@@ -53,9 +53,25 @@
         <v-row justify="center">
           <v-col cols="6">
             <v-form ref="form" v-model="isValid" lazy-validation>
-              <v-text-field label="Libellé" v-model="libelle" :readonly="readonly" :filled="readonly" maxlength="3" ref="deviseLabel" autofocus />
-              <v-select label="Type" v-model="typeDevise" :items="typeItems" item-text="label" item-value="value" :readonly="readonly" :filled="readonly"></v-select>
-              <v-checkbox label="CEE" v-model="cee" :readonly="readonly"/>
+              <v-text-field
+                label="Libellé"
+                v-model="libelle"
+                :readonly="readonly"
+                :filled="readonly"
+                maxlength="3"
+                ref="deviseLabel"
+                autofocus
+              />
+              <v-select
+                label="Type"
+                v-model="typeDevise"
+                :items="typeItems"
+                item-text="label"
+                item-value="value"
+                :readonly="readonly"
+                :filled="readonly"
+              ></v-select>
+              <v-checkbox label="CEE" v-model="cee" :readonly="readonly" />
             </v-form>
           </v-col>
         </v-row>
@@ -159,8 +175,8 @@ export default class DeviseVue extends Vue {
   ];
 
   public open(devise: DeviseMaintenance): Promise<boolean> {
-		this.readonly = true;
-		this.devise = new DeviseMaintenance();
+    this.readonly = true;
+    this.devise = new DeviseMaintenance();
     this.deviseBase = devise;
 
     this.setDevise(devise);
@@ -246,8 +262,8 @@ export default class DeviseVue extends Vue {
     if (!this.isValid) return false;
 
     this.saveLoading = true;
-		
-		this.mapDevise();
+
+    this.mapDevise();
 
     if (this.newRecord) {
       await DeviseApi.createDevise(this.devise)

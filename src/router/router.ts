@@ -125,8 +125,7 @@ export const asyncRoutes: RouteConfig[] = [
       },
       {
         path: 'devises',
-        component: () =>
-          import(/* webpackChunkName: "devises" */ '@/views/Maintenance/Devises/index.vue'),
+        component: () => import(/* webpackChunkName: "devises" */ '@/views/Maintenance/Devises/index.vue'),
         name: 'Devises',
         meta: {
           title: 'Devises',
@@ -136,15 +135,14 @@ export const asyncRoutes: RouteConfig[] = [
       },
       {
         path: 'taux',
-        component: () =>
-          import(/* webpackChunkName: "taux" */ '@/views/Maintenance/Taux/index.vue'),
+        component: () => import(/* webpackChunkName: "taux" */ '@/views/Maintenance/Taux/index.vue'),
         name: 'Taux',
         meta: {
           title: 'Taux',
           icon: 'mdi-sack-percent',
           affix: true
         }
-      },
+      }
     ]
   },
   {

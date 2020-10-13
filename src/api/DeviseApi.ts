@@ -27,10 +27,7 @@ export default abstract class DeviseApi {
     return response.data;
   }
 
-  static async updateDevise(
-    updatedDevise: DeviseMaintenanceDTO,
-    oldDevise: DeviseMaintenanceDTO
-  ): Promise<boolean> {    
+  static async updateDevise(updatedDevise: DeviseMaintenanceDTO, oldDevise: DeviseMaintenanceDTO): Promise<boolean> {
     const data = {
       updatedDevise,
       oldDevise

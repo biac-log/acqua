@@ -18,13 +18,7 @@
         ></v-text-field>
       </v-card-title>
 
-      <v-data-table
-        :headers="headers"
-        :items="taux"
-        :search="search"
-        :loading="isLoadingTaux"
-        @click:row="openTaux"
-      >
+      <v-data-table :headers="headers" :items="taux" :search="search" :loading="isLoadingTaux" @click:row="openTaux">
         <template v-slot:[`item.date`]="{ item }">
           <span>{{ item.date | dateToString }}</span>
         </template>
@@ -60,8 +54,8 @@ export default class TauxIndexVue extends Vue {
     { text: 'Base', value: 'base' },
     { text: 'Code', value: 'code' },
     { text: 'Date', value: 'date' },
-    {text: 'Com', value: 'com'},
-    {text: 'Tar', value: 'tar'},
+    { text: 'Com', value: 'com' },
+    { text: 'Tar', value: 'tar' }
   ];
 
   private async loadTaux() {
@@ -99,5 +93,4 @@ export default class TauxIndexVue extends Vue {
 }
 </script>
 
-<style>
-</style>
+<style></style>

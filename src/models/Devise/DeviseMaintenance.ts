@@ -19,6 +19,6 @@ export class DeviseMaintenance extends DeviseMaintenanceDTO {
   }
 
   public static rules = {
-    libelle: [(v: string) => !!v || 'Libellé requis.'],
+    libelle: [(v: string) => !!v || 'Libellé requis.']
   };
 }
