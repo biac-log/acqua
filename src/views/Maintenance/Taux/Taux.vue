@@ -62,6 +62,7 @@
                 :readonly="readonly"
                 :filled="readonly"
                 autofocus
+                :hide-details="readonly"
               ></v-select>
             </v-col>
             <v-col cols="6">
@@ -73,6 +74,7 @@
                 item-value="code"
                 :readonly="readonly"
                 :filled="readonly"
+                :hide-details="readonly"
               ></v-select>
             </v-col>
             <v-col cols="12"
@@ -86,10 +88,22 @@
                 :hide-details="readonly"
             /></v-col>
             <v-col cols="6"
-              ><v-text-field label="Com" v-model="com" :readonly="readonly" :filled="readonly"></v-text-field
+              ><v-text-field
+                label="Com"
+                v-model="com"
+                :readonly="readonly"
+                :filled="readonly"
+                :hide-details="readonly"
+              ></v-text-field
             ></v-col>
             <v-col cols="6">
-              <v-text-field label="Tar" v-model="tar" :readonly="readonly" :filled="readonly"></v-text-field>
+              <v-text-field
+                label="Tar"
+                v-model="tar"
+                :readonly="readonly"
+                :filled="readonly"
+                :hide-details="readonly"
+              ></v-text-field>
             </v-col>
           </v-row>
         </v-form>
@@ -306,7 +320,7 @@ export default class TauxVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-      await  TauxApi.update(this.taux, this.tauxBase)
+      await TauxApi.update(this.taux, this.tauxBase)
         .then(() => {
           this.readonly = true;
           this.successMessage.show('Le taux a été mis à jour avec succès.', '');
