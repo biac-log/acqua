@@ -77,7 +77,7 @@
                 :hide-details="readonly"
               ></v-select>
             </v-col>
-            <v-col cols="12"
+            <v-col cols="12" v-if="deviseParDate"
               ><date-picker
                 id="date"
                 label="Date"
@@ -163,6 +163,7 @@ import { DateTime } from '@/models/DateTime';
 import { Devise } from '@/models/Financier';
 import DeviseApi from '@/api/DeviseApi';
 import DatePicker from '@/components/DatePicker.vue';
+import { ApplicationModule } from '@/store/modules/application';
 
 @Component({
   name: 'TauxVue',
@@ -174,6 +175,10 @@ export default class TauxVue extends Vue {
   @Ref() successMessage!: AlertMessageVue;
 
   @Ref() tauxDialog!: any;
+
+  get deviseParDate() {
+    return ApplicationModule.parametre.deviseParDate;
+  }
 
   private display = false;
   private isValid = true;
@@ -239,6 +244,8 @@ export default class TauxVue extends Vue {
     this.setModel(new Taux());
     this.tauxBase = new Taux();
     this.newRecord = true;
+
+    this.date = DateTime.today('DD/MM/YYYY');
 
     this.display = true;
     this.$nextTick(() => {
