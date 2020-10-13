@@ -7,12 +7,18 @@ export default abstract class TauxApi {
     return response.data.map((taux) => new Taux(taux));
   }
 
-  static async getTaux() {
-    console.log('getTaux');
-  }
-
   static async createTaux(taux: Taux): Promise<boolean> {
     const response = await api.AcQuaCore.post<boolean>('/taux', taux);
+
+    return response.data;
+  }
+
+  static async update(updatedTaux: Taux, oldTaux: Taux): Promise<boolean> {
+    const data = {
+      updatedTaux,
+      oldTaux
+    };
+    const response = await api.AcQuaCore.put<boolean>('/taux', data);
 
     return response.data;
   }

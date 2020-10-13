@@ -2,12 +2,12 @@
   <v-dialog
     v-model="display"
     @click:outside="closeDialog"
-    @keydown.f2.stop="modifierTaux"
+    @keydown.f2.stop="modifierModel"
     @keydown.esc.prevent="cancelEdit()"
-    @keydown.alt.enter.stop="saveTaux()"
+    @keydown.alt.enter.stop="saveModel()"
     :persistent="!readonly || saveLoading || deleteLoading"
     ref="tauxDialog"
-    max-width="20%"
+    max-width="30%"
   >
     <v-card>
       <v-toolbar color="primary" dark flat>
@@ -15,12 +15,12 @@
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierTaux" v-on="on">
+            <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierModel" v-on="on">
               <v-icon left>mdi-pencil</v-icon>Modifier
             </v-btn>
           </template>
           <span>
-            Modifier la devise
+            Modifier le taux
             <span class="shortcutTooltip">F2</span>
           </span>
         </v-tooltip>
@@ -31,7 +31,7 @@
               class="mr-10"
               color="error"
               :disabled="saveLoading"
-              @click="deleteDevise"
+              @click="deleteModel"
               :loading="deleteLoading"
             >
               <v-icon left>mdi-delete</v-icon>Supprimer
@@ -123,7 +123,7 @@
               color="success"
               :loading="saveLoading"
               :disabled="deleteLoading"
-              @click="saveDevise()"
+              @click="saveModel()"
               tabindex="17"
             >
               <v-icon left>mdi-content-save</v-icon>Sauvegarder
@@ -204,7 +204,7 @@ export default class TauxVue extends Vue {
     this.taux = new Taux();
     this.tauxBase = taux;
 
-    this.setTaux(taux);
+    this.setModel(taux);
 
     this.display = true;
     this.newRecord = false;
@@ -222,7 +222,7 @@ export default class TauxVue extends Vue {
 
   public async openNew(): Promise<number> {
     this.readonly = false;
-    this.setTaux(new Taux());
+    this.setModel(new Taux());
     this.tauxBase = new Taux();
     this.newRecord = true;
 
@@ -237,7 +237,7 @@ export default class TauxVue extends Vue {
     });
   }
 
-  private setTaux(taux: Taux) {
+  private setModel(taux: Taux) {
     this.base = taux.base;
     this.code = taux.code;
     this.date = taux.dateDate;
@@ -245,7 +245,7 @@ export default class TauxVue extends Vue {
     this.tar = taux.tar.toIntString();
   }
 
-  private mapTaux() {
+  private mapModel() {
     this.taux.base = this.base;
     this.taux.code = this.code;
     this.taux.dateDate = this.date;
@@ -258,39 +258,39 @@ export default class TauxVue extends Vue {
     this.readonly = true;
     this.alertMessage.clear();
     this.successMessage.clear();
-    this.setTaux(new Taux());
+    this.setModel(new Taux());
     this.reject();
   }
 
-  private async loadTaux(id: number) {
-    this.getLoading = true;
+  // private async loadTaux(id: number) {
+  //   this.getLoading = true;
 
-    const taux = await TauxApi.getTaux();
+  //   const taux = await TauxApi.getTaux();
 
-    // this.setTaux(taux);
-    // this.tauxBase = taux;
+  //   this.setModel(taux);
+  //   this.tauxBase = taux;
 
-    this.getLoading = false;
-  }
+  //   this.getLoading = false;
+  // }
 
-  private modifierDevise() {
+  private modifierModel() {
     if (!this.getLoading) {
       this.readonly = false;
       // this.$nextTick(() => this.deviseLabel.focus());
     }
   }
 
-  private deleteDevise() {
+  private deleteModel() {
     console.log('delete');
   }
 
-  private async saveDevise() {
+  private async saveModel() {
     (this.$refs.form as any).validate();
     if (!this.isValid) return false;
 
     this.saveLoading = true;
 
-    this.mapTaux();
+    this.mapModel();
 
     if (this.newRecord) {
       await TauxApi.createTaux(this.taux)
@@ -299,20 +299,20 @@ export default class TauxVue extends Vue {
           this.closeDialog();
         })
         .catch((err) => {
-          this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Devise', displayAxiosError(err));
+          this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Model', displayAxiosError(err));
           this.readonly = false;
         })
         .finally(() => {
           this.saveLoading = false;
         });
     } else {
-      /* await  DeviseApi.updateDevise(this.devise, this.deviseBase)
+      await  TauxApi.update(this.taux, this.tauxBase)
         .then(() => {
           this.readonly = true;
-          this.successMessage.show('La devise a été mis à jour avec succès.', '');
+          this.successMessage.show('Le taux a été mis à jour avec succès.', '');
           this.resolve(true);
         })
-        .finally(() => (this.saveLoading = false)); */
+        .finally(() => (this.saveLoading = false));
     }
   }
 

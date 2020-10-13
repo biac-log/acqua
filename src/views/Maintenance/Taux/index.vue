@@ -86,16 +86,15 @@ export default class TauxIndexVue extends Vue {
   }
 
   private openTaux(taux: Taux) {
-    console.log('openTaux');
-    // this.deviseDialog
-    //   .open(devise)
-    //   .then((reloadOnClose: boolean) => {
-    //     if (reloadOnClose) this.loadTaux();
-    //   })
-    //   .catch(() => console.log('caught'))
-    //   .finally(() => {
-    //     this.$nextTick(() => (this.$refs.searchFocus as any).focus());
-    //   });
+    this.tauxDialog
+      .open(taux)
+      .then((reloadOnClose: boolean) => {
+        if (reloadOnClose) this.loadTaux();
+      })
+      .catch(() => console.log('caught'))
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.searchFocus as any).focus());
+      });
   }
 }
 </script>
