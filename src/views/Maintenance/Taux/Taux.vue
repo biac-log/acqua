@@ -8,6 +8,7 @@
     :persistent="!readonly || saveLoading || deleteLoading"
     ref="tauxDialog"
     max-width="30%"
+    eager
   >
     <v-card>
       <v-toolbar color="primary" dark flat>
