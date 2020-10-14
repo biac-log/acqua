@@ -1,6 +1,9 @@
 import api from '@/api/AxiosApi';
+import { TypeCompte } from '@/models/Compte/TypeCompte';
+import { TypeCompteDTO } from '@/models/Financier/Get/TypeCompte';
 import { EntetePieceComptable, Journal, JournalDTO } from '@/models/OperationDiverse';
 import { PeriodeComptable, PeriodeComptableDTO } from '@/models/OperationDiverse/PeriodeComptable';
+import { PieceComptable, PieceComptableDTO } from '@/models/OperationDiverse/PieceComptable';
 import { Pagination } from '@/models/Pagination';
 import { PaginationResult } from '@/models/PaginationResult';
 
@@ -25,6 +28,20 @@ export default class OperationDiverseApi {
     );
     return response.data;
   }
+
+  static async getPieceComptable(
+    periode: string,
+    numeroJournal: string | number,
+    numeroPiece: string | number
+  ): Promise<PieceComptable> {
+    const response = await api.AcQuaCore.get<PieceComptableDTO>(
+      `/OperationDiverse/GetPieceComptable?periode=${periode}&journal=${numeroJournal}&piece=${numeroPiece}`
+    );
+    return new PieceComptable(response.data);
+  }
+
+  static async getTypesComptesOD(): Promise<TypeCompte[]> {
+    const response = await api.AcQuaCore.get<TypeCompteDTO[]>(`/OperationDiverse/GetTypesCompteOD`);
+    return response.data.map((TypeCompteDTO) => new TypeCompte(TypeCompteDTO));
+  }
 }
-// http://localhost:5000/OperationDiverse/GetEntetePiecesComptables?Page=1&Limit=10&Term=&SortBy=&SortByAsc=&NumeroJournal=91&Periode=courante
-// http://localhost:5000/OperationDiverse/GetEntetePiecesComptables?Page=1&Limit=10&NumeroJournal=91&Periode=courantez

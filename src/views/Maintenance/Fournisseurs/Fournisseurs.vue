@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>
         Fournisseurs
-        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click.stop="addFournisseur">
+        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click.stop="addFournisseur" v-focus>
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
@@ -111,6 +111,7 @@ export default class extends Vue {
   }
 
   private addFournisseur() {
+<<<<<<< HEAD
     this.fournisseurDialog
       .openNew()
       .then(() => {
@@ -120,6 +121,11 @@ export default class extends Vue {
       .finally(() => {
         this.$nextTick(() => (this.$refs.searchFocus as any).focus());
       });
+=======
+    this.fournisseurDialog.openNew().then((numero: number) => {
+      this.loadFournisseurs();
+    });
+>>>>>>> feature/R202010-operationDiverse-read
   }
 }
 </script>

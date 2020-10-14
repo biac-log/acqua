@@ -323,7 +323,7 @@
 import { Component, Vue, PropSync, Watch, Ref } from 'vue-property-decorator';
 import { TypeCompte, Devise, TypeMouvement, getTypesMouvements } from '@/models/AchatVente';
 import SearchCaseTvaVue from '@/components/search/SearchCaseTva.vue';
-import SearchEcheancierVue from './SearchEcheancier.vue';
+import SearchEcheancierVue from '@/components/search/SearchEcheancier.vue';
 import SearchDossierVue from '@/components/search/SearchDossier.vue';
 import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import { Ventilation, Journal, PieceAchatVente } from '@/models/Financier';
@@ -711,34 +711,6 @@ export default class VentilationVue extends Vue {
     this.ventilations.push(ventilation);
   }
   //#endregion
-
-  // private calculMontant(){
-  //   if(this.caseTva.typeCase == 50)
-  //     this.montant = this.calculMontantTva().toComptaString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
-  //   else if(this.caseTva.typeCase == 1)
-  //     this.montant = this.calculMontantTaxable().toComptaString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
-  // }
-
-  // private calculMontantTva() : number{
-  //   let montantTva = this.tvaCalcule - this.tvaImpute;
-  //   if(this.typesMouvementsSelected.id == "DB") montantTva = this.tvaImpute -  this.tvaCalcule;
-  //   if(montantTva < 0)montantTva = 0;
-  //   return montantTva;
-  // }
-
-  // private calculMontantTaxable() : number {
-  //   let montantTaxable = this.tvaCalcule - this.tvaImpute;
-  //   if(this.typesMouvementsSelected.id == "CR")
-  //     montantTaxable = this.ventileDevise - montantTaxable;
-  //   else montantTaxable = montantTaxable - this.ventileDevise;
-
-  //   if(montantTaxable < 0)
-  //     montantTaxable = 0;
-  //   else if(this.caseTva.tauxTvaCase)
-  //     montantTaxable = (montantTaxable / (1+ (this.caseTva.tauxTvaCase / 100)));
-
-  //   return montantTaxable;
-  // }
 
   private async loadCaseTvaAsync() {
     try {

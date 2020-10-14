@@ -32,8 +32,9 @@ export class PeriodeComptable extends PeriodeComptableDTO {
   }
 
   get libellePeriodeFull(): string {
-    let stPeriode = 'Courante';
-    if (this.typePeriodeComptable == 'precedente') stPeriode = 'Précédente';
+    let stPeriode = 'Période courante';
+    if (this.typePeriodeComptable == 'precedente') stPeriode = 'Période précédente';
+    if (this.typePeriodeComptable == 'anneePrecedente') stPeriode = 'Année précédente';
     return `${stPeriode} du ${this.dateDebut} au ${this.dateFin}`;
   }
 }
