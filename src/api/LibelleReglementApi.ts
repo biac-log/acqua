@@ -13,13 +13,13 @@ export default abstract class LibelleReglementApi {
     return true;
   }
 
-//   static async update(updatedTaux: Taux, oldTaux: Taux): Promise<boolean> {
-//     const data = {
-//       updatedTaux,
-//       oldTaux
-//     };
-//     const response = await api.AcQuaCore.put<boolean>('/taux', data);
+  static async update(updatedLibelleReglement: LibelleReglement, oldLibelleReglement: LibelleReglement): Promise<boolean> {
+    const data = {
+      updatedModel : updatedLibelleReglement,
+      oldModel : oldLibelleReglement
+    };
+    const response = await api.AcQuaCore.put<boolean>('/parametres/libellesreglement', data);
 
-//     return response.data;
-//   }
+    return response.data;
+  }
 }

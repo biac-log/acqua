@@ -57,9 +57,9 @@
               <v-text-field
                 label="Numéro"
                 v-model="numero"
-                :readonly="readonly && !newRecord"
-                :filled="readonly && !newRecord"
-                :hide-details="readonly && !newRecord"
+                :readonly="readonly || !newRecord"
+                :filled="readonly || !newRecord"
+                :hide-details="readonly || !newRecord"
                 maxlength="2"
               />
               <v-text-field
@@ -254,13 +254,13 @@ export default class LibelleReglementVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-      // await TauxApi.update(this.taux, this.tauxBase)
-      //   .then(() => {
-      //     this.readonly = true;
-      //     this.successMessage.show('Le taux a été mis à jour avec succès.', '');
-      //     this.resolve(true);
-      //   })
-      //   .finally(() => (this.saveLoading = false));
+      await LibelleReglementApi.update(this.model, this.modelBase)
+        .then(() => {
+          this.readonly = true;
+          this.successMessage.show('Le libellé a été mis à jour avec succès.', '');
+          this.resolve(true);
+        })
+        .finally(() => (this.saveLoading = false));
     }
   }
 
