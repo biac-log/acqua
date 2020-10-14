@@ -99,7 +99,6 @@ export default class AutocompleteComptes extends Vue {
   private async numeroCompteChangeAsync(
     value: string | { numero: string | number; nom: string; numeroNom: string } | undefined | null
   ) {
-    console.log('numeroCompteChange');
     if (!value)
       //Si vide
       this.resetCompte();
@@ -153,7 +152,6 @@ export default class AutocompleteComptes extends Vue {
 
   @Watch('searchCompte')
   private async autocompleteCompte(matchCode: string) {
-    console.log('autocompleteCompte ', matchCode);
     if (!matchCode) return;
     try {
       this.autocompleteLoading = true;
@@ -228,7 +226,6 @@ export default class AutocompleteComptes extends Vue {
 
     this.numeroCompte = compte.numero.toString();
     this.nomCompte = compte.nom;
-    console.log('compte set');
   }
 
   public focus() {
