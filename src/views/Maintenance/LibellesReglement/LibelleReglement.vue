@@ -69,6 +69,7 @@
                 :filled="readonly"
                 :hide-details="readonly"
                 maxlength="11"
+                class="mt-4"
               />
             </v-col>
           </v-row>
