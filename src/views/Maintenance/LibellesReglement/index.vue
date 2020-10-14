@@ -51,8 +51,8 @@ export default class LibellesReglementVue extends Vue {
   private isLoading = false;
   private items: LibelleReglement[] = [];
   private headers = [
-    { text: 'numero', value: 'numero' },
-    { text: 'libelle', value: 'libelle' },
+    { text: 'Numéro', value: 'numero' },
+    { text: 'Libellé', value: 'libelle' },
   ];
 
   private async loadItems() {
