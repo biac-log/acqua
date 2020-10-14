@@ -111,7 +111,6 @@ export default class extends Vue {
   }
 
   private addFournisseur() {
-<<<<<<< HEAD
     this.fournisseurDialog
       .openNew()
       .then(() => {
@@ -121,11 +120,6 @@ export default class extends Vue {
       .finally(() => {
         this.$nextTick(() => (this.$refs.searchFocus as any).focus());
       });
-=======
-    this.fournisseurDialog.openNew().then((numero: number) => {
-      this.loadFournisseurs();
-    });
->>>>>>> feature/R202010-operationDiverse-read
   }
 }
 </script>
