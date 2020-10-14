@@ -7,7 +7,7 @@
     @keydown.alt.enter.stop="saveModel()"
     :persistent="!readonly || saveLoading || deleteLoading"
     ref="itemDialog"
-    max-width="30%"
+    max-width="20%"
     eager
   >
     <v-card>
@@ -53,7 +53,24 @@
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-form ref="form" v-model="isValid" lazy-validation>
           <v-row justify="center" dense>
-            
+            <v-col cols="6">
+              <v-text-field
+                label="Numéro"
+                v-model="numero"
+                :readonly="readonly && !newRecord"
+                :filled="readonly && !newRecord"
+                :hide-details="readonly && !newRecord"
+                maxlength="2"
+              />
+              <v-text-field
+                label="Libellé"
+                v-model="libelle"
+                :readonly="readonly"
+                :filled="readonly"
+                :hide-details="readonly"
+                maxlength="11"
+              />
+            </v-col>
           </v-row>
         </v-form>
       </v-card-text>
@@ -104,19 +121,14 @@
 
 <script lang="ts">
 import { Component, Vue, Ref } from 'vue-property-decorator';
-import { Taux } from '@/models/Taux/Taux';
+import { LibelleReglement } from '@/models/LibelleReglement/LibelleReglement';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
-import TauxApi from '@/api/TauxApi';
-import { DateTime } from '@/models/DateTime';
-import { Devise } from '@/models/Financier';
-import DeviseApi from '@/api/DeviseApi';
-import DatePicker from '@/components/DatePicker.vue';
-import { ApplicationModule } from '@/store/modules/application';
+import LibelleReglementApi from '@/api/LibelleReglementApi';
 
 @Component({
   name: 'LibelleReglementVue',
-  components: { AlertMessageVue, DatePicker }
+  components: { AlertMessageVue }
 })
 export default class LibelleReglementVue extends Vue {
   @Ref() readonly tauxLabel: any;
@@ -140,31 +152,24 @@ export default class LibelleReglementVue extends Vue {
     return this.saveLoading || this.deleteLoading || this.getLoading;
   }
 
-  private taux: Taux = new Taux();
-  private tauxBase: Taux = new Taux(); // Used for the reset method
+  private model: LibelleReglement = new LibelleReglement();
+  private modelBase: LibelleReglement = new LibelleReglement(); // Used for the reset method
 
-  /// Taux model
-  private base = '';
-  private code = '';
-  private date: DateTime = new DateTime();
-  private com = '';
-  private tar = '';
+  /// LibelleReglement model
+  private numero = '';
+  private libelle = '';
 
-  // private rules = DeviseMaintenance.rules;
-
-  private devises: Devise[] = [];
+  private rules = LibelleReglement.rules;
 
   private readonly = true;
   private newRecord = false;
 
-  private dateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
-
-  public open(taux: Taux): Promise<boolean> {
+  public open(item: LibelleReglement): Promise<boolean> {
     this.readonly = true;
-    this.taux = new Taux();
-    this.tauxBase = taux;
+    this.model = new LibelleReglement();
+    this.modelBase = item;
 
-    this.setModel(taux);
+    this.setModel(item);
 
     this.display = true;
     this.newRecord = false;
@@ -182,11 +187,9 @@ export default class LibelleReglementVue extends Vue {
 
   public async openNew(): Promise<number> {
     this.readonly = false;
-    this.setModel(new Taux());
-    this.tauxBase = new Taux();
+    this.setModel(new LibelleReglement());
+    this.modelBase = new LibelleReglement();
     this.newRecord = true;
-
-    this.date = DateTime.today('DD/MM/YYYY');
 
     this.display = true;
     this.$nextTick(() => {
@@ -199,20 +202,14 @@ export default class LibelleReglementVue extends Vue {
     });
   }
 
-  private setModel(taux: Taux) {
-    this.base = taux.base;
-    this.code = taux.code;
-    this.date = taux.dateDate;
-    this.com = taux.com.toIntString();
-    this.tar = taux.tar.toIntString();
+  private setModel(model: LibelleReglement) {
+    this.numero = model.numero.toIntString();
+    this.libelle = model.libelle;
   }
 
   private mapModel() {
-    this.taux.base = this.base;
-    this.taux.code = this.code;
-    this.taux.dateDate = this.date;
-    this.taux.com = this.com.toNumber();
-    this.taux.tar = this.tar.toNumber();
+    this.model.numero = this.numero.toNumber();
+    this.model.libelle = this.libelle;
   }
 
   private closeDialog() {
@@ -220,20 +217,9 @@ export default class LibelleReglementVue extends Vue {
     this.readonly = true;
     this.alertMessage.clear();
     this.successMessage.clear();
-    this.setModel(new Taux());
+    this.setModel(new LibelleReglement());
     this.reject();
   }
-
-  // private async loadTaux(id: number) {
-  //   this.getLoading = true;
-
-  //   const taux = await TauxApi.getTaux();
-
-  //   this.setModel(taux);
-  //   this.tauxBase = taux;
-
-  //   this.getLoading = false;
-  // }
 
   private modifierModel() {
     if (!this.getLoading) {
@@ -255,9 +241,9 @@ export default class LibelleReglementVue extends Vue {
     this.mapModel();
 
     if (this.newRecord) {
-      await TauxApi.createTaux(this.taux)
+      await LibelleReglementApi.create(this.model)
         .then(() => {
-          this.taux = this.tauxBase;
+          this.model = this.modelBase;
           this.closeDialog();
         })
         .catch((err) => {
@@ -268,35 +254,26 @@ export default class LibelleReglementVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-      await TauxApi.update(this.taux, this.tauxBase)
-        .then(() => {
-          this.readonly = true;
-          this.successMessage.show('Le taux a été mis à jour avec succès.', '');
-          this.resolve(true);
-        })
-        .finally(() => (this.saveLoading = false));
+      // await TauxApi.update(this.taux, this.tauxBase)
+      //   .then(() => {
+      //     this.readonly = true;
+      //     this.successMessage.show('Le taux a été mis à jour avec succès.', '');
+      //     this.resolve(true);
+      //   })
+      //   .finally(() => (this.saveLoading = false));
     }
   }
 
   private cancelEdit() {
-    this.taux = this.tauxBase;
+    this.model = this.modelBase;
     if (this.newRecord) {
       this.closeDialog();
     } else {
       this.readonly = true;
     }
   }
-
-  private async getDevises() {
-    if (this.devises.length <= 1) {
-      this.devises = await DeviseApi.getAllDevises();
-    }
-  }
 }
 </script>
 
 <style scoped>
-.v-dialog {
-  max-width: 60% !important;
-}
 </style>

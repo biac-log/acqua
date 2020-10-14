@@ -7,11 +7,11 @@ export default abstract class LibelleReglementApi {
     return response.data.map((l) => new LibelleReglement(l));
   }
 
-//   static async createTaux(taux: Taux): Promise<boolean> {
-//     const response = await api.AcQuaCore.post<boolean>('/taux', taux);
+  static async create(item: LibelleReglement): Promise<boolean> {
+    const response = await api.AcQuaCore.post<boolean>('/parametres/libellesreglement', item);
 
-//     return response.data;
-//   }
+    return true;
+  }
 
 //   static async update(updatedTaux: Taux, oldTaux: Taux): Promise<boolean> {
 //     const data = {
