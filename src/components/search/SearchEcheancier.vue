@@ -149,7 +149,7 @@ import { AgGridVue } from 'ag-grid-vue';
 import { Component, Vue, PropSync, Watch } from 'vue-property-decorator';
 import { GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
 import EcheancierApi from '@/api/EcheancierApi';
-import { Echeancier, EcheancierElement } from '../../../models/Echeancier';
+import { Echeancier, EcheancierElement } from '@/models/Echeancier';
 import { DateTime } from '@/models/DateTime';
 import _ from 'lodash';
 
@@ -160,8 +160,8 @@ import _ from 'lodash';
 export default class extends Vue {
   private dialog = false;
 
-  @PropSync('MontantAVentileDevise') private montantAVentileDevise!: number;
-  @PropSync('MontantAVentileBase') private montantAVentileBase!: number;
+  @PropSync('MontantAVentileDevise', { default: 0 }) private montantAVentileDevise!: number;
+  @PropSync('MontantAVentileBase', { default: 0 }) private montantAVentileBase!: number;
 
   private typeLoad!: string;
   private numeroEcheancierToLoad!: string;

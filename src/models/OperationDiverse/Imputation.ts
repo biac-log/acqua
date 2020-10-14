@@ -37,6 +37,10 @@ export class Imputation extends ImputationDTO {
     return `${this.numeroCompte} ${this.nomCompte}`;
   }
 
+  get libelleReference() {
+    return this.referencePiece ? `${this.referenceJournal}.${this.referencePiece}` : '';
+  }
+
   get debit() {
     return this.codeMouvement == 'DB' ? this.montantBase : 0;
   }

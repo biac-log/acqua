@@ -12,7 +12,7 @@
       @change="dossierChangeAsync"
       @keydown.ctrl.f.prevent="openSearchDossier()"
       :filled="readonly"
-      :hide-details="disabled || readonly"
+      :hide-details="isHideDetails"
       :readonly="isReadonly"
       :disabled="disabled"
       validate-on-blur
@@ -20,7 +20,7 @@
       item-text="idNom"
       item-value="idDossier"
       hide-no-data
-      dense
+      :dense="isDense"
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">
@@ -62,8 +62,10 @@ export default class AutoCompleteDossierVue extends Vue {
   @Ref() readonly searchDossierDialog!: SearchDossierVue;
   @Ref() readonly dossierComponent!: HTMLInputElement;
 
-  @PropSync('readonly', { type: Boolean }) isReadonly!: boolean;
-  @PropSync('disabled', { type: Boolean }) isDisabled!: boolean;
+  @PropSync('readonly', { type: Boolean, default: false }) isReadonly!: boolean;
+  @PropSync('disabled', { type: Boolean, default: false }) isDisabled!: boolean;
+  @PropSync('dense', { type: Boolean, default: false }) isDense!: boolean;
+  @PropSync('hide-details', { default: true }) isHideDetails!: boolean;
   @Prop() required!: boolean;
 
   private dossierLoading = false;
@@ -80,7 +82,7 @@ export default class AutoCompleteDossierVue extends Vue {
       return 'Dossier invalide';
     } else return true;
   }
-  private dossierSelected: DossierSearch = new DossierSearch();
+  private dossierSelected: DossierSearch | null = null;
   private nomDossier = '';
 
   @Watch('searchDossier')
@@ -120,6 +122,21 @@ export default class AutoCompleteDossierVue extends Vue {
     } else this.setDossier(value);
   }
 
+  public init(idDossier: string, nom: string) {
+    if (idDossier) {
+      const dossierToSelect = new DossierSearch();
+      dossierToSelect.idDossier = idDossier;
+      dossierToSelect.nom = nom;
+
+      this.dossiersSearch = [];
+      this.dossiersSearch.push(dossierToSelect);
+      this.dossierSelected = dossierToSelect;
+
+      this.idDossier = idDossier;
+      this.nomDossier = nom;
+    }
+  }
+
   public setDossier(dossier: DossierSearch) {
     if (dossier) {
       this.dossiersSearch = [];
@@ -133,7 +150,7 @@ export default class AutoCompleteDossierVue extends Vue {
   }
 
   public resetDossier() {
-    this.dossierSelected = new DossierSearch();
+    this.dossierSelected = null;
     this.searchDossier = '';
     this.idDossier = '';
     this.nomDossier = '';

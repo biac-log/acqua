@@ -1,4 +1,6 @@
 import api from '@/api/AxiosApi';
+import { TypeCompte } from '@/models/Compte/TypeCompte';
+import { TypeCompteDTO } from '@/models/Financier/Get/TypeCompte';
 import { EntetePieceComptable, Journal, JournalDTO } from '@/models/OperationDiverse';
 import { PeriodeComptable, PeriodeComptableDTO } from '@/models/OperationDiverse/PeriodeComptable';
 import { PieceComptable, PieceComptableDTO } from '@/models/OperationDiverse/PieceComptable';
@@ -36,5 +38,10 @@ export default class OperationDiverseApi {
       `/OperationDiverse/GetPieceComptable?periode=${periode}&journal=${numeroJournal}&piece=${numeroPiece}`
     );
     return new PieceComptable(response.data);
+  }
+
+  static async getTypesComptesOD(): Promise<TypeCompte[]> {
+    const response = await api.AcQuaCore.get<TypeCompteDTO[]>(`/OperationDiverse/GetTypesCompteOD`);
+    return response.data.map((TypeCompteDTO) => new TypeCompte(TypeCompteDTO));
   }
 }

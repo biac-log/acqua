@@ -56,57 +56,58 @@
           </v-btn>
         </v-toolbar>
         <v-card-text class="pb-0 pt-0">
-          <v-col cols="12" class="pr-5">
-            <v-row fill-height no-gutters>
-              <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
-              <v-row>
-                <v-col cols="3">
-                  <DatePicker
-                    ref="refDatePiece"
-                    name="datePiece"
-                    label="Date pièce"
-                    :date.sync="datePiece"
-                    :readonly.sync="readonly"
-                    :filled="readonly"
-                    :rules.sync="datePieceRules"
-                    :hide-details="readonly"
-                  ></DatePicker>
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field
-                    label="Débit"
-                    :value="debit | numberToString"
-                    :filled="readonly"
-                    :hide-details="readonly"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field
-                    label="Crédit"
-                    :value="credit | numberToString"
-                    :filled="readonly"
-                    :hide-details="readonly"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="3">
-                  <v-text-field
-                    label="A ventilé"
-                    :value="solde | numberToStringEvenZero"
-                    :filled="readonly"
-                    :hide-details="readonly"
-                    readonly
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row dense>
-                <v-col cols="12">
-                  <v-card class="pb-0" outlined>
-                    <v-toolbar color="#EEEEEE" flat dense>
-                      <v-card-title>
-                        Imputations
-                        <!-- <v-tooltip top open-delay="500">
+          <v-row>
+            <v-col cols="6" class="pr-5">
+              <v-row fill-height no-gutters>
+                <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
+                <v-row>
+                  <v-col cols="3">
+                    <DatePicker
+                      ref="refDatePiece"
+                      name="datePiece"
+                      label="Date pièce"
+                      :date.sync="datePiece"
+                      :readonly.sync="readonly"
+                      :filled="readonly"
+                      :rules.sync="datePieceRules"
+                      :hide-details="readonly"
+                    ></DatePicker>
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field
+                      label="Débit"
+                      :value="debit | numberToString"
+                      :filled="readonly"
+                      :hide-details="readonly"
+                      readonly
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field
+                      label="Crédit"
+                      :value="credit | numberToString"
+                      :filled="readonly"
+                      :hide-details="readonly"
+                      readonly
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field
+                      label="A ventilé"
+                      :value="solde | numberToStringEvenZero"
+                      :filled="readonly"
+                      :hide-details="readonly"
+                      readonly
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row dense>
+                  <v-col cols="12">
+                    <v-card class="pb-0" outlined>
+                      <v-toolbar color="#EEEEEE" flat dense>
+                        <v-card-title>
+                          Imputations
+                          <!-- <v-tooltip top open-delay="500">
                         <template v-slot:activator="{ on }">
                           <v-btn
                             color="primary"
@@ -123,25 +124,41 @@
                         </template>
                         <span>Ajouter une ligne <span class="shortcutTooltip"> + </span></span>
                       </v-tooltip> -->
-                      </v-card-title>
-                      <v-spacer></v-spacer>
-                    </v-toolbar>
-                    <v-data-table :headers="headersImputations" :items="imputations" @click:row="openImputation" dense>
-                      <template v-slot:[`item.debit`]="{ item }">
-                        <span>{{ item.debit | numberToString }}</span>
-                      </template>
-                      <template v-slot:[`item.credit`]="{ item }">
-                        <span>{{ item.credit | numberToString }}</span>
-                      </template>
-                    </v-data-table>
-                  </v-card>
-                </v-col>
+                        </v-card-title>
+                        <v-spacer></v-spacer>
+                      </v-toolbar>
+                      <v-data-table
+                        id="dataTable"
+                        :headers="headersImputations"
+                        :items="imputations"
+                        @click:row="openImputation"
+                        dense
+                        disable-pagination
+                        hide-default-footer
+                        height="352"
+                      >
+                        <template v-slot:[`item.debit`]="{ item }">
+                          <span>{{ item.debit | numberToString }}</span>
+                        </template>
+                        <template v-slot:[`item.credit`]="{ item }">
+                          <span>{{ item.credit | numberToString }}</span>
+                        </template>
+                      </v-data-table>
+                    </v-card>
+                  </v-col>
+                </v-row>
               </v-row>
-            </v-row>
-          </v-col>
-          <!-- <v-row dense>
-            <ExtraitVue ref="refExtraitVue" :isReadOnly.sync="readonly" :DatePiece.sync="datePiece"></ExtraitVue>
-          </v-row> -->
+            </v-col>
+            <v-col cols="6">
+              <ImputationVue
+                ref="refImputationVue"
+                :DatePiece.sync="datePiece"
+                :isReadonly.sync="readonly"
+                :periode.sync="periode"
+                :journal="journal"
+              ></ImputationVue>
+            </v-col>
+          </v-row>
         </v-card-text>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
@@ -378,22 +395,22 @@ export default class OperationDiverseVue extends Vue {
   }
 
   private openImputation(imputation: Imputation) {
-    // this.refExtraitVue
-    //   .open(this.journal, this.numeroPiece, extrait)
-    //   .then((resp: Extrait) => {
-    //     if (resp)
-    //       Vue.set(
-    //         this.extraits,
-    //         this.extraits.findIndex((d) => d == extrait),
-    //         resp
-    //       );
-    //     else this.extraits.splice(this.extraits.indexOf(extrait), 1);
-    //   })
-    //   .catch()
-    //   .finally(() => {
-    //     this.calculSolde();
-    //     this.gridExtraits?.focus();
-    //   });
+    this.refImputationVue
+      .open(this.journal, this.numeroPiece, imputation)
+      .then((resp: Imputation) => {
+        if (resp)
+          Vue.set(
+            this.imputations,
+            this.imputations.findIndex((d) => d == imputation),
+            resp
+          );
+        else this.imputations.splice(this.imputations.indexOf(imputation), 1);
+      })
+      .catch()
+      .finally(() => {
+        this.calculSolde();
+        //this.grid?.focus();
+      });
   }
 
   private init(piece: PieceComptable) {
@@ -608,5 +625,9 @@ export default class OperationDiverseVue extends Vue {
 
 .v-text-field.v-text-field--enclosed .v-text-field__details {
   margin-bottom: 0px;
+}
+
+#dataTable tbody tr {
+  cursor: pointer;
 }
 </style>
