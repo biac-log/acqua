@@ -13,10 +13,10 @@ export default abstract class TauxApi {
     return response.data;
   }
 
-  static async update(updatedTaux: Taux, oldTaux: Taux): Promise<boolean> {
+  static async update(updatedTaux: Taux, hashOldModel: string): Promise<boolean> {
     const data = {
       updatedTaux,
-      oldTaux
+      hashOldModel
     };
     const response = await api.AcQuaCore.put<boolean>('/taux', data);
 
