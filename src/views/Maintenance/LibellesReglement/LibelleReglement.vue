@@ -57,9 +57,9 @@
               <v-text-field
                 label="Numéro"
                 v-model="numero"
-                :readonly="readonly || !newRecord"
-                :filled="readonly || !newRecord"
-                :hide-details="readonly || !newRecord"
+                :readonly="keyReadonly"
+                :filled="keyReadonly"
+                :hide-details="keyReadonly"
                 maxlength="2"
               />
               <v-text-field
@@ -151,6 +151,10 @@ export default class LibelleReglementVue extends Vue {
 
   get isLoading() {
     return this.saveLoading || this.deleteLoading || this.getLoading;
+  }
+
+  get keyReadonly() {
+    return this.readonly || !this.newRecord;
   }
 
   private model: LibelleReglement = new LibelleReglement();
