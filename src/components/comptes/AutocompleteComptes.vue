@@ -20,6 +20,7 @@
       item-text="numeroNom"
       item-value="numero"
       hide-no-data
+      :dense="isDense"
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">
@@ -70,6 +71,7 @@ export default class AutocompleteComptes extends Vue {
 
   @PropSync('Readonly') private readonly!: boolean;
   @PropSync('TypeCompte') private typeCompte!: string;
+  @PropSync('dense', { default: false }) private isDense!: boolean;
   @Prop({ default: 'N° Compte' }) readonly label!: string;
   @Prop({ default: true }) hideDetails!: boolean;
 
@@ -84,15 +86,14 @@ export default class AutocompleteComptes extends Vue {
   private natureCompte = '';
 
   public init(numero: string, nom: string) {
-    const compteToSelect = {
-      numero: numero ? numero : '',
-      nom,
-      numeroNom: `${numero} ${nom}`
-    };
-
-    this.$nextTick(() => {
+    if (numero) {
+      const compteToSelect = {
+        numero: numero ? numero : '',
+        nom,
+        numeroNom: `${numero} ${nom}`
+      };
       this.setCompte(compteToSelect);
-    });
+    }
   }
 
   //#region Compte
