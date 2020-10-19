@@ -27,10 +27,10 @@ export default abstract class DeviseApi {
     return response.data;
   }
 
-  static async updateDevise(updatedDevise: DeviseMaintenanceDTO, oldDevise: DeviseMaintenanceDTO): Promise<boolean> {
+  static async updateDevise(updatedModel: DeviseMaintenanceDTO, hashOldModel: string): Promise<boolean> {
     const data = {
-      updatedDevise,
-      oldDevise
+      updatedModel,
+      hashOldModel
     };
     await api.AcQuaCore.put<DeviseMaintenanceDTO>(`devise`, data);
     return true;

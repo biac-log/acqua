@@ -279,7 +279,7 @@ export default class DeviseVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-      await DeviseApi.updateDevise(this.devise, this.deviseBase)
+      await DeviseApi.updateDevise(this.devise, this.deviseBase.hash)
         .then(() => {
           this.readonly = true;
           this.successMessage.show('La devise a été mis à jour avec succès.', '');

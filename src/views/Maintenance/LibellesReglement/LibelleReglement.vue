@@ -259,7 +259,7 @@ export default class LibelleReglementVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-      await LibelleReglementApi.update(this.model, this.modelBase)
+      await LibelleReglementApi.update(this.model, this.modelBase.hash)
         .then(() => {
           this.readonly = true;
           this.successMessage.show('Le libellé a été mis à jour avec succès.', '');

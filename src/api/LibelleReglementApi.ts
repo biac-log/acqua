@@ -13,10 +13,10 @@ export default abstract class LibelleReglementApi {
     return true;
   }
 
-  static async update(updatedLibelleReglement: LibelleReglement, oldLibelleReglement: LibelleReglement): Promise<boolean> {
+  static async update(updatedLibelleReglement: LibelleReglement, hashOldModel: string): Promise<boolean> {
     const data = {
       updatedModel : updatedLibelleReglement,
-      oldModel : oldLibelleReglement
+      hashOldModel : hashOldModel
     };
     const response = await api.AcQuaCore.put<boolean>('/parametres/libellesreglement', data);
 
