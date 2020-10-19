@@ -35,6 +35,7 @@
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 dense
+                autofocus
               ></v-select>
             </v-col>
             <v-col cols="4">
@@ -443,7 +444,7 @@ export default class VentilationVue extends Vue {
     this.$nextTick(() => {
       (this.$refs.form as any)?.resetValidation();
       this.init(ventilation, journal);
-      this.compteComponent?.focus();
+      // this.compteComponent?.focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -459,7 +460,7 @@ export default class VentilationVue extends Vue {
     this.$nextTick(() => {
       (this.$refs.form as any)?.resetValidation();
       this.init(ventilation, journal);
-      this.compteComponent?.focus();
+      // this.compteComponent?.focus();
     });
 
     return new Promise((resolve, reject) => {
