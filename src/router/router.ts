@@ -68,7 +68,7 @@ export const asyncRoutes: RouteConfig[] = [
         name: 'Financier',
         meta: {
           title: 'Financier',
-          icon: 'mdi-bank-transfer',
+          icon: 'mdi-cash',
           affix: true
         }
       }
