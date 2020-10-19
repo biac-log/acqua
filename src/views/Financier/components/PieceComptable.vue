@@ -5,7 +5,7 @@
     eager
     width="80%"
     :persistent="!readonly || saveLoading || deleteLoading"
-    @click:outside="closeDialog"
+    @click:outside.stop="clickOutside"
     @keydown.f2.stop="modifierPiece()"
     @keydown.46.prevent.stop="deletePiece"
     @keydown.107.prevent.stop="createExtrait"
@@ -587,6 +587,10 @@ export default class PieceComptableVue extends Vue {
     this.reset();
     this.dialog = false;
     this.reject();
+  }
+
+  private clickOutside() {
+    if(this.readonly) this.closeDialog();
   }
 }
 </script>
