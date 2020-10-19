@@ -16,7 +16,7 @@
       <v-card>
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
-            <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
+            <p class="mb-0" v-if="!newRecord">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
             <p class="mb-0" v-else>Nouvelle pièce</p>
             <p class="ml-10 mb-0 textMini">Période {{ periode.libellePeriodeFull.toLowerCase() }}</p>
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
@@ -201,7 +201,13 @@
         <Confirm ref="confirmDialog"></Confirm>
       </v-card>
     </v-form>
-    <v-dialog v-model="datePieceDialog" width="300" eager style="z-index: 999999999999999999" @keydown.enter.stop="datePieceDialog = false">
+    <v-dialog
+      v-model="datePieceDialog"
+      width="300"
+      eager
+      style="z-index: 999999999999999999"
+      @keydown.enter.stop="datePieceDialog = false"
+    >
       <v-card>
         <v-card-title primary-title>Nouvelle pièce</v-card-title>
         <v-card-text>
@@ -287,6 +293,7 @@ export default class PieceComptableVue extends Vue {
   get isLoading() {
     return this.saveLoading || this.deleteLoading || this.pieceIsLoading;
   }
+  private newRecord = false;
 
   private validateDatePiece(date: string): boolean {
     const dateTime = new DateTime(date);
@@ -296,7 +303,10 @@ export default class PieceComptableVue extends Vue {
   private hash = '';
   public async openNew(periode: PeriodeComptable, journal: Journal): Promise<string> {
     this.dialog = true;
-    this.$nextTick(() => (this.datePieceDialog = true));
+    this.$nextTick(() => {
+      this.newRecord = true;
+      this.datePieceDialog = true;
+    });
     this.reset();
     this.periode = periode;
     this.journal = journal;
@@ -318,6 +328,7 @@ export default class PieceComptableVue extends Vue {
   }
 
   public open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<EntetePieceComptable> {
+    this.newRecord = false;
     this.dialog = true;
     this.readonly = true;
     this.periode = periode;
@@ -400,6 +411,7 @@ export default class PieceComptableVue extends Vue {
     this.hash = '';
     this.soldeInitial = '';
     this.soldeActuel = '';
+    this.newRecord = false;
     (this.$refs.extraits as any)?.reset();
   }
 
