@@ -18,7 +18,7 @@
           <v-card-title class="d-flex justify-start">
             <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
             <p class="mb-0" v-else>Nouvelle pièce</p>
-            <p class="ml-10 mb-0 textMini">{{ periode.libellePeriodeFull }}</p>
+            <p class="ml-10 mb-0 textMini">Période {{ periode.libellePeriodeFull.toLowerCase() }}</p>
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
           <v-spacer></v-spacer>
