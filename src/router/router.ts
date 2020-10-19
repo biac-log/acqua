@@ -142,6 +142,16 @@ export const asyncRoutes: RouteConfig[] = [
           icon: 'mdi-sack-percent',
           affix: true
         }
+      },
+      {
+        path: 'libellesreglement',
+        component: () => import(/* webpackChunkName: "libellesreglement" */ '@/views/Maintenance/LibellesReglement/index.vue'),
+        name: 'Libellés règlement',
+        meta: {
+          title: 'Libellés règlement',
+          icon: 'mdi-format-title',
+          affix: true
+        }
       }
     ]
   },
