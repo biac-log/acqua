@@ -60,8 +60,8 @@
                 :items="devises"
                 item-text="libelle"
                 item-value="code"
-                :readonly="readonly"
-                :filled="readonly"
+                :readonly="keyReadonly"
+                :filled="keyReadonly"
                 autofocus
                 :hide-details="readonly"
               ></v-select>
@@ -73,8 +73,8 @@
                 :items="devises"
                 item-text="libelle"
                 item-value="code"
-                :readonly="readonly"
-                :filled="readonly"
+                :readonly="keyReadonly"
+                :filled="keyReadonly"
                 :hide-details="readonly"
               ></v-select>
             </v-col>
@@ -83,8 +83,8 @@
                 id="date"
                 label="Date"
                 :date.sync="date"
-                :readonly.sync="readonly"
-                :filled="readonly"
+                :readonly.sync="keyReadonly"
+                :filled="keyReadonly"
                 :rules.sync="dateRules"
                 :hide-details="readonly"
             /></v-col>
@@ -179,6 +179,10 @@ export default class TauxVue extends Vue {
 
   get deviseParDate() {
     return ApplicationModule.parametre.deviseParDate;
+  }
+
+  get keyReadonly() {
+    return this.readonly || !this.newRecord;
   }
 
   private display = false;
@@ -328,7 +332,7 @@ export default class TauxVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-      await TauxApi.update(this.taux, this.tauxBase)
+      await TauxApi.update(this.taux, this.tauxBase.hash)
         .then(() => {
           this.readonly = true;
           this.successMessage.show('Le taux a été mis à jour avec succès.', '');

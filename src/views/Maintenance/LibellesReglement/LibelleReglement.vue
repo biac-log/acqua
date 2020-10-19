@@ -2,25 +2,26 @@
   <v-dialog
     v-model="display"
     @click:outside="closeDialog"
-    @keydown.f2.stop="modifierDevise"
+    @keydown.f2.stop="modifierModel"
     @keydown.esc.prevent="cancelEdit()"
-    @keydown.alt.enter.stop="saveDevise()"
+    @keydown.alt.enter.stop="saveModel()"
     :persistent="!readonly || saveLoading || deleteLoading"
-    ref="deviseDialog"
+    ref="itemDialog"
     max-width="20%"
+    eager
   >
     <v-card>
       <v-toolbar color="primary" dark flat>
-        <v-card-title>{{ newRecord ? 'Nouvelle Devise' : `${id} - ${libelle}` }}</v-card-title>
+        <v-card-title>{{ newRecord ? 'Nouveau libellé' : `${numero}` }}</v-card-title>
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierDevise" v-on="on">
+            <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierModel" v-on="on">
               <v-icon left>mdi-pencil</v-icon>Modifier
             </v-btn>
           </template>
           <span>
-            Modifier la devise
+            Modifier le libellé
             <span class="shortcutTooltip">F2</span>
           </span>
         </v-tooltip>
@@ -31,7 +32,7 @@
               class="mr-10"
               color="error"
               :disabled="saveLoading"
-              @click="deleteDevise"
+              @click="deleteModel"
               :loading="deleteLoading"
             >
               <v-icon left>mdi-delete</v-icon>Supprimer
@@ -50,31 +51,29 @@
       <v-card-text>
         <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
-        <v-row justify="center">
-          <v-col cols="6">
-            <v-form ref="form" v-model="isValid" lazy-validation>
+        <v-form ref="form" v-model="isValid" lazy-validation>
+          <v-row justify="center" dense>
+            <v-col cols="6">
+              <v-text-field
+                label="Numéro"
+                v-model="numero"
+                :readonly="keyReadonly"
+                :filled="keyReadonly"
+                :hide-details="keyReadonly"
+                maxlength="2"
+              />
               <v-text-field
                 label="Libellé"
                 v-model="libelle"
                 :readonly="readonly"
                 :filled="readonly"
-                maxlength="3"
-                ref="deviseLabel"
-                autofocus
+                :hide-details="readonly"
+                maxlength="11"
+                class="mt-4"
               />
-              <v-select
-                label="Type"
-                v-model="typeDevise"
-                :items="typeItems"
-                item-text="label"
-                item-value="value"
-                :readonly="readonly"
-                :filled="readonly"
-              ></v-select>
-              <v-checkbox label="CEE" v-model="cee" :readonly="readonly" />
-            </v-form>
-          </v-col>
-        </v-row>
+            </v-col>
+          </v-row>
+        </v-form>
       </v-card-text>
       <v-card-actions v-if="!readonly">
         <v-spacer />
@@ -105,14 +104,14 @@
               color="success"
               :loading="saveLoading"
               :disabled="deleteLoading"
-              @click="saveDevise()"
+              @click="saveModel()"
               tabindex="17"
             >
               <v-icon left>mdi-content-save</v-icon>Sauvegarder
             </v-btn>
           </template>
           <span>
-            Sauvegarder la devise
+            Sauvegarder le libellé
             <span class="shortcutTooltip">alt + enter</span>
           </span>
         </v-tooltip>
@@ -123,22 +122,21 @@
 
 <script lang="ts">
 import { Component, Vue, Ref } from 'vue-property-decorator';
-import { DeviseMaintenance } from '@/models/Devise/DeviseMaintenance';
+import { LibelleReglement } from '@/models/LibelleReglement/LibelleReglement';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
-import DeviseApi from '@/api/DeviseApi';
+import LibelleReglementApi from '@/api/LibelleReglementApi';
 
 @Component({
-  name: 'DeviseVue',
+  name: 'LibelleReglementVue',
   components: { AlertMessageVue }
 })
-export default class DeviseVue extends Vue {
-  @Ref() readonly deviseLabel: any;
+export default class LibelleReglementVue extends Vue {
+  @Ref() readonly tauxLabel: any;
   @Ref() alertMessage!: AlertMessageVue;
   @Ref() successMessage!: AlertMessageVue;
 
-  @Ref() paiementField!: any;
-  @Ref() DeviseDialog!: any;
+  @Ref() itemDialog!: any;
 
   private display = false;
   private isValid = true;
@@ -155,38 +153,35 @@ export default class DeviseVue extends Vue {
     return this.saveLoading || this.deleteLoading || this.getLoading;
   }
 
-  private devise: DeviseMaintenance = new DeviseMaintenance();
-  private deviseBase: DeviseMaintenance = new DeviseMaintenance(); // Used for the reset method
+  get keyReadonly() {
+    return this.readonly || !this.newRecord;
+  }
 
-  /// Devise model
-  private id = 0;
+  private model: LibelleReglement = new LibelleReglement();
+  private modelBase: LibelleReglement = new LibelleReglement(); // Used for the reset method
+
+  /// LibelleReglement model
+  private numero = '';
   private libelle = '';
-  private typeDevise = '';
-  private cee = false;
 
-  private rules = DeviseMaintenance.rules;
+  private rules = LibelleReglement.rules;
 
   private readonly = true;
   private newRecord = false;
 
-  private typeItems = [
-    { label: 'Décimal', value: 'D' },
-    { label: 'Entier', value: 'E' }
-  ];
-
-  public open(devise: DeviseMaintenance): Promise<boolean> {
+  public open(item: LibelleReglement): Promise<boolean> {
     this.readonly = true;
-    this.devise = new DeviseMaintenance();
-    this.deviseBase = devise;
+    this.model = new LibelleReglement();
+    this.modelBase = item;
 
-    this.setDevise(devise);
+    this.setModel(item);
 
     this.display = true;
     this.newRecord = false;
     this.reloadOnClose = false;
 
     this.$nextTick(() => {
-      (this.deviseLabel as any).focus();
+      // (this.deviseLabel as any).focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -197,13 +192,13 @@ export default class DeviseVue extends Vue {
 
   public async openNew(): Promise<number> {
     this.readonly = false;
-    this.setDevise(new DeviseMaintenance());
-    this.deviseBase = new DeviseMaintenance();
+    this.setModel(new LibelleReglement());
+    this.modelBase = new LibelleReglement();
     this.newRecord = true;
 
     this.display = true;
     this.$nextTick(() => {
-      (this.deviseLabel as any).focus();
+      // (this.deviseLabel as any).focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -212,18 +207,14 @@ export default class DeviseVue extends Vue {
     });
   }
 
-  private setDevise(devise: DeviseMaintenance) {
-    this.id = devise.id;
-    this.libelle = devise.libelle;
-    this.typeDevise = devise.typeDevise;
-    this.cee = devise.cee;
+  private setModel(model: LibelleReglement) {
+    this.numero = model.numero.toIntString();
+    this.libelle = model.libelle;
   }
 
-  private mapDevise() {
-    this.devise.id = this.id;
-    this.devise.libelle = this.libelle;
-    this.devise.typeDevise = this.typeDevise;
-    this.devise.cee = this.cee;
+  private mapModel() {
+    this.model.numero = this.numero.toNumber();
+    this.model.libelle = this.libelle;
   }
 
   private closeDialog() {
@@ -231,58 +222,47 @@ export default class DeviseVue extends Vue {
     this.readonly = true;
     this.alertMessage.clear();
     this.successMessage.clear();
-    this.setDevise(new DeviseMaintenance());
+    this.setModel(new LibelleReglement());
     this.reject();
   }
 
-  private async loadDevise(id: number) {
-    this.getLoading = true;
-
-    const devise = await DeviseApi.getDeviseById(id);
-
-    this.setDevise(devise);
-    this.deviseBase = devise;
-
-    this.getLoading = false;
-  }
-
-  private modifierDevise() {
+  private modifierModel() {
     if (!this.getLoading) {
       this.readonly = false;
-      this.$nextTick(() => this.deviseLabel.focus());
+      // this.$nextTick(() => this.deviseLabel.focus());
     }
   }
 
-  private deleteDevise() {
+  private deleteModel() {
     console.log('delete');
   }
 
-  private async saveDevise() {
+  private async saveModel() {
     (this.$refs.form as any).validate();
     if (!this.isValid) return false;
 
     this.saveLoading = true;
 
-    this.mapDevise();
+    this.mapModel();
 
     if (this.newRecord) {
-      await DeviseApi.createDevise(this.devise)
+      await LibelleReglementApi.create(this.model)
         .then(() => {
-          this.devise = this.deviseBase;
+          this.model = this.modelBase;
           this.closeDialog();
         })
         .catch((err) => {
-          this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Devise', displayAxiosError(err));
+          this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Model', displayAxiosError(err));
           this.readonly = false;
         })
         .finally(() => {
           this.saveLoading = false;
         });
     } else {
-      await DeviseApi.updateDevise(this.devise, this.deviseBase.hash)
+      await LibelleReglementApi.update(this.model, this.modelBase.hash)
         .then(() => {
           this.readonly = true;
-          this.successMessage.show('La devise a été mis à jour avec succès.', '');
+          this.successMessage.show('Le libellé a été mis à jour avec succès.', '');
           this.resolve(true);
         })
         .finally(() => (this.saveLoading = false));
@@ -290,7 +270,7 @@ export default class DeviseVue extends Vue {
   }
 
   private cancelEdit() {
-    this.devise = this.deviseBase;
+    this.model = this.modelBase;
     if (this.newRecord) {
       this.closeDialog();
     } else {
@@ -301,7 +281,4 @@ export default class DeviseVue extends Vue {
 </script>
 
 <style scoped>
-.v-dialog {
-  max-width: 60% !important;
-}
 </style>

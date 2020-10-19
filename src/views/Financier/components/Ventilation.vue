@@ -42,6 +42,8 @@
                 ref="compteComponent"
                 :Readonly.sync="readonly"
                 :TypeCompte.sync="typesComptesSelected.id"
+                :rules.sync="numeroCompteRules"
+                dense
                 @Change="compteChange"
               >
               </AutocompleteComptesVue>
@@ -388,6 +390,7 @@ export default class VentilationVue extends Vue {
   private numeroCompte = '';
   private nomCompte = '';
   private nomCompteRules: any = [(v: string) => !!v || 'Nom obligatoire'];
+  private numeroCompteRules: any = [(v: string) => !!v || 'Numéro obligatoire'];
   private natureCompte = '';
 
   private devises: Devise[] = [];
@@ -479,9 +482,9 @@ export default class VentilationVue extends Vue {
     this.nomCompte = ventilation?.nomCompte ? ventilation.nomCompte : '';
 
     if (ventilation) {
-      this.$nextTick(() => {
+      if (ventilation.numeroCompte)
         this.compteComponent?.init(ventilation.numeroCompte.toString(), ventilation.nomCompte);
-      });
+
       if (ventilation.dossier) {
         this.dossierComponent.setDossier(
           new DossierSearch({

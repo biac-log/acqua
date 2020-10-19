@@ -6,7 +6,7 @@
       v-model="numeroCompteSelected"
       :items="comptesSearch"
       :search-input.sync="searchCompte"
-      :rules="numeroCompteRules"
+      :rules="bindedRules"
       @keyup.enter="$event.target.select()"
       @focus="$event.target.select()"
       @change="numeroCompteChangeAsync"
@@ -17,9 +17,10 @@
       :loading="compteLoading || autocompleteLoading"
       validate-on-blur
       hide-selected
-      item-text="numeroNom"
       item-value="numero"
+      item-text="nom"
       hide-no-data
+      :dense="isDense"
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">
@@ -40,12 +41,8 @@
           <span>Recherche de compte <span class="shortcutTooltip">ctrl + f</span></span>
         </v-tooltip>
       </template>
-      <template v-slot:selection="{ item }">
-        {{ item.numero }}
-      </template>
-      <template v-slot:item="{ item }">
-        {{ item.numeroNom }}
-      </template>
+      <template v-slot:selection="{ item }"> {{ item.numero ? item.numero : '' }}</template>
+      <template v-slot:item="{ item }"> {{ item.numero ? item.numero : '' }} {{ item.nom }}</template>
     </v-combobox>
     <SearchCompteTierVue ref="searchCompteTierDialog"></SearchCompteTierVue>
     <SearchCompteGeneralVue ref="searchCompteGeneralDialog"></SearchCompteGeneralVue>
@@ -70,35 +67,29 @@ export default class AutocompleteComptes extends Vue {
 
   @PropSync('Readonly') private readonly!: boolean;
   @PropSync('TypeCompte') private typeCompte!: string;
+  @PropSync('dense', { default: false }) private isDense!: boolean;
+  @PropSync('rules', { default: undefined }) private bindedRules!: any;
   @Prop({ default: 'N° Compte' }) readonly label!: string;
   @Prop({ default: true }) hideDetails!: boolean;
 
   private compteLoading = false;
   private autocompleteLoading = false;
-  private numeroCompte = '';
-  private numeroCompteRules: any = [(v: string) => !!v || 'Numéro obligatoire'];
-  private comptesSearch: { numero: string | number; numeroNom: string }[] = [];
+  private comptesSearch: { numero: string | number; nom: string }[] = [];
   private searchCompte = '';
-  private numeroCompteSelected: { numero: string | number; nom: string; numeroNom: string } | null = null;
-  private nomCompte = '';
-  private natureCompte = '';
+  private numeroCompteSelected: { numero: string | number; nom: string } | null = null;
 
   public init(numero: string, nom: string) {
-    const compteToSelect = {
-      numero: numero ? numero : '',
-      nom,
-      numeroNom: `${numero} ${nom}`
-    };
-
-    this.$nextTick(() => {
+    if (numero) {
+      const compteToSelect = {
+        numero: numero ? numero : '',
+        nom
+      };
       this.setCompte(compteToSelect);
-    });
+    } else this.resetCompte();
   }
 
   //#region Compte
-  private async numeroCompteChangeAsync(
-    value: string | { numero: string | number; nom: string; numeroNom: string } | undefined | null
-  ) {
+  private async numeroCompteChangeAsync(value: string | { numero: string | number; nom: string } | undefined | null) {
     if (!value)
       //Si vide
       this.resetCompte();
@@ -114,7 +105,6 @@ export default class AutocompleteComptes extends Vue {
     else {
       if (this.typeCompte == 'F' || this.typeCompte == 'C') {
         this.setCompte(value);
-        this.natureCompte = '';
         this.$emit('Change', value);
       } else {
         if (this.numeroCompteSelected) {
@@ -139,9 +129,6 @@ export default class AutocompleteComptes extends Vue {
           this.setCompteGeneral(compte);
           this.$emit('Change', compte);
         }
-      } else {
-        this.numeroCompte = '';
-        this.nomCompte = '';
       }
     } catch (err) {
       console.log(err);
@@ -213,19 +200,15 @@ export default class AutocompleteComptes extends Vue {
   }
 
   private setCompteGeneral(compteGeneral: CompteGeneralSearch) {
-    this.natureCompte = compteGeneral.nature;
     this.setCompte(compteGeneral);
   }
 
-  private setCompte(compte: { numero: number | string; nom: string; numeroNom: string }) {
+  private setCompte(compte: { numero: number | string; nom: string }) {
     if (compte) {
       this.comptesSearch = [];
       this.comptesSearch.push(compte);
       this.numeroCompteSelected = compte;
     }
-
-    this.numeroCompte = compte.numero.toString();
-    this.nomCompte = compte.nom;
   }
 
   public focus() {
@@ -240,9 +223,6 @@ export default class AutocompleteComptes extends Vue {
   public resetCompte() {
     this.numeroCompteSelected = null;
     this.searchCompte = '';
-    this.numeroCompte = '';
-    this.nomCompte = '';
-    this.natureCompte = '';
     this.$emit('Change', '');
   }
 }

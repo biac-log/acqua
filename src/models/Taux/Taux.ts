@@ -6,6 +6,7 @@ export interface ITaux {
   date: string;
   com: number;
   tar: number;
+  hash: string;
 }
 
 export class TauxDTO implements ITaux {
@@ -14,6 +15,7 @@ export class TauxDTO implements ITaux {
   date = '';
   com = 0;
   tar = 0;
+  hash = '';
 }
 
 export class Taux extends TauxDTO {

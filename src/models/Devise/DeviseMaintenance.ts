@@ -3,6 +3,7 @@ export interface IDeviseMaintenance {
   libelle: string;
   typeDevise: string;
   cee: boolean;
+  hash: string;
 }
 
 export class DeviseMaintenanceDTO implements IDeviseMaintenance {
@@ -10,6 +11,7 @@ export class DeviseMaintenanceDTO implements IDeviseMaintenance {
   libelle = '';
   typeDevise = '';
   cee = false;
+  hash = '';
 }
 
 export class DeviseMaintenance extends DeviseMaintenanceDTO {
