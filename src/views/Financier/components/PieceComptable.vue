@@ -201,7 +201,7 @@
         <Confirm ref="confirmDialog"></Confirm>
       </v-card>
     </v-form>
-    <v-dialog v-model="datePieceDialog" width="300" eager style="z-index: 999999999999999999">
+    <v-dialog v-model="datePieceDialog" width="300" eager style="z-index: 999999999999999999" @keydown.enter.stop="datePieceDialog = false">
       <v-card>
         <v-card-title primary-title>Nouvelle pièce</v-card-title>
         <v-card-text>
