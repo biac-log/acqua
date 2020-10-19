@@ -21,10 +21,11 @@
             </v-card-text>
           </v-card>
         </v-card-text>
-        <v-card-text v-else class="pb-0">
+        <v-card-text v-show="imputationIsSelected" class="pb-0">
           <v-row dense>
             <v-col cols="3">
               <v-select
+                ref="firstElement"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
@@ -330,6 +331,7 @@ export default class ImputationVue extends Vue {
   @Ref('autocompleteCompte') private autocompleteCompte?: AutocompleteComptesVue;
   @Ref('dossierComponent') private autocompleteDossier?: AutocompleteDossierVue;
   @Ref('searchEcheancierDialog') readonly searchEcheancierDialog!: SearchEcheancierVue;
+  @Ref('firstElement') readonly firstElement!: HTMLElement;
 
   @PropSync('isReadonly', { default: true }) private readonly!: boolean;
   @PropSync('DatePiece') public datePiece!: DateTime;
@@ -425,6 +427,7 @@ export default class ImputationVue extends Vue {
     this.autocompleteDossier?.resetDossier();
 
     this.setImputation(imputation);
+    this.$nextTick(() => this.firstElement?.focus());
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -434,6 +437,11 @@ export default class ImputationVue extends Vue {
 
   public openNew(journal: Journal): Promise<Imputation> {
     this.imputationIsSelected = true;
+    this.autocompleteCompte?.resetCompte();
+    this.autocompleteDossier?.resetDossier();
+
+    this.setImputation(new Imputation());
+    this.$nextTick(() => this.firstElement?.focus());
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -452,7 +460,7 @@ export default class ImputationVue extends Vue {
     this.nomDossier = imputation.dossierNom;
     if (imputation.dossier) this.autocompleteDossier?.init(imputation.dossier, imputation.dossierNom);
     this.devisesSelected = this.devises.find((d) => d.id == imputation.codeDevise) || this.devises[0];
-    this.initTauxDeviseAsync(imputation.codeDevise, this.datePiece);
+    this.initTauxDeviseAsync(this.devisesSelected.id, this.datePiece);
     this.typesMouvementsSelected =
       this.typesMouvements.find((t) => t.id == imputation.codeMouvement) || this.typesMouvements[0];
     this.caseTva = new CaseTva(imputation.caseTva);
@@ -634,6 +642,10 @@ export default class ImputationVue extends Vue {
       .catch(() => {
         this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus());
       });
+  }
+
+  private focusFirstElement() {
+    this.$nextTick(() => this.firstElement.focus());
   }
 
   public close() {

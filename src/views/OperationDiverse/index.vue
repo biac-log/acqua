@@ -44,7 +44,7 @@
     <v-card class="mt-5">
       <v-card-title>
         Pièces comptables
-        <!-- <v-tooltip top open-delay="500">
+        <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
               ref="btnAdd"
@@ -53,14 +53,14 @@
               fab
               class="ml-5"
               :disabled="!searchIsValid"
-              @click="openPieceComptable()"
+              @click="createNewPieceComptable()"
               v-on="on"
             >
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </template>
           <span>Créer une nouvelle pièce <span class="shortcutTooltip">+</span></span>
-        </v-tooltip> -->
+        </v-tooltip>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -214,16 +214,16 @@ export default class extends Vue {
   }
 
   private createNewPieceComptable() {
-    // this.refDialogPiece
-    //   .openNew(this.periodeSelected, this.journalSelected)
-    //   .then((resp) => {
-    //     this.displayAddResult(resp);
-    //     this.journalSelected.numeroDernierePiece = parseInt(resp);
-    //     this.loadPiecesComptables();
-    //   })
-    //   .finally(() => {
-    //     this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-    //   });
+    this.refDialogPiece
+      .openNew(this.periodeSelected, this.journalSelected)
+      .then((resp) => {
+        this.displayAddResult(resp);
+        this.journalSelected.numeroDernierePiece = parseInt(resp);
+        this.loadPiecesComptables();
+      })
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+      });
   }
 
   private displayAddResult(numeroPiece: string) {

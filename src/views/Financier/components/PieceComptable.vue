@@ -551,8 +551,7 @@ export default class PieceComptableVue extends Vue {
   private modifierPiece() {
     if (!this.pieceIsLoading) {
       this.readonly = false;
-      if (this.datePieceDialog) this.refDatePieceDialog.focus();
-      else this.refDatePiece.focus();
+      this.focusDatePiece();
     }
   }
 

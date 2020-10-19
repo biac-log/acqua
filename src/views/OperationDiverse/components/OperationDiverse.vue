@@ -60,7 +60,7 @@
             <v-col cols="6" class="pr-5">
               <v-row fill-height no-gutters>
                 <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
-                <v-row>
+                <v-row dense>
                   <v-col cols="3">
                     <DatePicker
                       ref="refDatePiece"
@@ -80,6 +80,7 @@
                       :filled="readonly"
                       :hide-details="readonly"
                       readonly
+                      tabindex="-1"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3">
@@ -89,6 +90,7 @@
                       :filled="readonly"
                       :hide-details="readonly"
                       readonly
+                      tabindex="-1"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3">
@@ -98,6 +100,7 @@
                       :filled="readonly"
                       :hide-details="readonly"
                       readonly
+                      tabindex="-1"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -107,23 +110,23 @@
                       <v-toolbar color="#EEEEEE" flat dense>
                         <v-card-title>
                           Imputations
-                          <!-- <v-tooltip top open-delay="500">
-                        <template v-slot:activator="{ on }">
-                          <v-btn
-                            color="primary"
-                            fab
-                            small
-                            class="ml-5"
-                            ref="btnAdd"
-                            :disabled="readonly"
-                            @click.stop="createImputation"
-                            v-on="on"
-                          >
-                            <v-icon>mdi-plus</v-icon>
-                          </v-btn>
-                        </template>
-                        <span>Ajouter une ligne <span class="shortcutTooltip"> + </span></span>
-                      </v-tooltip> -->
+                          <v-tooltip top open-delay="500">
+                            <template v-slot:activator="{ on }">
+                              <v-btn
+                                color="primary"
+                                fab
+                                x-small
+                                class="ml-5"
+                                ref="btnAdd"
+                                :disabled="readonly"
+                                @click.stop="createImputation"
+                                v-on="on"
+                              >
+                                <v-icon>mdi-plus</v-icon>
+                              </v-btn>
+                            </template>
+                            <span>Ajouter une ligne <span class="shortcutTooltip"> + </span></span>
+                          </v-tooltip>
                         </v-card-title>
                         <v-spacer></v-spacer>
                       </v-toolbar>
@@ -274,6 +277,7 @@ export default class OperationDiverseVue extends Vue {
   @Ref() refDatePiece!: DatePicker;
   @Ref() refDatePieceDialog!: DatePicker;
   @Ref() warningMessage!: AlertMessageVue;
+  @Ref() btnAddImputation!: any;
 
   private dialog = false;
   private oldPiece!: PieceComptable | null;
@@ -334,20 +338,17 @@ export default class OperationDiverseVue extends Vue {
   private hash = '';
   public async openNew(periode: PeriodeComptable, journal: Journal): Promise<string> {
     this.dialog = true;
-    // this.$nextTick(() => (this.datePieceDialog = true));
-    // this.reset();
-    // this.periode = periode;
-    // this.journal = journal;
-    // this.libelleCompte = `${journal.compteBanque.numero.toString()} ${journal.compteBanque.nom}`;
-    // const solde = await FinancierApi.getSoldeCompte(journal.numeroCompteBanque);
-    // //this.soldeInitial = solde.toComptaString();
+    this.reset();
+    this.periode = periode;
+    this.journal = journal;
+    this.numeroPiece = (journal.numeroDernierePiece + 1).toString();
 
-    // const today = DateTime.today();
-    // if (today.isBefore(this.periode.dateDebut)) this.datePiece = this.periode.dateDebut;
-    // else if (today.isAfter(this.periode.dateFin)) this.datePiece = this.periode.dateFin;
-    // else this.datePiece = today;
+    const today = DateTime.today();
+    if (today.isBefore(this.periode.dateDebut)) this.datePiece = this.periode.dateDebut;
+    else if (today.isAfter(this.periode.dateFin)) this.datePiece = this.periode.dateFin;
+    else this.datePiece = today;
 
-    // this.focusDatePiece();
+    this.focusDatePiece();
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -370,6 +371,7 @@ export default class OperationDiverseVue extends Vue {
       })
       .finally(() => {
         this.pieceIsLoading = false;
+        this.focusDatePiece();
       });
 
     return new Promise((resolve, reject) => {
@@ -378,20 +380,20 @@ export default class OperationDiverseVue extends Vue {
     });
   }
 
-  private createExtrait() {
-    // if (!this.readonly) {
-    //   this.refExtraitVue
-    //     .openNew(this.journal)
-    //     .then((resp: Extrait) => {
-    //       const maxLigne = this.extraits?.length ? Math.max(...this.extraits.map((i) => i.numeroExtrait)) : 0;
-    //       resp.numeroExtrait = maxLigne + 1;
-    //       this.extraits.push(resp);
-    //     })
-    //     .catch()
-    //     .finally(() => {
-    //       this.gridExtraits?.focus();
-    //     });
-    // }
+  private createImputation() {
+    if (!this.readonly) {
+      this.refImputationVue
+        .openNew(this.journal)
+        .then((resp: Imputation) => {
+          const maxLigne = this.imputations?.length ? Math.max(...this.imputations.map((i) => i.numeroVentilation)) : 0;
+          resp.numeroVentilation = maxLigne + 1;
+          this.imputations.push(resp);
+        })
+        .catch()
+        .finally(() => {
+          this.$nextTick(() => this.btnAddImputation?.$el?.focus());
+        });
+    }
   }
 
   private openImputation(imputation: Imputation) {
@@ -418,7 +420,6 @@ export default class OperationDiverseVue extends Vue {
     this.numeroPiece = piece.numeroPiece.toString();
     this.datePiece = new DateTime(piece.datePiece);
     this.imputations = piece.imputations;
-
     this.hash = piece.hash;
   }
 
@@ -430,7 +431,7 @@ export default class OperationDiverseVue extends Vue {
     this.imputations = [];
     this.oldPiece = null;
     this.readonly = false;
-    this.numeroPiece = '0';
+    this.numeroPiece = '';
     this.hash = '';
     // this.soldeInitial = '';
     // this.soldeActuel = '';
@@ -585,15 +586,14 @@ export default class OperationDiverseVue extends Vue {
   private modifierPiece() {
     if (!this.pieceIsLoading) {
       this.readonly = false;
-      if (this.datePieceDialog) this.refDatePieceDialog.focus();
-      else this.refDatePiece.focus();
+      this.focusDatePiece();
     }
   }
 
   @Watch('datePieceDialog')
   private focusDatePiece() {
     if (this.datePieceDialog) this.$nextTick(() => this.refDatePieceDialog.focus());
-    else this.refDatePiece.focus();
+    else this.$nextTick(() => this.refDatePiece.focus());
   }
 
   private cancelEdit() {
