@@ -2,8 +2,8 @@
   <v-container
     fluid
     @keydown.107.prevent="openPieceComptable()"
-    @keydown.page-up="nextPage()"
-    @keydown.page-down="previousPage()"
+    @keydown.page-down="nextPage()"
+    @keydown.page-up="previousPage()"
   >
     <v-card>
       <v-form ref="form" v-model="searchIsValid">

@@ -4,8 +4,8 @@
     v-model="dialog"
     @click:outside="close()"
     @keydown.esc="close()"
-    @keydown.page-up="nextPage()"
-    @keydown.page-down="previousPage()"
+    @keydown.page-down="nextPage()"
+    @keydown.page-up="previousPage()"
     @keydown.ctrl.f.prevent="focusSearch()"
   >
     <v-card class="mt-5" :loading="isLoading">
