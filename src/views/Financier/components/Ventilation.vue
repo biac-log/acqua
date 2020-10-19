@@ -42,6 +42,7 @@
                 ref="compteComponent"
                 :Readonly.sync="readonly"
                 :TypeCompte.sync="typesComptesSelected.id"
+                dense
                 @Change="compteChange"
               >
               </AutocompleteComptesVue>
@@ -480,7 +481,7 @@ export default class VentilationVue extends Vue {
 
     if (ventilation) {
       this.$nextTick(() => {
-        this.compteComponent?.init(ventilation.numeroCompte.toString(), ventilation.nomCompte);
+        this.compteComponent?.init(ventilation.numeroCompte?.toString(), ventilation.nomCompte);
       });
       if (ventilation.dossier) {
         this.dossierComponent.setDossier(
