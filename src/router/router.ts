@@ -17,7 +17,7 @@ export const constantRoutes: RouteConfig[] = [
     component: Layout,
     redirect: '/home',
     meta: {
-      title: 'home',
+      title: 'Home',
       icon: 'mdi-home',
       affix: true
     },
@@ -88,21 +88,21 @@ export const asyncRoutes: RouteConfig[] = [
     ]
   },
   {
-    path: '/operationdiverse',
+    path: '/operationsdiverses',
     component: Layout,
-    redirect: 'operationdiverse/index',
+    redirect: 'operationsdiverses/index',
     meta: {
       roles: ['admin', 'ACQUAACHATVENTE'],
-      title: 'Operation diverse',
+      title: 'Opérations diverses',
       icon: 'mdi-swap-horizontal-bold'
     },
     children: [
       {
         path: 'index',
         component: () => import(/* webpackChunkName: "achatvente" */ '@/views/OperationDiverse/index.vue'),
-        name: 'Operation diverse',
+        name: 'Opérations diverses',
         meta: {
-          title: 'Operation diverse',
+          title: 'Opérations diverses',
           icon: 'mdi-cake',
           affix: true
         }
@@ -177,7 +177,7 @@ export const asyncRoutes: RouteConfig[] = [
     path: '/utilisateurs',
     component: Layout,
     redirect: 'utilisateurs/index',
-    meta: { roles: ['ACQUAGESTIONUTILISATEUR'] },
+    meta: { roles: ['ACQUAGESTIONUTILISATEUR'], title: 'Utilisateurs', icon: 'mdi-account-multiple' },
     children: [
       {
         path: 'index',
