@@ -226,6 +226,7 @@ export default class extends Vue {
   }
 
   private createNewPieceComptable() {
+    if(!this.searchIsValid) return false;
     this.refDialogPiece
       .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {

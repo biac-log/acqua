@@ -267,6 +267,7 @@ export default class extends Vue {
   }
 
   private openPieceComptable(entete?: EntetePieceComptable) {
+    if(!entete && !this.searchIsValid) return false;
     this.refDialogPiece
       .open(this.periodeSelected, this.journalSelected, entete)
       .then((resp) => {
