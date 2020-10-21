@@ -18,7 +18,7 @@
           <v-toolbar color="primary" dark flat>
             <v-card-title class="d-flex justify-start">
               <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
-              <p class="mb-0" v-if="!numeroPiece">Nouvelle pièce</p>
+              <p class="mb-0" v-if="!numeroPiece">Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}</p>
               <p class="ml-10 mb-0 textMini">Période {{ periodeDisplay }}</p>
               <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
             </v-card-title>

@@ -273,6 +273,7 @@ export default class extends Vue {
         if (resp.action == DialogActionResult.Create) {
           if (!this.skipAddResult) this.displayAddResult(resp.data);
           this.piecesComptables.unshift(resp.data);
+          this.journalSelected.numeroDernierePiece = resp.data.codePiece;
         } else if (resp.action == DialogActionResult.Update && entete) {
           Vue.set(
             this.piecesComptables,
@@ -293,7 +294,7 @@ export default class extends Vue {
   private displayAddResult(piece: EntetePieceComptable) {
     (this.$refs.PieceAddResultVue as PieceAddResultVue)
       .open(piece.codeJournal, piece.codePiece, this.periodeSelected.typePeriodeComptable)
-      .then((numero) => {
+      .then((numero) => {        
         if (piece.codePiece != numero) {
           piece.codePiece = numero;
           Vue.set(
@@ -301,6 +302,7 @@ export default class extends Vue {
             this.piecesComptables.findIndex((e) => e == piece),
             piece
           );
+          this.journalSelected.numeroDernierePiece = numero;
         }
       })
       .finally(() => {
