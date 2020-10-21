@@ -11,14 +11,14 @@
       @focus="$event.target.select()"
       @change="numeroCompteChangeAsync"
       @keydown.ctrl.f.prevent="openSearchCompte()"
+      @keydown.f5.prevent="openSearchCompte()"
       :hide-details="hideDetails && readonly"
       :filled="readonly"
       :readonly="readonly"
       :loading="compteLoading || autocompleteLoading"
       validate-on-blur
-      hide-selected
       item-value="numero"
-      item-text="nom"
+      item-text="numeroNom"
       hide-no-data
       :dense="isDense"
     >
@@ -41,7 +41,6 @@
           <span>Recherche de compte <span class="shortcutTooltip">ctrl + f</span></span>
         </v-tooltip>
       </template>
-      <template v-slot:selection="{ item }"> {{ item.numero ? item.numero : '' }}</template>
       <template v-slot:item="{ item }"> {{ item.numero ? item.numero : '' }} {{ item.nom }}</template>
     </v-combobox>
     <SearchCompteTierVue ref="searchCompteTierDialog"></SearchCompteTierVue>
@@ -82,7 +81,8 @@ export default class AutocompleteComptes extends Vue {
     if (numero) {
       const compteToSelect = {
         numero: numero ? numero : '',
-        nom
+        nom,
+        numeroNom: numero ? `${numero} ${nom}` : ''
       };
       this.setCompte(compteToSelect);
     } else this.resetCompte();
@@ -90,6 +90,7 @@ export default class AutocompleteComptes extends Vue {
 
   //#region Compte
   private async numeroCompteChangeAsync(value: string | { numero: string | number; nom: string } | undefined | null) {
+    console.log('numeroCompteChangeAsync = ', value);
     if (!value)
       //Si vide
       this.resetCompte();
@@ -140,6 +141,7 @@ export default class AutocompleteComptes extends Vue {
   @Watch('searchCompte')
   private async autocompleteCompte(matchCode: string) {
     if (!matchCode) return;
+
     try {
       this.autocompleteLoading = true;
       if (matchCode && matchCode.isInt() && this.typeCompte == 'G') {
@@ -222,7 +224,6 @@ export default class AutocompleteComptes extends Vue {
   //@Watch('typeCompte')
   public resetCompte() {
     this.numeroCompteSelected = null;
-    this.searchCompte = '';
     this.$emit('Change', '');
   }
 }
