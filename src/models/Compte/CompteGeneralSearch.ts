@@ -31,7 +31,7 @@ export class CompteGeneralSearch extends CompteGeneralSearchDTO {
   }
 
   get numeroNom() {
-    return `${this.numero} ${this.nom}`;
+    return `${this.numero ? this.numero : ''} ${this.nom}`;
   }
 
   get caseTvaDisplay() {
