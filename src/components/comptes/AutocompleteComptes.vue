@@ -145,14 +145,15 @@ export default class AutocompleteComptes extends Vue {
       if (matchCode && matchCode.isInt() && this.typeCompte == 'G') {
         this.comptesSearch = await CompteApi.autocompleteCompteByNumero(this.typeCompte, matchCode, 5);
       } else if (matchCode) {
-        if (this.typeCompte == 'F' || this.typeCompte == 'C')
+        if (this.typeCompte == 'F' || this.typeCompte == 'C') {
           this.comptesSearch = await CompteApi.searchCompteDeTier(this.typeCompte, matchCode.toUpperCase(), 5);
-        else
+        } else {
           this.comptesSearch = await CompteApi.autocompleteCompteByMatchCode(
             this.typeCompte,
             matchCode.toUpperCase(),
             5
           );
+        }
       } else this.comptesSearch = [];
     } catch (err) {
       console.log(err);
@@ -173,7 +174,7 @@ export default class AutocompleteComptes extends Vue {
     if (this.typeCompte) {
       this.comboboxCompte.blur();
       this.searchCompteGeneralDialog
-        .open(this.typeCompte)
+        .open(this.typeCompte, this.searchCompte)
         .then((compte) => {
           this.setCompte(compte);
           this.$emit('Change', compte);
@@ -188,7 +189,7 @@ export default class AutocompleteComptes extends Vue {
     if (this.typeCompte) {
       this.comboboxCompte.blur();
       this.searchCompteTierDialog
-        .open(this.typeCompte)
+        .open(this.typeCompte, this.searchCompte)
         .then((compte) => {
           this.setCompte(compte);
           this.$emit('Change', compte);

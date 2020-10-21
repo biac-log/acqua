@@ -86,8 +86,9 @@ export default class extends Vue {
     }
   };
 
-  public open(typeToLoad: string): Promise<CompteSearch> {
+  public open(typeToLoad: string, filter: string): Promise<CompteSearch> {
     this.dialog = true;
+    this.filtreCompte = filter;
     this.loadComptes(typeToLoad);
 
     return new Promise((resolve, reject) => {
@@ -109,6 +110,9 @@ export default class extends Vue {
       CompteApi.getComptesTiers(this.typeLoad)
         .then((resp) => {
           this.comptes = resp;
+          this.$nextTick(() => {
+            this.filterGrid(this.filtreCompte);
+          });
         })
         .finally(() => {
           this.isLoading = false;
@@ -117,7 +121,13 @@ export default class extends Vue {
   }
 
   @Watch('filtreCompte')
-  private filterGrid() {
+  private filterGrid(newValue: string) {
+    const numeroFilterComponent = this.gridOptions?.api?.getFilterInstance('numero');
+    if (newValue && newValue.isInt()) {
+      numeroFilterComponent?.setModel({ type: 'contains', filter: newValue });
+    } else {
+      numeroFilterComponent?.setModel({ type: 'startsWith', filter: '' });
+    }
     this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
   }
 

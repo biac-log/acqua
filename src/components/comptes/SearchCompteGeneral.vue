@@ -89,8 +89,9 @@ export default class extends Vue {
     onRowDoubleClicked: this.rowDoubleClick
   };
 
-  public open(typeToLoad: string): Promise<CompteGeneralSearch> {
+  public open(typeToLoad: string, search: string): Promise<CompteGeneralSearch> {
     this.dialog = true;
+    this.filtreCompte = search;
     this.loadComptes(typeToLoad);
 
     return new Promise((resolve, reject) => {
@@ -116,6 +117,9 @@ export default class extends Vue {
       CompteApi.getComptesGeneraux(this.typeLoad)
         .then((resp) => {
           this.comptes = resp;
+          this.$nextTick(() => {
+            this.filterGrid(this.filtreCompte);
+          });
         })
         .finally(() => {
           this.isLoading = false;
