@@ -16,6 +16,11 @@ export const constantRoutes: RouteConfig[] = [
     path: '/',
     component: Layout,
     redirect: '/home',
+    meta: {
+      title: 'home',
+      icon: 'mdi-home',
+      affix: true
+    },
     children: [
       {
         path: 'home',
@@ -42,7 +47,11 @@ export const asyncRoutes: RouteConfig[] = [
     path: '/achatvente',
     component: Layout,
     redirect: 'achatvente/index',
-    meta: { roles: ['admin', 'ACQUAACHATVENTE'] },
+    meta: {
+      roles: ['admin', 'ACQUAACHATVENTE'],
+      title: 'Achat Vente',
+      icon: 'mdi-currency-eur'
+    },
     children: [
       {
         path: 'index',
@@ -60,7 +69,11 @@ export const asyncRoutes: RouteConfig[] = [
     path: '/financier',
     component: Layout,
     redirect: 'financier/index',
-    meta: { roles: ['admin', 'ACQUAACHATVENTE'] },
+    meta: {
+      roles: ['admin', 'ACQUAACHATVENTE'],
+      title: 'Financier',
+      icon: 'mdi-bank-transfer'
+    },
     children: [
       {
         path: 'index',
@@ -78,7 +91,11 @@ export const asyncRoutes: RouteConfig[] = [
     path: '/operationdiverse',
     component: Layout,
     redirect: 'operationdiverse/index',
-    meta: { roles: ['admin', 'ACQUAACHATVENTE'] },
+    meta: {
+      roles: ['admin', 'ACQUAACHATVENTE'],
+      title: 'Operation diverse',
+      icon: 'mdi-swap-horizontal-bold'
+    },
     children: [
       {
         path: 'index',
@@ -145,7 +162,8 @@ export const asyncRoutes: RouteConfig[] = [
       },
       {
         path: 'libellesreglement',
-        component: () => import(/* webpackChunkName: "libellesreglement" */ '@/views/Maintenance/LibellesReglement/index.vue'),
+        component: () =>
+          import(/* webpackChunkName: "libellesreglement" */ '@/views/Maintenance/LibellesReglement/index.vue'),
         name: 'Libellés règlement',
         meta: {
           title: 'Libellés règlement',
