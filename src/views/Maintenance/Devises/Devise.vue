@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="display"
-    @click:outside="closeDialog"
+    @click:outside="clickOutside"
     @keydown.f2.stop="modifierDevise"
     @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="saveDevise()"
@@ -296,6 +296,10 @@ export default class DeviseVue extends Vue {
     } else {
       this.readonly = true;
     }
+  }
+
+  private clickOutside() {
+    if(this.readonly) this.closeDialog();
   }
 }
 </script>

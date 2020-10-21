@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="display"
-    @click:outside="closeDialog"
+    @click:outside="clickOutside"
     @keydown.f2.stop="modifierModel"
     @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="saveModel()"
@@ -355,6 +355,10 @@ export default class TauxVue extends Vue {
     if (this.devises.length <= 1) {
       this.devises = await DeviseApi.getAllDevises();
     }
+  }
+
+  private clickOutside() {
+    if(this.readonly) this.closeDialog();
   }
 }
 </script>

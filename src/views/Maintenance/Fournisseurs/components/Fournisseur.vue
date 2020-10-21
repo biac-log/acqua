@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="display"
-    @click:outside="closeDialog"
+    @click:outside="clickOutside"
     @keydown.f2.stop="modifierFournisseur"
     @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="saveFournisseur()"
@@ -1540,6 +1540,10 @@ export default class FournisseurVue extends Vue {
 
   private changeCodePaiement() {
     this.libellePaiement = this.codesPaiement.find((c) => c.code.toString() == this.codePaiement)?.valeur || '';
+  }
+
+  private clickOutside() {
+    if(this.readonly) this.closeDialog();
   }
 }
 </script>

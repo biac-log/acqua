@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="display"
-    @click:outside="closeDialog"
+    @click:outside="clickOutside"
     @keydown.f2.stop="modifierModel"
     @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="saveModel()"
@@ -276,6 +276,10 @@ export default class LibelleReglementVue extends Vue {
     } else {
       this.readonly = true;
     }
+  }
+
+  private clickOutside() {
+    if(this.readonly) this.closeDialog();
   }
 }
 </script>

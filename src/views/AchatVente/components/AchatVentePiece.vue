@@ -10,7 +10,7 @@
       @keydown.46.prevent.stop="deletePiece"
       @keydown.107.prevent.stop="createContrepartie"
       @keydown.alt.enter="savePiece()"
-      @click:outside.stop="closeDialog()"
+      @click:outside.stop="clickOutside"
       @keydown.esc.stop="closeDialog()"
     >
       <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
@@ -1138,6 +1138,10 @@ export default class extends Vue {
       this.dialog = false;
       this.resolve({ action: DialogActionResult.None });
     });
+  }
+
+  private clickOutside() {
+    if(this.piecereadonly) this.closeDialog();
   }
 }
 </script>
