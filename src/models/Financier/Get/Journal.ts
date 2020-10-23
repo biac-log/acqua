@@ -32,6 +32,7 @@ export class Journal extends JournalDTO {
   }
 
   get description(): string {
+    if(!this.devise.libelle) return '';
     return `Devise ${this.devise.libelle} - Dernière pièce ${this.numeroDernierePiece}`;
   }
 }

@@ -34,4 +34,9 @@ export class Journal extends JournalDTO {
   get codeMouvement(): string {
     return this.famille == 'vente' || this.famille == 'ncachat' ? 'DB' : 'CR';
   }
+
+  get description(): string {
+    if(!this.devise) return '';
+    return `Devise ${this.devise} - Dernière pièce ${this.numeroDernierePiece}`;
+  }
 }

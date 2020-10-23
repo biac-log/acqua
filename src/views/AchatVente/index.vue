@@ -34,7 +34,7 @@
               :loading="journauxIsLoading"
               item-text="fullLibelle"
               item-value="numero"
-              :hint="`Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`"
+              :hint="journalSelected.description"
               return-object
               persistent-hint
               @change="loadPiecesComptables"
