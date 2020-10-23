@@ -17,6 +17,13 @@ import { ApplicationModule } from '@/store/modules/application';
 export default class App extends Vue {
   mounted() {
     ApplicationModule.initParametre();
+
+    // Prevent focus loss on alt press. Prevents for Chrome, on Firefox you can regain focus when re-pressing alt key.
+    document.addEventListener('keydown', function(e) {
+      if (18 == e.keyCode && (e.target as Element).nodeName == 'INPUT') {
+        e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+      }
+    });
   }
 }
 </script>
