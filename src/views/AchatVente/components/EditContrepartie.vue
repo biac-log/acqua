@@ -25,6 +25,7 @@
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 tabindex="2"
+                autofocus
               ></v-select>
             </v-col>
             <v-col cols="3">
