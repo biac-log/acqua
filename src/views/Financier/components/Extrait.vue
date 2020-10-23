@@ -298,6 +298,7 @@ export default class extends Vue {
     return !this.readonly && this.montant;
   }
   private createVentilation() {
+    if(this.readonly) return false;
     (this.$refs.form as any).validate();
     this.$nextTick(() => {
       if (this.montant && this.isValid) {
