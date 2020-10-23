@@ -62,52 +62,17 @@
               <v-col cols="5">
                 <v-row dense>
                   <v-col cols="4">
-                    <v-combobox
+                    <autocomplete-comptes-vue 
                       ref="autocompleteCompteTier"
-                      label="Numéro compte tiers"
+                      label="Compte tiers"
                       v-model="numeroCompteTierSelected"
-                      :items="comptesTiersSearch"
-                      :search-input.sync="searchCompteDeTier"
-                      :rules="numeroCompteTierRules"
-                      @keypress.enter="loadCompte"
-                      @keyup.enter="$event.target.select()"
-                      @focus="$event.target.select()"
-                      @change="numeroCompteTierChange"
-                      @keydown.ctrl.f.prevent="openSearchCompte()"
+                      @Change="numeroCompteTierChange"
                       :hide-details="piecereadonly"
                       :filled="piecereadonly"
                       :readonly="piecereadonly"
-                      hide-selected
-                      item-text="nom"
-                      item-value="numero"
-                      hide-no-data
-                    >
-                      <template v-slot:append>
-                        <v-tooltip top open-delay="500" open-on-hover>
-                          <template v-slot:activator="{ on }">
-                            <v-btn
-                              icon
-                              small
-                              v-show="!piecereadonly"
-                              v-on="on"
-                              :disabled="piecereadonly || saveLoading"
-                              @click="openSearchCompte()"
-                              @keydown.enter.prevent.stop="openSearchCompte()"
-                              tabindex="-1"
-                            >
-                              <v-icon>mdi-magnify</v-icon>
-                            </v-btn>
-                          </template>
-                          <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
-                        </v-tooltip>
-                      </template>
-                      <template v-slot:selection="{ item }">
-                        {{ item.numero }}
-                      </template>
-                      <template v-slot:item="{ item }">
-                        {{ item.nom }}
-                      </template>
-                    </v-combobox>
+                      :rules="numeroCompteTierRules"
+                      :TypeCompte="typeCompte"
+                    />
                   </v-col>
                   <v-col cols="8">
                     <v-text-field
@@ -451,13 +416,14 @@ import { DateTime } from '../../../models/DateTime';
 import DeviseApi from '@/api/DeviseApi';
 import { Devise } from '@/models/Devise/Devise';
 import { DialogActionResult } from '@/models/DialogResult';
+import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 
 @Component({
   name: 'AchatVentePiece',
-  components: { SearchCompteTier, GridContreparties, Confirm, DatePicker }
+  components: { SearchCompteTier, GridContreparties, Confirm, DatePicker, AutocompleteComptesVue }
 })
 export default class extends Vue {
-  @Ref() readonly autocompleteCompteTier!: HTMLInputElement;
+  @Ref() readonly autocompleteCompteTier!: AutocompleteComptesVue;
   @Ref() readonly buttonSave!: HTMLButtonElement;
   @Ref() readonly gridContreparties!: GridContreparties;
   @Ref() readonly confirmDialog!: Confirm;
@@ -652,6 +618,7 @@ export default class extends Vue {
     try {
       const pieceComptable = await AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece);
       this.setPiece(pieceComptable);
+      this.autocompleteCompteTier.init(pieceComptable.compteTiersNumero.toString(), '');
     } catch (err) {
       this.errorMessage = displayAxiosError(err);
     } finally {

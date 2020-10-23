@@ -28,53 +28,17 @@
               ></v-select>
             </v-col>
             <v-col cols="3">
-              <v-combobox
+              <autocomplete-comptes-vue
                 ref="numeroCompte"
                 label="N° compte"
                 v-model="numeroCompteSelected"
-                :items="comptesSearch"
-                :search-input.sync="searchCompte"
-                :rules="numeroCompteRules"
-                @keyup.enter="$event.target.select()"
-                @focus="$event.target.select()"
-                @change="numeroCompteChange"
-                @keydown.ctrl.f.prevent="openSearchCompte()"
+                @Change="numeroCompteChange"
                 :hide-details="readonly"
                 :filled="readonly"
                 :readonly="readonly"
-                hide-selected
-                item-text="numeroNom"
-                item-value="numero"
-                hide-no-data
-                autofocus
-                tabindex="3"
-              >
-                <template v-slot:append>
-                  <v-tooltip top open-delay="500" open-on-hover>
-                    <template v-slot:activator="{ on }">
-                      <v-btn
-                        icon
-                        small
-                        v-show="!readonly"
-                        :disabled="readonly"
-                        @click="openSearchCompte()"
-                        @keydown.enter.prevent.stop="openSearchCompte()"
-                        v-on="on"
-                        tabindex="-1"
-                      >
-                        <v-icon>mdi-magnify</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
-                  </v-tooltip>
-                </template>
-                <template v-slot:selection="{ item }">
-                  {{ item.numero }}
-                </template>
-                <template v-slot:item="{ item }">
-                  {{ item.numeroNom }}
-                </template>
-              </v-combobox>
+                :rules="numeroCompteTierRules"
+                :TypeCompte="typesComptesSelected.id"
+              />
             </v-col>
             <SearchCompteContrepartieVue ref="compteDialog"></SearchCompteContrepartieVue>
             <v-col cols="3">
@@ -315,13 +279,15 @@ import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossie
 import { DateTime } from '@/models/DateTime';
 import { AxiosError } from 'axios';
 import { ApplicationModule } from '@/store/modules/application';
+import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 
 @Component({
   name: 'EditContrepartie',
   components: {
     SearchCompteContrepartieVue,
     SearchCaseTvaVue,
-    AutoCompleteDossierVue
+    AutoCompleteDossierVue,
+    AutocompleteComptesVue
   }
 })
 export default class extends Vue {
