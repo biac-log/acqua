@@ -446,8 +446,6 @@ export default class extends Vue {
     nom: ''
   };
   private numeroCompteTierRules: any = [(v: { numero: number | string }) => !!v?.numero || 'Numéro obligatoire'];
-  private comptesTiersSearch: { numero: number; nom: string }[] = [];
-  private searchCompteDeTier = '';
   private libelleFromInit = '';
   private libelle = '';
   private libelleRules: any = [(v: string) => !!v || 'Libellé obligatoire'];
@@ -572,8 +570,6 @@ export default class extends Vue {
     this.forcerNumero = false;
     this.numeroToForce = '';
 
-    this.comptesTiersSearch = [];
-    this.searchCompteDeTier = '';
     this.numeroCompteTierSelected = { numero: '', nom: '' };
 
     this.periodeDisplay = '';
@@ -638,8 +634,6 @@ export default class extends Vue {
         numero: pieceComptable.compteTiersNumero,
         nom: pieceComptable.compteTiersNom
       };
-      this.comptesTiersSearch = [];
-      this.comptesTiersSearch.push(compteToSelect);
       this.numeroCompteTierSelected = compteToSelect;
     }
 
@@ -704,32 +698,6 @@ export default class extends Vue {
     }
   }
 
-  private openSearchCompte(): void {
-    if (this.piecereadonly) return;
-    this.autocompleteCompteTier.blur();
-    (this.$refs.compteDialog as SearchCompteTier)
-      .open(this.typeCompte)
-      .then((compte) => {
-        this.numeroCompteTier = compte.numero.toString();
-        this.loadCompte();
-        this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
-      })
-      .catch(() => {
-        this.$nextTick(() => this.autocompleteCompteTier?.focus());
-      });
-  }
-
-  @Watch('searchCompteDeTier')
-  private async searchCompteDeTierChanged(matchCode: string) {
-    try {
-      if (matchCode && !matchCode.toNumber()) {
-        this.compteLoading = true;
-        this.comptesTiersSearch = await CompteApi.searchCompteDeTier(this.typeCompte, matchCode.toUpperCase(), 5);
-      } else this.comptesTiersSearch = [];
-    } finally {
-      this.compteLoading = false;
-    }
-  }
   private numeroCompteTierChange(value: string | CompteSearch) {
     if (typeof value === 'string') {
       this.numeroCompteTier = value;
@@ -747,8 +715,6 @@ export default class extends Vue {
   private async setCompteDeTier(compte?: CompteDeTier) {
     if (compte) {
       const compteToSelect = { numero: compte.numero, nom: compte.nom };
-      this.comptesTiersSearch = [];
-      this.comptesTiersSearch.push(compteToSelect);
       this.numeroCompteTierSelected = compteToSelect;
     }
 

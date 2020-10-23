@@ -317,8 +317,6 @@ export default class extends Vue {
   private compteLoading = false;
   private numeroCompte = '';
   private numeroCompteRules: any = [(v: string) => !!v || 'Numéro obligatoire'];
-  private comptesSearch: { numero: string | number; numeroNom: string }[] = [];
-  private searchCompte = '';
   private numeroCompteSelected: {
     numero: string | number;
     numeroNom: string;
@@ -430,8 +428,6 @@ export default class extends Vue {
         numero: contrepartie.numeroCompte ? contrepartie.numeroCompte : '',
         numeroNom: contrepartie.compteLibelle
       };
-      this.comptesSearch = [];
-      this.comptesSearch.push(compteToSelect);
       this.numeroCompteSelected = compteToSelect;
 
       if (contrepartie.dossier) {
@@ -500,38 +496,8 @@ export default class extends Vue {
         });
     }
   }
-  private openSearchCompte(): void {
-    if (this.typesComptesSelected) {
-      (this.$refs.numeroCompte as any).blur();
-      (this.$refs.compteDialog as SearchCompteContrepartieVue)
-        .open(this.typesComptesSelected, this.searchCompte)
-        .then((compte) => {
-          this.setCompte(compte);
-          this.$nextTick(() => (this.$refs.libelle as any)?.focus());
-        })
-        .catch(() => {
-          this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
-        });
-    }
-  }
-  @Watch('searchCompte')
-  private async searchCompteChanged(matchCode: string) {
-    try {
-      this.compteLoading = true;
-      if (matchCode && matchCode.isInt()) {
-        this.comptesSearch = await CompteApi.autocompleteCompteByNumero(this.typesComptesSelected.id, matchCode, 5);
-      } else if (matchCode) {
-        this.comptesSearch = await CompteApi.autocompleteCompteByMatchCode(
-          this.typesComptesSelected.id,
-          matchCode.toUpperCase(),
-          5
-        );
-      } else this.comptesSearch = [];
-    } finally {
-      this.compteLoading = false;
-    }
-  }
-  private numeroCompteChange(value: string | CompteGeneralSearch) {
+
+private numeroCompteChange(value: string | CompteGeneralSearch) {
     if (typeof value === 'string') this.numeroCompte = value;
     else if (value instanceof CompteGeneralSearch) {
       this.numeroCompte = value.numero.toString();
@@ -543,8 +509,6 @@ export default class extends Vue {
   private setCompte(compte: CompteGeneralSearch) {
     if (compte) {
       const compteToSelect = { numero: compte.numero, numeroNom: compte.nom };
-      this.comptesSearch = [];
-      this.comptesSearch.push(compteToSelect);
       this.numeroCompteSelected = compteToSelect;
     }
 
