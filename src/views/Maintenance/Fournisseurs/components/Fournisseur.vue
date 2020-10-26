@@ -1144,7 +1144,7 @@ export default class FournisseurVue extends Vue {
 
   private emissionDocuments = '';
 
-  private tournees: string[] = ['01','02'];
+  private tournees: string[] = [];
 
   mounted() {
     this.getDevises();
@@ -1283,6 +1283,10 @@ export default class FournisseurVue extends Vue {
     this.emissionDocuments += fournisseur.emissionDocumentCar3 != '' ? fournisseur.emissionDocumentCar3 : 'N';
     this.emissionDocuments += fournisseur.emissionDocumentCar4 != '' ? fournisseur.emissionDocumentCar4 : 'N';
     this.emissionDocuments += fournisseur.emissionDocumentCar5 != '' ? fournisseur.emissionDocumentCar5 : 'N';
+    this.tournees = [];
+    if(fournisseur.tournee1 != 0) this.tournees.push(fournisseur.tournee1.toIntString())
+    if(fournisseur.tournee2 != 0) this.tournees.push(fournisseur.tournee2.toIntString())
+    if(fournisseur.tournee3 != 0) this.tournees.push(fournisseur.tournee3.toIntString())
   }
 
   private mapFournisseur() {
@@ -1354,6 +1358,9 @@ export default class FournisseurVue extends Vue {
     this.fournisseur.delaiLivraison = this.delaiLivraison != '' ? parseInt(this.delaiLivraison) : 0;
     this.fournisseur.conditionsTransport = this.conditionsTransport;
     this.mapEmissionDocuments();
+    if(this.tournees.length > 0)this.fournisseur.tournee1 = this.tournees[0].toNumber();
+    if(this.tournees.length > 1)this.fournisseur.tournee2 = this.tournees[1].toNumber();
+    if(this.tournees.length > 2)this.fournisseur.tournee3 = this.tournees[2].toNumber();
   }
 
   private mapEmissionDocuments() {

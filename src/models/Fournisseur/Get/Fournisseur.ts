@@ -88,6 +88,9 @@ export class FournisseurDTO {
   public emissionDocumentCar3 = '';
   public emissionDocumentCar4 = '';
   public emissionDocumentCar5 = '';
+  public tournee1 = 0;
+  public tournee2 = 0;
+  public tournee3 = 0;
 }
 
 export class Fournisseur extends FournisseurDTO {
