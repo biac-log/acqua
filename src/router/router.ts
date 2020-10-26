@@ -72,7 +72,7 @@ export const asyncRoutes: RouteConfig[] = [
     meta: {
       roles: ['admin', 'ACQUAACHATVENTE'],
       title: 'Financier',
-      icon: 'mdi-bank-transfer'
+      icon: 'mdi-cash'
     },
     children: [
       {
