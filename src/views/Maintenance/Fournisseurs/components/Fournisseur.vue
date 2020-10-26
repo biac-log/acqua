@@ -773,7 +773,7 @@
                     ></v-select>
                     <v-tooltip top open-delay="500">
                       <template v-slot:activator="{ on }">
-                        <v-select
+                        <v-text-field
                           label="Catégorie facturation"
                           v-model="categorieFacturation"
                           :filled="readonly"
@@ -781,7 +781,8 @@
                           v-on="on"
                           dense
                           :hide-details="readonly"
-                        ></v-select>
+                          maxlength="1"
+                        ></v-text-field>
                       </template>
                       <span
                         >Ce code permet de regrouper les clients au niveau des lots de facturation
