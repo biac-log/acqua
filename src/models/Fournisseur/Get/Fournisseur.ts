@@ -83,6 +83,11 @@ export class FournisseurDTO {
   public periodiciteCommande = 0;
   public delaiLivraison = 0;
   public conditionsTransport = '';
+  public emissionDocumentCar1 = '';
+  public emissionDocumentCar2 = '';
+  public emissionDocumentCar3 = '';
+  public emissionDocumentCar4 = '';
+  public emissionDocumentCar5 = '';
 }
 
 export class Fournisseur extends FournisseurDTO {

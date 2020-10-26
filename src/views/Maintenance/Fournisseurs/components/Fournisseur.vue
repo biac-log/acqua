@@ -922,6 +922,8 @@
                           v-on="on"
                           dense
                           :hide-details="readonly"
+                          v-model="emissionDocuments"
+                          maxlength="5"
                         ></v-text-field>
                       </template>
                       <span
@@ -1150,6 +1152,8 @@ export default class FournisseurVue extends Vue {
 
   private fermetureAuRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
 
+  private emissionDocuments = '';
+
   mounted() {
     this.getDevises();
     this.getParams();
@@ -1281,6 +1285,12 @@ export default class FournisseurVue extends Vue {
       fournisseur.periodiciteCommande == 0 ? '' : fournisseur.periodiciteCommande.toIntString();
     this.delaiLivraison = fournisseur.delaiLivraison == 0 ? '' : fournisseur.delaiLivraison.toIntString();
     this.conditionsTransport = fournisseur.conditionsTransport;
+    this.emissionDocuments = '';
+    this.emissionDocuments += fournisseur.emissionDocumentCar1 != '' ? fournisseur.emissionDocumentCar1 : 'N';
+    this.emissionDocuments += fournisseur.emissionDocumentCar2 != '' ? fournisseur.emissionDocumentCar2 : 'N';
+    this.emissionDocuments += fournisseur.emissionDocumentCar3 != '' ? fournisseur.emissionDocumentCar3 : 'N';
+    this.emissionDocuments += fournisseur.emissionDocumentCar4 != '' ? fournisseur.emissionDocumentCar4 : 'N';
+    this.emissionDocuments += fournisseur.emissionDocumentCar5 != '' ? fournisseur.emissionDocumentCar5 : 'N';
   }
 
   private mapFournisseur() {
@@ -1351,6 +1361,15 @@ export default class FournisseurVue extends Vue {
     this.fournisseur.periodiciteCommande = this.periodiciteCommande != '' ? parseInt(this.periodiciteCommande) : 0;
     this.fournisseur.delaiLivraison = this.delaiLivraison != '' ? parseInt(this.delaiLivraison) : 0;
     this.fournisseur.conditionsTransport = this.conditionsTransport;
+    this.mapEmissionDocuments();
+  }
+
+  private mapEmissionDocuments() {
+    this.fournisseur.emissionDocumentCar1 = this.emissionDocuments.substring(0,1);
+    this.fournisseur.emissionDocumentCar2 = this.emissionDocuments.substring(1,2);
+    this.fournisseur.emissionDocumentCar3 = this.emissionDocuments.substring(2,3);
+    this.fournisseur.emissionDocumentCar4 = this.emissionDocuments.substring(3,4);
+    this.fournisseur.emissionDocumentCar5 = this.emissionDocuments.substring(4,5);
   }
 
   private closeDialog() {
