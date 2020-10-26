@@ -828,7 +828,7 @@
               </v-col>
               <v-col cols="3" dense class="pl-3 pr-3">
                 <v-row dense>
-                  <v-col cols="6">
+                  <v-col cols="12" dense>
                     <v-select
                       label="Transporteur"
                       v-model="transporteur"
@@ -838,31 +838,21 @@
                       item-text="transportFR"
                       item-value="id"
                       dense
-                      :hide-details="readonly"
+                      hide-details
                     ></v-select>
-                    <v-text-field
+                    <v-combobox
                       label="Tournées"
+                      dense
                       :filled="readonly"
                       :readonly="readonly"
-                      dense
+                      chips
+                      multiple
                       :hide-details="readonly"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field
-                      label="nom transporteur"
-                      :filled="readonly"
-                      :readonly="readonly"
-                      dense
-                      :hide-details="readonly"
-                    ></v-text-field>
-                    <v-text-field
-                      label="libellé tournées ?"
-                      :filled="readonly"
-                      :readonly="readonly"
-                      dense
-                      :hide-details="readonly"
-                    ></v-text-field>
+                      v-model="tournees"
+                      append-icon=""
+                      :rules="rules.tournees"
+                      class="mt-2"
+                    ></v-combobox>
                   </v-col>
                 </v-row>
               </v-col>
@@ -1154,6 +1144,8 @@ export default class FournisseurVue extends Vue {
 
   private emissionDocuments = '';
 
+  private tournees: string[] = ['01','02'];
+
   mounted() {
     this.getDevises();
     this.getParams();
@@ -1365,11 +1357,11 @@ export default class FournisseurVue extends Vue {
   }
 
   private mapEmissionDocuments() {
-    this.fournisseur.emissionDocumentCar1 = this.emissionDocuments.substring(0,1);
-    this.fournisseur.emissionDocumentCar2 = this.emissionDocuments.substring(1,2);
-    this.fournisseur.emissionDocumentCar3 = this.emissionDocuments.substring(2,3);
-    this.fournisseur.emissionDocumentCar4 = this.emissionDocuments.substring(3,4);
-    this.fournisseur.emissionDocumentCar5 = this.emissionDocuments.substring(4,5);
+    this.fournisseur.emissionDocumentCar1 = this.emissionDocuments.substring(0, 1);
+    this.fournisseur.emissionDocumentCar2 = this.emissionDocuments.substring(1, 2);
+    this.fournisseur.emissionDocumentCar3 = this.emissionDocuments.substring(2, 3);
+    this.fournisseur.emissionDocumentCar4 = this.emissionDocuments.substring(3, 4);
+    this.fournisseur.emissionDocumentCar5 = this.emissionDocuments.substring(4, 5);
   }
 
   private closeDialog() {
@@ -1562,7 +1554,7 @@ export default class FournisseurVue extends Vue {
   }
 
   private clickOutside() {
-    if(this.readonly) this.closeDialog();
+    if (this.readonly) this.closeDialog();
   }
 }
 </script>
