@@ -46,6 +46,14 @@ export class UpdateFournisseurDTO {
   public periodiciteCommande = 0;
   public delaiLivraison = 0;
   public conditionsTransport = '';
+  public emissionDocumentCar1 = '';
+  public emissionDocumentCar2 = '';
+  public emissionDocumentCar3 = '';
+  public emissionDocumentCar4 = '';
+  public emissionDocumentCar5 = '';
+  public tournee1 = 0;
+  public tournee2 = 0;
+  public tournee3 = 0;
 }
 
 export class UpdateFournisseur extends UpdateFournisseurDTO {

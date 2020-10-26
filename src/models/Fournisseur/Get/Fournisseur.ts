@@ -83,6 +83,14 @@ export class FournisseurDTO {
   public periodiciteCommande = 0;
   public delaiLivraison = 0;
   public conditionsTransport = '';
+  public emissionDocumentCar1 = '';
+  public emissionDocumentCar2 = '';
+  public emissionDocumentCar3 = '';
+  public emissionDocumentCar4 = '';
+  public emissionDocumentCar5 = '';
+  public tournee1 = 0;
+  public tournee2 = 0;
+  public tournee3 = 0;
 }
 
 export class Fournisseur extends FournisseurDTO {
@@ -127,6 +135,11 @@ export class Fournisseur extends FournisseurDTO {
     escompte: [(v: string) => !v || !!v.toNumber() || 'Nombre invalide'],
     remiseGlobaleDefaut: [(v: string) => !v || !!v.toNumber() || 'Nombre invalide'],
     francoMontant: [(v: string) => !v || !!v.toNumber() || 'Nombre invalide'],
-    limiteCredit: [(v: string) => !v || !!v.toNumber() || 'Nombre invalide']
+    limiteCredit: [(v: string) => !v || !!v.toNumber() || 'Nombre invalide'],
+    tournees: [
+      (v: string[]) => v.length <= 3 || '3 valeurs max.',
+      (v: string[]) => v.every((f) => f.isInt()) || 'Nombres uniquement',
+      (v: string[]) => v.every((f) => f.length <= 3) || 'Valeurs limitées à 3 caractères',
+    ]
   };
 }
