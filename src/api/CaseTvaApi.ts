@@ -13,4 +13,9 @@ export default abstract class CaseTvaApi {
     );
     return new CaseTva(response.data);
   }
+
+  static async getAll(): Promise<CaseTva[]> {
+    const response = await api.AcQuaCore.get<CaseTva[]>(`CaseTVA`);
+    return response.data.map((caseTvaDTO) => new CaseTva(caseTvaDTO));
+  }
 }
