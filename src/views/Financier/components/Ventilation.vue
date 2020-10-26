@@ -44,6 +44,7 @@
                 :Readonly.sync="readonly"
                 :TypeCompte.sync="typesComptesSelected.id"
                 :rules.sync="numeroCompteRules"
+                label="Compte"
                 dense
                 @Change="compteChange"
               >
@@ -533,7 +534,7 @@ export default class VentilationVue extends Vue {
       this.dossierIsDisabled = true;
       this.natureCompte = '';
       this.dossierComponent?.resetDossier();
-      this.compteComponent.blur();
+      //this.compteComponent.blur();
       this.$nextTick(() => (this.$refs.montant as any)?.focus());
     } else if (compte instanceof CompteGeneralSearch) {
       this.nomCompte = compte.nom;
@@ -550,7 +551,7 @@ export default class VentilationVue extends Vue {
       } else {
         this.dossierIsDisabled = true;
         this.dossierComponent?.resetDossier();
-        this.compteComponent.blur();
+        //this.compteComponent.blur();
         this.$nextTick(() => (this.$refs.montant as any)?.focus());
       }
     } else if (compte instanceof CompteSearch || compte instanceof CompteDeTier) {
@@ -559,7 +560,7 @@ export default class VentilationVue extends Vue {
       this.dossierIsDisabled = true;
       this.natureCompte = '';
       this.dossierComponent?.resetDossier();
-      this.compteComponent.blur();
+      //this.compteComponent.blur();
       this.$nextTick(() => (this.$refs.reference as any)?.focus());
     }
   }

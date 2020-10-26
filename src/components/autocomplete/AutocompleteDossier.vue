@@ -11,6 +11,7 @@
       @focus="$event.target.select()"
       @change="dossierChangeAsync"
       @keydown.ctrl.f.prevent="openSearchDossier()"
+      @keydown.f5.prevent="openSearchDossier()"
       :filled="readonly"
       :hide-details="isHideDetails"
       :readonly="isReadonly"

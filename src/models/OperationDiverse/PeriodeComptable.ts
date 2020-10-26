@@ -28,7 +28,7 @@ export class PeriodeComptable extends PeriodeComptableDTO {
   }
 
   get libellePeriode(): string {
-    return `Début ${this.dateDebut} - Fin ${this.dateFin}`;
+    return this.debut ? `Début ${this.dateDebut} - Fin ${this.dateFin}` : '';
   }
 
   get libellePeriodeFull(): string {

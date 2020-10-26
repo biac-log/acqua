@@ -8,14 +8,14 @@
               autofocus
               label="Sélection de la période"
               outlined
-              persistent-hint
               required
               return-object
               item-text="libelle"
               :items="periodes"
               v-model="periodeSelected"
               :loading="periodeIsLoading"
-              :hint="periodeSelected.libellePeriode"
+              :hint="periodeHint"
+              persistent-hint
               :rules="periodesRules"
               @change="loadPiecesComptables"
             ></v-select>
@@ -29,9 +29,9 @@
               :loading="journauxIsLoading"
               item-text="fullLibelle"
               item-value="numero"
-              :hint="journalSelected.description"
-              return-object
+              :hint="journalHint"
               persistent-hint
+              return-object
               :rules="journalRules"
               @change="loadPiecesComptables"
               required
@@ -44,7 +44,7 @@
     <v-card class="mt-5">
       <v-card-title>
         Pièces comptables
-        <!-- <v-tooltip top open-delay="500">
+        <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
               ref="btnAdd"
@@ -53,14 +53,14 @@
               fab
               class="ml-5"
               :disabled="!searchIsValid"
-              @click="openPieceComptable()"
+              @click="createNewPieceComptable()"
               v-on="on"
             >
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </template>
           <span>Créer une nouvelle pièce <span class="shortcutTooltip">+</span></span>
-        </v-tooltip> -->
+        </v-tooltip>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -135,15 +135,23 @@ export default class extends Vue {
   private isErrorPeriode = false;
   private periodeIsLoading = false;
   private periodes: PeriodeComptable[] = [];
-  private periodeSelected: PeriodeComptable = new PeriodeComptable();
-  private periodesRules: any = [(v: PeriodeComptable) => !!v.typePeriodeComptable || 'La période est obligatoire'];
+  private periodeSelected: PeriodeComptable | null = null;
+  private periodesRules: any = [
+    (v: PeriodeComptable | null) => !!v?.typePeriodeComptable || 'La période est obligatoire'
+  ];
+  get periodeHint() {
+    return this.periodeSelected ? this.periodeSelected.libellePeriode : '';
+  }
 
   private isErrorJournaux = false;
   private journaux: Journal[] = [];
   private journauxIsLoading = false;
-  private journalSelected: Journal = new Journal();
+  private journalSelected: Journal | null = null;
   private detailJournalSelected = '';
-  private journalRules: any = [(v: Journal) => v.numero != 0 || 'Sélection de journal obligatoire'];
+  private journalRules: any = [(v: Journal | null) => v?.numero != 0 || 'Sélection de journal obligatoire'];
+  get journalHint() {
+    return this.journalSelected ? this.journalSelected.description : '';
+  }
 
   private selectedPiece!: EntetePieceComptable;
 
@@ -192,6 +200,8 @@ export default class extends Vue {
   }
 
   private async openPieceComptable(entete: EntetePieceComptable) {
+    if (!this.periodeSelected || !this.journalSelected) return;
+
     this.refDialogPiece
       .open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
       .then((resp) => {
@@ -214,16 +224,18 @@ export default class extends Vue {
   }
 
   private createNewPieceComptable() {
-    // this.refDialogPiece
-    //   .openNew(this.periodeSelected, this.journalSelected)
-    //   .then((resp) => {
-    //     this.displayAddResult(resp);
-    //     this.journalSelected.numeroDernierePiece = parseInt(resp);
-    //     this.loadPiecesComptables();
-    //   })
-    //   .finally(() => {
-    //     this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-    //   });
+    if (!this.periodeSelected || !this.journalSelected) return;
+
+    this.refDialogPiece
+      .openNew(this.periodeSelected, this.journalSelected)
+      .then((resp) => {
+        this.displayAddResult(resp);
+        if (this.journalSelected) this.journalSelected.numeroDernierePiece = parseInt(resp);
+        this.loadPiecesComptables();
+      })
+      .finally(() => {
+        this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+      });
   }
 
   private displayAddResult(numeroPiece: string) {
@@ -243,7 +255,7 @@ export default class extends Vue {
   @Watch('search')
   private async loadPiecesComptables() {
     try {
-      if (this.periodeSelected.typePeriodeComptable && this.journalSelected.numero) {
+      if (this.periodeSelected?.typePeriodeComptable && this.journalSelected?.numero) {
         const { sortBy, sortDesc, page, itemsPerPage } = this.options;
         const pagination = new Pagination();
         pagination.terms = this.search;

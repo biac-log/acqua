@@ -1,47 +1,42 @@
 <template>
   <v-app id="inspire">
     <!-- Click display only child -->
-    <v-navigation-drawer v-model="drawer" :mini-variant="mini" app>
+    <v-navigation-drawer v-model="drawer" disable-resize-watcher app width="86">
       <v-list dense>
         <v-list-item v-if="parentRoute" :key="previousName" @click="previous()">
-          <v-list-item-action>
-            <v-icon>mdi-menu-left</v-icon>
-          </v-list-item-action>
           <v-list-item-content>
+            <v-icon>mdi-keyboard-backspace</v-icon>
             <v-list-item-title>{{ previousName }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <template v-for="route in routesDisplay">
-          <v-list-item link v-if="!route.children || route.children.length == 1" :key="route.title" :to="route">
-            <v-list-item-action>
-              <v-icon>{{ getOnlyChildren(route).meta.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>{{ getOnlyChildren(route).name }}</v-list-item-title>
+          <v-list-item
+            link
+            v-if="!route.children || route.children.length == 1"
+            :key="route.title"
+            :to="route"
+            class="pr-1 pl-1"
+          >
+            <v-list-item-content class="text-center">
+              <v-icon class="align-self-center">{{ route.meta.icon }}</v-icon>
+              <v-list-item-title class="align-self-center text-wrap">{{ route.meta.title }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item v-else :key="route.meta.title" @click="displayChildRoute(route)">
-            <v-list-item-action>
-              <v-icon>{{ route.meta.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>{{ route.meta.title }}</v-list-item-title>
+          <v-list-item v-else :key="route.meta.title" @click="displayChildRoute(route)" class="pr-1 pl-1">
+            <v-list-item-content class="text-center">
+              <v-icon class="align-self-center">{{ route.meta.icon }}</v-icon>
+              <v-list-item-title class="align-self-center text-wrap">{{ route.meta.title }}</v-list-item-title>
             </v-list-item-content>
-            <v-list-item-action>
-              <v-btn icon>
-                <v-icon color="grey lighten-1">mdi-menu-right</v-icon>
-              </v-btn>
-            </v-list-item-action>
           </v-list-item>
         </template>
       </v-list>
     </v-navigation-drawer>
 
     <v-app-bar app color="blue" dark>
-      <v-app-bar-nav-icon @click.stop="mini = !mini">
+      <!-- <v-app-bar-nav-icon @click.stop="mini = !mini">
         <v-icon v-if="mini">mdi-forwardburger</v-icon>
         <v-icon v-if="!mini">mdi-backburger</v-icon>
-      </v-app-bar-nav-icon>
+      </v-app-bar-nav-icon> -->
       <v-toolbar-title class="d-flex justify-start">AcQua / {{ currentRoute }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <span style="width: 400px">

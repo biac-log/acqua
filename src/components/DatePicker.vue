@@ -6,6 +6,7 @@
     offset-y
     max-width="290px"
     min-width="290px"
+    :disabled="isDisabled"
     :close-on-content-click="false"
   >
     <template v-slot:activator="{}">
@@ -19,6 +20,7 @@
         @blur.prevent="dateSelected = parseDate(dateFormatted)"
         @focus="$event.target.select()"
         :hide-details="isReadonly"
+        :disabled="isDisabled"
         validate-on-blur
       >
         <template v-slot:prepend-inner>
@@ -53,23 +55,22 @@ export default class extends Vue {
 
   @Prop()
   readonly label: string | undefined;
-  @PropSync('readonly')
-  private isReadonly!: boolean;
-  @PropSync('date')
-  public syncedDate!: DateTime;
-  @PropSync('rules')
-  public dateRules!: any;
-  @PropSync('filled')
-  public isFilled?: boolean;
+  @PropSync('readonly') private isReadonly!: boolean;
+  @PropSync('date') public syncedDate!: DateTime | null;
+  @PropSync('rules') public dateRules!: any;
+  @PropSync('filled') public isFilled?: boolean;
+  @PropSync('disabled', { default: false }) public isDisabled!: boolean;
 
   private parseDate(date: string): string {
     if (!date) return '';
     else {
       let dateString = date;
-      if (date.length === 2) dateString = `${date}/${this.syncedDate.date.format('MM/YYYY')}`;
-      else if (date.length === 4) dateString = `${date}${this.syncedDate.date.format('YYYY')}`;
-      else if (date.length === 5) dateString = `${date}/${this.syncedDate.date.format('YYYY')}`;
-      else if (date.length === 6) {
+      if (date.length < 6) {
+        const dateBase = this.syncedDate ? this.syncedDate : new DateTime();
+        if (date.length === 2) dateString = `${date}/${dateBase.date.format('MM/YYYY')}`;
+        else if (date.length === 4) dateString = `${date}${dateBase.date.format('YYYY')}`;
+        else if (date.length === 5) dateString = `${date}/${dateBase.date.format('YYYY')}`;
+      } else if (date.length === 6) {
         let annee = date.slice(-2).toNumber();
         if (annee >= 80) annee += 1900;
         else annee += 2000;
@@ -91,14 +92,14 @@ export default class extends Vue {
       this.$nextTick(() => (this.$refs.refDate as any).validate(true));
     } else {
       this.dateFormatted = '';
-      this.syncedDate = new DateTime();
+      this.syncedDate = null;
     }
   }
 
   @Watch('syncedDate')
-  private syncedDateChanged(val: DateTime) {
+  private syncedDateChanged(val: DateTime | null) {
     const currentDate = new DateTime(this.dateFormatted);
-    if (!val.isValid()) this.dateSelected = '';
+    if (!val?.isValid()) this.dateSelected = '';
     else if (!val.isSame(currentDate)) this.dateSelected = val.toUtc();
   }
 

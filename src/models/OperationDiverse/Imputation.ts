@@ -1,4 +1,5 @@
 import { CaseTvaDTO } from '../CaseTva';
+import { DateTime } from '../DateTime';
 
 export class ImputationDTO {
   numeroVentilation = 0;
@@ -18,6 +19,7 @@ export class ImputationDTO {
   libelleDevise = '';
   codeCaseTVA = 0;
   libelleCaseTVA = '';
+  dateEcheance = '';
   caseTva: CaseTvaDTO = new CaseTvaDTO();
   operationNumero = 0;
   operationLibelle = '';
@@ -38,7 +40,7 @@ export class Imputation extends ImputationDTO {
   }
 
   get libelleReference() {
-    return this.referencePiece ? `${this.referenceJournal}.${this.referencePiece}` : '';
+    return this.referencePiece ? `${this.referenceJournal.toString().padStart(2, '0')}.${this.referencePiece}` : '';
   }
 
   get debit() {
@@ -47,5 +49,12 @@ export class Imputation extends ImputationDTO {
 
   get credit() {
     return this.codeMouvement == 'CR' ? this.montantBase : 0;
+  }
+
+  get dateEcheanceDate(): DateTime | null {
+    return new DateTime(this.dateEcheance);
+  }
+  set dateEcheanceDate(date: DateTime | null) {
+    this.dateEcheance = date ? date.toJsonDateTime() : '';
   }
 }

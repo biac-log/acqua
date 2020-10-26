@@ -97,6 +97,7 @@
                 @keypress.enter="loadCaseTva"
                 @change="loadCaseTva"
                 @keydown.ctrl.f.prevent="OpenSearchCaseTva()"
+                @keydown.f5.prevent="OpenSearchCaseTva()"
                 tabindex="6"
               >
                 <template v-slot:append>
@@ -497,7 +498,7 @@ export default class extends Vue {
     }
   }
 
-private numeroCompteChange(value: string | CompteGeneralSearch) {
+  private numeroCompteChange(value: string | CompteGeneralSearch) {
     if (typeof value === 'string') this.numeroCompte = value;
     else if (value instanceof CompteGeneralSearch) {
       this.numeroCompte = value.numero.toString();
