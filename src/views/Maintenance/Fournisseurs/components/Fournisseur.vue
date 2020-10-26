@@ -851,7 +851,7 @@
                       v-model="tournees"
                       append-icon=""
                       :rules="rules.tournees"
-                      class="mt-2"
+                      :class="readonly ? '' : 'mt-2'"
                     ></v-combobox>
                   </v-col>
                 </v-row>
