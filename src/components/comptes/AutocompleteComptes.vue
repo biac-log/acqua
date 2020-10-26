@@ -16,9 +16,11 @@
       :filled="readonly"
       :readonly="readonly"
       :loading="compteLoading || autocompleteLoading"
+      :error-messages="errorCompte"
       validate-on-blur
+      no-filter
       item-value="numero"
-      item-text="numeroNom"
+      :item-text="castNumero"
       hide-no-data
       :dense="isDense"
     >
@@ -67,7 +69,7 @@ export default class AutocompleteComptes extends Vue {
   @PropSync('Readonly') private readonly!: boolean;
   @PropSync('TypeCompte') private typeCompte!: string;
   @PropSync('dense', { default: false }) private isDense!: boolean;
-  @PropSync('rules', { default: undefined }) private bindedRules!: any;
+  @PropSync('rules', { default: null }) private bindedRules!: any | null;
   @Prop({ default: 'N° Compte' }) readonly label!: string;
   @Prop({ default: true }) hideDetails!: boolean;
 
@@ -76,6 +78,12 @@ export default class AutocompleteComptes extends Vue {
   private comptesSearch: { numero: string | number; nom: string }[] = [];
   private searchCompte = '';
   private numeroCompteSelected: { numero: string | number; nom: string } | null = null;
+  private errorCompte = '';
+
+  private castNumero(item: { numero: number }) {
+    //Car search-input doit être un string
+    return item.numero.toString();
+  }
 
   public init(numero: string, nom: string) {
     if (numero) {
@@ -90,7 +98,7 @@ export default class AutocompleteComptes extends Vue {
 
   //#region Compte
   private async numeroCompteChangeAsync(value: string | { numero: string | number; nom: string } | undefined | null) {
-    console.log('numeroCompteChangeAsync = ', value);
+    this.errorCompte = '';
     if (!value)
       //Si vide
       this.resetCompte();
@@ -119,8 +127,9 @@ export default class AutocompleteComptes extends Vue {
 
   private async loadCompteByString(value: string) {
     try {
-      this.compteLoading = true;
+      this.errorCompte = '';
       if (value) {
+        this.compteLoading = true;
         if (this.typeCompte == 'F' || this.typeCompte == 'C') {
           const compte = await CompteApi.getCompteDeTier(this.typeCompte, value);
           this.setCompte(compte);
@@ -132,7 +141,8 @@ export default class AutocompleteComptes extends Vue {
         }
       }
     } catch (err) {
-      console.log(err);
+      this.errorCompte = `Compte ${value} invalide.`;
+      this.$emit('Change', '');
     } finally {
       this.compteLoading = false;
     }
@@ -140,8 +150,7 @@ export default class AutocompleteComptes extends Vue {
 
   @Watch('searchCompte')
   private async autocompleteCompte(matchCode: string) {
-    if (!matchCode) return;
-
+    if (!matchCode || matchCode.toString().length == 9) return;
     try {
       this.autocompleteLoading = true;
       if (matchCode && matchCode.isInt() && this.typeCompte == 'G') {
@@ -221,9 +230,9 @@ export default class AutocompleteComptes extends Vue {
     this.$nextTick(() => this.comboboxCompte?.blur());
   }
 
-  //@Watch('typeCompte')
   public resetCompte() {
     this.numeroCompteSelected = null;
+    this.errorCompte = '';
     this.$emit('Change', '');
   }
 }

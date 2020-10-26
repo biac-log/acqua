@@ -8,7 +8,7 @@
     @click:outside="closeDialog"
     @keydown.f2.stop="modifierPiece()"
     @keydown.46.prevent.stop="deletePiece"
-    @keydown.107.prevent.stop="createExtrait"
+    @keydown.107.prevent.stop="createImputation()"
     @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="savePiece()"
   >
@@ -119,7 +119,7 @@
                                 class="ml-5"
                                 ref="btnAdd"
                                 :disabled="readonly"
-                                @click.stop="createImputation"
+                                @click.stop="createImputation()"
                                 v-on="on"
                               >
                                 <v-icon>mdi-plus</v-icon>
@@ -338,6 +338,7 @@ export default class OperationDiverseVue extends Vue {
   private hash = '';
   public async openNew(periode: PeriodeComptable, journal: Journal): Promise<string> {
     this.dialog = true;
+    this.readonly = false;
     this.reset();
     this.periode = periode;
     this.journal = journal;
@@ -383,7 +384,7 @@ export default class OperationDiverseVue extends Vue {
   private createImputation() {
     if (!this.readonly) {
       this.refImputationVue
-        .openNew(this.journal)
+        .openNew()
         .then((resp: Imputation) => {
           const maxLigne = this.imputations?.length ? Math.max(...this.imputations.map((i) => i.numeroVentilation)) : 0;
           resp.numeroVentilation = maxLigne + 1;
@@ -398,7 +399,7 @@ export default class OperationDiverseVue extends Vue {
 
   private openImputation(imputation: Imputation) {
     this.refImputationVue
-      .open(this.journal, this.numeroPiece, imputation)
+      .open(imputation)
       .then((resp: Imputation) => {
         if (resp)
           Vue.set(

@@ -117,7 +117,13 @@ export default class extends Vue {
   }
 
   @Watch('filtreCompte')
-  private filterGrid() {
+  private filterGrid(newValue: string) {
+    const numeroFilterComponent = this.gridOptions?.api?.getFilterInstance('numero');
+    if (newValue && newValue.isInt()) {
+      numeroFilterComponent?.setModel({ type: 'contains', filter: newValue });
+    } else {
+      numeroFilterComponent?.setModel({ type: 'startsWith', filter: '' });
+    }
     this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
   }
 

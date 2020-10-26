@@ -15,6 +15,7 @@
       @keyup.enter="$event.target.select()"
       @focus="$event.target.select()"
       @keydown.ctrl.f.prevent="openSearch()"
+      @keydown.f5.prevent="openSearch()"
       v-model="codeSelected"
       :hide-details="hideDetails"
     >

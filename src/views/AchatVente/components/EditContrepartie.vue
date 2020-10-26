@@ -39,6 +39,7 @@
                 @focus="$event.target.select()"
                 @change="numeroCompteChange"
                 @keydown.ctrl.f.prevent="openSearchCompte()"
+                @keydown.f5.prevent="openSearchCompte()"
                 :hide-details="readonly"
                 :filled="readonly"
                 :readonly="readonly"
@@ -132,6 +133,7 @@
                 @keypress.enter="loadCaseTva"
                 @change="loadCaseTva"
                 @keydown.ctrl.f.prevent="OpenSearchCaseTva()"
+                @keydown.f5.prevent="OpenSearchCaseTva()"
                 tabindex="6"
               >
                 <template v-slot:append>

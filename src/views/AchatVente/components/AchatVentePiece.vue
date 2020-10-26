@@ -74,6 +74,7 @@
                       @focus="$event.target.select()"
                       @change="numeroCompteTierChange"
                       @keydown.ctrl.f.prevent="openSearchCompte()"
+                      @keydown.f5.prevent="openSearchCompte()"
                       :hide-details="piecereadonly"
                       :filled="piecereadonly"
                       :readonly="piecereadonly"

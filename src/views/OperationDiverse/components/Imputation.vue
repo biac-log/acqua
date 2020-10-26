@@ -43,6 +43,8 @@
                 :Readonly.sync="readonly"
                 :TypeCompte.sync="typesComptesSelected.id"
                 :hide-details="readonly"
+                :rules="compteRules"
+                label="Compte"
                 @Change="compteChange"
               >
               </AutocompleteComptesVue>
@@ -53,7 +55,6 @@
                 v-model="nomCompte"
                 :filled="readonly"
                 :hide-details="readonly"
-                :rules="nomCompteRules"
                 tabindex="-1"
                 readonly
               ></v-text-field>
@@ -62,6 +63,7 @@
           <v-row dense>
             <v-col cols="5">
               <v-text-field
+                ref="refLibelle"
                 label="Libellé"
                 v-model="libelle"
                 :filled="readonly"
@@ -84,6 +86,7 @@
                 @keypress.enter="loadCaseTvaAsync"
                 @change="loadCaseTvaAsync"
                 @keydown.ctrl.f.prevent="openSearchCaseTva()"
+                @keydown.f5.prevent="openSearchCaseTva()"
                 :error="numeroCaseTvaError != ''"
                 :error-messages="numeroCaseTvaError"
               >
@@ -183,7 +186,7 @@
             </v-col>
             <v-col cols="3">
               <v-text-field
-                ref="montant"
+                ref="refMontant"
                 v-model="montant"
                 label="Montant"
                 :filled="readonly"
@@ -206,12 +209,13 @@
                 label="Operation"
                 item-value="numero"
                 item-text="libelle"
+                :disabled="compteGeneralSelected"
                 return-object
               ></v-select>
             </v-col>
             <v-col cols="4">
               <v-text-field
-                ref="reference"
+                ref="refReference"
                 label="Référence"
                 v-model="reference"
                 :filled="readonly"
@@ -219,7 +223,11 @@
                 :disabled="!referenceEnabled"
                 :hide-details="readonly"
                 :rules="referenceRules"
+                :error-messages="errorReference"
+                :loading="loadingReference"
+                @change="loadPieceComptable(reference)"
                 @keydown.ctrl.f.prevent="openSearchEcheancier()"
+                @keydown.f5.prevent="openSearchEcheancier()"
                 validate-on-blur
               >
                 <template v-slot:append>
@@ -250,7 +258,8 @@
                 label="Date échéance"
                 :date.sync="dateEcheance"
                 :readonly.sync="readonly"
-                :filled="readonly"
+                :filled.sync="readonly"
+                :disabled.sync="compteGeneralSelected"
                 :rules.sync="dateEcheanceRules"
               ></DatePicker>
             </v-col>
@@ -264,6 +273,7 @@
                 :readonly="readonly"
                 :rules="chidaRules"
                 :hide-details="readonly"
+                :disabled="compteGeneralSelected"
                 @blur="chida = chida.toNumber().toComptaString()"
               >
               </v-text-field>
@@ -276,6 +286,7 @@
                 :readonly="readonly"
                 :rules="escompteRules"
                 :hide-details="readonly"
+                :disabled="compteGeneralSelected"
                 @blur="escompte = escompte.toNumber().toComptaString()"
               >
               </v-text-field>
@@ -288,12 +299,59 @@
                 :readonly="readonly"
                 :rules="montantTVARules"
                 :hide-details="readonly"
+                :disabled="compteGeneralSelected"
                 @blur="montantTVA = montantTVA.toNumber().toComptaString()"
               >
               </v-text-field>
             </v-col>
           </v-row>
         </v-card-text>
+        <v-card-actions v-if="imputationIsSelected" class="text-center pt-0">
+          <v-tooltip top open-delay="500">
+            <template v-slot:activator="{ on }">
+              <v-btn
+                color="error"
+                class="ma-2 pr-4"
+                text
+                tabindex="-1"
+                v-if="!isAdd && !readonly"
+                @click="deleteImputation()"
+                dense
+                v-on="on"
+              >
+                Supprimer
+              </v-btn>
+            </template>
+            <span>Supprimer l'imputation<span class="shortcutTooltip">del</span></span>
+          </v-tooltip>
+          <v-spacer></v-spacer>
+          <v-tooltip top open-delay="500">
+            <template v-slot:activator="{ on }">
+              <v-btn color="blue darken-1" class="ma-2 pr-4" tile outlined @click="close()" tabindex="-1" v-on="on">
+                <v-icon left>mdi-close</v-icon> Fermer
+              </v-btn>
+            </template>
+            <span>Fermer <span class="shortcutTooltip">esc</span></span>
+          </v-tooltip>
+          <v-tooltip top open-delay="500">
+            <template v-slot:activator="{ on }">
+              <v-btn
+                ref="btnValidate"
+                class="ma-2 pr-4"
+                tile
+                color="success"
+                v-if="!readonly"
+                :disabled="!isValid"
+                @click="sendImputation()"
+                @keydown.tab.prevent="focusFirstElement"
+                v-on="on"
+              >
+                <v-icon left>mdi-check</v-icon> Valider
+              </v-btn>
+            </template>
+            <span>Valider les modifications <span class="shortcutTooltip">alt + enter</span></span>
+          </v-tooltip>
+        </v-card-actions>
       </v-card>
     </v-form>
   </div>
@@ -323,6 +381,7 @@ import { PeriodeComptable } from '@/models/AchatVente';
 import { CaseTva } from '@/models/CaseTva';
 import CaseTvaApi from '@/api/CaseTvaApi';
 import SearchCaseTvaVue from '@/components/search/SearchCaseTva.vue';
+import { FinancierApi } from '@/api/FinancierApi';
 
 @Component({
   components: { AutocompleteComptesVue, AutocompleteDossierVue, SearchEcheancierVue, DatePicker, SearchCaseTvaVue }
@@ -332,21 +391,26 @@ export default class ImputationVue extends Vue {
   @Ref('dossierComponent') private autocompleteDossier?: AutocompleteDossierVue;
   @Ref('searchEcheancierDialog') readonly searchEcheancierDialog!: SearchEcheancierVue;
   @Ref('firstElement') readonly firstElement!: HTMLElement;
+  @Ref('refLibelle') readonly refLibelle!: HTMLElement;
+  @Ref('refMontant') readonly refMontant!: HTMLElement;
+  @Ref('refReference') readonly refReference!: HTMLElement;
 
   @PropSync('isReadonly', { default: true }) private readonly!: boolean;
   @PropSync('DatePiece') public datePiece!: DateTime;
   @PropSync('periode') public periodeComptable!: PeriodeComptable;
   @PropSync('journal') public journalPiece!: Journal;
+
   private isValid = false;
   private imputationIsSelected = false;
+  private isAdd = false;
 
   private typesComptes: TypeCompte[] = [];
   private typesComptesSelected: TypeCompte = new TypeCompte();
   private typesComptesRules: any = [(v: string) => !!v || 'Type obligatoire'];
 
   private numeroCompte = '';
+  private compteRules: any = [(v: string) => !!v || 'Un compte est obligatoire'];
   private nomCompte = '';
-  private nomCompteRules: any = [(v: string) => !!v || 'Nom obligatoire'];
   private natureCompte = '';
 
   private libelle = '';
@@ -375,6 +439,9 @@ export default class ImputationVue extends Vue {
   private numeroCaseTvaRules: any = [(v: string) => !v || (v.isInt() && v.toNumber() != 0) || 'Numéro invalide'];
   private tvaLoading = false;
 
+  private get compteGeneralSelected() {
+    return this.typesComptesSelected.id != 'C' && this.typesComptesSelected.id != 'F';
+  }
   private typesOperation: TypeOperation[] = TypeOperation.getAllOperations();
   private typesOperationSelected: TypeOperation | null = null;
 
@@ -387,6 +454,8 @@ export default class ImputationVue extends Vue {
   ];
   private referenceJournal = 0;
   private referencePiece = 0;
+  private errorReference = '';
+  private loadingReference = false;
 
   private dateEcheance: DateTime | null = null;
   private dateEcheanceRules: any = [
@@ -402,7 +471,11 @@ export default class ImputationVue extends Vue {
   private montantTVARules: any = [(v: string) => v.isDecimal() || 'Montant invalide'];
 
   get dossierIsEnabled() {
-    return this.typesComptesSelected.id == 'G' && ApplicationModule.parametre.modeDossier;
+    return (
+      this.typesComptesSelected.id == 'G' &&
+      ApplicationModule.parametre.modeDossier &&
+      (this.natureCompte == 'C' || this.natureCompte == 'R')
+    );
   }
   get dossierIsDisabled() {
     return !this.dossierIsEnabled;
@@ -421,8 +494,9 @@ export default class ImputationVue extends Vue {
     });
   }
 
-  public open(journal: Journal, numeroPiece: string, imputation: Imputation): Promise<Imputation> {
+  public open(imputation: Imputation): Promise<Imputation> {
     this.imputationIsSelected = true;
+    this.isAdd = false;
     this.autocompleteCompte?.resetCompte();
     this.autocompleteDossier?.resetDossier();
 
@@ -435,8 +509,9 @@ export default class ImputationVue extends Vue {
     });
   }
 
-  public openNew(journal: Journal): Promise<Imputation> {
+  public openNew(): Promise<Imputation> {
     this.imputationIsSelected = true;
+    this.isAdd = true;
     this.autocompleteCompte?.resetCompte();
     this.autocompleteDossier?.resetDossier();
 
@@ -455,6 +530,7 @@ export default class ImputationVue extends Vue {
       this.autocompleteCompte?.init(imputation.numeroCompte.toString(), imputation.nomCompte);
 
     this.nomCompte = imputation.nomCompte;
+    this.natureCompte = imputation.natureCompte;
     this.libelle = imputation.libelle;
     this.idDossier = imputation.dossier;
     this.nomDossier = imputation.dossierNom;
@@ -469,6 +545,7 @@ export default class ImputationVue extends Vue {
     this.reference = imputation.libelleReference;
     this.referenceJournal = imputation.referenceJournal;
     this.referencePiece = imputation.referencePiece;
+    this.dateEcheance = imputation.dateEcheanceDate;
     this.chida = imputation.chida.toDecimalString();
     this.escompte = imputation.escompte.toDecimalString();
     this.montantTVA = imputation.montantTVA.toDecimalString();
@@ -477,43 +554,33 @@ export default class ImputationVue extends Vue {
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
     if (!compte) {
       this.nomCompte = '';
-    } else if (
-      typeof compte === 'string' &&
-      (this.typesComptesSelected.id == 'C' || this.typesComptesSelected.id == 'F') &&
-      compte.length == 8
-    ) {
-      //this.loadPieceComptable(compte);
-      //this.dossierIsDisabled = true;
-      this.natureCompte = '';
-      //this.dossierComponent?.resetDossier();
-      //this.compteComponent.blur();
-      this.$nextTick(() => (this.$refs.montant as any)?.focus());
     } else if (compte instanceof CompteGeneralSearch) {
       this.nomCompte = compte.nom;
       this.numeroCompte = compte.numero.toString();
       this.natureCompte = compte.nature;
-      //this.setCompteGeneralCaseTvaAsync(compte);
-      // if (
-      //   this.typesComptesSelected?.id == 'G' &&
-      //   (compte.nature == 'R' || compte.nature == 'C') &&
-      //   this.dossierIsEnabled
-      // ) {
-      //   this.dossierIsDisabled = false;
-      //   this.dossierComponent?.focus();
-      // } else {
-      //   this.dossierIsDisabled = true;
-      //   this.dossierComponent?.resetDossier();
-      //   this.compteComponent.blur();
-      //   this.$nextTick(() => (this.$refs.montant as any)?.focus());
-      // }
+      this.setCompteGeneralCaseTvaAsync(compte);
+      this.autocompleteCompte?.blur();
+      this.refLibelle?.focus();
     } else if (compte instanceof CompteSearch || compte instanceof CompteDeTier) {
       this.nomCompte = compte.nom;
       this.numeroCompte = compte.numero.toString();
-      //this.dossierIsDisabled = true;
       this.natureCompte = '';
-      // this.dossierComponent?.resetDossier();
-      // this.compteComponent.blur();
-      this.$nextTick(() => (this.$refs.reference as any)?.focus());
+      this.autocompleteDossier?.resetDossier();
+      this.autocompleteCompte?.blur();
+      this.refLibelle?.focus();
+    }
+  }
+
+  private async setCompteGeneralCaseTvaAsync(compte: CompteGeneralSearch) {
+    if (compte.numeroCase) {
+      const caseTva = await CaseTvaApi.getCaseTVA(compte.numeroCase, this.journalPiece.numero);
+      if (caseTva) {
+        this.caseTva = caseTva;
+        this.numeroCaseTva = compte.numeroCase.toString();
+      } else {
+        this.caseTva = new CaseTva();
+        this.numeroCaseTva = '';
+      }
     }
   }
 
@@ -559,9 +626,9 @@ export default class ImputationVue extends Vue {
 
   @Watch('typesOperationSelected')
   private typeOperationSelectedChange(value: TypeOperation) {
-    if (value && value.numero != 3 && !this.dateEcheance) {
+    if (this.isAdd && value && value.numero != 3 && !this.dateEcheance) {
       this.dateEcheance = new DateTime(this.datePiece.date);
-    }
+    } else this.dateEcheance = null;
   }
 
   private async initTauxDeviseAsync(numeroDevise: number, datePiece: DateTime) {
@@ -577,16 +644,45 @@ export default class ImputationVue extends Vue {
     }
   }
 
+  private loadPieceComptable(piece: string) {
+    this.referenceJournal = 0;
+    this.referencePiece = 0;
+    this.errorReference = '';
+
+    if (piece && piece.length == 8) {
+      const numeroJournal = piece.substring(0, 2);
+      const numeroPiece = piece.substring(2, 8);
+      this.reference = `${numeroJournal}.${numeroPiece}`;
+      this.loadingReference = true;
+
+      FinancierApi.getPieceAchatVente(numeroJournal.toNumber(), numeroPiece.toNumber())
+        .then((piece) => {
+          if (piece) {
+            this.referenceJournal = piece.numeroJournal;
+            this.referencePiece = piece.numeroPiece;
+            this.refMontant?.focus();
+          } else this.errorReference = "La pièce n'existe pas";
+        })
+        .catch(() => {
+          this.errorReference = "La pièce n'existe pas";
+          this.refReference?.focus();
+        })
+        .finally(() => {
+          this.loadingReference = false;
+        });
+    }
+  }
+
   private openSearchEcheancier(): void {
     if ((this.typesComptesSelected.id == 'C' || this.typesComptesSelected.id == 'F') && this.numeroCompte) {
       (this.$refs.searchEcheancierDialog as SearchEcheancierVue)
         .open(this.typesComptesSelected.id, this.numeroCompte, `${this.numeroCompte} - ${this.nomCompte}`)
         .then((elements) => {
           //this.initFromEcheancier(elements);
-          this.$nextTick(() => (this.$refs.montant as any)?.focus());
+          this.refMontant?.focus();
         })
         .catch(() => {
-          this.$nextTick(() => (this.$refs.reference as any)?.focus());
+          this.refReference?.focus();
         });
     }
   }
@@ -594,7 +690,7 @@ export default class ImputationVue extends Vue {
   private initFromEcheancier(elements: EcheancierElement[]) {
     const element = elements[0];
     //this.devisesSelected = this.devises.find((e) => e.id == element.codeDevise) || this.devises[0];
-    this.reference = `${element.numeroJournal}.${element.numeroPiece}`;
+    this.reference = `${element.numeroJournal.toString().padStart(2, '0')}.${element.numeroPiece}`;
     this.referenceJournal = element.numeroJournal;
     this.referencePiece = element.numeroPiece;
   }
@@ -616,7 +712,6 @@ export default class ImputationVue extends Vue {
           this.numeroCaseTva = caseTva.numeroCase.toString();
           this.caseTva = caseTva;
           this.numeroCaseTvaError = '';
-          //this.calculMontant();
         }
       } else {
         this.caseTva.refresh();
@@ -645,7 +740,67 @@ export default class ImputationVue extends Vue {
   }
 
   private focusFirstElement() {
-    this.$nextTick(() => this.firstElement.focus());
+    this.$nextTick(() => this.firstElement?.focus());
+  }
+
+  private sendImputation() {
+    (this.$refs.form as any).validate();
+    this.$nextTick(() => {
+      if (this.isValid) {
+        this.imputationIsSelected = false;
+        this.resolve(this.getModel());
+      }
+    });
+  }
+
+  private deleteImputation() {
+    this.imputationIsSelected = false;
+    this.resolve();
+  }
+
+  @Watch('typesComptesSelected')
+  private typeCompteChange(typeCompte: TypeCompte) {
+    if (typeCompte.id != 'C' && typeCompte.id != 'F') {
+      this.typesOperationSelected = null;
+      this.reference = '';
+      this.referenceJournal = 0;
+      this.referencePiece = 0;
+      this.dateEcheance = null;
+      this.chida = '';
+      this.escompte = '';
+      this.montantTVA = '';
+    }
+  }
+
+  private getModel(): Imputation {
+    const imputation = new Imputation();
+    imputation.numeroVentilation = 0;
+    imputation.typeCompte = this.typesComptesSelected.id;
+    imputation.numeroCompte = this.numeroCompte.toNumber();
+    imputation.nomCompte = this.nomCompte;
+    imputation.natureCompte = this.natureCompte;
+    imputation.dossier = this.idDossier;
+    imputation.dossierNom = this.nomDossier;
+    imputation.referenceJournal = this.referenceJournal;
+    imputation.referencePiece = this.referencePiece;
+    imputation.libelle = this.libelle;
+    imputation.codeMouvement = this.typesMouvementsSelected.id;
+    imputation.montantDevise = this.montant.toNumber();
+    imputation.montantBase = this.montant.toNumber();
+    imputation.codeDevise = this.devisesSelected?.id;
+    imputation.libelleDevise = this.devisesSelected?.libelle;
+    imputation.codeCaseTVA = this.caseTva?.numeroCase;
+    imputation.libelleCaseTVA = this.caseTva?.libelleCase;
+    imputation.dateEcheanceDate = this.dateEcheance;
+    imputation.caseTva = new CaseTva(this.caseTva);
+    imputation.operationNumero = this.typesOperationSelected ? this.typesOperationSelected.numero : 0;
+    imputation.operationLibelle = this.typesOperationSelected ? this.typesOperationSelected.libelle : '';
+    imputation.chida = this.chida.toNumber();
+    imputation.escompte = this.escompte.toNumber();
+    //imputation.escompteDevise = this.chida.toNumber();
+    imputation.montantTVA = this.montantTVA.toNumber();
+
+    return imputation;
   }
 
   public close() {

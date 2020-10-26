@@ -4,7 +4,7 @@ import moment, { Moment } from 'moment';
 export class DateTime {
   public date: Moment;
 
-  constructor(date?: string | Date | Moment) {
+  constructor(date?: string | Date | Moment | null) {
     this.date = this.momentify(date || new Date());
   }
 
