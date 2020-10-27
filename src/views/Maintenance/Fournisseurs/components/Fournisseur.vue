@@ -306,9 +306,9 @@
                       <!-- Not the best, but it corrects the alignments .. -->
                       <autocomplete-comptes-vue
                         :readonly="readonly"
-                        TypeCompte="G"
+                        typeCompte="G"
                         label="N° de compte associé"
-                        @Change="setCompteAssocie"
+                        @change="setCompteAssocie"
                         v-model="compteAssocie"
                         ref="autocompleteCompteAssocie"
                         :hide-details="readonly"
@@ -317,9 +317,9 @@
                     </div>
                     <autocomplete-comptes-vue
                       :readonly="readonly"
-                      TypeCompte="C"
+                      typeCompte="C"
                       label="N° de compte maître"
-                      @Change="setCompteMaitre"
+                      @change="setCompteMaitre"
                       ref="autocompleteCompteMaitre"
                       :hide-details="readonly"
                       :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
@@ -328,9 +328,9 @@
                       <!-- Not the best, but it corrects the alignments .. -->
                       <autocomplete-comptes-vue
                         :readonly="readonly"
-                        TypeCompte="G"
+                        typeCompte="G"
                         label="N° de compte vente/achat"
-                        @Change="setCompteVenteAchat"
+                        @change="setCompteVenteAchat"
                         ref="autocompleteCompteVenteAchat"
                         :hide-details="readonly"
                         :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
@@ -1543,7 +1543,7 @@ export default class FournisseurVue extends Vue {
   }
 
   private clickOutside() {
-    if(this.readonly) this.closeDialog();
+    if (this.readonly) this.closeDialog();
   }
 }
 </script>

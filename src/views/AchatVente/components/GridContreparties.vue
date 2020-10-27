@@ -38,7 +38,7 @@
         :items="contreparties"
         id="dataTable"
         class="elevation-1"
-        :dense="contreparties.length > 8"
+        :dense="contreparties && contreparties.length > 8"
         disable-pagination
         hide-default-footer
         @click:row="editContrepartie"
@@ -74,7 +74,7 @@ export default class extends Vue {
   @PropSync('Contreparties') private contreparties!: PieceComptableContrepartie[];
   @PropSync('Journal') public journal!: Journal;
   @PropSync('DeviseEntete') public devise!: Devise;
-  @PropSync('CompteAchatVente') private numeroCompteAchatVente!: string;
+  @PropSync('CompteAchatVente') private numeroCompteAchatVente!: number;
   @PropSync('MontantDevise') private montantDevise!: string;
   @PropSync('MontantBase') private montantBase!: string;
   @PropSync('NomCompteDeTier') private nomCompteDeTier!: string;
@@ -153,7 +153,7 @@ export default class extends Vue {
   }
 
   public async createContrepartie() {
-    if ((!this.numeroCompteAchatVente || this.numeroCompteAchatVente == '0') && this.contreparties.length == 0) {
+    if (!this.numeroCompteAchatVente && this.contreparties.length == 0) {
       this.propositionLibelle = this.nomCompteDeTier;
       this.addContrepartie();
     } else if (this.contreparties.length == 0) {
@@ -179,7 +179,7 @@ export default class extends Vue {
       contrepartie.montantDevise = 0;
       contrepartie.montantBase = this.ventilleBase;
       contrepartie.codeDevise = 1;
-      if (+this.numeroCompteAchatVente) {
+      if (this.numeroCompteAchatVente) {
         const compteAchatVente = await CompteApi.getCompteGeneral('G', this.numeroCompteAchatVente);
         if (compteAchatVente.numeroCase) {
           const tva = await CaseTvaApi.getCaseTVA(compteAchatVente?.numeroCase, this.journal.numero);

@@ -34,6 +34,7 @@
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
+                @change="resetCompte"
                 dense
                 autofocus
               ></v-select>
@@ -41,12 +42,12 @@
             <v-col cols="4">
               <AutocompleteComptesVue
                 ref="compteComponent"
-                :Readonly.sync="readonly"
-                :TypeCompte.sync="typesComptesSelected.id"
+                :readonly.sync="readonly"
+                :typeCompte.sync="typesComptesSelected.id"
                 :rules.sync="numeroCompteRules"
                 label="Compte"
                 dense
-                @Change="compteChange"
+                @change="compteChange"
               >
               </AutocompleteComptesVue>
             </v-col>
@@ -521,6 +522,9 @@ export default class VentilationVue extends Vue {
     }
   }
   //#endregion
+  private resetCompte() {
+    this.compteComponent?.resetCompte();
+  }
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
     if (!compte) {

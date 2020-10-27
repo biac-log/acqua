@@ -1,11 +1,6 @@
 <template>
   <!-- <v-dialog v-model="dialog" width="800" @click:outside="close()" @keydown.esc="close()" @keydown.alt.enter="sendContrepartie()"> -->
-  <div
-    class="ma-0 pa-0 editContainer"
-    @keydown.esc.stop="close()"
-    @keydown.alt.enter.stop="sendContrepartie()"
-    @keydown.46.prevent.stop="deleteContrepartie"
-  >
+  <div class="ma-0 pa-0 editContainer" @keydown.esc.stop="close()" @keydown.alt.enter.stop="sendContrepartie()">
     <div :class="dialog ? 'overlay' : ''" @click="close()" />
     <!-- <transition name="fade" leave-absolute> -->
     <v-form v-if="dialog" ref="form" v-model="isValid" lazy-validation autocomplete="off">
@@ -24,21 +19,22 @@
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
+                @change="resetCompte"
                 tabindex="2"
                 autofocus
               ></v-select>
             </v-col>
             <v-col cols="3">
               <autocomplete-comptes-vue
-                ref="numeroCompte"
+                ref="refNumeroCompte"
                 label="N° compte"
-                v-model="numeroCompteSelected"
-                @Change="numeroCompteChange"
+                @change="numeroCompteChange"
                 :hide-details="readonly"
                 :filled="readonly"
                 :readonly="readonly"
-                :rules="numeroCompteTierRules"
-                :TypeCompte="typesComptesSelected.id"
+                :rules="numeroCompteRules"
+                :tabindex="3"
+                :typeCompte="typesComptesSelected.id"
               />
             </v-col>
             <SearchCompteContrepartieVue ref="compteDialog"></SearchCompteContrepartieVue>
@@ -294,6 +290,7 @@ import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue
 })
 export default class extends Vue {
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
+  @Ref() readonly refNumeroCompte!: AutocompleteComptesVue;
   @Ref() readonly montantComponent!: HTMLInputElement;
 
   @PropSync('isReadOnly') public readonly!: boolean;
@@ -425,11 +422,7 @@ export default class extends Vue {
     this.devisesSelected = this.devises.find((d) => d.id == contrepartie.codeDevise) || deviseEntete;
 
     if (contrepartie) {
-      const compteToSelect = {
-        numero: contrepartie.numeroCompte ? contrepartie.numeroCompte : '',
-        numeroNom: contrepartie.compteLibelle
-      };
-      this.numeroCompteSelected = compteToSelect;
+      this.refNumeroCompte.init(contrepartie.numeroCompte.toString(), contrepartie.compteLibelle);
 
       if (contrepartie.dossier) {
         this.dossierComponent.setDossier(
@@ -485,9 +478,32 @@ export default class extends Vue {
     }
   }
 
+  private resetCompte() {
+    this.refNumeroCompte?.resetCompte();
+  }
+
+  private numeroCompteChange(value: string | CompteGeneralSearch) {
+    if (!value) {
+      this.numeroCompte = '';
+      this.nomCompte = '';
+    }
+    if (typeof value === 'string') {
+      this.numeroCompte = value;
+      this.loadCompte();
+    } else if (value instanceof CompteGeneralSearch) {
+      this.numeroCompte = value.numero.toString();
+      this.$nextTick(() => (this.$refs.numeroCompte as any)?.blur());
+      this.$nextTick(() => (this.$refs.libelle as any)?.focus());
+      this.loadCompte();
+    } else {
+      this.numeroCompte = '';
+      this.nomCompte = '';
+    }
+  }
+
   private loadCompte() {
-    this.compteLoading = true;
     if (this.typesComptesSelected && this.numeroCompte) {
+      this.compteLoading = true;
       CompteApi.getCompteGeneral(this.typesComptesSelected.id, this.numeroCompte.toString())
         .then((compte) => {
           this.setCompte(compte);
@@ -498,21 +514,7 @@ export default class extends Vue {
     }
   }
 
-  private numeroCompteChange(value: string | CompteGeneralSearch) {
-    if (typeof value === 'string') this.numeroCompte = value;
-    else if (value instanceof CompteGeneralSearch) {
-      this.numeroCompte = value.numero.toString();
-      this.$nextTick(() => (this.$refs.numeroCompte as any)?.blur());
-      this.$nextTick(() => (this.$refs.libelle as any)?.focus());
-    } else this.numeroCompte = '';
-    this.loadCompte();
-  }
   private setCompte(compte: CompteGeneralSearch) {
-    if (compte) {
-      const compteToSelect = { numero: compte.numero, numeroNom: compte.nom };
-      this.numeroCompteSelected = compteToSelect;
-    }
-
     this.numeroCompte = compte.numero.toString();
     this.nomCompte = compte.nom;
     if (compte.numeroCase) {

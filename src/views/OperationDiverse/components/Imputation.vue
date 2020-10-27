@@ -35,17 +35,18 @@
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
+                @change="resetCompte"
               ></v-select>
             </v-col>
             <v-col cols="4">
               <AutocompleteComptesVue
                 ref="autocompleteCompte"
                 :Readonly.sync="readonly"
-                :TypeCompte.sync="typesComptesSelected.id"
+                :typeCompte.sync="typesComptesSelected.id"
                 :hide-details="readonly"
                 :rules="compteRules"
                 label="Compte"
-                @Change="compteChange"
+                @change="compteChange"
               >
               </AutocompleteComptesVue>
             </v-col>
@@ -550,7 +551,9 @@ export default class ImputationVue extends Vue {
     this.escompte = imputation.escompte.toDecimalString();
     this.montantTVA = imputation.montantTVA.toDecimalString();
   }
-
+  private resetCompte() {
+    this.autocompleteCompte?.resetCompte();
+  }
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
     if (!compte) {
       this.nomCompte = '';

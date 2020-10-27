@@ -7,7 +7,6 @@
       :persistent="!piecereadonly"
       eager
       @keydown.f2="ModifierPiece"
-      @keydown.46.prevent.stop="deletePiece"
       @keydown.107.prevent.stop="createContrepartie"
       @keydown.alt.enter="savePiece()"
       @click:outside.stop="clickOutside"
@@ -27,7 +26,14 @@
             <v-spacer></v-spacer>
             <v-tooltip v-if="piecereadonly" top open-delay="500">
               <template v-slot:activator="{ on }">
-                <v-btn class="mr-5" color="success" :disabled="saveLoading" @click="ModifierPiece" v-on="on">
+                <v-btn
+                  ref="refButtonModifier"
+                  class="mr-5"
+                  color="success"
+                  :disabled="saveLoading"
+                  @click="ModifierPiece"
+                  v-on="on"
+                >
                   <v-icon left>mdi-pencil</v-icon>Modifier
                 </v-btn>
               </template>
@@ -66,14 +72,13 @@
                   <v-col cols="4">
                     <autocomplete-comptes-vue
                       ref="autocompleteCompteTier"
-                      label="Compte tiers"
-                      v-model="numeroCompteTierSelected"
-                      @Change="numeroCompteTierChange"
-                      :hide-details="piecereadonly"
-                      :filled="piecereadonly"
-                      :readonly="piecereadonly"
-                      :rules="numeroCompteTierRules"
-                      :TypeCompte="typeCompte"
+                      label="Compte de tiers"
+                      @change="numeroCompteTierChange"
+                      :hide-details.sync="piecereadonly"
+                      :filled.sync="piecereadonly"
+                      :readonly.sync="piecereadonly"
+                      :rules.sync="numeroCompteTierRules"
+                      :typeCompte.sync="typeCompte"
                     />
                   </v-col>
                   <v-col cols="8">
@@ -170,6 +175,7 @@
                       :date.sync="datePiece"
                       :readonly.sync="piecereadonly"
                       :rules.sync="datePieceRules"
+                      :filled="piecereadonly"
                     ></DatePicker>
                   </v-col>
                   <v-col cols="4">
@@ -178,6 +184,7 @@
                       :date.sync="dateEcheance"
                       :readonly.sync="piecereadonly"
                       :rules.sync="dateEcheanceRules"
+                      :filled="piecereadonly"
                     ></DatePicker>
                   </v-col>
                   <v-col cols="4">
@@ -412,9 +419,9 @@ import DatePicker from '@/components/DatePicker.vue';
 import CompteApi from '@/api/CompteApi';
 import AchatVenteApi from '@/api/AchatVenteApi';
 import GridContreparties from './GridContreparties.vue';
-import { CompteDeTier } from '../../../models/Compte/CompteDeTier';
+import { CompteDeTier } from '@/models/Compte/CompteDeTier';
 import { displayAxiosError } from '@/utils/ErrorMethods';
-import { DateTime } from '../../../models/DateTime';
+import { DateTime } from '@/models/DateTime';
 import DeviseApi from '@/api/DeviseApi';
 import { Devise } from '@/models/Devise/Devise';
 import { DialogActionResult } from '@/models/DialogResult';
@@ -426,6 +433,7 @@ import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue
 })
 export default class extends Vue {
   @Ref() readonly autocompleteCompteTier!: AutocompleteComptesVue;
+  @Ref() readonly refButtonModifier!: HTMLButtonElement;
   @Ref() readonly buttonSave!: HTMLButtonElement;
   @Ref() readonly gridContreparties!: GridContreparties;
   @Ref() readonly confirmDialog!: Confirm;
@@ -447,12 +455,13 @@ export default class extends Vue {
     numero: '',
     nom: ''
   };
-  private numeroCompteTierRules: any = [(v: { numero: number | string }) => !!v?.numero || 'Numéro obligatoire'];
+
+  private numeroCompteTierRules: any = [(v: any) => !!v || 'Numéro obligatoire'];
   private libelleFromInit = '';
   private libelle = '';
   private libelleRules: any = [(v: string) => !!v || 'Libellé obligatoire'];
   private libelleWarningMessage = '';
-  private compteAssocieNumero = '';
+  private compteAssocieNumero = 0;
   private compteAssocieNom = '';
   private montantDevise = '';
   private montantRules: any = [(v: string) => v.isDecimal(true) || 'Montant invalide'];
@@ -470,7 +479,7 @@ export default class extends Vue {
     (v: string) => this.validateDatePiece(v) || 'La date est hors période'
   ];
 
-  private dateEcheance: DateTime = new DateTime();
+  private dateEcheance: DateTime | null = null;
   private dateEcheanceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
@@ -510,7 +519,7 @@ export default class extends Vue {
   private compteTiersEscomptePourcentage = '';
   private compteTiersEscompteNombreJours = '';
   private libelleCompteAssocie = '';
-  private numeroCompteAchatVente = '';
+  private numeroCompteAchatVente = 0;
   private nomCompteAchatVente = '';
   private libelleCompteVenteAchat = '';
   private codeTaxe = 0;
@@ -548,7 +557,8 @@ export default class extends Vue {
 
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
-      this.autocompleteCompteTier?.focus();
+      if (entete) this.$nextTick(() => (this.refButtonModifier as any).$el.focus());
+      else this.autocompleteCompteTier.focus();
     });
     return new Promise((resolve) => {
       this.resolve = resolve;
@@ -567,6 +577,7 @@ export default class extends Vue {
   }
 
   private resetForm() {
+    this.autocompleteCompteTier.resetCompte();
     this.errorMessage = '';
     this.libelleWarningMessage = '';
     this.forcerNumero = false;
@@ -585,7 +596,7 @@ export default class extends Vue {
     this.deviseSelected = this.devises[0];
     this.statutSelected = this.statuts[0];
     this.datePiece = new DateTime();
-    this.dateEcheance = new DateTime();
+    this.dateEcheance = null;
     this.typeCompte = '';
 
     this.compteTiersNom = '';
@@ -599,12 +610,12 @@ export default class extends Vue {
     this.compteTiersEscomptePourcentage = '';
     this.compteTiersEscompteNombreJours = '';
     this.libelleCompteAssocie = '';
-    this.numeroCompteAchatVente = '';
+    this.numeroCompteAchatVente = 0;
     this.nomCompteAchatVente = '';
     this.libelleCompteVenteAchat = '';
     this.codeTaxe = 0;
     this.contreparties = [];
-    this.compteAssocieNumero = '';
+    this.compteAssocieNumero = 0;
     this.compteAssocieNom = '';
     this.hash = '';
     (this.$refs.form as any).resetValidation();
@@ -656,7 +667,7 @@ export default class extends Vue {
     this.compteTiersEscompteNombreJours = pieceComptable.compteTiersEscompteNombreJours;
     this.codeTaxe = pieceComptable.compteTiersCodeTaxe;
     this.libelleCompteAssocie = pieceComptable.libelleCompteAssocie;
-    this.numeroCompteAchatVente = pieceComptable.compteVenteAchatNumero.toDecimalString(2);
+    this.numeroCompteAchatVente = pieceComptable.compteVenteAchatNumero;
     this.libelleCompteVenteAchat = pieceComptable.libelleCompteVenteAchat;
     this.compteAssocieNom = pieceComptable.compteAssocieNom;
     this.compteAssocieNumero = pieceComptable.compteAssocieNumero;
@@ -700,26 +711,25 @@ export default class extends Vue {
     }
   }
 
-  private numeroCompteTierChange(value: string | CompteSearch) {
-    if (typeof value === 'string') {
+  private numeroCompteTierChange(value: string | CompteSearch | CompteDeTier) {
+    if (value && typeof value === 'string') {
       this.numeroCompteTier = value;
+      this.loadCompte();
     } else if (value instanceof CompteSearch) {
       this.numeroCompteTier = value.numero.toString();
-      this.$nextTick(() => this.autocompleteCompteTier?.blur());
+      //this.$nextTick(() => this.autocompleteCompteTier?.blur());
       this.$nextTick(() => (this.$refs.libellePiece as any)?.focus());
+      this.loadCompte();
+    } else if (value instanceof CompteDeTier) {
+      this.setCompteDeTier(value);
     } else {
       this.numeroCompteTier = '';
       this.compteTiersNom = '';
+      this.setCompteDeTier(new CompteDeTier());
     }
-    this.loadCompte();
   }
 
   private async setCompteDeTier(compte?: CompteDeTier) {
-    if (compte) {
-      const compteToSelect = { numero: compte.numero, nom: compte.nom };
-      this.numeroCompteTierSelected = compteToSelect;
-    }
-
     this.numeroCompteTier = compte ? compte.numero.toString() : '';
     this.compteTiersNom = compte ? compte.nom : '';
     this.deviseSelected = compte
@@ -735,11 +745,11 @@ export default class extends Vue {
     this.compteTiersEscomptePourcentage = compte ? compte.escomptePourcentage.toDecimalString(2) : '';
     this.compteTiersEscompteNombreJours = compte ? compte.escompteNombreJours.toDecimalString(2) : '';
     this.libelleCompteAssocie = compte ? compte.libelleCompteAssocie : '';
-    this.numeroCompteAchatVente = compte ? compte.compteVenteAchatNumero.toString() : '';
+    this.numeroCompteAchatVente = compte ? compte.compteVenteAchatNumero : 0;
     this.libelleCompteVenteAchat = compte ? compte.libelleCompteVenteAchat : '';
     this.delaiPaiementLibelle = compte ? compte.delaiPaiementLibelle : '';
     this.codeTaxe = compte ? compte.codeTaxe : 0;
-    this.compteAssocieNumero = compte ? compte.compteAssocieNumero.toString() : '';
+    this.compteAssocieNumero = compte ? compte.compteAssocieNumero : 0;
     this.compteAssocieNom = compte ? compte.compteAssocieNom : '';
     this.initDateEcheance(this.numeroCompteTier, this.typeCompte, this.datePiece);
   }
@@ -759,10 +769,10 @@ export default class extends Vue {
     } else this.libelleWarningMessage = '';
   }
 
-  private async ModifierPiece() {
+  private ModifierPiece() {
     this.piecereadonly = false;
-    await this.loadCompte();
-    this.$nextTick(() => this.autocompleteCompteTier?.focus());
+    this.autocompleteCompteTier.focus();
+    //await this.loadCompte();
   }
 
   private devisesLoading = false;
@@ -995,14 +1005,14 @@ export default class extends Vue {
     pieceComptaSave.numeroJournal = this.journal.numero;
     pieceComptaSave.numeroPiece = this.numeroPiece.toNumber();
     pieceComptaSave.datePiece = this.datePiece.toUtc();
-    pieceComptaSave.dateEcheance = this.dateEcheance.toUtc();
+    pieceComptaSave.dateEcheance = this.dateEcheance?.toUtc() || '';
     pieceComptaSave.montantBase = this.montantBase.toNumber();
     pieceComptaSave.montantDevise = this.montantDevise.toNumber();
     pieceComptaSave.codeDevise = this.deviseSelected.id;
     pieceComptaSave.libelle = this.libelle;
     pieceComptaSave.typeCompte = this.typeCompte;
     pieceComptaSave.numeroCompte = this.numeroCompteTier.toNumber();
-    pieceComptaSave.numeroCompteAssocie = this.compteAssocieNumero.toNumber();
+    pieceComptaSave.numeroCompteAssocie = this.compteAssocieNumero;
     pieceComptaSave.montantEscompteBase = this.montantEscompte.toNumber() * this.taux.toNumber();
     pieceComptaSave.montantEscompteDevise = this.montantEscompte.toNumber();
     pieceComptaSave.codeBlocage = this.statutSelected.id;

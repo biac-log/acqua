@@ -77,7 +77,7 @@ export const asyncRoutes: RouteConfig[] = [
     children: [
       {
         path: 'index',
-        component: () => import(/* webpackChunkName: "achatvente" */ '@/views/Financier/index.vue'),
+        component: () => import(/* webpackChunkName: "financier" */ '@/views/Financier/index.vue'),
         name: 'Financier',
         meta: {
           title: 'Financier',
@@ -99,7 +99,7 @@ export const asyncRoutes: RouteConfig[] = [
     children: [
       {
         path: 'index',
-        component: () => import(/* webpackChunkName: "achatvente" */ '@/views/OperationDiverse/index.vue'),
+        component: () => import(/* webpackChunkName: "operationdiverse" */ '@/views/OperationDiverse/index.vue'),
         name: 'Opérations diverses',
         meta: {
           title: 'Opérations diverses',

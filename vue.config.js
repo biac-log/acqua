@@ -1,8 +1,11 @@
 const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 module.exports = {
   transpileDependencies: ['vuetify'],
   configureWebpack: {
-    devtool: 'source-map'
+    devtool: 'source-map',
+    plugins: [new BundleAnalyzerPlugin()]
   },
   pwa: {
     name: 'acqua',

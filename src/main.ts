@@ -11,6 +11,7 @@ import 'moment/locale/fr';
 import '@/utils/Extensions';
 moment.locale('fr');
 
+//Vue.prototype.$lodash = lodash;
 Vue.config.productionTip = false;
 Vue.config.keyCodes.f2 = 113;
 Vue.config.keyCodes.del = 46;
@@ -20,7 +21,6 @@ Vue.config.keyCodes.plus = 107;
 Object.keys(filters).forEach((key) => {
   Vue.filter(key, (filters as { [key: string]: Function })[key]);
 });
-
 Vue.config.errorHandler = function(err: any, vm, info) {
   if (process.env.NODE_ENV === 'production') {
     LoggingApi.generateLog(err, vm, info);

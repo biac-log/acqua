@@ -1,7 +1,7 @@
 <template>
   <v-app id="inspire">
     <!-- Click display only child -->
-    <v-navigation-drawer v-model="drawer" disable-resize-watcher app width="86">
+    <v-navigation-drawer v-model="drawer" disable-resize-watcher permanent app width="86">
       <v-list dense>
         <v-list-item v-if="parentRoute" :key="previousName" @click="previous()">
           <v-list-item-content>

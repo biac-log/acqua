@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@types/jwt-decode": "^2.2.1",
-    "@types/lodash": "^4.14.157",
+    "@types/lodash": "^4.14.162",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "^4.4.4",

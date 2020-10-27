@@ -263,10 +263,10 @@ import AlertMessageVue from '@/components/AlertMessage.vue';
 import DatePicker from '@/components/DatePicker.vue';
 import ImputationVue from './Imputation.vue';
 import OperationDiverseApi from '../../../api/OperationDiverseApi';
-import _ from 'lodash';
 import Confirm from '@/components/Confirm.vue';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
+import { sum } from 'lodash';
 
 @Component({
   components: { ImputationVue, DatePicker, Confirm, AlertMessageVue }
@@ -299,10 +299,10 @@ export default class OperationDiverseVue extends Vue {
   ];
 
   get credit() {
-    return _.sum(this.imputations.filter((c) => c.codeMouvement == 'CR').map((i) => i.montantDevise));
+    return sum(this.imputations.filter((c) => c.codeMouvement == 'CR').map((i) => i.montantDevise));
   }
   get debit() {
-    return _.sum(this.imputations.filter((c) => c.codeMouvement == 'DB').map((i) => i.montantDevise));
+    return sum(this.imputations.filter((c) => c.codeMouvement == 'DB').map((i) => i.montantDevise));
   }
   get solde() {
     return Math.abs(this.credit - this.debit);
@@ -613,7 +613,7 @@ export default class OperationDiverseVue extends Vue {
   }
 
   private clickOutside() {
-    if(this.readonly) this.closeDialog();
+    if (this.readonly) this.closeDialog();
   }
 }
 </script>

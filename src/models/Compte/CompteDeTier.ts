@@ -35,13 +35,13 @@ export class CompteDeTierDTO implements ICompteDeTier {
 }
 
 export class CompteDeTier extends CompteDeTierDTO {
-  constructor(dto: CompteDeTierDTO) {
+  constructor(dto?: CompteDeTierDTO) {
     super();
-    Object.assign(this, dto);
+    Object.assign(this, dto || new CompteDeTierDTO());
   }
 
   get libelleCompteAssocie(): string {
-    return `${this.compteAssocieNumero} ${this.compteAssocieNom}`;
+    return this.compteAssocieNumero ? `${this.compteAssocieNumero} ${this.compteAssocieNom}` : '';
   }
 
   get libelleCompteVenteAchat(): string {

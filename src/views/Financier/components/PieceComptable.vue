@@ -240,10 +240,10 @@ import DatePicker from '@/components/DatePicker.vue';
 import ExtraitsVue from './Extraits.vue';
 import { FinancierApi } from '../../../api/FinancierApi';
 import ExtraitVue from './Extrait.vue';
-import _ from 'lodash';
 import Confirm from '@/components/Confirm.vue';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
+import { sum } from 'lodash';
 
 @Component({
   components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue }
@@ -417,8 +417,8 @@ export default class PieceComptableVue extends Vue {
 
   @Watch('extraits')
   private calculSolde() {
-    const sumCredit = _.sum(this.extraits.map((m) => m.montantCredit.toNumber()));
-    const sumDebit = _.sum(this.extraits.map((m) => m.montantDebit.toNumber()));
+    const sumCredit = sum(this.extraits.map((m) => m.montantCredit.toNumber()));
+    const sumDebit = sum(this.extraits.map((m) => m.montantDebit.toNumber()));
     this.soldeActuel = (this.soldeInitial.toNumber() + sumDebit - sumCredit).toComptaString();
   }
 
@@ -589,7 +589,7 @@ export default class PieceComptableVue extends Vue {
   }
 
   private clickOutside() {
-    if(this.readonly) this.closeDialog();
+    if (this.readonly) this.closeDialog();
   }
 }
 </script>
