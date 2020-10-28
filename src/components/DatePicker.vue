@@ -22,6 +22,7 @@
         :hide-details="isReadonly"
         :disabled="isDisabled"
         validate-on-blur
+        :tabindex="tabindex"
       >
         <template v-slot:prepend-inner>
           <v-btn
@@ -53,8 +54,8 @@ export default class extends Vue {
   public dateSelected = '';
   public dateFormatted = '';
 
-  @Prop()
-  readonly label: string | undefined;
+  @Prop() readonly label: string | undefined;
+  @Prop() readonly tabindex: number | undefined;
   @PropSync('readonly') private isReadonly!: boolean;
   @PropSync('date') public syncedDate!: DateTime | null;
   @PropSync('rules') public dateRules!: any;
