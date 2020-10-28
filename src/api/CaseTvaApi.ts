@@ -1,5 +1,6 @@
 import { CaseTva, CaseTvaDTO } from '@/models/CaseTva/CaseTva';
 import api from '@/api/AxiosApi';
+import { CaseTvaMaintenance, CaseTvaMaintenanceDTO } from '@/models/CaseTva/CaseTvaMaintenance';
 
 export default abstract class CaseTvaApi {
   static async getCasesTVADisponibles(journal: number | string): Promise<CaseTva[]> {
@@ -14,8 +15,8 @@ export default abstract class CaseTvaApi {
     return new CaseTva(response.data);
   }
 
-  static async getAll(): Promise<CaseTva[]> {
-    const response = await api.AcQuaCore.get<CaseTva[]>(`CaseTVA`);
-    return response.data.map((caseTvaDTO) => new CaseTva(caseTvaDTO));
+  static async getAll(): Promise<CaseTvaMaintenance[]> {
+    const response = await api.AcQuaCore.get<CaseTvaMaintenanceDTO[]>(`CaseTVA`);
+    return response.data.map((caseTvaDTO) => new CaseTvaMaintenance(caseTvaDTO));
   }
 }

@@ -19,18 +19,33 @@
       </v-card-title>
 
       <v-data-table :headers="headers" :items="items" :search="search" :loading="isLoadingItems" @click:row="openItem">
-        <!-- <template v-slot:[`item.date`]="{ item }">
-          <span>{{ item.date | dateToString }}</span>
+        <!-- <template v-slot:[`item.ncSurVente`]="{ item }">
+          <v-icon color="green">{{ item.ncSurVente ? 'mdi-check' : '' }}</v-icon>
+        </template>
+        <template v-slot:[`item.facturesVentes`]="{ item }">
+          <v-icon color="green">{{ item.facturesVentes ? 'mdi-check' : '' }}</v-icon>
+        </template>
+        <template v-slot:[`item.facturesAchat`]="{ item }">
+          <v-icon color="green">{{ item.facturesAchat ? 'mdi-check' : '' }}</v-icon>
+        </template>
+        <template v-slot:[`item.ncSurAchat`]="{ item }">
+          <v-icon color="green">{{ item.ncSurAchat ? 'mdi-check' : '' }}</v-icon>
+        </template>
+        <template v-slot:[`item.financiers`]="{ item }">
+          <v-icon color="green">{{ item.financiers ? 'mdi-check' : '' }}</v-icon>
+        </template>
+        <template v-slot:[`item.od`]="{ item }">
+          <v-icon color="green">{{ item.od ? 'mdi-check' : '' }}</v-icon>
         </template> -->
       </v-data-table>
     </v-card>
-    <!-- <libelle-reglement-vue ref="itemDialog" /> -->
+    <case-tva-vue ref="itemDialog" />
   </v-container>
 </template>
 
 <script lang="ts">
 import CaseTvaApi from '@/api/CaseTvaApi';
-import { CaseTva } from '@/models/CaseTva/CaseTva';
+import { CaseTvaMaintenance } from '@/models/CaseTva/CaseTvaMaintenance';
 import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
 import CaseTvaVue from '@/views/Maintenance/CasesTVA/CaseTVA.vue';
 
@@ -49,10 +64,22 @@ export default class CasesTvaVue extends Vue {
 
   private search = '';
   private isLoading = false;
-  private items: CaseTva[] = [];
+  private items: CaseTvaMaintenance[] = [];
   private headers = [
+    {text: 'Numéro', value: 'numeroCase'},
     { text: 'Libellé', value: 'libelleCase' },
-  ];
+    {text: 'Type', value: 'typeCase'},
+    {text: 'Taux TVA', value: 'tauxTvaCase'},
+    {text: 'Taux Egalisé', value: 'tauxEgalisationCase'},
+    // {text: 'NC Ventes', value: 'ncSurVente'},
+    // {text: 'Factures Ventes', value: 'facturesVentes'},
+    // {text: 'Factures Achat', value: 'facturesAchat'},
+    // {text: 'NC Achat', value: 'ncSurAchat'},
+    // {text: 'Financiers', value: 'financiers'},
+    // {text: 'O.D', value: 'od'},
+    {text: 'Code Pays', value: 'codePays'},
+    {text: 'Intrastat', value: 'intrastat'},
+  ];  
 
   private async loadItems() {
     this.isLoadingItems = true;
@@ -75,7 +102,7 @@ export default class CasesTvaVue extends Vue {
       });
   }
 
-  private openItem(item: CaseTva) {
+  private openItem(item: CaseTvaMaintenance) {
     this.itemDialog
       .open(item)
       .then((reloadOnClose: boolean) => {

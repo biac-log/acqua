@@ -122,7 +122,7 @@
 
 <script lang="ts">
 import { Component, Vue, Ref } from 'vue-property-decorator';
-import { CaseTva } from '@/models/CaseTva/CaseTva';
+import { CaseTvaMaintenance } from '@/models/CaseTva/CaseTvaMaintenance';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
 import CaseTvaApi from '@/api/CaseTvaApi';
@@ -157,21 +157,34 @@ export default class CaseTvaVue extends Vue {
     return this.readonly || !this.newRecord;
   }
 
-  private model: CaseTva = new CaseTva();
-  private modelBase: CaseTva = new CaseTva(); // Used for the reset method
+  private model: CaseTvaMaintenance = new CaseTvaMaintenance();
+  private modelBase: CaseTvaMaintenance = new CaseTvaMaintenance(); // Used for the reset method
 
-  /// LibelleReglement model
-  private numero = '';
+  private vatKey = '';
+  private numero = 0;
   private libelle = '';
+  private typeCase = '';
+  private tauxTvaCase = '';
+  private tauxEgalisationCase = '';
+  private ncSurVente = false;
+  private facturesAchat = false;
+  private facturesVente = false;
+  private ncSurAchat = false;
+  private financiers = false;
+  private od = false;
+  private natureCase = '';
+  private libelleTypeCase = '';
+  private codePays = '';
+  private intrastat = false;
 
   // private rules = LibelleReglement.rules;
 
   private readonly = true;
   private newRecord = false;
 
-  public open(item: CaseTva): Promise<boolean> {
+  public open(item: CaseTvaMaintenance): Promise<boolean> {
     this.readonly = true;
-    this.model = new CaseTva();
+    this.model = new CaseTvaMaintenance();
     this.modelBase = item;
 
     this.setModel(item);
@@ -192,8 +205,8 @@ export default class CaseTvaVue extends Vue {
 
   public async openNew(): Promise<number> {
     this.readonly = false;
-    this.setModel(new CaseTva());
-    this.modelBase = new CaseTva();
+    this.setModel(new CaseTvaMaintenance());
+    this.modelBase = new CaseTvaMaintenance();
     this.newRecord = true;
 
     this.display = true;
@@ -207,7 +220,7 @@ export default class CaseTvaVue extends Vue {
     });
   }
 
-  private setModel(model: CaseTva) {
+  private setModel(model: CaseTvaMaintenance) {
     // this.numero = model.numero.toIntString();
     this.libelle = model.libelleCase;
   }
@@ -222,7 +235,7 @@ export default class CaseTvaVue extends Vue {
     this.readonly = true;
     this.alertMessage.clear();
     this.successMessage.clear();
-    this.setModel(new CaseTva());
+    this.setModel(new CaseTvaMaintenance());
     this.reject();
   }
 
