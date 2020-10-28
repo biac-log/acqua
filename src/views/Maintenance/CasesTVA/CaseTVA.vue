@@ -238,6 +238,7 @@ export default class CaseTvaVue extends Vue {
   private intrastat = false;
 
   // private rules = LibelleReglement.rules;
+  private codePaysRules = []; //TODO
   private types = CaseTvaMaintenance.types;
   private natures = CaseTvaMaintenance.natures;
 
@@ -303,8 +304,23 @@ export default class CaseTvaVue extends Vue {
   }
 
   private mapModel() {
-    // this.model.numero = this.numero.toNumber();
+    this.model.vatKey = this.vatKey;
+    this.model.numeroCase = this.numero;
     this.model.libelleCase = this.libelle;
+    this.model.typeCase = this.typeCase;
+    this.model.tauxTvaCase = this.tauxTvaCase.toNumber();
+    this.model.tauxNature = this.tauxNature.toNumber();
+    this.model.tauxEgalisationCase = this.tauxEgalisationCase.toNumber();
+    this.model.ncSurVente = this.ncSurVente;
+    this.model.facturesAchat = this.facturesAchat;
+    this.model.facturesVentes = this.facturesVente;
+    this.model.ncSurAchat = this.ncSurAchat;
+    this.model.financiers = this.financiers;
+    this.model.od = this.od;
+    this.model.natureCase = this.natureCase;
+    this.model.libelleTypeCase = this.libelleTypeCase;
+    this.model.codePays = this.codePays;
+    this.model.intrastat = this.intrastat;
   }
 
   private closeDialog() {
@@ -335,28 +351,28 @@ export default class CaseTvaVue extends Vue {
 
     this.mapModel();
 
-    // if (this.newRecord) {
-    //   await CaseTvaApi.create(this.model)
-    //     .then(() => {
-    //       this.model = this.modelBase;
-    //       this.closeDialog();
-    //     })
-    //     .catch((err) => {
-    //       this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Model', displayAxiosError(err));
-    //       this.readonly = false;
-    //     })
-    //     .finally(() => {
-    //       this.saveLoading = false;
-    //     });
-    // } else {
-    //   await LibelleReglementApi.update(this.model, this.modelBase.hash)
-    //     .then(() => {
-    //       this.readonly = true;
-    //       this.successMessage.show('Le libellé a été mis à jour avec succès.', '');
-    //       this.resolve(true);
-    //     })
-    //     .finally(() => (this.saveLoading = false));
-    // }
+    if (this.newRecord) {
+      await CaseTvaApi.create(this.model)
+        .then(() => {
+          this.model = this.modelBase;
+          this.closeDialog();
+        })
+        .catch((err) => {
+          this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Model', displayAxiosError(err));
+          this.readonly = false;
+        })
+        .finally(() => {
+          this.saveLoading = false;
+        });
+    } else {
+      // await LibelleReglementApi.update(this.model, this.modelBase.hash)
+      //   .then(() => {
+      //     this.readonly = true;
+      //     this.successMessage.show('Le libellé a été mis à jour avec succès.', '');
+      //     this.resolve(true);
+      //   })
+      //   .finally(() => (this.saveLoading = false));
+    }
   }
 
   private cancelEdit() {
