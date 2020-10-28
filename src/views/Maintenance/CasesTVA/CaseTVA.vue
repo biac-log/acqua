@@ -12,7 +12,7 @@
   >
     <v-card>
       <v-toolbar color="primary" dark flat>
-        <v-card-title>{{ newRecord ? 'Nouveau libellé' : `${numero}` }}</v-card-title>
+        <v-card-title>{{ newRecord ? 'Nouvelle case TVA' : `${numero} - ${libelle}` }}</v-card-title>
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
@@ -52,26 +52,85 @@
         <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-form ref="form" v-model="isValid" lazy-validation>
-          <v-row justify="center" dense>
-            <v-col cols="6">
-              <v-text-field
-                label="Numéro"
-                v-model="numero"
-                :readonly="keyReadonly"
-                :filled="keyReadonly"
-                :hide-details="keyReadonly"
-                maxlength="2"
-              />
+          <v-row dense>
+            <v-col cols="12">
               <v-text-field
                 label="Libellé"
                 v-model="libelle"
                 :readonly="readonly"
                 :filled="readonly"
                 :hide-details="readonly"
-                maxlength="11"
-                class="mt-4"
+                maxlength="5"
+                required
               />
             </v-col>
+            <v-col cols="12">
+              <v-select
+                label="Type case"
+                v-model="typeCase"
+                :readonly="readonly"
+                :filled="readonly"
+                :hide-details="readonly"
+                :items="types"
+              />
+            </v-col>
+            <v-col cols="8">
+              <v-combobox
+                label="Nature"
+                v-model="natureCase"
+                :readonly="readonly"
+                :filled="readonly"
+                :hide-details="readonly"
+                :items="natures"
+                item-text="text"
+                item-value="value"
+              >
+              </v-combobox>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                label="Code Pays"
+                v-model="codePays"
+                :readonly="readonly"
+                :filled="readonly"
+                :hide-details="readonly"
+                :rules="codePaysRules"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                label="Taux TVA"
+                v-model="tauxTvaCase"
+                :readonly="readonly"
+                :filled="readonly"
+                :hide-details="readonly"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                label="Taux égalisé"
+                v-model="tauxEgalisationCase"
+                :readonly="readonly"
+                :filled="readonly"
+                :hide-details="readonly"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                label="Taux déclaré"
+                v-model="tauxNature"
+                :readonly="readonly"
+                :filled="readonly"
+                :hide-details="readonly"
+              />
+            </v-col>
+            <v-col cols="6"><v-checkbox hide-details label="Factures vente" :readonly="readonly" v-model="facturesVente"></v-checkbox></v-col>
+            <v-col cols="6"><v-checkbox hide-details label="NC sur vente" :readonly="readonly" v-model="ncSurVente"></v-checkbox></v-col>
+            <v-col cols="6"><v-checkbox hide-details label="Factures achat" :readonly="readonly" v-model="facturesAchat"></v-checkbox></v-col>
+            <v-col cols="6"><v-checkbox hide-details label="NC sur achat" :readonly="readonly" v-model="ncSurAchat"></v-checkbox></v-col>
+            <v-col cols="6"><v-checkbox hide-details label="Financiers" :readonly="readonly" v-model="financiers"></v-checkbox></v-col>
+            <v-col cols="6"><v-checkbox hide-details label="O.D." :readonly="readonly" v-model="od"></v-checkbox></v-col>
+            <v-col cols="6"><v-checkbox hide-details label="Intrastat" :readonly="readonly" v-model="intrastat"></v-checkbox></v-col>
           </v-row>
         </v-form>
       </v-card-text>
@@ -166,6 +225,7 @@ export default class CaseTvaVue extends Vue {
   private typeCase = '';
   private tauxTvaCase = '';
   private tauxEgalisationCase = '';
+  private tauxNature = '';
   private ncSurVente = false;
   private facturesAchat = false;
   private facturesVente = false;
@@ -178,6 +238,8 @@ export default class CaseTvaVue extends Vue {
   private intrastat = false;
 
   // private rules = LibelleReglement.rules;
+  private types = CaseTvaMaintenance.types;
+  private natures = CaseTvaMaintenance.natures;
 
   private readonly = true;
   private newRecord = false;
@@ -221,8 +283,23 @@ export default class CaseTvaVue extends Vue {
   }
 
   private setModel(model: CaseTvaMaintenance) {
-    // this.numero = model.numero.toIntString();
+    this.vatKey = model.vatKey;
+    this.numero = model.numeroCase;
     this.libelle = model.libelleCase;
+    this.typeCase = model.typeCase;
+    this.tauxTvaCase = model.tauxTvaCase.toDecimalString();
+    this.tauxNature = model.tauxNature.toDecimalString();
+    this.tauxEgalisationCase = model.tauxEgalisationCase.toDecimalString();
+    this.ncSurVente = model.ncSurVente;
+    this.facturesAchat = model.facturesAchat;
+    this.facturesVente = model.facturesVentes;
+    this.ncSurAchat = model.ncSurAchat;
+    this.financiers = model.financiers;
+    this.od = model.od;
+    this.natureCase = model.natureCase;
+    this.libelleTypeCase = model.libelleTypeCase;
+    this.codePays = model.codePays;
+    this.intrastat = model.intrastat;
   }
 
   private mapModel() {
@@ -292,7 +369,7 @@ export default class CaseTvaVue extends Vue {
   }
 
   private clickOutside() {
-    if(this.readonly) this.closeDialog();
+    if (this.readonly) this.closeDialog();
   }
 }
 </script>
