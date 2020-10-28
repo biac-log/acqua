@@ -7,7 +7,6 @@
     :persistent="!readonly || saveLoading || deleteLoading"
     @click:outside="clickOutside"
     @keydown.f2.stop="modifierPiece()"
-    @keydown.46.prevent.stop="deletePiece"
     @keydown.107.prevent.stop="createImputation()"
     @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="savePiece()"
@@ -117,7 +116,7 @@
                                 fab
                                 x-small
                                 class="ml-5"
-                                ref="btnAdd"
+                                ref="btnAddImputation"
                                 :disabled="readonly"
                                 @click.stop="createImputation()"
                                 v-on="on"
@@ -386,12 +385,16 @@ export default class OperationDiverseVue extends Vue {
       this.refImputationVue
         .openNew()
         .then((resp: Imputation) => {
-          const maxLigne = this.imputations?.length ? Math.max(...this.imputations.map((i) => i.numeroVentilation)) : 0;
-          resp.numeroVentilation = maxLigne + 1;
-          this.imputations.push(resp);
+          if (resp) {
+            const maxLigne = this.imputations?.length
+              ? Math.max(...this.imputations.map((i) => i.numeroVentilation))
+              : 0;
+            resp.numeroVentilation = maxLigne + 1;
+            this.imputations.push(resp);
+            this.createImputation();
+          } else this.$nextTick(() => this.btnAddImputation?.$el?.focus());
         })
-        .catch()
-        .finally(() => {
+        .catch(() => {
           this.$nextTick(() => this.btnAddImputation?.$el?.focus());
         });
     }
@@ -599,10 +602,11 @@ export default class OperationDiverseVue extends Vue {
 
   private cancelEdit() {
     if (this.deleteLoading || this.saveLoading) return;
-    this.readonly = true;
-    if (this.numeroPiece.toNumber() == 0) this.closeDialog();
     else if (this.oldPiece) {
+      this.readonly = true;
       this.init(this.oldPiece);
+    } else {
+      this.closeDialog();
     }
   }
 

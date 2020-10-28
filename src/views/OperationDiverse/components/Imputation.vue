@@ -8,6 +8,7 @@
   >
     <div :class="imputationIsSelected ? 'overlay' : ''" @click="close()" />
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
+      <span tabindex="1" @focus="focusFirstElement" />-
       <v-card outlined id="editImputation">
         <v-toolbar color="primary" dark flat dense>
           <v-card-title class="pa-2">
@@ -36,6 +37,7 @@
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 @change="resetCompte"
+                tabindex="2"
               ></v-select>
             </v-col>
             <v-col cols="4">
@@ -47,6 +49,7 @@
                 :rules="compteRules"
                 label="Compte"
                 @change="compteChange"
+                tabindex="3"
               >
               </AutocompleteComptesVue>
             </v-col>
@@ -70,6 +73,7 @@
                 :filled="readonly"
                 :hide-details="readonly"
                 :readonly="readonly"
+                tabindex="4"
               ></v-text-field>
             </v-col>
             <v-col cols="3">
@@ -90,6 +94,7 @@
                 @keydown.f5.prevent="openSearchCaseTva()"
                 :error="numeroCaseTvaError != ''"
                 :error-messages="numeroCaseTvaError"
+                tabindex="5"
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -131,6 +136,7 @@
                 :readonly.sync="readonly"
                 :hide-details="readonly"
                 @Change="dossierChange"
+                tabindex="6"
               >
               </AutocompleteDossierVue>
             </v-col>
@@ -159,6 +165,7 @@
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
+                tabindex="7"
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -183,6 +190,7 @@
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
+                tabindex="8"
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -195,6 +203,7 @@
                 :rules="montantRules"
                 :hide-details="readonly"
                 @blur="montant = montant.toNumber().toComptaString()"
+                tabindex="9"
               >
               </v-text-field>
             </v-col>
@@ -212,6 +221,7 @@
                 item-text="libelle"
                 :disabled="compteGeneralSelected"
                 return-object
+                tabindex="10"
               ></v-select>
             </v-col>
             <v-col cols="4">
@@ -230,6 +240,7 @@
                 @keydown.ctrl.f.prevent="openSearchEcheancier()"
                 @keydown.f5.prevent="openSearchEcheancier()"
                 validate-on-blur
+                tabindex="11"
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -262,6 +273,7 @@
                 :filled.sync="readonly"
                 :disabled.sync="compteGeneralSelected"
                 :rules.sync="dateEcheanceRules"
+                tabindex="12"
               ></DatePicker>
             </v-col>
           </v-row>
@@ -276,6 +288,7 @@
                 :hide-details="readonly"
                 :disabled="compteGeneralSelected"
                 @blur="chida = chida.toNumber().toComptaString()"
+                tabindex="13"
               >
               </v-text-field>
             </v-col>
@@ -289,6 +302,7 @@
                 :hide-details="readonly"
                 :disabled="compteGeneralSelected"
                 @blur="escompte = escompte.toNumber().toComptaString()"
+                tabindex="14"
               >
               </v-text-field>
             </v-col>
@@ -302,6 +316,7 @@
                 :hide-details="readonly"
                 :disabled="compteGeneralSelected"
                 @blur="montantTVA = montantTVA.toNumber().toComptaString()"
+                tabindex="15"
               >
               </v-text-field>
             </v-col>
@@ -346,12 +361,14 @@
                 @click="sendImputation()"
                 @keydown.tab.prevent="focusFirstElement"
                 v-on="on"
+                tabindex="16"
               >
                 <v-icon left>mdi-check</v-icon> Valider
               </v-btn>
             </template>
             <span>Valider les modifications <span class="shortcutTooltip">alt + enter</span></span>
           </v-tooltip>
+          <span tabindex="17" @focus="focusFirstElement" />
         </v-card-actions>
       </v-card>
     </v-form>
@@ -551,9 +568,11 @@ export default class ImputationVue extends Vue {
     this.escompte = imputation.escompte.toDecimalString();
     this.montantTVA = imputation.montantTVA.toDecimalString();
   }
+
   private resetCompte() {
     this.autocompleteCompte?.resetCompte();
   }
+
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
     if (!compte) {
       this.nomCompte = '';
