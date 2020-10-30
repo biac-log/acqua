@@ -21,7 +21,7 @@ export default abstract class CaseTvaApi {
     return response.data.map((caseTvaDTO) => new CaseTvaMaintenance(caseTvaDTO));
   }
 
-  static async create(item: CreateCaseTva): Promise<boolean> {
+  static async create(item: CaseTvaMaintenance): Promise<boolean> {
     const response = await api.AcQuaCore.post<boolean>('/casetva', item);
 
     return true;

@@ -2,7 +2,7 @@ export class CaseTvaMaintenanceDTO {
     vatKey = 'VAT';
     numeroCase = 0;
     libelleCase = '';
-    typeCase = '';
+    typeCase = 0;
     tauxTvaCase = 0;
     tauxEgalisationCase = 0;
     ncSurVente = false;
@@ -27,6 +27,12 @@ export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {
 
     get getLibelleCase(): string {
         return `${this.numeroCase} - ${this.libelleCase}`;
+    }
+
+    get libelleType(): string {
+        const libelle: string = CaseTvaMaintenance.types.find((t) => t.value == this.typeCase)?.text ?? '';
+
+        return libelle;
     }
 
     static types = [

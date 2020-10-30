@@ -298,7 +298,7 @@ export default class CaseTvaVue extends Vue {
     this.vatKey = model.vatKey;
     this.numero = model.numeroCase.toIntString();
     this.libelle = model.libelleCase;
-    this.typeCase = model.typeCase;
+    this.typeCase = model.typeCase.toIntString();
     this.tauxTvaCase = model.tauxTvaCase.toDecimalString();
     this.tauxNature = model.tauxNature.toDecimalString();
     this.tauxEgalisationCase = model.tauxEgalisationCase.toDecimalString();
@@ -318,7 +318,7 @@ export default class CaseTvaVue extends Vue {
     this.model.vatKey = this.vatKey;
     this.model.numeroCase = this.numero.toNumber();
     this.model.libelleCase = this.libelle;
-    this.model.typeCase = this.typeCase;
+    this.model.typeCase = this.typeCase.toNumber();
     this.model.tauxTvaCase = this.tauxTvaCase.toNumber();
     this.model.tauxNature = this.tauxNature.toNumber();
     this.model.tauxEgalisationCase = this.tauxEgalisationCase.toNumber();

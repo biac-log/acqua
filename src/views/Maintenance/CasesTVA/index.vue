@@ -19,12 +19,19 @@
       </v-card-title>
 
       <v-data-table :headers="headers" :items="items" :search="search" :loading="isLoadingItems" @click:row="openItem">
-        <!-- <template v-slot:[`item.ncSurVente`]="{ item }">
-          <v-icon color="green">{{ item.ncSurVente ? 'mdi-check' : '' }}</v-icon>
+        <template v-slot:[`item.typeCase`]="{ item }">
+          {{ item.libelleType }}
         </template>
-        <template v-slot:[`item.facturesVentes`]="{ item }">
-          <v-icon color="green">{{ item.facturesVentes ? 'mdi-check' : '' }}</v-icon>
+        <template v-slot:[`item.intrastat`]="{ item }">
+          <v-icon color="green">{{ item.intrastat ? 'mdi-check' : '' }}</v-icon>
         </template>
+        <template v-slot:[`item.tauxTvaCase`]="{ item }">
+          {{ item.tauxTvaCase | numberToString}}
+        </template>
+        <template v-slot:[`item.tauxEgalisationCase`]="{ item }">
+          {{ item.tauxEgalisationCase | numberToString}}
+        </template>
+        <!-- 
         <template v-slot:[`item.facturesAchat`]="{ item }">
           <v-icon color="green">{{ item.facturesAchat ? 'mdi-check' : '' }}</v-icon>
         </template>
