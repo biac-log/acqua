@@ -109,6 +109,7 @@
                 :filled="readonly"
                 :hide-details="readonly"
                 :rules="codePaysRules"
+                validate-on-blur
               />
             </v-col>
             <v-col cols="4">
@@ -141,13 +142,27 @@
                 suffix="%"
               />
             </v-col>
-            <v-col cols="6"><v-checkbox hide-details label="Factures vente" :readonly="readonly" v-model="facturesVente"></v-checkbox></v-col>
-            <v-col cols="6"><v-checkbox hide-details label="NC sur vente" :readonly="readonly" v-model="ncSurVente"></v-checkbox></v-col>
-            <v-col cols="6"><v-checkbox hide-details label="Factures achat" :readonly="readonly" v-model="facturesAchat"></v-checkbox></v-col>
-            <v-col cols="6"><v-checkbox hide-details label="NC sur achat" :readonly="readonly" v-model="ncSurAchat"></v-checkbox></v-col>
-            <v-col cols="6"><v-checkbox hide-details label="Financiers" :readonly="readonly" v-model="financiers"></v-checkbox></v-col>
-            <v-col cols="6"><v-checkbox hide-details label="O.D." :readonly="readonly" v-model="od"></v-checkbox></v-col>
-            <v-col cols="6"><v-checkbox hide-details label="Intrastat" :readonly="readonly" v-model="intrastat"></v-checkbox></v-col>
+            <v-col cols="6"
+              ><v-checkbox hide-details label="Factures vente" :readonly="readonly" v-model="facturesVente"></v-checkbox
+            ></v-col>
+            <v-col cols="6"
+              ><v-checkbox hide-details label="NC sur vente" :readonly="readonly" v-model="ncSurVente"></v-checkbox
+            ></v-col>
+            <v-col cols="6"
+              ><v-checkbox hide-details label="Factures achat" :readonly="readonly" v-model="facturesAchat"></v-checkbox
+            ></v-col>
+            <v-col cols="6"
+              ><v-checkbox hide-details label="NC sur achat" :readonly="readonly" v-model="ncSurAchat"></v-checkbox
+            ></v-col>
+            <v-col cols="6"
+              ><v-checkbox hide-details label="Financiers" :readonly="readonly" v-model="financiers"></v-checkbox
+            ></v-col>
+            <v-col cols="6"
+              ><v-checkbox hide-details label="O.D." :readonly="readonly" v-model="od"></v-checkbox
+            ></v-col>
+            <v-col cols="6"
+              ><v-checkbox hide-details label="Intrastat" :readonly="readonly" v-model="intrastat"></v-checkbox
+            ></v-col>
           </v-row>
         </v-form>
       </v-card-text>
@@ -197,7 +212,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref } from 'vue-property-decorator';
+import { Component, Vue, Ref, Watch } from 'vue-property-decorator';
 import { CaseTvaMaintenance, TypeCase } from '@/models/CaseTva/CaseTvaMaintenance';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
@@ -255,9 +270,13 @@ export default class CaseTvaVue extends Vue {
   private intrastat = false;
 
   private rules = CaseTvaMaintenance.rules;
-  private codePaysRules = []; //TODO
+  private codePaysRules = [(v: string) => this.countryCodeRequired() || 'Requis'];
+
   private types: TypeCase[] = CaseTvaMaintenance.types;
-  private natures: ({ text: string; value: string; header?: undefined; } | { header: string; text?: undefined; value?: undefined; })[] = CaseTvaMaintenance.natures;
+  private natures: (
+    | { text: string; value: string; header?: undefined }
+    | { header: string; text?: undefined; value?: undefined }
+  )[] = CaseTvaMaintenance.natures;
 
   private readonly = true;
   private newRecord = false;
@@ -403,6 +422,15 @@ export default class CaseTvaVue extends Vue {
 
   private clickOutside() {
     if (this.readonly) this.closeDialog();
+  }
+
+  private countryCodeRequired(): boolean {
+    // if nature is in the array, require country code
+    if (CaseTvaMaintenance.requiresCountryCode.find((n) => n == this.natureCase) != null && this.codePays == '') {
+      return false;
+    }
+
+    return true;
   }
 }
 </script>

@@ -48,8 +48,8 @@ export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {
     static rules = {
         numero: [(v: string) => !!v || 'Numéro requis', (v: string) => v.length <= 3 || 'Max. 3 caractères' ],
         libelle: [(v: string) => !!v || 'Libellé requis', (v: string) => v.length <= 5 || 'Max. 5 caractères' ],
-        typeCase: [(v: string) => !!v || 'Type requis', (v: string) => CaseTvaMaintenance.types.find((t) => t.text == v) != null || 'Valeur incorrecte'],
-        natureCase: [(v: string) => !!v || 'Nature requise', (v: string) => CaseTvaMaintenance.natures.find((n) => n.text == v) != null || 'Valeur incorrecte'],        
+        typeCase: [(v: string) => !!v || 'Type requis', (v: string) => CaseTvaMaintenance.types.find((t) => t.value == v) != null || 'Valeur incorrecte'],
+        natureCase: [(v: string) => !!v || 'Nature requise', (v: string) => CaseTvaMaintenance.natures.find((n) => n.value == v) != null || 'Valeur incorrecte'],        
     };
 
     static types = [
@@ -128,6 +128,8 @@ export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {
         {text: "YV - 13B All. Vente", value: "YV"},
         {text: "YA - 13B All. Achat", value: "YA"},
     ];
+
+    static requiresCountryCode = ["VE","AI","II","FI","IT","PV","PA","PF","PI","VX","BX","FX","AX","PX","SX","IX","TX","XL","XE","XA","XI","YV","YA"];
 }
 
 
