@@ -63,6 +63,7 @@
                 maxlength="3"
                 required
                 ref="numeroInput"
+                :rules="rules.numero"
               />
             </v-col>
             <v-col cols="6">
@@ -74,6 +75,7 @@
                 :hide-details="readonly"
                 maxlength="5"
                 required
+                :rules="rules.libelle"
               />
             </v-col>
             <v-col cols="12">
@@ -84,7 +86,7 @@
                 :filled="readonly"
                 :hide-details="readonly"
                 :items="types"
-                :value=typeCase
+                :rules="rules.typeCase"
               />
             </v-col>
             <v-col cols="8">
@@ -95,6 +97,7 @@
                 :filled="readonly"
                 :hide-details="readonly"
                 :items="natures"
+                :rules="rules.natureCase"
               >
               </v-select>
             </v-col>
@@ -251,7 +254,7 @@ export default class CaseTvaVue extends Vue {
   private codePays = '';
   private intrastat = false;
 
-  // private rules = LibelleReglement.rules;
+  private rules = CaseTvaMaintenance.rules;
   private codePaysRules = []; //TODO
   private types: TypeCase[] = CaseTvaMaintenance.types;
   private natures: ({ text: string; value: string; header?: undefined; } | { header: string; text?: undefined; value?: undefined; })[] = CaseTvaMaintenance.natures;

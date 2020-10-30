@@ -45,6 +45,13 @@ export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {
         return libelle;
     }
 
+    static rules = {
+        numero: [(v: string) => !!v || 'Numéro requis', (v: string) => v.length <= 3 || 'Max. 3 caractères' ],
+        libelle: [(v: string) => !!v || 'Libellé requis', (v: string) => v.length <= 5 || 'Max. 5 caractères' ],
+        typeCase: [(v: string) => !!v || 'Type requis', (v: string) => CaseTvaMaintenance.types.find((t) => t.text == v) != null || 'Valeur incorrecte'],
+        natureCase: [(v: string) => !!v || 'Nature requise', (v: string) => CaseTvaMaintenance.natures.find((n) => n.text == v) != null || 'Valeur incorrecte'],        
+    };
+
     static types = [
         new TypeCase("Taxé", "1"),
         new TypeCase("TVA Inclus", "4"),
