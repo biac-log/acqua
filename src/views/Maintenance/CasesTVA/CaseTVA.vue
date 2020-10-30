@@ -88,17 +88,15 @@
               />
             </v-col>
             <v-col cols="8">
-              <v-combobox
+              <v-select
                 label="Nature"
                 v-model="natureCase"
                 :readonly="readonly"
                 :filled="readonly"
                 :hide-details="readonly"
                 :items="natures"
-                item-text="text"
-                item-value="value"
               >
-              </v-combobox>
+              </v-select>
             </v-col>
             <v-col cols="4">
               <v-text-field
@@ -256,7 +254,7 @@ export default class CaseTvaVue extends Vue {
   // private rules = LibelleReglement.rules;
   private codePaysRules = []; //TODO
   private types: TypeCase[] = CaseTvaMaintenance.types;
-  private natures = CaseTvaMaintenance.natures;
+  private natures: ({ text: string; value: string; header?: undefined; } | { header: string; text?: undefined; value?: undefined; })[] = CaseTvaMaintenance.natures;
 
   private readonly = true;
   private newRecord = false;
