@@ -26,4 +26,14 @@ export default abstract class CaseTvaApi {
 
     return true;
   }
+
+  static async update(updatedModel: CaseTvaMaintenance, hashOldModel: string): Promise<boolean> {
+    const data = {
+      updatedModel,
+      hashOldModel
+    };
+    const response = await api.AcQuaCore.put<boolean>('/casetva', data);
+
+    return response.data;
+  }
 }

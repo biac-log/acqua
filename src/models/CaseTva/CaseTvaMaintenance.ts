@@ -1,5 +1,5 @@
 export class CaseTvaMaintenanceDTO {
-    vatKey = '';
+    vatKey = 'VAT';
     numeroCase = 0;
     libelleCase = '';
     typeCase = '';
@@ -16,6 +16,7 @@ export class CaseTvaMaintenanceDTO {
     codePays = '';
     intrastat = false;
     tauxNature = 0;
+    hash = '';
 }
 
 export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {

@@ -7,7 +7,7 @@
     @keydown.alt.enter.stop="saveModel()"
     :persistent="!readonly || saveLoading || deleteLoading"
     ref="itemDialog"
-    max-width="20%"
+    max-width="25%"
     eager
   >
     <v-card>
@@ -53,7 +53,18 @@
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-form ref="form" v-model="isValid" lazy-validation>
           <v-row dense>
-            <v-col cols="12">
+            <v-col cols="6">
+              <v-text-field
+                label="Numéro"
+                v-model="numero"
+                readonly
+                :filled="readonly"
+                :hide-details="readonly"
+                maxlength="3"
+                required
+              />
+            </v-col>
+            <v-col cols="6">
               <v-text-field
                 label="Libellé"
                 v-model="libelle"
@@ -220,7 +231,7 @@ export default class CaseTvaVue extends Vue {
   private modelBase: CaseTvaMaintenance = new CaseTvaMaintenance(); // Used for the reset method
 
   private vatKey = '';
-  private numero = 0;
+  private numero = '';
   private libelle = '';
   private typeCase = '';
   private tauxTvaCase = '';
@@ -285,7 +296,7 @@ export default class CaseTvaVue extends Vue {
 
   private setModel(model: CaseTvaMaintenance) {
     this.vatKey = model.vatKey;
-    this.numero = model.numeroCase;
+    this.numero = model.numeroCase.toIntString();
     this.libelle = model.libelleCase;
     this.typeCase = model.typeCase;
     this.tauxTvaCase = model.tauxTvaCase.toDecimalString();
@@ -305,7 +316,7 @@ export default class CaseTvaVue extends Vue {
 
   private mapModel() {
     this.model.vatKey = this.vatKey;
-    this.model.numeroCase = this.numero;
+    this.model.numeroCase = this.numero.toNumber();
     this.model.libelleCase = this.libelle;
     this.model.typeCase = this.typeCase;
     this.model.tauxTvaCase = this.tauxTvaCase.toNumber();
@@ -365,13 +376,13 @@ export default class CaseTvaVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-      // await LibelleReglementApi.update(this.model, this.modelBase.hash)
-      //   .then(() => {
-      //     this.readonly = true;
-      //     this.successMessage.show('Le libellé a été mis à jour avec succès.', '');
-      //     this.resolve(true);
-      //   })
-      //   .finally(() => (this.saveLoading = false));
+      await CaseTvaApi.update(this.model, this.modelBase.hash)
+        .then(() => {
+          this.readonly = true;
+          this.successMessage.show('La case TVA a été mis à jour avec succès.', '');
+          this.resolve(true);
+        })
+        .finally(() => (this.saveLoading = false));
     }
   }
 
