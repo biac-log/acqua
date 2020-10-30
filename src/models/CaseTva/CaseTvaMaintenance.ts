@@ -19,6 +19,16 @@ export class CaseTvaMaintenanceDTO {
     hash = '';
 }
 
+export class TypeCase {
+    public text = '';
+    public value = '';
+
+    constructor(text: string, value: string) {
+        this.text = text;
+        this.value = value;
+    }
+}
+
 export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {
     constructor(dto?: CaseTvaMaintenanceDTO) {
         super();
@@ -30,18 +40,18 @@ export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {
     }
 
     get libelleType(): string {
-        const libelle: string = CaseTvaMaintenance.types.find((t) => t.value == this.typeCase)?.text ?? '';
+        const libelle: string = CaseTvaMaintenance.types.find((t) => t.value.toNumber() == this.typeCase)?.text ?? '';
 
         return libelle;
     }
 
     static types = [
-        {text: "Taxé", value: 1},
-        {text: "TVA Inclus", value: 4},
-        {text: "Non taxé", value: 5},
-        {text: "Escompte", value: 9},
-        {text: "TVA", value: 50},
-        {text: "Taxe Luxe", value: 51},
+        new TypeCase("Taxé", "1"),
+        new TypeCase("TVA Inclus", "4"),
+        new TypeCase("Non taxé", "5"),
+        new TypeCase("Escompte", "9"),
+        new TypeCase("TVA", "50"),
+        new TypeCase("Taxe Luxe", "51"),
     ];
 
     static natures = [
@@ -112,3 +122,5 @@ export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {
         {text: "YA - 13B All. Achat", value: "YA"},
     ];
 }
+
+

@@ -57,11 +57,12 @@
               <v-text-field
                 label="Numéro"
                 v-model="numero"
-                readonly
+                :readonly="readonly && newRecord"
                 :filled="readonly"
                 :hide-details="readonly"
                 maxlength="3"
                 required
+                ref="numeroInput"
               />
             </v-col>
             <v-col cols="6">
@@ -83,6 +84,7 @@
                 :filled="readonly"
                 :hide-details="readonly"
                 :items="types"
+                :value=typeCase
               />
             </v-col>
             <v-col cols="8">
@@ -115,6 +117,7 @@
                 :readonly="readonly"
                 :filled="readonly"
                 :hide-details="readonly"
+                suffix="%"
               />
             </v-col>
             <v-col cols="4">
@@ -124,6 +127,7 @@
                 :readonly="readonly"
                 :filled="readonly"
                 :hide-details="readonly"
+                suffix="%"
               />
             </v-col>
             <v-col cols="4">
@@ -133,6 +137,7 @@
                 :readonly="readonly"
                 :filled="readonly"
                 :hide-details="readonly"
+                suffix="%"
               />
             </v-col>
             <v-col cols="6"><v-checkbox hide-details label="Factures vente" :readonly="readonly" v-model="facturesVente"></v-checkbox></v-col>
@@ -192,7 +197,7 @@
 
 <script lang="ts">
 import { Component, Vue, Ref } from 'vue-property-decorator';
-import { CaseTvaMaintenance } from '@/models/CaseTva/CaseTvaMaintenance';
+import { CaseTvaMaintenance, TypeCase } from '@/models/CaseTva/CaseTvaMaintenance';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
 import CaseTvaApi from '@/api/CaseTvaApi';
@@ -202,7 +207,7 @@ import CaseTvaApi from '@/api/CaseTvaApi';
   components: { AlertMessageVue }
 })
 export default class CaseTvaVue extends Vue {
-  @Ref() readonly tauxLabel: any;
+  @Ref() readonly numeroInput: any;
   @Ref() alertMessage!: AlertMessageVue;
   @Ref() successMessage!: AlertMessageVue;
 
@@ -250,7 +255,7 @@ export default class CaseTvaVue extends Vue {
 
   // private rules = LibelleReglement.rules;
   private codePaysRules = []; //TODO
-  private types = CaseTvaMaintenance.types;
+  private types: TypeCase[] = CaseTvaMaintenance.types;
   private natures = CaseTvaMaintenance.natures;
 
   private readonly = true;
@@ -258,7 +263,7 @@ export default class CaseTvaVue extends Vue {
 
   public open(item: CaseTvaMaintenance): Promise<boolean> {
     this.readonly = true;
-    this.model = new CaseTvaMaintenance();
+    this.model = item;
     this.modelBase = item;
 
     this.setModel(item);
@@ -268,7 +273,7 @@ export default class CaseTvaVue extends Vue {
     this.reloadOnClose = false;
 
     this.$nextTick(() => {
-      // (this.deviseLabel as any).focus();
+      (this.numeroInput as any).focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -285,7 +290,7 @@ export default class CaseTvaVue extends Vue {
 
     this.display = true;
     this.$nextTick(() => {
-      // (this.deviseLabel as any).focus();
+      (this.numeroInput as any).focus();
     });
 
     return new Promise((resolve, reject) => {
