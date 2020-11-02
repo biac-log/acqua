@@ -15,16 +15,27 @@ import { ApplicationModule } from '@/store/modules/application';
   components: { ServiceWorkerUpdatePopup }
 })
 export default class App extends Vue {
+  private ctrlKeyDown = false;
+
   mounted() {
     ApplicationModule.initParametre();
 
-    // Prevent focus loss on alt press. Prevents for Chrome, on Firefox you can regain focus when re-pressing alt key.
     document.addEventListener('keydown', function(e) {
+      // Prevent focus loss on alt press. Prevents for Chrome, on Firefox you can regain focus when re-pressing alt key.
       if (18 == e.keyCode && (e.target as Element).nodeName == 'INPUT') {
         e.preventDefault ? e.preventDefault() : (e.returnValue = false);
       }
+
+      // Prevent F5 default behavior
+      // In Apollo, F5 was meant to open search so it was confusing for the user
+      if ((e.which || e.keyCode) == 116 && !e.ctrlKey){ // Prevent page refresh
+        e.preventDefault();
+        if((e.target as Element).nodeName == 'INPUT'){ // If F5 when in an input, open search
+          e.target?.dispatchEvent(new KeyboardEvent('keypress', {code: '70', ctrlKey: true}));
+        }
+      }
     });
-  }
+  }  
 }
 </script>
 
