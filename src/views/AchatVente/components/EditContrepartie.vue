@@ -10,6 +10,7 @@
           <v-row dense>
             <v-col cols="2">
               <v-select
+                ref="typesComptes"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
@@ -22,6 +23,7 @@
                 @change="resetCompte"
                 tabindex="2"
                 autofocus
+                @keyup="changeType"
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -675,6 +677,14 @@ export default class extends Vue {
   private close() {
     this.dialog = false;
     this.reject();
+  }
+
+  private changeType(event: KeyboardEvent) {
+    console.log(event.key);
+    if (['c', 'f', 'g', 'zz'].includes(event.key)) {
+      this.$nextTick(() => (this.$refs.typesComptes as any).blur());
+      this.$nextTick(() => this.refNumeroCompte.focus());
+    }
   }
 }
 </script>

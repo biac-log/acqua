@@ -24,6 +24,7 @@
           <v-row>
             <v-col cols="3">
               <v-select
+                ref="typesComptes"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
@@ -36,6 +37,7 @@
                 @change="resetCompte"
                 dense
                 autofocus
+                @keyup="changeType"
               ></v-select>
             </v-col>
             <v-col cols="4">
@@ -820,6 +822,14 @@ export default class VentilationVue extends Vue {
     if (this.ventilationIsSelected) {
       this.ventilationIsSelected = false;
       if (this.reject) this.reject();
+    }
+  }
+
+  private changeType(event: KeyboardEvent) {
+    console.log(event.key);
+    if (['c', 'f', 'g', 'z'].includes(event.key)) {
+      this.$nextTick(() => (this.$refs.typesComptes as any).blur());
+      this.$nextTick(() => this.compteComponent.focus());
     }
   }
 }
