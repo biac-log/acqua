@@ -11,7 +11,6 @@
       @focus="$event.target.select()"
       @change="numeroCompteChangeAsync"
       @keydown.ctrl.f.prevent="openSearchCompte()"
-      @keydown.f5.prevent="openSearchCompte()"
       :hide-details="hideDetails && isReadonly"
       :filled="isReadonly"
       :readonly="isReadonly"

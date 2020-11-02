@@ -15,8 +15,6 @@ import { ApplicationModule } from '@/store/modules/application';
   components: { ServiceWorkerUpdatePopup }
 })
 export default class App extends Vue {
-  private ctrlKeyDown = false;
-
   mounted() {
     ApplicationModule.initParametre();
 
@@ -30,8 +28,9 @@ export default class App extends Vue {
       // In Apollo, F5 was meant to open search so it was confusing for the user
       if ((e.which || e.keyCode) == 116 && !e.ctrlKey){ // Prevent page refresh
         e.preventDefault();
-        if((e.target as Element).nodeName == 'INPUT'){ // If F5 when in an input, open search
-          e.target?.dispatchEvent(new KeyboardEvent('keypress', {code: '70', ctrlKey: true}));
+        console.dir(e.target);
+        if((e.target as Element).nodeName == 'INPUT'){ // If hitting F5 when in an input
+          e.target?.dispatchEvent(new KeyboardEvent('keydown', {code: '70', ctrlKey: true})); // Simulate ctrl-f keypress to open search (if defined)
         }
       }
     });
