@@ -250,7 +250,8 @@ export default class extends Vue {
     onCellKeyDown: this.keypress,
     navigateToNextCell: this.navigateToNextCell,
     pagination: true,
-    paginationAutoPageSize: true,
+    // paginationAutoPageSize: true,
+    paginationPageSize: 15,
     suppressRowClickSelection: true,
     enableSorting: true,
     columnTypes: {

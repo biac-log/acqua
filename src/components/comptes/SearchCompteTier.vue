@@ -79,7 +79,8 @@ export default class extends Vue {
     onCellKeyDown: this.keypress,
     overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
     pagination: true,
-    paginationAutoPageSize: true,
+    // paginationAutoPageSize: true,
+    paginationPageSize: 15,
     onRowDoubleClicked: this.rowDoubleClick,
     getRowStyle(params: any) {
       if (params.node.data.compteBloque) return { 'background-color': '#ffd6cc' };
