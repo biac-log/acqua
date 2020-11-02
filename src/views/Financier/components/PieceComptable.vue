@@ -7,7 +7,6 @@
     :persistent="!readonly || saveLoading || deleteLoading"
     @click:outside.stop="clickOutside"
     @keydown.f2.stop="modifierPiece()"
-    @keydown.46.prevent.stop="deletePiece"
     @keydown.107.prevent.stop="createExtrait"
     @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="savePiece()"

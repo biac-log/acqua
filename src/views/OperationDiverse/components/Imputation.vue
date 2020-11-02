@@ -3,7 +3,6 @@
     @keydown.alt.enter.stop="sendImputation()"
     @click:outside="close()"
     @keydown.esc.stop="close()"
-    @keydown.46.prevent.stop="deleteImputation"
     class="ma-0 pa-0"
   >
     <div :class="imputationIsSelected ? 'overlay' : ''" @click="close()" />

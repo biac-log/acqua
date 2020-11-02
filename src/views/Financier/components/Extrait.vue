@@ -6,7 +6,6 @@
     @keydown.esc.stop="close()"
     @keydown.f2.stop="modifierPiece()"
     @keydown.107.prevent.stop="createVentilation"
-    @keydown.46.prevent.stop="deleteExtrait"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card min-height="710px">
