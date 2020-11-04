@@ -29,7 +29,6 @@ export default class App extends Vue {
       if ((e.which || e.keyCode) == 116 && !e.ctrlKey) {
         // Prevent page refresh
         e.preventDefault();
-        console.dir(e.target);
         if ((e.target as Element).nodeName == 'INPUT') {
           // If hitting F5 when in an input
           e.target?.dispatchEvent(new KeyboardEvent('keydown', { code: '70', ctrlKey: true })); // Simulate ctrl-f keypress to open search (if defined)
@@ -48,18 +47,18 @@ export default class App extends Vue {
       }
     }
 
-    // window.onblur = () => {
-    //   this.lastFocus = document.activeElement;
-    // };
-    // window.onfocus = () => {
-    //   console.log(this.lastFocus);
-    //   const lastFocusId = this.lastFocus?.id;
-    //   if (lastFocusId != null) {
-    //     document.getElementById(lastFocusId)?.focus();
-    //   }
-    // };
+    window.onblur = () => {
+      this.lastFocusId = document.activeElement?.id;
+    };
+    window.onfocus = () => {
+      if (this.lastFocusId != null) {
+        document.getElementById(this.lastFocusId)?.focus();
+      }else{
+        document.getElementById('indexSearch')?.focus();
+      }
+    };
   }
-  public lastFocus: Element | null = null;
+  public lastFocusId: string | undefined = '';
 }
 </script>
 
