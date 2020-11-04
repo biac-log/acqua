@@ -756,11 +756,11 @@ export default class extends Vue {
 
   private validateLibelle() {
     if (!this.piecereadonly && this.libelle && this.libelle != this.libelleFromInit) {
-      AchatVenteApi.validateLibelle(this.libelle, this.typeCompte, this.numeroCompteTier).then((isUsed) => {
-        if (isUsed) {
-          this.libelleWarningMessage = 'Attention, ce libellé est déjà utilisé par une autre pièce';
+      AchatVenteApi.validateLibelle(this.libelle, this.typeCompte, this.numeroCompteTier).then((numeroPiece) => {
+        if (numeroPiece != 0) {
+          this.libelleWarningMessage = `Attention, ce libellé est déjà utilisé par la pièce ${numeroPiece}`;
           (this.$refs.confirmLibellelDialog as Confirm)
-            .open('Attention', `Attention, ce libellé est déjà utilisé par une autre pièce`, 'error', "J'ai compris")
+            .open('Attention', `Attention, ce libellé est déjà utilisé par la pièce ${numeroPiece}`, 'error', "OK")
             .then(() => {
               this.$nextTick(() => (this.$refs.montant as any)?.focus());
             });
@@ -894,14 +894,14 @@ export default class extends Vue {
       if (!this.gridContreparties.pieceIsEquilibre())
         return await (this.$refs.confirmDialog as Confirm).open(
           'Attention, pièce non équilibrée',
-          `La pièce n'est pas équilibrée, voulez vous sauvegarder ?`,
+          `La pièce n'est pas équilibrée, voulez-vous sauvegarder ?`,
           'error',
           'Sauvegarder'
         );
       else if (this.gridContreparties.errorInTVA())
         return await (this.$refs.confirmDialog as Confirm).open(
           'Attention, contrôle de tva',
-          `La tva calculée est différente de la tva assignée, voulez-vous continuer ?`,
+          `La tva calculée est différente de la tva imputée, voulez-vous continuer ?`,
           'error',
           'Sauvegarder'
         );

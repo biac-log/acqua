@@ -105,8 +105,8 @@ export default class AchatVenteApi {
     return response.data;
   }
 
-  static async validateLibelle(libelle: string, typeComte: string, numeroCompte: string | number): Promise<boolean> {
-    const response = await api.AcQuaCore.get<boolean>(
+  static async validateLibelle(libelle: string, typeComte: string, numeroCompte: string | number): Promise<number> {
+    const response = await api.AcQuaCore.get<number>(
       `/AchatVente/IsReferenceExiste?typeCompte=${typeComte}&numeroCompte=${numeroCompte}&reference=${libelle}`
     );
     return response.data;
