@@ -230,6 +230,7 @@ export default class AutocompleteComptes extends Vue {
       this.numeroCompteSelected = compte;
       this.error = false;
       (this.comboboxCompte as any).errorBucket = [];
+      (this.comboboxCompte).blur();
     }
   }
 
