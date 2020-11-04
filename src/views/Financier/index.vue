@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid @keydown.107.prevent="createNewPieceComptable">
+  <v-container fluid @keydown.107.prevent="createNewPieceComptable" >
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
@@ -62,6 +62,7 @@
           label="Rechercher"
           single-line
           hide-details
+          id="indexSearch"
         ></v-text-field>
       </v-card-title>
       <v-data-table

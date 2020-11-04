@@ -17,6 +17,7 @@
           hide-details
           autofocus
           ref="recherche"
+          id="indexSearch"
         ></v-text-field>
       </v-card-title>
       <v-card-text class="ma-0 pa-0">

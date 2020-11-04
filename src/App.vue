@@ -26,15 +26,40 @@ export default class App extends Vue {
 
       // Prevent F5 default behavior
       // In Apollo, F5 was meant to open search so it was confusing for the user
-      if ((e.which || e.keyCode) == 116 && !e.ctrlKey){ // Prevent page refresh
+      if ((e.which || e.keyCode) == 116 && !e.ctrlKey) {
+        // Prevent page refresh
         e.preventDefault();
         console.dir(e.target);
-        if((e.target as Element).nodeName == 'INPUT'){ // If hitting F5 when in an input
-          e.target?.dispatchEvent(new KeyboardEvent('keydown', {code: '70', ctrlKey: true})); // Simulate ctrl-f keypress to open search (if defined)
+        if ((e.target as Element).nodeName == 'INPUT') {
+          // If hitting F5 when in an input
+          e.target?.dispatchEvent(new KeyboardEvent('keydown', { code: '70', ctrlKey: true })); // Simulate ctrl-f keypress to open search (if defined)
         }
       }
     });
-  }  
+
+    // Handle global blur/focus
+    // When clicking somewhere, check 
+    // - if the document.activeElement is an input or a button => normal behavior, the element takes the focus
+    // - if clicking nothing "specific" (should return body) => element to enable shortcuts
+    // Also need to handle coming back to app via alt-tab i.e. => focus last focused element || element to enable shortcuts
+    window.onclick = () => {
+      if(document.activeElement?.nodeName == "BODY") {
+        document.getElementById('indexSearch')?.focus();
+      }
+    }
+
+    // window.onblur = () => {
+    //   this.lastFocus = document.activeElement;
+    // };
+    // window.onfocus = () => {
+    //   console.log(this.lastFocus);
+    //   const lastFocusId = this.lastFocus?.id;
+    //   if (lastFocusId != null) {
+    //     document.getElementById(lastFocusId)?.focus();
+    //   }
+    // };
+  }
+  public lastFocus: Element | null = null;
 }
 </script>
 
