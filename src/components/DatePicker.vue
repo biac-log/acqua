@@ -17,11 +17,10 @@
         :filled="isFilled"
         :readonly="isReadonly"
         :rules="dateRules"
-        @blur.prevent="dateSelected = parseDate(dateFormatted)"
+        @blur.prevent="parseDate(dateFormatted)"
         @focus="$event.target.select()"
         :hide-details="isReadonly"
         :disabled="isDisabled"
-        validate-on-blur
       >
         <template v-slot:prepend-inner>
           <v-btn
@@ -61,8 +60,8 @@ export default class extends Vue {
   @PropSync('filled') public isFilled?: boolean;
   @PropSync('disabled', { default: false }) public isDisabled!: boolean;
 
-  private parseDate(date: string): string {
-    if (!date) return '';
+  private parseDate(date: string) {
+    if (!date) this.dateSelected = '';
     else {
       let dateString = date;
       if (date.length < 6) {
@@ -79,7 +78,7 @@ export default class extends Vue {
       const dateToSelect = new DateTime(dateString);
       if (dateToSelect.toString('YYYY-MM-DD') == this.dateSelected)
         this.$nextTick(() => (this.dateFormatted = dateToSelect.toString()));
-      return dateToSelect.toString('YYYY-MM-DD');
+      this.dateSelected = dateToSelect.toString('YYYY-MM-DD');
     }
   }
 
