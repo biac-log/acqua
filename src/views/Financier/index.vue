@@ -157,7 +157,6 @@ export default class extends Vue {
     { text: '', value: 'pieceEquilibree', width: 50 },
     { text: 'Numéro pièce', value: 'numeroPiece' },
     { text: 'Date pièce', value: 'datePieceDate' },
-    { text: 'Libellé', value: 'libelle' },
     { text: 'Solde initial', value: 'soldeInitiale', align: 'end' },
     { text: 'Débit', value: 'totalDebit', align: 'end' },
     { text: 'Crédit', value: 'totalCredit', align: 'end' },
