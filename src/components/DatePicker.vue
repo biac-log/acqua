@@ -105,5 +105,9 @@ export default class extends Vue {
   public focus() {
     this.$nextTick(() => (this.$refs.refDate as any).focus());
   }
+
+  public selectText() {
+    this.$nextTick(() => (this.$refs.refDate as Vue).$el.querySelector('input')?.select());
+  }
 }
 </script>

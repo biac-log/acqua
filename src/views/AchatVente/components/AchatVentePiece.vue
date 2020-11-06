@@ -185,6 +185,7 @@
                       :readonly.sync="piecereadonly"
                       :rules.sync="dateEcheanceRules"
                       :filled="piecereadonly"
+                      ref="refDateEcheance"
                     ></DatePicker>
                   </v-col>
                   <v-col cols="4">
@@ -437,6 +438,7 @@ export default class extends Vue {
   @Ref() readonly buttonSave!: HTMLButtonElement;
   @Ref() readonly gridContreparties!: GridContreparties;
   @Ref() readonly confirmDialog!: Confirm;
+  @Ref() readonly refDateEcheance!: DatePicker;
 
   public piecereadonly = true;
   private pieceLoading = false;
@@ -751,7 +753,7 @@ export default class extends Vue {
     this.codeTaxe = compte ? compte.codeTaxe : 0;
     this.compteAssocieNumero = compte ? compte.compteAssocieNumero : 0;
     this.compteAssocieNom = compte ? compte.compteAssocieNom : '';
-    this.initDateEcheance(this.numeroCompteTier, this.typeCompte, this.datePiece);
+    this.initDateEcheance(this.numeroCompteTier, this.typeCompte, this.datePiece, false);
   }
 
   private validateLibelle() {
@@ -815,18 +817,21 @@ export default class extends Vue {
   }
 
   @Watch('datePiece')
-  private datePieceChanged(val: DateTime) {
+  private async datePieceChanged(val: DateTime) {
     if (!this.piecereadonly) {
-      this.initDateEcheance(this.numeroCompteTier, this.typeCompte, val);
+      await this.initDateEcheance(this.numeroCompteTier, this.typeCompte, val, true);
       if (this.deviseSelected) this.initTauxDevise(this.deviseSelected.id, val);
     }
   }
 
-  private initDateEcheance(numeroCompteTier: string, typeComptetier: string, datePiece: DateTime) {
+  private async initDateEcheance(numeroCompteTier: string, typeComptetier: string, datePiece: DateTime, focusDateEcheance: boolean) {
     if (this.numeroCompteTier && this.typeCompte && datePiece.isValid()) {
-      AchatVenteApi.getDateEcheance(typeComptetier, numeroCompteTier, datePiece)
+      await AchatVenteApi.getDateEcheance(typeComptetier, numeroCompteTier, datePiece)
         .then((dateEcheance) => {
           this.dateEcheance = dateEcheance;
+          if(focusDateEcheance){
+            this.refDateEcheance.selectText();
+          } 
         })
         .catch((err) => {
           this.errorMessage = displayAxiosError(err);
