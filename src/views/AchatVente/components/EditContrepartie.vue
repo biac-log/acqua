@@ -219,7 +219,7 @@
             Supprimer</v-btn
           >
           <v-spacer></v-spacer>
-          <v-btn @click="generateTva" class="ma-2 pr-4" tile outlined color="warning">Solde = TVA</v-btn>
+          <v-btn @click="generateTVA" class="ma-2 pr-4" tile outlined color="warning">Solde = TVA</v-btn>
           <v-btn color="blue darken-1" class="ma-2 pr-4" tile outlined @click="close()" tabindex="-1">
             <v-icon left>mdi-close</v-icon> Fermer</v-btn
           >
