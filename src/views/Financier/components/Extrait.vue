@@ -1,8 +1,8 @@
 <template>
   <v-dialog
     v-model="dialog"
-    @keydown.alt.enter.stop="sendExtrait(false)"
-    @keydown.ctrl.enter.stop="sendExtrait(true)"
+    @keydown.alt.enter.stop="sendExtrait(true)"
+    @keydown.ctrl.enter.stop="sendExtrait(false)"
     @click:outside="close()"
     @keydown.esc.stop="close()"
     @keydown.f2.stop="modifierPiece()"
@@ -216,7 +216,7 @@
                 <v-icon left>mdi-check</v-icon> Valider et nouveau
               </v-btn>
             </template>
-            <span>Valider les modifications et ouvrir un nouvel encodage<span class="shortcutTooltip"> ctrl + enter </span></span>
+            <span>Valider les modifications et ouvrir un nouvel encodage<span class="shortcutTooltip"> alt + enter </span></span>
           </v-tooltip>
           <v-tooltip top open-delay="500">
             <template v-slot:activator="{ on }">
@@ -233,7 +233,7 @@
                 <v-icon left>mdi-check</v-icon> Valider
               </v-btn>
             </template>
-            <span>Valider les modifications<span class="shortcutTooltip"> alt + enter </span></span>
+            <span>Valider les modifications<span class="shortcutTooltip"> ctrl + enter </span></span>
           </v-tooltip>
         </v-card-actions>
       </v-card>
