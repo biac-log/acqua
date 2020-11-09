@@ -356,7 +356,7 @@ export default class PieceComptableVue extends Vue {
   private createExtrait() {
     if (!this.readonly) {
       this.refExtraitVue
-        .openNew(this.journal)
+        .openNew(this.journal, this.soldeInitial, this.soldeActuel)
         .then((resp: Extrait) => {
           const maxLigne = this.extraits?.length ? Math.max(...this.extraits.map((i) => i.numeroExtrait)) : 0;
           resp.numeroExtrait = maxLigne + 1;
@@ -371,7 +371,7 @@ export default class PieceComptableVue extends Vue {
 
   private editExtrait(extrait: Extrait) {
     this.refExtraitVue
-      .open(this.journal, this.numeroPiece, extrait)
+      .open(this.journal, this.numeroPiece, extrait, this.soldeInitial, this.soldeActuel)
       .then((resp: Extrait) => {
         if (resp)
           Vue.set(
