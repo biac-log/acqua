@@ -362,6 +362,13 @@ export default class extends Vue {
               : 0;
             ventil.numeroVentilation = maxLigne + 1;
             this.ventilations.push(ventil);
+            this.$nextTick(() => {
+              if (this.ventileDevise != 0) {
+                this.createVentilation();
+              } else {
+                this.sendExtrait();
+              }
+            });
           })
           .catch()
           .finally(() => {
@@ -530,7 +537,6 @@ export default class extends Vue {
       this.$nextTick(() => {
         if (this.isValid) {
           this.dialog = false;
-
           this.resolve(new PromiseResponse<Extrait>(this.getModel(), true)); // Send true to trigger openNew again
         }
       });
