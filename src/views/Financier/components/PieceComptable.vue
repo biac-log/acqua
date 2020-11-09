@@ -16,7 +16,7 @@
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
             <p class="mb-0" v-if="!newRecord">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
-            <p class="mb-0" v-else>Nouvelle pièce</p>
+            <p class="mb-0" v-else>Nouvelle pièce - {{journal.numero}}.{{journal.numeroDernierePiece + 1}}</p>
             <p class="ml-10 mb-0 textMini">Période {{ periode.libellePeriodeFull.toLowerCase() }}</p>
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
@@ -202,13 +202,15 @@
     </v-form>
     <v-dialog
       v-model="datePieceDialog"
-      width="300"
+      width="350"
       eager
       style="z-index: 999999999999999999"
       @keydown.enter.stop="datePieceDialog = false"
     >
       <v-card>
-        <v-card-title primary-title>Nouvelle pièce</v-card-title>
+        <v-toolbar color="primary" dark flat >
+          <v-card-title class="mt-2">Nouvelle pièce - {{journal.numero}}.{{journal.numeroDernierePiece + 1}} <small class="textMini">Solde initial : {{soldeInitial}}</small> </v-card-title>
+        </v-toolbar>
         <v-card-text>
           <DatePicker
             ref="refDatePieceDialog"
