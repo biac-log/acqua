@@ -16,7 +16,7 @@
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
             <p class="mb-0" v-if="!newRecord">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
-            <p class="mb-0" v-else>Nouvelle pièce - {{journal.numero}}.{{journal.numeroDernierePiece + 1}}</p>
+            <p class="mb-0" v-else>Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}</p>
             <p class="ml-10 mb-0 textMini">Période {{ periode.libellePeriodeFull.toLowerCase() }}</p>
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
@@ -208,8 +208,11 @@
       @keydown.enter.stop="closeDatePieceDialog"
     >
       <v-card>
-        <v-toolbar color="primary" dark flat >
-          <v-card-title class="mt-2">Nouvelle pièce - {{journal.numero}}.{{journal.numeroDernierePiece + 1}} <small class="textMini">Solde initial : {{soldeInitial}}</small> </v-card-title>
+        <v-toolbar color="primary" dark flat>
+          <v-card-title class="mt-2"
+            >Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}
+            <small class="textMini">Solde initial : {{ soldeInitial }}</small>
+          </v-card-title>
         </v-toolbar>
         <v-card-text>
           <DatePicker
@@ -362,7 +365,7 @@ export default class PieceComptableVue extends Vue {
           const maxLigne = this.extraits?.length ? Math.max(...this.extraits.map((i) => i.numeroExtrait)) : 0;
           resp.data.numeroExtrait = maxLigne + 1;
           this.extraits.push(resp.data);
-          if(resp.triggerEvent) this.createExtrait();
+          if (resp.triggerEvent) this.$nextTick(() => this.createExtrait());
         })
         .catch()
         .finally(() => {

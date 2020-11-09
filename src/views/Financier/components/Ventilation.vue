@@ -826,7 +826,6 @@ export default class VentilationVue extends Vue {
   }
 
   private changeType(event: KeyboardEvent) {
-    console.log(event.key);
     if (['c', 'f', 'g', 'z'].includes(event.key)) {
       if('z' == event.key) this.typesComptesSelected = new TypeCompte({id: 'Z', libelle: 'Extra-comptable'});
       this.$nextTick(() => (this.$refs.typesComptes as any).blur());

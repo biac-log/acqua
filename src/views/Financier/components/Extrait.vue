@@ -1,8 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
-    @keydown.alt.enter.stop="sendExtrait(true)"
-    @keydown.ctrl.enter.stop="sendExtrait(false)"
+    @keydown.alt.enter.stop="sendExtrait"
     @click:outside="close()"
     @keydown.esc.stop="close()"
     @keydown.f2.stop="modifierPiece()"
@@ -209,31 +208,13 @@
                 color="success"
                 v-if="!readonly"
                 :disabled="!isValid"
-                @click="sendExtrait(true)"
-                v-on="on"
-                outlined
-              >
-                <v-icon left>mdi-check</v-icon> Valider et nouveau
-              </v-btn>
-            </template>
-            <span>Valider les modifications et ouvrir un nouvel encodage<span class="shortcutTooltip"> alt + enter </span></span>
-          </v-tooltip>
-          <v-tooltip top open-delay="500">
-            <template v-slot:activator="{ on }">
-              <v-btn
-                ref="btnValidate"
-                class="ma-2 pr-4"
-                tile
-                color="success"
-                v-if="!readonly"
-                :disabled="!isValid"
-                @click="sendExtrait(false)"
+                @click="sendExtrait"
                 v-on="on"
               >
                 <v-icon left>mdi-check</v-icon> Valider
               </v-btn>
             </template>
-            <span>Valider les modifications<span class="shortcutTooltip"> ctrl + enter </span></span>
+            <span>Valider les modifications<span class="shortcutTooltip"> alt + enter </span></span>
           </v-tooltip>
         </v-card-actions>
       </v-card>
@@ -539,15 +520,21 @@ export default class extends Vue {
     return extrait;
   }
 
-  private sendExtrait(openNew: boolean) {
-    (this.$refs.form as any).validate();
-    this.$nextTick(() => {
-      if (this.isValid) {
-        this.dialog = false;
-        
-        this.resolve(new PromiseResponse<Extrait>(this.getModel(), openNew));
-      }
-    });
+  private sendExtrait() {
+    if (!(this.ventilations.length > 0)) {
+      // If there's no ventilation
+      this.dialog = false;
+      this.reject();
+    } else {
+      (this.$refs.form as any).validate();
+      this.$nextTick(() => {
+        if (this.isValid) {
+          this.dialog = false;
+
+          this.resolve(new PromiseResponse<Extrait>(this.getModel(), true)); // Send true to trigger openNew again
+        }
+      });
+    }
   }
 
   private deleteExtrait() {
