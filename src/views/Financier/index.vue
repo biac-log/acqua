@@ -104,7 +104,7 @@
       </v-data-table>
     </v-card>
     <PieceComptableVue ref="refDialogPiece"></PieceComptableVue>
-    <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue>
+    <PieceAddResultVue ref="PieceAddResultVue" :SkipDialog.sync="skipAddResult"></PieceAddResultVue>
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
@@ -130,6 +130,7 @@ export default class extends Vue {
   @Ref() readonly refDialogPiece!: PieceComptableVue;
   @Ref() readonly PieceAddResultVue!: PieceAddResultVue;
   private searchIsValid = true;
+  private skipAddResult = false;
 
   private isErrorPeriode = false;
   private periodeIsLoading = false;
@@ -230,7 +231,7 @@ export default class extends Vue {
     this.refDialogPiece
       .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
-        this.displayAddResult(resp);
+        if(!this.skipAddResult) this.displayAddResult(resp);
         this.journalSelected.numeroDernierePiece = parseInt(resp);
         this.loadPiecesComptables();
       })
