@@ -196,7 +196,7 @@
                 Supprimer
               </v-btn>
             </template>
-            <span>Supprimer l'extrait'<span class="shortcutTooltip">del</span></span>
+            <span>Supprimer l'extrait<span class="shortcutTooltip">del</span></span>
           </v-tooltip>
           <v-spacer></v-spacer>
           <v-tooltip top open-delay="500">

@@ -432,7 +432,7 @@ export default class PieceComptableVue extends Vue {
     this.confirmDialog
       .open(
         'Suppression',
-        `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
+        `Êtes-vous sur de vouloir supprimer la pièce ${this.journal.numero}.${this.numeroPiece} ?`,
         'error',
         'Supprimer'
       )

@@ -217,7 +217,7 @@ export default class extends Vue {
           this.notifier(`Pièce numéro <b>${resp.codePieceDisplay}</b> mise à jour.`, 'success');
         } else {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
-          this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimer.`, 'error');
+          this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimée.`, 'error');
         }
       })
       .catch()
