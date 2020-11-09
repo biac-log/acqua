@@ -50,7 +50,7 @@
                     hide-details
                   />
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="1">
                   <v-text-field
                     label="Solde initial"
                     v-model="soldeInitial"
@@ -60,7 +60,7 @@
                     hide-details
                   />
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="1">
                   <v-text-field
                     label="Solde actuel"
                     v-model="soldeActuel"
@@ -81,7 +81,7 @@
                     hide-details
                   />
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="2">
                   <v-text-field
                     ref="montant"
                     label="Montant"
@@ -94,7 +94,7 @@
                     autofocus
                   ></v-text-field>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="2">
                   <v-select
                     :items="reglements"
                     v-model="reglementSelected"
