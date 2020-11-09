@@ -1,7 +1,8 @@
 <template>
   <v-dialog
     v-model="dialog"
-    @keydown.alt.enter.stop="sendExtrait()"
+    @keydown.alt.enter.stop="sendExtrait(false)"
+    @keydown.ctrl.enter.stop="sendExtrait(true)"
     @click:outside="close()"
     @keydown.esc.stop="close()"
     @keydown.f2.stop="modifierPiece()"
@@ -208,7 +209,25 @@
                 color="success"
                 v-if="!readonly"
                 :disabled="!isValid"
-                @click="sendExtrait"
+                @click="sendExtrait(true)"
+                v-on="on"
+                outlined
+              >
+                <v-icon left>mdi-check</v-icon> Valider et nouveau
+              </v-btn>
+            </template>
+            <span>Valider les modifications et ouvrir un nouvel encodage<span class="shortcutTooltip"> ctrl + enter </span></span>
+          </v-tooltip>
+          <v-tooltip top open-delay="500">
+            <template v-slot:activator="{ on }">
+              <v-btn
+                ref="btnValidate"
+                class="ma-2 pr-4"
+                tile
+                color="success"
+                v-if="!readonly"
+                :disabled="!isValid"
+                @click="sendExtrait(false)"
                 v-on="on"
               >
                 <v-icon left>mdi-check</v-icon> Valider
@@ -229,6 +248,7 @@ import { FinancierApi } from '@/api/FinancierApi';
 import VentilationVue from './Ventilation.vue';
 import { Reglement } from '@/models/Financier/Get/Reglement';
 import { DateTime } from '@/models/DateTime';
+import { PromiseResponse } from '@/models/PromiseResponse';
 import DeviseApi from '@/api/DeviseApi';
 import DatePicker from '@/components/DatePicker.vue';
 
@@ -320,7 +340,7 @@ export default class extends Vue {
     });
   }
 
-  public openNew(journal: Journal, soldeInitial: string, soldeActuel: string): Promise<Extrait> {
+  public openNew(journal: Journal, soldeInitial: string, soldeActuel: string): Promise<PromiseResponse<Extrait>> {
     this.reset();
     this.dialog = true;
     this.isNew = true;
@@ -347,6 +367,7 @@ export default class extends Vue {
   get createVentilationEnabled() {
     return !this.readonly && this.montant;
   }
+
   private createVentilation() {
     if (this.readonly) return false;
     (this.$refs.form as any).validate();
@@ -518,12 +539,13 @@ export default class extends Vue {
     return extrait;
   }
 
-  private sendExtrait() {
+  private sendExtrait(openNew: boolean) {
     (this.$refs.form as any).validate();
     this.$nextTick(() => {
       if (this.isValid) {
         this.dialog = false;
-        this.resolve(this.getModel());
+        
+        this.resolve(new PromiseResponse<Extrait>(this.getModel(), openNew));
       }
     });
   }

@@ -205,7 +205,7 @@
       width="350"
       eager
       style="z-index: 999999999999999999"
-      @keydown.enter.stop="datePieceDialog = false"
+      @keydown.enter.stop="closeDatePieceDialog"
     >
       <v-card>
         <v-toolbar color="primary" dark flat >
@@ -245,6 +245,7 @@ import Confirm from '@/components/Confirm.vue';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
 import { sum } from 'lodash';
+import { PromiseResponse } from '@/models/PromiseResponse';
 
 @Component({
   components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue }
@@ -357,10 +358,11 @@ export default class PieceComptableVue extends Vue {
     if (!this.readonly) {
       this.refExtraitVue
         .openNew(this.journal, this.soldeInitial, this.soldeActuel)
-        .then((resp: Extrait) => {
+        .then((resp: PromiseResponse<Extrait>) => {
           const maxLigne = this.extraits?.length ? Math.max(...this.extraits.map((i) => i.numeroExtrait)) : 0;
-          resp.numeroExtrait = maxLigne + 1;
-          this.extraits.push(resp);
+          resp.data.numeroExtrait = maxLigne + 1;
+          this.extraits.push(resp.data);
+          if(resp.triggerEvent) this.createExtrait();
         })
         .catch()
         .finally(() => {
