@@ -681,7 +681,13 @@ export default class VentilationVue extends Vue {
         .open(this.typesComptesSelected.id, this.numeroCompte, `${this.numeroCompte} - ${this.nomCompte}`)
         .then((elements) => {
           this.initFromEcheancier(elements);
-          this.$nextTick(() => (this.$refs.montant as any)?.focus());
+          this.$nextTick(() => {
+            if(this.montant.toNumber() == this.ventileDevise) {
+              this.sendVentilation();
+            }else{
+              (this.$refs.montant as any)?.focus();
+            }
+          });
         })
         .catch(() => {
           this.$nextTick(() => (this.$refs.reference as any)?.focus());
