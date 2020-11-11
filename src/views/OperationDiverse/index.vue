@@ -103,7 +103,7 @@
       </v-data-table>
     </v-card>
     <OperationDiverseVue ref="refDialogPiece"></OperationDiverseVue>
-    <!-- <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue> -->
+    <PieceAddResult ref="refPieceAddResult"></PieceAddResult>
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
@@ -121,15 +121,15 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PeriodeComptable, Journal, EntetePieceComptable } from '@/models/OperationDiverse';
 import { Pagination } from '@/models/Pagination';
 import OperationDiverseVue from './components/OperationDiverse.vue';
-//import PieceAddResultVue from './components/PieceAddResult.vue';
+import PieceAddResult from './components/PieceAddResult.vue';
 
 @Component({
   name: 'OperationDiverse',
-  components: { OperationDiverseVue }
+  components: { OperationDiverseVue, PieceAddResult }
 })
 export default class extends Vue {
   @Ref() readonly refDialogPiece!: OperationDiverseVue;
-  // @Ref() readonly PieceAddResultVue!: PieceAddResultVue;
+  @Ref() readonly refPieceAddResult!: PieceAddResult;
   private searchIsValid = true;
 
   private isErrorPeriode = false;
@@ -204,14 +204,10 @@ export default class extends Vue {
 
     this.refDialogPiece
       .open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
-      .then((resp) => {
-        if (resp) {
-          Vue.set(
-            this.piecesComptables,
-            this.piecesComptables.findIndex((e) => e == entete),
-            resp
-          );
-          this.notifier(`Pièce numéro <b>${resp.codePieceDisplay}</b> mise à jour.`, 'success');
+      .then((numeroPiece) => {
+        if (numeroPiece) {
+          this.notifier(`Pièce numéro <b>${numeroPiece}</b> mise à jour.`, 'success');
+          this.loadPiecesComptables();
         } else {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
           this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimer.`, 'error');
@@ -239,16 +235,18 @@ export default class extends Vue {
   }
 
   private displayAddResult(numeroPiece: string) {
-    // (this.$refs.PieceAddResultVue as PieceAddResultVue)
-    //   .open(this.journalSelected.numero, parseInt(numeroPiece), this.periodeSelected.typePeriodeComptable)
-    //   .then((numero) => {
-    //     if (parseInt(numeroPiece) != numero) {
-    //       this.loadPiecesComptables();
-    //     }
-    //   })
-    //   .finally(() => {
-    //     this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
-    //   });
+    if (this.journalSelected != null && this.periodeSelected != null) {
+      this.refPieceAddResult
+        .open(this.journalSelected.numero, parseInt(numeroPiece), this.periodeSelected.typePeriodeComptable)
+        .then((numero) => {
+          if (parseInt(numeroPiece) != numero) {
+            this.loadPiecesComptables();
+          }
+        })
+        .finally(() => {
+          this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+        });
+    }
   }
 
   @Watch('options')
@@ -300,5 +298,15 @@ export default class extends Vue {
 
 #dataTable tbody tr {
   cursor: pointer;
+}
+
+.notEquilibre {
+  color: red;
+  margin-left: 10px;
+}
+
+.equilibre {
+  color: green;
+  margin-left: 10px;
 }
 </style>

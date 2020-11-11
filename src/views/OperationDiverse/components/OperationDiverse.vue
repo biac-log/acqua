@@ -60,7 +60,7 @@
               <v-row fill-height no-gutters>
                 <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
                 <v-row dense>
-                  <v-col cols="3">
+                  <v-col cols="4">
                     <DatePicker
                       ref="refDatePiece"
                       name="datePiece"
@@ -70,9 +70,10 @@
                       :filled="readonly"
                       :rules.sync="datePieceRules"
                       :hide-details="readonly"
+                      tabindex="1"
                     ></DatePicker>
                   </v-col>
-                  <v-col cols="3">
+                  <v-col cols="4">
                     <v-text-field
                       label="Débit"
                       :value="debit | numberToString"
@@ -82,7 +83,7 @@
                       tabindex="-1"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="3">
+                  <v-col cols="4">
                     <v-text-field
                       label="Crédit"
                       :value="credit | numberToString"
@@ -92,7 +93,7 @@
                       tabindex="-1"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="3">
+                  <!-- <v-col cols="3">
                     <v-text-field
                       label="A ventilé"
                       :value="solde | numberToStringEvenZero"
@@ -101,7 +102,7 @@
                       readonly
                       tabindex="-1"
                     ></v-text-field>
-                  </v-col>
+                  </v-col> -->
                 </v-row>
                 <v-row dense>
                   <v-col cols="12">
@@ -120,6 +121,7 @@
                                 :disabled="readonly"
                                 @click.stop="createImputation()"
                                 v-on="on"
+                                tabindex="2"
                               >
                                 <v-icon>mdi-plus</v-icon>
                               </v-btn>
@@ -128,6 +130,14 @@
                           </v-tooltip>
                         </v-card-title>
                         <v-spacer></v-spacer>
+                        <v-spacer></v-spacer>
+                        <span :class="!solde || solde == 0 ? 'equilibre' : 'notEquilibre'">
+                          Montant à ventiler :
+                          <b
+                            >{{ solde | numberToStringEvenZero }}
+                            {{ this.journal.devise ? this.journal.devise.libelle : 'EUR' }}</b
+                          >
+                        </span>
                       </v-toolbar>
                       <v-data-table
                         id="dataTable"
@@ -238,6 +248,7 @@
                 :loading="saveLoading"
                 :disabled="!isValid || deleteLoading"
                 @click="savePiece()"
+                tabindex="3"
               >
                 <v-icon left>mdi-content-save</v-icon>Sauvegarder
               </v-btn>
@@ -246,6 +257,7 @@
               Sauvegarder la pièce
               <span class="shortcutTooltip">alt + enter</span>
             </span>
+            <span tabindex="99" @focus="focusFirstElement" />
           </v-tooltip>
         </v-card-actions>
         <Confirm ref="confirmDialog"></Confirm>
@@ -256,7 +268,14 @@
 
 <script lang="ts">
 import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
-import { PeriodeComptable, EntetePieceComptable, Journal, PieceComptable, Imputation } from '@/models/OperationDiverse';
+import {
+  PeriodeComptable,
+  EntetePieceComptable,
+  Journal,
+  PieceComptable,
+  Imputation,
+  OperationDiverseToSave
+} from '@/models/OperationDiverse';
 import { DateTime } from '@/models/DateTime';
 import AlertMessageVue from '@/components/AlertMessage.vue';
 import DatePicker from '@/components/DatePicker.vue';
@@ -264,7 +283,6 @@ import ImputationVue from './Imputation.vue';
 import OperationDiverseApi from '../../../api/OperationDiverseApi';
 import Confirm from '@/components/Confirm.vue';
 import { displayAxiosError } from '@/utils/ErrorMethods';
-import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
 import { sum } from 'lodash';
 
 @Component({
@@ -412,11 +430,7 @@ export default class OperationDiverseVue extends Vue {
           );
         else this.imputations.splice(this.imputations.indexOf(imputation), 1);
       })
-      .catch()
-      .finally(() => {
-        this.calculSolde();
-        //this.grid?.focus();
-      });
+      .catch();
   }
 
   private init(piece: PieceComptable) {
@@ -437,48 +451,39 @@ export default class OperationDiverseVue extends Vue {
     this.readonly = false;
     this.numeroPiece = '';
     this.hash = '';
-    // this.soldeInitial = '';
-    // this.soldeActuel = '';
     (this.$refs.extraits as any)?.reset();
   }
 
-  @Watch('extraits')
-  private calculSolde() {
-    // const sumCredit = _.sum(this.extraits.map((m) => m.montantCredit.toNumber()));
-    // const sumDebit = _.sum(this.extraits.map((m) => m.montantDebit.toNumber()));
-    // this.soldeActuel = (this.soldeInitial.toNumber() + sumDebit - sumCredit).toComptaString();
-  }
-
   private deletePiece() {
-    // this.confirmDialog
-    //   .open(
-    //     'Suppression',
-    //     `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
-    //     'error',
-    //     'Supprimer'
-    //   )
-    //   .then((resp) => {
-    //     if (resp) {
-    //       this.deleteLoading = true;
-    //       this.readonly = true;
-    //       FinancierApi.deletePieceComptable(
-    //         this.periode.typePeriodeComptable,
-    //         this.journal.numero,
-    //         this.numeroPiece.toNumber()
-    //       )
-    //         .then(() => {
-    //           this.dialog = false;
-    //           this.resolve();
-    //         })
-    //         .catch((err) => {
-    //           this.readonly = false;
-    //           this.warningMessage.show('Une erreur est survenue lors de la suppression', displayAxiosError(err));
-    //         })
-    //         .finally(() => {
-    //           this.deleteLoading = false;
-    //         });
-    //     }
-    //   });
+    this.confirmDialog
+      .open(
+        'Suppression',
+        `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
+        'error',
+        'Supprimer'
+      )
+      .then((resp) => {
+        if (resp) {
+          this.deleteLoading = true;
+          this.readonly = true;
+          OperationDiverseApi.deletePieceComptable(
+            this.periode.typePeriodeComptable,
+            this.journal.numero,
+            this.numeroPiece.toNumber()
+          )
+            .then(() => {
+              this.dialog = false;
+              this.resolve();
+            })
+            .catch((err) => {
+              this.readonly = false;
+              this.warningMessage.show('Une erreur est survenue lors de la suppression', displayAxiosError(err));
+            })
+            .finally(() => {
+              this.deleteLoading = false;
+            });
+        }
+      });
   }
 
   private async savePiece() {
@@ -486,106 +491,62 @@ export default class OperationDiverseVue extends Vue {
     this.$nextTick(async () => {
       if (this.isValid) {
         const pieceToSave = this.getModelToSave();
-        if (pieceToSave.numeroPiece == 0) this.addPiece(pieceToSave);
+        if (!this.oldPiece) this.addPiece(pieceToSave);
         else this.updatePiece(pieceToSave);
       }
     });
   }
 
-  private addPiece(piece: PieceSaveDTO) {
+  private addPiece(piece: OperationDiverseToSave) {
     this.saveLoading = true;
     this.readonly = true;
-    // FinancierApi.addPieceComptable(piece)
-    //   .then((numeroPiece) => {
-    //     this.numeroPiece = numeroPiece.toString();
-    //     this.resolve(numeroPiece);
-    //     (this.$refs.form as any).resetValidation();
-    //     this.dialog = false;
-    //     this.reset();
-    //   })
-    //   .catch((err) => {
-    //     this.warningMessage.show('Une erreur est survenue lors de la sauvegarde de la pièce', displayAxiosError(err));
-    //     this.readonly = false;
-    //   })
-    //   .finally(() => {
-    //     this.saveLoading = false;
-    //   });
+
+    OperationDiverseApi.addPiece(piece)
+      .then((numeroPiece) => {
+        this.numeroPiece = numeroPiece.toString();
+        this.resolve(numeroPiece);
+        (this.$refs.form as any).resetValidation();
+        this.dialog = false;
+        this.reset();
+      })
+      .catch((err) => {
+        this.warningMessage.show('Une erreur est survenue lors de la sauvegarde de la pièce', displayAxiosError(err));
+        this.readonly = false;
+      })
+      .finally(() => {
+        this.saveLoading = false;
+      });
   }
 
-  private updatePiece(piece: PieceSaveDTO) {
+  private updatePiece(piece: OperationDiverseToSave) {
     this.saveLoading = true;
     this.readonly = true;
-    // FinancierApi.updatePieceComptable(piece)
-    //   .then(() => {
-    //     this.resolve(piece.numeroPiece);
-    //     this.dialog = false;
-    //     this.reset();
-    //   })
-    //   .catch((err) => {
-    //     this.warningMessage.show('Une erreur est survenue lors de la mise à jour de la pièce', displayAxiosError(err));
-    //     this.readonly = false;
-    //   })
-    //   .finally(() => {
-    //     this.saveLoading = false;
-    //   });
+    OperationDiverseApi.updatePieceComptable(piece)
+      .then(() => {
+        this.resolve(piece.numeroPiece);
+        this.dialog = false;
+        this.reset();
+      })
+      .catch((err) => {
+        this.warningMessage.show('Une erreur est survenue lors de la mise à jour de la pièce', displayAxiosError(err));
+        this.readonly = false;
+      })
+      .finally(() => {
+        this.saveLoading = false;
+      });
   }
 
-  private getModelToSave(): PieceSaveDTO {
-    const pieceToSave: PieceSaveDTO = new PieceSaveDTO();
-    // if (this.forcerNumero && this.numeroToForce) pieceToSave.numeroPiece = +this.numeroPiece;
-
-    // pieceToSave.periode = this.periode.typePeriodeComptable;
-    // pieceToSave.numeroJournal = this.journal.numero;
-    // pieceToSave.numeroPiece = this.numeroPiece.toNumber();
-    // pieceToSave.datePiece = this.datePiece.toUtc();
-    // pieceToSave.soldeInitial = this.soldeInitial.toNumber();
-    // pieceToSave.hash = this.hash;
-    // pieceToSave.extraits = [];
-
-    // this.extraits.forEach((e) => {
-    //   const extrait: ExtraitSaveDTO = new ExtraitSaveDTO();
-    //   extrait.numeroExtrait = e.numeroExtrait;
-    //   extrait.montantBase = e.montantBase;
-    //   extrait.montantDevise = e.montantDevise;
-    //   extrait.libelle = e.libelleReglement;
-    //   extrait.codeMouvement = e.codeMouvement;
-    //   extrait.codeReglement = e.codeReglement;
-    //   pieceToSave.extraits.push(extrait);
-
-    //   e.ventilations.forEach((v) => {
-    //     const ventilation: VentilationSaveDTO = new VentilationSaveDTO();
-    //     ventilation.numeroVentilation = v.numeroVentilation;
-    //     ventilation.typeCompte = v.typeCompte;
-    //     ventilation.numeroCompte = v.numeroCompte;
-    //     ventilation.montantBase = v.montantBase;
-    //     ventilation.montantDevise = v.montantDevise;
-    //     ventilation.libelle = v.libelle;
-    //     ventilation.codeDevise = v.codeDevise;
-    //     ventilation.numeroCaseTVA = v.caseTva.numeroCase;
-    //     ventilation.codeMouvement = v.codeMouvement;
-    //     ventilation.referenceJournal = v.referenceJournal;
-    //     ventilation.referencePiece = v.referencePiece;
-    //     ventilation.dossier = v.dossier;
-    //     extrait.ventilations.push(ventilation);
-    //   });
-    // });
+  private getModelToSave(): OperationDiverseToSave {
+    const pieceToSave: OperationDiverseToSave = new OperationDiverseToSave();
+    if (this.forcerNumero && this.numeroToForce) pieceToSave.numeroPiece = +this.numeroPiece;
+    else if (this.oldPiece) pieceToSave.numeroPiece = this.oldPiece.numeroPiece;
+    pieceToSave.numeroJournal = this.journal.numero;
+    pieceToSave.periode = this.periode.typePeriodeComptable;
+    pieceToSave.datePiece = this.datePiece.toJsonDateTime();
+    this.imputations.forEach((i) => pieceToSave.imputations.push(i.toSaveModel()));
+    pieceToSave.hash = this.hash;
     return pieceToSave;
   }
-
-  // private getModelForGrid(): EntetePieceComptable {
-  //   const entetePieceComptable = new EntetePieceComptable();
-  //   entetePieceComptable.numeroJournal = this.journal.numero;
-  //   entetePieceComptable.numeroPiece = this.numeroPiece.toNumber();
-  //   entetePieceComptable.soldeInitiale = this.soldeInitial.toNumber();
-  //   entetePieceComptable.totalDebit = _.sum(this.extraits.map((m) => m.montantDebit.toNumber()));
-  //   entetePieceComptable.totalCredit = _.sum(this.extraits.map((m) => m.montantCredit.toNumber()));
-  //   entetePieceComptable.soldeFinale = this.soldeActuel.toNumber();
-  //   entetePieceComptable.pieceEquilibree = true;
-  //   entetePieceComptable.libelleDevise = this.journal.devise.libelle;
-  //   entetePieceComptable.datePiece = this.datePiece.toString();
-  //   entetePieceComptable.libelle = this.journal.libelle;
-  //   return entetePieceComptable;
-  // }
 
   private modifierPiece() {
     if (!this.pieceIsLoading) {
@@ -608,6 +569,10 @@ export default class OperationDiverseVue extends Vue {
     } else {
       this.closeDialog();
     }
+  }
+
+  private focusFirstElement() {
+    this.$nextTick(() => this.refDatePiece.focus());
   }
 
   private closeDialog() {

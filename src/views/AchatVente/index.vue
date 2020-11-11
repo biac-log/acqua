@@ -267,7 +267,7 @@ export default class extends Vue {
   }
 
   private openPieceComptable(entete?: EntetePieceComptable) {
-    if(!entete && !this.searchIsValid) return false;
+    if (!entete && !this.searchIsValid) return false;
     this.refDialogPiece
       .open(this.periodeSelected, this.journalSelected, entete)
       .then((resp) => {
@@ -295,7 +295,7 @@ export default class extends Vue {
   private displayAddResult(piece: EntetePieceComptable) {
     (this.$refs.PieceAddResultVue as PieceAddResultVue)
       .open(piece.codeJournal, piece.codePiece, this.periodeSelected.typePeriodeComptable)
-      .then((numero) => {        
+      .then((numero) => {
         if (piece.codePiece != numero) {
           piece.codePiece = numero;
           Vue.set(

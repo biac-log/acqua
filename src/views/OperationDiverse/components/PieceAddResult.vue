@@ -106,13 +106,11 @@
 
 <script lang="ts">
 import { Component, Vue, PropSync } from 'vue-property-decorator';
-import { FinancierApi } from '@/api/FinancierApi';
+import OperationDiverseApi from '@/api/OperationDiverseApi';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 
-@Component({
-  name: 'PieceAddResult'
-})
-export default class extends Vue {
+@Component
+export default class PieceAddResult extends Vue {
   private dialog = false;
   @PropSync('SkipDialog')
   private skipDialog!: boolean;
@@ -152,7 +150,7 @@ export default class extends Vue {
 
   private saveNewNumero() {
     this.numeroLoading = true;
-    FinancierApi.changeNumero(this.periode, this.journal, this.numero, this.nouveauNumero.toNumber())
+    OperationDiverseApi.changeNumero(this.periode, this.journal, this.numero, this.nouveauNumero.toNumber())
       .then(() => {
         this.numero = this.nouveauNumero.toNumber();
         this.$nextTick(() => (this.$refs.btnClose as any)?.$el?.focus());

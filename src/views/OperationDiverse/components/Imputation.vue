@@ -4,11 +4,12 @@
     @click:outside="close()"
     @keydown.esc.stop="close()"
     @keydown.46.prevent.stop="deleteImputation"
+    @keydown.107.prevent.stop=""
     class="ma-0 pa-0"
   >
     <div :class="imputationIsSelected ? 'overlay' : ''" @click="close()" />
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
-      <span tabindex="1" @focus="focusFirstElement" />-
+      <span tabindex="1" @focus="focusFirstElement" />
       <v-card outlined id="editImputation">
         <v-toolbar color="primary" dark flat dense>
           <v-card-title class="pa-2">
@@ -29,6 +30,7 @@
                 ref="firstElement"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
+                @change="resetCompte"
                 label="Type compte"
                 item-text="libelle"
                 return-object
@@ -36,7 +38,6 @@
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
-                @change="resetCompte"
                 tabindex="2"
               ></v-select>
             </v-col>
@@ -368,7 +369,7 @@
             </template>
             <span>Valider les modifications <span class="shortcutTooltip">alt + enter</span></span>
           </v-tooltip>
-          <span tabindex="17" @focus="focusFirstElement" />
+          <span tabindex="99" @focus="focusFirstElement" />
         </v-card-actions>
       </v-card>
     </v-form>
@@ -421,7 +422,7 @@ export default class ImputationVue extends Vue {
   private isValid = false;
   private imputationIsSelected = false;
   private isAdd = false;
-
+  private numeroVentilation = 0;
   private typesComptes: TypeCompte[] = [];
   private typesComptesSelected: TypeCompte = new TypeCompte();
   private typesComptesRules: any = [(v: string) => !!v || 'Type obligatoire'];
@@ -543,6 +544,7 @@ export default class ImputationVue extends Vue {
   }
 
   private setImputation(imputation: Imputation) {
+    this.numeroVentilation = imputation.numeroVentilation;
     this.typesComptesSelected = this.typesComptes.find((tc) => tc.id == imputation.typeCompte) || this.typesComptes[0];
     if (imputation.numeroCompte)
       this.autocompleteCompte?.init(imputation.numeroCompte.toString(), imputation.nomCompte);
@@ -796,7 +798,7 @@ export default class ImputationVue extends Vue {
 
   private getModel(): Imputation {
     const imputation = new Imputation();
-    imputation.numeroVentilation = 0;
+    imputation.numeroVentilation = this.numeroVentilation;
     imputation.typeCompte = this.typesComptesSelected.id;
     imputation.numeroCompte = this.numeroCompte.toNumber();
     imputation.nomCompte = this.nomCompte;
@@ -819,7 +821,6 @@ export default class ImputationVue extends Vue {
     imputation.operationLibelle = this.typesOperationSelected ? this.typesOperationSelected.libelle : '';
     imputation.chida = this.chida.toNumber();
     imputation.escompte = this.escompte.toNumber();
-    //imputation.escompteDevise = this.chida.toNumber();
     imputation.montantTVA = this.montantTVA.toNumber();
 
     return imputation;
@@ -838,16 +839,6 @@ export default class ImputationVue extends Vue {
 <style scoped>
 .v-text-field.v-text-field--enclosed .v-text-field__details {
   margin-bottom: 0px;
-}
-
-.notEquilibre {
-  color: red;
-  margin-left: 10px;
-}
-
-.equilibre {
-  color: green;
-  margin-left: 10px;
 }
 
 #editImputation {

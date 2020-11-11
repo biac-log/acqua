@@ -1,5 +1,6 @@
 import { CaseTvaDTO } from '../CaseTva';
 import { DateTime } from '../DateTime';
+import { OperationDiverseImputationToSave } from './OperationDiverseImputationToSave';
 
 export class ImputationDTO {
   numeroVentilation = 0;
@@ -55,6 +56,29 @@ export class Imputation extends ImputationDTO {
     return new DateTime(this.dateEcheance);
   }
   set dateEcheanceDate(date: DateTime | null) {
-    this.dateEcheance = date ? date.toJsonDateTime() : '';
+    this.dateEcheance = date ? date.toJsonDateTime() : new DateTime(DateTime.minValue()).toJsonDateTime();
+  }
+
+  public toSaveModel(): OperationDiverseImputationToSave {
+    const modelToSave = new OperationDiverseImputationToSave();
+    modelToSave.numeroVentilation = this.numeroVentilation;
+    modelToSave.typeCompte = this.typeCompte;
+    modelToSave.numeroCompte = this.numeroCompte;
+    modelToSave.dossier = this.dossier;
+    modelToSave.referenceJournal = this.referenceJournal;
+    modelToSave.referencePiece = this.referencePiece;
+    modelToSave.libelle = this.libelle;
+    modelToSave.codeMouvement = this.codeMouvement;
+    modelToSave.montantDevise = this.montantDevise;
+    modelToSave.montantBase = this.montantBase;
+    modelToSave.codeDevise = this.codeDevise;
+    modelToSave.codeCaseTVA = this.codeCaseTVA;
+    modelToSave.operationNumero = this.operationNumero;
+    modelToSave.dateEcheance = this.dateEcheance;
+    modelToSave.chida = this.chida;
+    modelToSave.escompte = this.escompte;
+    modelToSave.escompteDevise = this.escompteDevise;
+    modelToSave.montantTVA = this.montantTVA;
+    return modelToSave;
   }
 }

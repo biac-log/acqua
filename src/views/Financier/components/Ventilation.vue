@@ -4,6 +4,7 @@
     @click:outside="close()"
     @keydown.esc.stop="close()"
     @keydown.46.prevent.stop="deleteVentilation"
+    @keydown.107.prevent.stop=""
     class="ma-0 pa-0"
   >
     <div :class="ventilationIsSelected ? 'overlay' : ''" @click="close()" />
