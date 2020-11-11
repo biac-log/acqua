@@ -365,7 +365,9 @@ export default class PieceComptableVue extends Vue {
           const maxLigne = this.extraits?.length ? Math.max(...this.extraits.map((i) => i.numeroExtrait)) : 0;
           resp.data.numeroExtrait = maxLigne + 1;
           this.extraits.push(resp.data);
-          if (resp.triggerEvent) this.$nextTick(() => this.createExtrait());
+          this.$nextTick(() => {
+            if (resp.triggerEvent) this.createExtrait();
+          });
         })
         .catch()
         .finally(() => {
