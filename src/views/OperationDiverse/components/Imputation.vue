@@ -3,7 +3,6 @@
     @keydown.alt.enter.stop="sendImputation()"
     @click:outside="close()"
     @keydown.esc.stop="close()"
-    @keydown.46.prevent.stop="deleteImputation"
     @keydown.107.prevent.stop=""
     class="ma-0 pa-0"
   >
@@ -702,7 +701,7 @@ export default class ImputationVue extends Vue {
       (this.$refs.searchEcheancierDialog as SearchEcheancierVue)
         .open(this.typesComptesSelected.id, this.numeroCompte, `${this.numeroCompte} - ${this.nomCompte}`)
         .then((elements) => {
-          //this.initFromEcheancier(elements);
+          this.initFromEcheancier(elements);
           this.refMontant?.focus();
         })
         .catch(() => {

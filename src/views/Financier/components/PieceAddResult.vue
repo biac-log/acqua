@@ -114,8 +114,7 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 })
 export default class extends Vue {
   private dialog = false;
-  @PropSync('SkipDialog')
-  private skipDialog!: boolean;
+  @PropSync('SkipDialog', { default: false }) private skipDialog!: boolean;
   private numero = 0;
   private periode = '';
   private journal = 0;

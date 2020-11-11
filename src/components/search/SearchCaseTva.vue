@@ -70,7 +70,8 @@ export default class extends Vue {
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
-    onRowDoubleClicked: this.rowDoubleClick
+    onRowDoubleClicked: this.rowDoubleClick,
+    paginationPageSize: 15
   };
 
   public open(numeroJournal: number): Promise<CaseTva> {

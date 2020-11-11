@@ -11,7 +11,6 @@
       @focus="$event.target.select()"
       @change="numeroCompteChangeAsync"
       @keydown.ctrl.f.prevent="openSearchCompte()"
-      @keydown.f5.prevent="openSearchCompte()"
       :hide-details="hideDetails && isReadonly"
       :filled="isReadonly"
       :readonly="isReadonly"
@@ -231,6 +230,7 @@ export default class AutocompleteComptes extends Vue {
       this.numeroCompteSelected = compte;
       this.error = false;
       (this.comboboxCompte as any).errorBucket = [];
+      (this.comboboxCompte).blur();
     }
   }
 

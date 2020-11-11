@@ -3,7 +3,6 @@
     @keydown.alt.enter.stop="sendVentilation()"
     @click:outside="close()"
     @keydown.esc.stop="close()"
-    @keydown.46.prevent.stop="deleteVentilation"
     @keydown.107.prevent.stop=""
     class="ma-0 pa-0"
   >
@@ -26,6 +25,7 @@
           <v-row>
             <v-col cols="3">
               <v-select
+                ref="refTypesComptes"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
@@ -38,6 +38,7 @@
                 @change="resetCompte"
                 dense
                 autofocus
+                @keyup="changeType"
               ></v-select>
             </v-col>
             <v-col cols="4">
@@ -250,6 +251,7 @@
                 :hide-details="readonly"
                 @blur="montant = montant.toNumber().toComptaString()"
                 dense
+                @keydown.tab.prevent="cycleFocus"
               >
                 <!-- <template v-slot:append>
                   <v-btn icon small :disabled="readonly" @click="calculMontant()" @keydown.enter.prevent.stop="calculMontant()">
@@ -361,6 +363,8 @@ export default class VentilationVue extends Vue {
   @Ref() readonly searchEcheancierDialog!: SearchEcheancierVue;
   @Ref() readonly caseTvaDialog!: SearchCaseTvaVue;
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
+  @Ref() readonly refTypesComptes!: HTMLElement;
+  @Ref() readonly btnValidate!: HTMLElement;
 
   @PropSync('isReadOnly') public readonly!: boolean;
   @PropSync('Ventilations') public ventilations!: Ventilation[];
@@ -681,7 +685,13 @@ export default class VentilationVue extends Vue {
         .open(this.typesComptesSelected.id, this.numeroCompte, `${this.numeroCompte} - ${this.nomCompte}`)
         .then((elements) => {
           this.initFromEcheancier(elements);
-          this.$nextTick(() => (this.$refs.montant as any)?.focus());
+          this.$nextTick(() => {
+            if (this.montant.toNumber() == this.ventileDevise) {
+              this.sendVentilation();
+            } else {
+              (this.$refs.montant as any)?.focus();
+            }
+          });
         })
         .catch(() => {
           this.$nextTick(() => (this.$refs.reference as any)?.focus());
@@ -814,7 +824,12 @@ export default class VentilationVue extends Vue {
   }
 
   private focusFirstElement() {
-    this.compteComponent.focus();
+    this.refTypesComptes.focus();
+  }
+
+  private cycleFocus() {
+    if (!this.isValid) this.focusFirstElement();
+    else (this.$refs.btnValidate as any)?.$el?.focus();
   }
 
   public close() {
@@ -822,6 +837,14 @@ export default class VentilationVue extends Vue {
     if (this.ventilationIsSelected) {
       this.ventilationIsSelected = false;
       if (this.reject) this.reject();
+    }
+  }
+
+  private changeType(event: KeyboardEvent) {
+    if (['c', 'f', 'g', 'z'].includes(event.key)) {
+      if ('z' == event.key) this.typesComptesSelected = new TypeCompte({ id: 'Z', libelle: 'Extra-comptable' });
+      this.$nextTick(() => this.refTypesComptes.blur());
+      this.$nextTick(() => this.compteComponent.focus());
     }
   }
 }

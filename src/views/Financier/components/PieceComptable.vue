@@ -7,7 +7,6 @@
     :persistent="!readonly || saveLoading || deleteLoading"
     @click:outside.stop="clickOutside"
     @keydown.f2.stop="modifierPiece()"
-    @keydown.46.prevent.stop="deletePiece"
     @keydown.107.prevent.stop="createExtrait"
     @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="savePiece()"
@@ -17,7 +16,7 @@
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
             <p class="mb-0" v-if="!newRecord">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
-            <p class="mb-0" v-else>Nouvelle pièce</p>
+            <p class="mb-0" v-else>Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}</p>
             <p class="ml-10 mb-0 textMini">Période {{ periode.libellePeriodeFull.toLowerCase() }}</p>
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
@@ -203,13 +202,18 @@
     </v-form>
     <v-dialog
       v-model="datePieceDialog"
-      width="300"
+      width="350"
       eager
       style="z-index: 999999999999999999"
-      @keydown.enter.stop="datePieceDialog = false"
+      @keydown.enter.stop="closeDatePieceDialog"
     >
       <v-card>
-        <v-card-title primary-title>Nouvelle pièce</v-card-title>
+        <v-toolbar color="primary" dark flat>
+          <v-card-title class="mt-2"
+            >Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}
+            <small class="textMini">Solde initial : {{ soldeInitial }}</small>
+          </v-card-title>
+        </v-toolbar>
         <v-card-text>
           <DatePicker
             ref="refDatePieceDialog"
@@ -224,7 +228,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="success" @click="datePieceDialog = false">Valider</v-btn>
+          <v-btn color="success" @click="closeDatePieceDialog">Valider</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -244,6 +248,7 @@ import Confirm from '@/components/Confirm.vue';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
 import { sum } from 'lodash';
+import { PromiseResponse } from '@/models/PromiseResponse';
 
 @Component({
   components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue }
@@ -355,11 +360,14 @@ export default class PieceComptableVue extends Vue {
   private createExtrait() {
     if (!this.readonly) {
       this.refExtraitVue
-        .openNew(this.journal)
-        .then((resp: Extrait) => {
+        .openNew(this.journal, this.soldeInitial, this.soldeActuel)
+        .then((resp: PromiseResponse<Extrait>) => {
           const maxLigne = this.extraits?.length ? Math.max(...this.extraits.map((i) => i.numeroExtrait)) : 0;
-          resp.numeroExtrait = maxLigne + 1;
-          this.extraits.push(resp);
+          resp.data.numeroExtrait = maxLigne + 1;
+          this.extraits.push(resp.data);
+          this.$nextTick(() => {
+            if (resp.triggerEvent) this.createExtrait();
+          });
         })
         .catch()
         .finally(() => {
@@ -370,7 +378,7 @@ export default class PieceComptableVue extends Vue {
 
   private editExtrait(extrait: Extrait) {
     this.refExtraitVue
-      .open(this.journal, this.numeroPiece, extrait)
+      .open(this.journal, this.numeroPiece, extrait, this.soldeInitial, this.soldeActuel)
       .then((resp: Extrait) => {
         if (resp)
           Vue.set(
@@ -426,7 +434,7 @@ export default class PieceComptableVue extends Vue {
     this.confirmDialog
       .open(
         'Suppression',
-        `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
+        `Êtes-vous sur de vouloir supprimer la pièce ${this.journal.numero}.${this.numeroPiece} ?`,
         'error',
         'Supprimer'
       )
@@ -590,6 +598,11 @@ export default class PieceComptableVue extends Vue {
 
   private clickOutside() {
     if (this.readonly) this.closeDialog();
+  }
+
+  private closeDatePieceDialog() {
+    this.datePieceDialog = false;
+    this.createExtrait();
   }
 }
 </script>

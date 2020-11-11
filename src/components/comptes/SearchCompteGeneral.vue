@@ -85,8 +85,9 @@ export default class extends Vue {
     suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
     pagination: true,
-    paginationAutoPageSize: true,
-    onRowDoubleClicked: this.rowDoubleClick
+    // paginationAutoPageSize: true,
+    onRowDoubleClicked: this.rowDoubleClick,
+    paginationPageSize: 15
   };
 
   public open(typeToLoad: string, search: string): Promise<CompteGeneralSearch> {

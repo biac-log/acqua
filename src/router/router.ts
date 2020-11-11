@@ -170,6 +170,17 @@ export const asyncRoutes: RouteConfig[] = [
           icon: 'mdi-format-title',
           affix: true
         }
+      },
+      {
+        path: 'casestva',
+        component: () =>
+          import(/* webpackChunkName: "casestva" */ '@/views/Maintenance/CasesTVA/index.vue'),
+        name: 'Cases TVA',
+        meta: {
+          title: 'Cases TVA',
+          icon: 'mdi-checkbox-blank-outline',
+          affix: true
+        }
       }
     ]
   },

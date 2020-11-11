@@ -10,6 +10,7 @@
           <v-row dense>
             <v-col cols="2">
               <v-select
+                ref="typesComptes"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
@@ -22,6 +23,7 @@
                 @change="resetCompte"
                 tabindex="2"
                 autofocus
+                @keyup="changeType"
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -217,19 +219,7 @@
             Supprimer</v-btn
           >
           <v-spacer></v-spacer>
-          <v-menu bottom left v-if="!readonly">
-            <template v-slot:activator="{ on }">
-              <v-btn icon v-on="on">
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
-            </template>
-
-            <v-list>
-              <v-list-item @click="generateTVA">
-                <v-list-item-title>Calculer la TVA</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+          <v-btn @click="generateTVA" class="ma-2 pr-4" tile outlined color="warning">Solde = TVA</v-btn>
           <v-btn color="blue darken-1" class="ma-2 pr-4" tile outlined @click="close()" tabindex="-1">
             <v-icon left>mdi-close</v-icon> Fermer</v-btn
           >
@@ -675,6 +665,15 @@ export default class extends Vue {
   private close() {
     this.dialog = false;
     this.reject();
+  }
+
+  private changeType(event: KeyboardEvent) {
+    console.log(event.key);
+    if (['c', 'f', 'g', 'z'].includes(event.key)) {
+      if('z' == event.key) this.typesComptesSelected = new TypeCompte({id: 'Z', libelle: 'Extra-comptable'});
+      this.$nextTick(() => (this.$refs.typesComptes as any).blur());
+      this.$nextTick(() => this.refNumeroCompte.focus());
+    }
   }
 }
 </script>
