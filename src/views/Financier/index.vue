@@ -209,11 +209,6 @@ export default class extends Vue {
       .open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
       .then((resp) => {
         if (resp) {
-          // Vue.set(
-          //   this.piecesComptables,
-          //   this.piecesComptables.findIndex((e) => e == entete),
-          //   resp
-          // );
           this.notifier(`Pièce numéro <b>${resp}</b> mise à jour.`, 'success');
         } else {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
