@@ -332,7 +332,7 @@ export default class PieceComptableVue extends Vue {
     });
   }
 
-  public open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<EntetePieceComptable> {
+  public open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<number> {
     this.newRecord = false;
     this.dialog = true;
     this.readonly = true;
