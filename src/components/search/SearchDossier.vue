@@ -76,7 +76,8 @@ export default class extends Vue {
     onCellKeyDown: this.keypress,
     onRowDoubleClicked: this.rowDoubleClick,
     pagination: true,
-    paginationAutoPageSize: true,
+    // paginationAutoPageSize: true,
+    paginationPageSize: 15,
     defaultColDef: {
       sortable: true
     },

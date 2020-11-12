@@ -81,6 +81,7 @@ export default class AutocompleteCodeVue extends Vue {
   private async codeChange(value: CodeItem) {
     this.codeSelected = value;
     this.$emit('select', value);
+    this.comboboxCode.blur();
   }
 
   @Watch('searchCode')

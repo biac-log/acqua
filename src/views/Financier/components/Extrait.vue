@@ -1,19 +1,18 @@
 <template>
   <v-dialog
     v-model="dialog"
-    @keydown.alt.enter.stop="sendExtrait()"
+    @keydown.alt.enter.stop="sendExtrait"
     @click:outside="close()"
     @keydown.esc.stop="close()"
     @keydown.f2.stop="modifierPiece()"
     @keydown.107.prevent.stop="createVentilation"
-    @keydown.46.prevent.stop="deleteExtrait"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card min-height="710px">
         <v-toolbar color="primary" dark flat>
           <v-card-title class="pa-2">
             <span v-if="numeroExtrait">Extrait {{ journal.numero }}.{{ numeroPiece }} - Ligne {{ numeroExtrait }}</span>
-            <span v-else>Nouvelle ligne</span>
+            <span v-else>Nouvelle ligne - Pièce {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}</span>
           </v-card-title>
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay="500">
@@ -41,11 +40,48 @@
           <v-row>
             <v-col cols="7">
               <v-row dense>
-                <v-col cols="5">
-                  <v-text-field v-model="libelleCompte" label="Compte" :filled="readonly" readonly tabindex="-1">
-                  </v-text-field>
+                <v-col cols="4">
+                  <v-text-field
+                    v-model="libelleCompte"
+                    label="Compte"
+                    :filled="readonly"
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  />
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="1">
+                  <v-text-field
+                    label="Solde initial"
+                    v-model="soldeInitial"
+                    :filled="readonly"
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="1">
+                  <v-text-field
+                    label="Solde actuel"
+                    v-model="soldeActuel"
+                    :filled="readonly"
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="2">
+                  <v-text-field
+                    label="Date pièce"
+                    v-model="datePiece"
+                    :filled="readonly"
+                    readonly
+                    tabindex="-1"
+                    prepend-inner-icon="mdi-calendar"
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="2">
                   <v-text-field
                     ref="montant"
                     label="Montant"
@@ -58,7 +94,7 @@
                     autofocus
                   ></v-text-field>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="2">
                   <v-select
                     :items="reglements"
                     v-model="reglementSelected"
@@ -160,7 +196,7 @@
                 Supprimer
               </v-btn>
             </template>
-            <span>Supprimer l'extrait'<span class="shortcutTooltip">del</span></span>
+            <span>Supprimer l'extrait<span class="shortcutTooltip">del</span></span>
           </v-tooltip>
           <v-spacer></v-spacer>
           <v-tooltip top open-delay="500">
@@ -193,11 +229,13 @@ import { FinancierApi } from '@/api/FinancierApi';
 import VentilationVue from './Ventilation.vue';
 import { Reglement } from '@/models/Financier/Get/Reglement';
 import { DateTime } from '@/models/DateTime';
+import { PromiseResponse } from '@/models/PromiseResponse';
 import DeviseApi from '@/api/DeviseApi';
+import DatePicker from '@/components/DatePicker.vue';
 
 @Component({
   name: 'Extrait',
-  components: { VentilationVue }
+  components: { VentilationVue, DatePicker }
 })
 export default class extends Vue {
   @Ref() readonly refVentilationVue!: VentilationVue;
@@ -221,6 +259,8 @@ export default class extends Vue {
   private numeroCompte = '';
   private nomCompte = '';
   private libelleCompte = '';
+  private soldeInitial = '';
+  private soldeActuel = '';
 
   private reglementsLoading = false;
   private reglements: Reglement[] = [];
@@ -256,11 +296,19 @@ export default class extends Vue {
     this.loadReglements();
   }
 
-  public open(journal: Journal, numeroPiece: string, extrait: Extrait): Promise<Extrait> {
+  public open(
+    journal: Journal,
+    numeroPiece: string,
+    extrait: Extrait,
+    soldeInitial: string,
+    soldeActuel: string
+  ): Promise<Extrait> {
     this.reset();
     this.dialog = true;
     this.isNew = false;
     this.numeroPiece = numeroPiece;
+    this.soldeInitial = soldeInitial;
+    this.soldeActuel = soldeActuel;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
       this.initJournal(journal);
@@ -273,10 +321,13 @@ export default class extends Vue {
     });
   }
 
-  public openNew(journal: Journal): Promise<Extrait> {
+  public openNew(journal: Journal, soldeInitial: string, soldeActuel: string): Promise<PromiseResponse<Extrait>> {
     this.reset();
     this.dialog = true;
     this.isNew = true;
+
+    this.soldeInitial = soldeInitial;
+    this.soldeActuel = soldeActuel;
 
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
@@ -297,6 +348,7 @@ export default class extends Vue {
   get createVentilationEnabled() {
     return !this.readonly && this.montant;
   }
+
   private createVentilation() {
     if (this.readonly) return false;
     (this.$refs.form as any).validate();
@@ -310,6 +362,13 @@ export default class extends Vue {
               : 0;
             ventil.numeroVentilation = maxLigne + 1;
             this.ventilations.push(ventil);
+            this.$nextTick(() => {
+              if (this.ventileDevise != 0) {
+                this.createVentilation();
+              } else {
+                this.sendExtrait();
+              }
+            });
           })
           .catch()
           .finally(() => {
@@ -469,13 +528,19 @@ export default class extends Vue {
   }
 
   private sendExtrait() {
-    (this.$refs.form as any).validate();
-    this.$nextTick(() => {
-      if (this.isValid) {
-        this.dialog = false;
-        this.resolve(this.getModel());
-      }
-    });
+    if (!(this.ventilations.length > 0)) {
+      // If there's no ventilation
+      this.dialog = false;
+      this.reject();
+    } else {
+      (this.$refs.form as any).validate();
+      this.$nextTick(() => {
+        if (this.isValid) {
+          this.dialog = false;
+          this.resolve(new PromiseResponse<Extrait>(this.getModel(), true)); // Send true to trigger openNew again
+        }
+      });
+    }
   }
 
   private deleteExtrait() {

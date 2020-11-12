@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid @keydown.107.prevent="createNewPieceComptable">
+  <v-container fluid @keydown.107.prevent="createNewPieceComptable" >
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
@@ -62,6 +62,7 @@
           label="Rechercher"
           single-line
           hide-details
+          id="indexSearch"
         ></v-text-field>
       </v-card-title>
       <v-data-table
@@ -103,7 +104,7 @@
       </v-data-table>
     </v-card>
     <PieceComptableVue ref="refDialogPiece"></PieceComptableVue>
-    <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue>
+    <PieceAddResultVue ref="PieceAddResultVue" :SkipDialog.sync="skipAddResult"></PieceAddResultVue>
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
@@ -129,6 +130,7 @@ export default class extends Vue {
   @Ref() readonly refDialogPiece!: PieceComptableVue;
   @Ref() readonly PieceAddResultVue!: PieceAddResultVue;
   private searchIsValid = true;
+  private skipAddResult = false;
 
   private isErrorPeriode = false;
   private periodeIsLoading = false;
@@ -156,7 +158,6 @@ export default class extends Vue {
     { text: '', value: 'pieceEquilibree', width: 50 },
     { text: 'Numéro pièce', value: 'numeroPiece' },
     { text: 'Date pièce', value: 'datePieceDate' },
-    { text: 'Libellé', value: 'libelle' },
     { text: 'Solde initial', value: 'soldeInitiale', align: 'end' },
     { text: 'Débit', value: 'totalDebit', align: 'end' },
     { text: 'Crédit', value: 'totalCredit', align: 'end' },
@@ -208,15 +209,10 @@ export default class extends Vue {
       .open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
       .then((resp) => {
         if (resp) {
-          Vue.set(
-            this.piecesComptables,
-            this.piecesComptables.findIndex((e) => e == entete),
-            resp
-          );
-          this.notifier(`Pièce numéro <b>${resp.codePieceDisplay}</b> mise à jour.`, 'success');
+          this.notifier(`Pièce numéro <b>${resp}</b> mise à jour.`, 'success');
         } else {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
-          this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimer.`, 'error');
+          this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimée.`, 'error');
         }
       })
       .catch()
@@ -230,7 +226,7 @@ export default class extends Vue {
     this.refDialogPiece
       .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
-        this.displayAddResult(resp);
+        if(!this.skipAddResult) this.displayAddResult(resp);
         this.journalSelected.numeroDernierePiece = parseInt(resp);
         this.loadPiecesComptables();
       })

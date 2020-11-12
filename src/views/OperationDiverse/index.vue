@@ -68,6 +68,7 @@
           label="Rechercher"
           single-line
           hide-details
+          id="indexSearch"
         ></v-text-field>
       </v-card-title>
       <v-data-table

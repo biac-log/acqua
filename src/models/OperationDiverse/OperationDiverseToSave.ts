@@ -5,6 +5,7 @@ export class OperationDiverseToSave {
   numeroPiece = 0;
   periode = '';
   codeDeviseJournal = '';
+  libellePiece = '';
   datePiece: Date | string = '';
   imputations: OperationDiverseImputationToSave[] = [];
   hash = '';
