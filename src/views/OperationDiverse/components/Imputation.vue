@@ -74,6 +74,9 @@
                 :hide-details="readonly"
                 :readonly="readonly"
                 tabindex="4"
+                :rules="libelleRules"
+                counter
+                maxlength="23"
               ></v-text-field>
             </v-col>
             <v-col cols="3">

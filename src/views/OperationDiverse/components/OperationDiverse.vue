@@ -58,9 +58,8 @@
           <v-row>
             <v-col cols="6" class="pr-5">
               <v-row fill-height no-gutters>
-                <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
                 <v-row dense>
-                  <v-col cols="4">
+                  <v-col cols="3">
                     <DatePicker
                       ref="refDatePiece"
                       name="datePiece"
@@ -70,10 +69,19 @@
                       :filled="readonly"
                       :rules.sync="datePieceRules"
                       :hide-details="readonly"
-                      tabindex="1"
                     ></DatePicker>
                   </v-col>
-                  <v-col cols="4">
+                  <v-col cols="5">
+                    <v-text-field
+                      label="Libellé"
+                      v-model="libellePiece"
+                      :filled="readonly"
+                      :hide-details="readonly"
+                      counter
+                      maxlength="23"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="2">
                     <v-text-field
                       label="Débit"
                       :value="debit | numberToString"
@@ -83,7 +91,7 @@
                       tabindex="-1"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="4">
+                  <v-col cols="2">
                     <v-text-field
                       label="Crédit"
                       :value="credit | numberToString"
@@ -93,16 +101,6 @@
                       tabindex="-1"
                     ></v-text-field>
                   </v-col>
-                  <!-- <v-col cols="3">
-                    <v-text-field
-                      label="A ventilé"
-                      :value="solde | numberToStringEvenZero"
-                      :filled="readonly"
-                      :hide-details="readonly"
-                      readonly
-                      tabindex="-1"
-                    ></v-text-field>
-                  </v-col> -->
                 </v-row>
                 <v-row dense>
                   <v-col cols="12">
@@ -121,7 +119,6 @@
                                 :disabled="readonly"
                                 @click.stop="createImputation()"
                                 v-on="on"
-                                tabindex="2"
                               >
                                 <v-icon>mdi-plus</v-icon>
                               </v-btn>
@@ -172,6 +169,9 @@
             </v-col>
           </v-row>
         </v-card-text>
+        <v-card-actions>
+          <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
+        </v-card-actions>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
           <v-tooltip v-if="numeroPiece" top open-delay="500">
@@ -248,7 +248,6 @@
                 :loading="saveLoading"
                 :disabled="!isValid || deleteLoading"
                 @click="savePiece()"
-                tabindex="3"
               >
                 <v-icon left>mdi-content-save</v-icon>Sauvegarder
               </v-btn>
@@ -314,6 +313,7 @@ export default class OperationDiverseVue extends Vue {
     (v: string) => DateTime.isValid(v) || 'Date invalide',
     (v: string) => this.validateDatePiece(v) || 'La date est hors période'
   ];
+  private libellePiece = '';
 
   get credit() {
     return sum(this.imputations.filter((c) => c.codeMouvement == 'CR').map((i) => i.montantDevise));
@@ -450,6 +450,7 @@ export default class OperationDiverseVue extends Vue {
     this.oldPiece = null;
     this.readonly = false;
     this.numeroPiece = '';
+    this.libellePiece = '';
     this.hash = '';
     (this.$refs.extraits as any)?.reset();
   }
@@ -543,6 +544,7 @@ export default class OperationDiverseVue extends Vue {
     pieceToSave.numeroJournal = this.journal.numero;
     pieceToSave.periode = this.periode.typePeriodeComptable;
     pieceToSave.datePiece = this.datePiece.toJsonDateTime();
+    pieceToSave.libellePiece = this.libellePiece;
     this.imputations.forEach((i) => pieceToSave.imputations.push(i.toSaveModel()));
     pieceToSave.hash = this.hash;
     return pieceToSave;
