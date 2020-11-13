@@ -182,14 +182,14 @@
           </v-row>
         </v-card-text>
         <v-card-actions class="text-center" v-if="!readonly">
-          <v-tooltip top open-delay="500">
+          <v-tooltip top open-delay="500" v-if="numeroExtrait && !readonly">
             <template v-slot:activator="{ on }">
               <v-btn
                 color="error"
                 class="ma-2 pr-4"
                 text
                 tabindex="-1"
-                v-if="numeroExtrait && !readonly"
+                
                 @click="deleteExtrait()"
                 v-on="on"
               >
