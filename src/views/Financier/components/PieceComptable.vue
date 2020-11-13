@@ -113,7 +113,7 @@
         </v-card-text>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
-          <v-tooltip v-if="numeroPiece" top open-delay="500">
+          <v-tooltip v-if="!newRecord" top open-delay="500">
             <template v-slot:activator="{ on }">
               <v-btn
                 color="error"
