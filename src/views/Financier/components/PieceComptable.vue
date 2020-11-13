@@ -371,7 +371,7 @@ export default class PieceComptableVue extends Vue {
         })
         .catch()
         .finally(() => {
-          this.gridExtraits?.focus();
+          if (!this.refExtraitVue.isOpened) this.gridExtraits?.focus();
         });
     }
   }

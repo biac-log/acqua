@@ -189,7 +189,7 @@
                 class="ma-2 pr-4"
                 text
                 tabindex="-1"
-                v-if="!isNew && !readonly"
+                v-if="numeroExtrait && !readonly"
                 @click="deleteExtrait()"
                 v-on="on"
               >
@@ -252,6 +252,10 @@ export default class extends Vue {
   private reject!: any;
   private journal: Journal = new Journal();
   private numeroPiece = '';
+
+  public get isOpened(): boolean {
+    return this.dialog;
+  }
 
   private numeroExtrait = 0;
   private typeCompte = '';
@@ -333,6 +337,9 @@ export default class extends Vue {
       (this.$refs.form as any).resetValidation();
       this.setReglement(5);
       this.initJournal(journal);
+      this.$nextTick(() => {
+        (this.$refs.montant as HTMLElement).focus();
+      });
     });
 
     return new Promise((resolve, reject) => {
