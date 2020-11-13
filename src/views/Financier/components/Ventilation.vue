@@ -1,6 +1,6 @@
 <template>
   <div
-    @keydown.alt.enter.stop="sendVentilation()"
+    @keydown.alt.enter.prevent.stop="sendVentilation()"
     @click:outside="close()"
     @keydown.esc.stop="close()"
     @keydown.107.prevent.stop=""
