@@ -76,9 +76,18 @@
                       :filled="readonly"
                       :readonly="soldeReadonly"
                     >
-                    <template v-slot:append>
-                      <v-btn icon small @click="toggleSoldeReadonly" v-if="!readonly"><v-icon>mdi-pencil</v-icon></v-btn>
-                    </template>
+                      <template v-slot:append>
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{on}">
+                            <v-btn icon small @click="toggleSoldeReadonly" v-if="!readonly" v-on="on"
+                              ><v-icon>mdi-pencil</v-icon></v-btn
+                            >
+                          </template>
+                          <span>
+                            Permettre l'édition du solde initial
+                          </span>
+                        </v-tooltip>
+                      </template>
                     </v-text-field>
                   </v-col>
                   <v-col cols="3">
