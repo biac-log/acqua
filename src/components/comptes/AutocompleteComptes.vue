@@ -24,6 +24,7 @@
       :dense="isDense"
       :tabIndex="_tabIndex"
       :error.sync="error"
+      :outlined="outlined"
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">
@@ -73,8 +74,8 @@ export default class AutocompleteComptes extends Vue {
   @PropSync('rules', { default: null }) private bindedRules!: any | null;
   @Prop({ default: 'N° Compte' }) readonly label!: string;
   @Prop({ default: true }) hideDetails!: boolean;
+  @Prop() outlined!: boolean;
   @PropSync('tabindex', { default: undefined }) _tabIndex!: number;
-
   private compteLoading = false;
   private autocompleteLoading = false;
   private comptesSearch: { numero: string | number; nom: string }[] = [];

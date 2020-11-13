@@ -88,4 +88,12 @@ export default class App extends Vue {
   margin-left: 3px;
   font-size: 12px;
 }
+
+.v-text-field__suffix {
+  color: black !important;
+}
+
+div.v-input--is-readonly.v-text-field--outlined > .v-input__control > div.v-input__slot {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
 </style>

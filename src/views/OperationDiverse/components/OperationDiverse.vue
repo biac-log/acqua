@@ -3,7 +3,7 @@
     v-model="dialog"
     scrollable
     eager
-    width="80%"
+    width="85%"
     :persistent="!readonly || saveLoading || deleteLoading"
     @click:outside="clickOutside"
     @keydown.f2.stop="modifierPiece()"
@@ -56,7 +56,7 @@
         </v-toolbar>
         <v-card-text class="pb-0 pt-0">
           <v-row>
-            <v-col cols="6" class="pr-5">
+            <v-col cols="12" lg="7" md="12" class="pr-5">
               <v-row fill-height no-gutters>
                 <v-row dense>
                   <v-col cols="3">
@@ -66,39 +66,42 @@
                       label="Date pièce"
                       :date.sync="datePiece"
                       :readonly.sync="readonly"
-                      :filled="readonly"
                       :rules.sync="datePieceRules"
                       :hide-details="readonly"
+                      outlined
                     ></DatePicker>
                   </v-col>
-                  <v-col cols="5">
+                  <v-col cols="3">
                     <v-text-field
                       label="Libellé"
                       v-model="libellePiece"
-                      :filled="readonly"
                       :hide-details="readonly"
                       counter
                       maxlength="23"
+                      outlined
+                      :readonly="readonly"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="2">
+                  <v-col cols="3">
                     <v-text-field
                       label="Débit"
                       :value="debit | numberToString"
-                      :filled="readonly"
                       :hide-details="readonly"
                       readonly
                       tabindex="-1"
+                      outlined
+                      :suffix="journal.devise.libelle"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="2">
+                  <v-col cols="3">
                     <v-text-field
                       label="Crédit"
                       :value="credit | numberToString"
-                      :filled="readonly"
                       :hide-details="readonly"
                       readonly
                       tabindex="-1"
+                      outlined
+                      :suffix="journal.devise.libelle"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -144,7 +147,8 @@
                         dense
                         disable-pagination
                         hide-default-footer
-                        height="352"
+                        disable-sort
+                        :height="$vuetify.breakpoint.lgAndUp ? 352 : ''"
                       >
                         <template v-slot:[`item.debit`]="{ item }">
                           <span>{{ item.debit | numberToString }}</span>
@@ -158,7 +162,7 @@
                 </v-row>
               </v-row>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" lg="5" md="12">
               <ImputationVue
                 ref="refImputationVue"
                 :DatePiece.sync="datePiece"
@@ -348,6 +352,7 @@ export default class OperationDiverseVue extends Vue {
   }
 
   private validateDatePiece(date: string): boolean {
+    console.log(date);
     const dateTime = new DateTime(date);
     return dateTime.isBetween(this.periode.dateDebut, this.periode.dateFin);
   }
@@ -437,6 +442,7 @@ export default class OperationDiverseVue extends Vue {
     this.oldPiece = piece;
     this.numeroPiece = piece.numeroPiece.toString();
     this.datePiece = new DateTime(piece.datePiece);
+    this.libellePiece = piece.libelle;
     this.imputations = piece.imputations;
     this.hash = piece.hash;
   }
@@ -453,6 +459,7 @@ export default class OperationDiverseVue extends Vue {
     this.libellePiece = '';
     this.hash = '';
     (this.$refs.extraits as any)?.reset();
+    (this.$refs.form as any).resetValidation();
   }
 
   private deletePiece() {

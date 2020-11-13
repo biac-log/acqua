@@ -4,6 +4,7 @@ import { Imputation } from './Imputation';
 export class PieceComptableDTO {
   numeroJournal = 0;
   numeroPiece = 0;
+  libelle = '';
   codeDeviseJournal = 0;
   libelleDeviseJournal = '';
   datePiece = '';
