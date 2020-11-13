@@ -93,6 +93,7 @@ export default class extends Vue {
 
   private refreshcasesTva() {
     if (this.numeroJournalLoad) {
+      this.isLoading = true;
       (this.gridOptions.api as GridApi)?.showLoadingOverlay();
       CaseTvaApi.getCasesTVADisponibles(this.numeroJournalLoad)
         .then((resp) => {
@@ -100,6 +101,7 @@ export default class extends Vue {
         })
         .finally(() => {
           (this.gridOptions.api as GridApi)?.hideOverlay();
+          this.isLoading = false;
         });
     }
   }
