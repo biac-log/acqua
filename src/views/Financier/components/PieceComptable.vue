@@ -74,8 +74,12 @@
                       label="Solde initial"
                       v-model="soldeInitial"
                       :filled="readonly"
-                      readonly
-                    ></v-text-field>
+                      :readonly="soldeReadonly"
+                    >
+                    <template v-slot:append>
+                      <v-btn icon small @click="toggleSoldeReadonly" v-if="!readonly"><v-icon>mdi-pencil</v-icon></v-btn>
+                    </template>
+                    </v-text-field>
                   </v-col>
                   <v-col cols="3">
                     <v-text-field label="Solde actuel" v-model="soldeActuel" :filled="readonly" readonly></v-text-field>
@@ -264,6 +268,7 @@ export default class PieceComptableVue extends Vue {
   private dialog = false;
   private oldPiece!: Piece | null;
   private readonly = false;
+  private soldeReadonly = true;
   private resolve: any;
   private reject: any;
   private isValid = true;
@@ -415,6 +420,7 @@ export default class PieceComptableVue extends Vue {
     this.extraits = [];
     this.oldPiece = null;
     this.readonly = false;
+    this.soldeReadonly = true;
     this.numeroPiece = '0';
     this.hash = '';
     this.soldeInitial = '';
@@ -603,6 +609,10 @@ export default class PieceComptableVue extends Vue {
   private closeDatePieceDialog() {
     this.datePieceDialog = false;
     this.createExtrait();
+  }
+
+  private toggleSoldeReadonly() {
+    this.soldeReadonly = !this.soldeReadonly;
   }
 }
 </script>
