@@ -33,23 +33,24 @@
                 label="Type compte"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 tabindex="2"
+                outlined
               ></v-select>
             </v-col>
             <v-col cols="4">
               <AutocompleteComptesVue
                 ref="autocompleteCompte"
-                :Readonly.sync="readonly"
+                :readonly.sync="readonly"
                 :typeCompte.sync="typesComptesSelected.id"
                 :hide-details="readonly"
                 :rules="compteRules"
                 label="Compte"
                 @change="compteChange"
                 tabindex="3"
+                outlined
               >
               </AutocompleteComptesVue>
             </v-col>
@@ -57,7 +58,7 @@
               <v-text-field
                 label="Nom compte"
                 v-model="nomCompte"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 tabindex="-1"
                 readonly
@@ -65,26 +66,26 @@
             </v-col>
           </v-row>
           <v-row dense>
-            <v-col cols="5">
+            <v-col cols="9">
               <v-text-field
                 ref="refLibelle"
                 label="Libellé"
                 v-model="libelle"
-                :filled="readonly"
                 :hide-details="readonly"
                 :readonly="readonly"
                 tabindex="4"
                 :rules="libelleRules"
                 counter
                 maxlength="23"
+                outlined
               ></v-text-field>
             </v-col>
             <v-col cols="3">
               <v-text-field
-                label="Numéro case TVA"
+                label="Case TVA - Nature - Taux"
                 ref="numeroCaseTva"
                 v-model="numeroCaseTva"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
                 :hide-details="readonly"
@@ -98,7 +99,11 @@
                 :error="numeroCaseTvaError != ''"
                 :error-messages="numeroCaseTvaError"
                 tabindex="5"
+                :suffix="caseTva.libelleCase"
               >
+                <template v-slot:suffixe>
+                  {{ caseTva.libelleCase }}
+                </template>
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
                     <template v-slot:activator="{ on }">
@@ -118,17 +123,6 @@
                   </v-tooltip>
                 </template>
               </v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-text-field
-                label="Libellé case TVA"
-                v-model="caseTva.libelleCase"
-                :filled="readonly"
-                :hide-details="readonly"
-                :disabled="typesComptesSelected.id != 'G'"
-                tabindex="-1"
-                readonly
-              ></v-text-field>
               <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
             </v-col>
           </v-row>
@@ -140,6 +134,7 @@
                 :hide-details="readonly"
                 @Change="dossierChange"
                 tabindex="6"
+                outlined
               >
               </AutocompleteDossierVue>
             </v-col>
@@ -147,31 +142,34 @@
               <v-text-field
                 label="Nom Dossier"
                 v-model="nomDossier"
-                :filled="readonly"
                 :hide-details="readonly"
                 :disabled="dossierIsDisabled"
                 tabindex="-1"
                 readonly
+                outlined
               ></v-text-field>
             </v-col>
           </v-row>
           <v-row dense>
-            <v-col cols="3">
+            <v-col cols="4">
               <v-select
                 :items="devises"
                 v-model="devisesSelected"
-                label="Devise"
+                label="Devise - Taux"
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
                 tabindex="7"
-              ></v-select>
+                class="d-flex"
+                :suffix="taux"
+                outlined
+              >
+              </v-select>
             </v-col>
-            <v-col cols="3">
+            <!-- <v-col cols="3">
               <v-text-field
                 label="Taux devise"
                 readonly
@@ -180,7 +178,7 @@
                 :hide-details="readonly"
                 tabindex="-1"
               ></v-text-field>
-            </v-col>
+            </v-col> -->
             <v-col cols="3">
               <v-select
                 :items="typesMouvements"
@@ -189,42 +187,43 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
                 tabindex="8"
+                outlined
               ></v-select>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="5">
               <v-text-field
                 ref="refMontant"
                 v-model="montant"
                 label="Montant"
-                :filled="readonly"
                 :readonly="readonly"
                 :rules="montantRules"
                 :hide-details="readonly"
                 @blur="montant = montant.toNumber().toComptaString()"
                 tabindex="9"
+                outlined
               >
               </v-text-field>
             </v-col>
           </v-row>
+          <v-divider class="mb-6"></v-divider>
           <v-row dense>
             <v-col cols="4">
               <v-select
                 :items="typesOperation"
-                :filled="readonly"
                 :readonly="readonly"
                 :hide-details="readonly"
                 v-model="typesOperationSelected"
-                label="Operation"
+                label="Opération"
                 item-value="numero"
                 item-text="libelle"
                 :disabled="compteGeneralSelected"
                 return-object
                 tabindex="10"
+                outlined
               ></v-select>
             </v-col>
             <v-col cols="4">
@@ -232,7 +231,6 @@
                 ref="refReference"
                 label="Référence"
                 v-model="reference"
-                :filled="readonly"
                 :readonly="readonly"
                 :disabled="!referenceEnabled"
                 :hide-details="readonly"
@@ -244,6 +242,7 @@
                 @keydown.f5.prevent="openSearchEcheancier()"
                 validate-on-blur
                 tabindex="11"
+                outlined
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -273,10 +272,10 @@
                 label="Date échéance"
                 :date.sync="dateEcheance"
                 :readonly.sync="readonly"
-                :filled.sync="readonly"
                 :disabled.sync="compteGeneralSelected"
                 :rules.sync="dateEcheanceRules"
                 tabindex="12"
+                outlined
               ></DatePicker>
             </v-col>
           </v-row>
@@ -285,13 +284,14 @@
               <v-text-field
                 v-model="chida"
                 label="Chiffre d'affaire"
-                :filled="readonly"
                 :readonly="readonly"
                 :rules="chidaRules"
                 :hide-details="readonly"
                 :disabled="compteGeneralSelected"
                 @blur="chida = chida.toNumber().toComptaString()"
                 tabindex="13"
+                outlined
+                :suffix="chida ? journalPiece.devise.libelle : ''"
               >
               </v-text-field>
             </v-col>
@@ -299,13 +299,13 @@
               <v-text-field
                 v-model="escompte"
                 label="Escompte"
-                :filled="readonly"
                 :readonly="readonly"
                 :rules="escompteRules"
                 :hide-details="readonly"
                 :disabled="compteGeneralSelected"
                 @blur="escompte = escompte.toNumber().toComptaString()"
                 tabindex="14"
+                outlined
               >
               </v-text-field>
             </v-col>
@@ -313,13 +313,14 @@
               <v-text-field
                 v-model="montantTVA"
                 label="Montant T.V.A"
-                :filled="readonly"
                 :readonly="readonly"
                 :rules="montantTVARules"
                 :hide-details="readonly"
                 :disabled="compteGeneralSelected"
                 @blur="montantTVA = montantTVA.toNumber().toComptaString()"
                 tabindex="15"
+                outlined
+                :suffix="montantTVA ? journalPiece.devise.libelle : ''"
               >
               </v-text-field>
             </v-col>
@@ -511,7 +512,7 @@ export default class ImputationVue extends Vue {
       this.typesComptes = resp;
     });
     DeviseApi.getAllDevises().then((resp) => {
-      this.devises = resp;
+      this.devises = resp.filter((d) => d.libelle);
     });
   }
 
@@ -533,6 +534,7 @@ export default class ImputationVue extends Vue {
   public openNew(): Promise<Imputation> {
     this.imputationIsSelected = true;
     this.isAdd = true;
+    (this.$refs.form as any).resetValidation();
     this.autocompleteCompte?.resetCompte();
     this.autocompleteDossier?.resetDossier();
 
@@ -622,25 +624,25 @@ export default class ImputationVue extends Vue {
     this.$nextTick(() => (this.$refs.montant as any)?.focus());
   }
 
-  private async initDevisesAsync(deviseJournal: Devise, imputation?: Imputation) {
-    this.devises = [];
-    this.devises.push(new Devise({ id: 1, libelle: 'EUR', typeDevise: 'D' }));
-    if (deviseJournal && !this.devises.find((d) => d.id == deviseJournal.id)) this.devises.push(deviseJournal);
-    if (imputation && imputation.codeDevise != 0) {
-      if (!this.devises.find((d) => d.id == imputation.codeDevise)) {
-        this.devises.push(
-          new Devise({
-            id: imputation.codeDevise,
-            libelle: imputation.libelleDevise,
-            typeDevise: this.devisesSelected.typeDevise
-          })
-        );
-        this.devisesSelected = this.devises.find((d) => d.id == imputation.codeDevise) || this.devises[0];
-      } else this.devisesSelected = this.devises[0];
-    }
+  // private async initDevisesAsync(deviseJournal: Devise, imputation?: Imputation) {
+  //   this.devises = [];
+  //   this.devises.push(new Devise({ id: 1, libelle: 'EUR', typeDevise: 'D' }));
+  //   if (deviseJournal && !this.devises.find((d) => d.id == deviseJournal.id)) this.devises.push(deviseJournal);
+  //   if (imputation && imputation.codeDevise != 0) {
+  //     if (!this.devises.find((d) => d.id == imputation.codeDevise)) {
+  //       this.devises.push(
+  //         new Devise({
+  //           id: imputation.codeDevise,
+  //           libelle: imputation.libelleDevise,
+  //           typeDevise: this.devisesSelected.typeDevise
+  //         })
+  //       );
+  //       this.devisesSelected = this.devises.find((d) => d.id == imputation.codeDevise) || this.devises[0];
+  //     } else this.devisesSelected = this.devises[0];
+  //   }
 
-    await this.initTauxDeviseAsync(this.devisesSelected.id, this.datePiece);
-  }
+  //   await this.initTauxDeviseAsync(this.devisesSelected.id, this.datePiece);
+  // }
 
   @Watch('datePiece')
   @Watch('devisesSelected', { deep: true })

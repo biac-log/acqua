@@ -15,7 +15,10 @@ Number.prototype.toDecimalString = function(nbDecimal = 2) {
   if (!nbDecimal) nbDecimal = 2;
 
   if (!this) return '';
-  else return Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(+this);
+  else
+    return Intl.NumberFormat('fr-FR', { minimumFractionDigits: nbDecimal, maximumFractionDigits: nbDecimal }).format(
+      +this
+    );
 };
 
 Number.prototype.toIntString = function() {
@@ -28,11 +31,14 @@ Number.prototype.toComptaString = function(nbDecimal = 2) {
   if (!this) return '';
   else {
     if (+this >= 0)
-      return Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(+this));
-    else
-      return `${Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+      return Intl.NumberFormat('fr-FR', { minimumFractionDigits: nbDecimal, maximumFractionDigits: nbDecimal }).format(
         Math.abs(+this)
-      )}-`;
+      );
+    else
+      return `${Intl.NumberFormat('fr-FR', {
+        minimumFractionDigits: nbDecimal,
+        maximumFractionDigits: nbDecimal
+      }).format(Math.abs(+this))}-`;
   }
 };
 
