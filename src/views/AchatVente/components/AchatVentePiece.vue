@@ -210,7 +210,6 @@
                       outlined
                       readonly
                       tabindex="-1"
-                      hide-details
                     ></v-text-field>
                   </v-col>
                 </v-row>
