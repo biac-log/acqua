@@ -64,7 +64,7 @@
                     <v-text-field
                       v-model="libelleCompte"
                       label="Compte"
-                      :filled="readonly"
+                      outlined
                       readonly
                       tabindex="-1"
                     ></v-text-field>
@@ -73,7 +73,7 @@
                     <v-text-field
                       label="Solde initial"
                       v-model="soldeInitial"
-                      :filled="readonly"
+                      outlined
                       :readonly="soldeReadonly"
                     >
                       <template v-slot:append>
@@ -91,7 +91,7 @@
                     </v-text-field>
                   </v-col>
                   <v-col cols="3">
-                    <v-text-field label="Solde actuel" v-model="soldeActuel" :filled="readonly" readonly></v-text-field>
+                    <v-text-field label="Solde actuel" v-model="soldeActuel" outlined readonly></v-text-field>
                   </v-col>
                   <v-col cols="2">
                     <DatePicker
@@ -100,7 +100,7 @@
                       label="Date pièce"
                       :date.sync="datePiece"
                       :readonly.sync="readonly"
-                      :filled="readonly"
+                      outlined
                       :rules.sync="datePieceRules"
                     ></DatePicker>
                   </v-col>
@@ -227,14 +227,14 @@
             <small class="textMini">Solde initial : {{ soldeInitial }}</small>
           </v-card-title>
         </v-toolbar>
-        <v-card-text>
+        <v-card-text class="mt-2 pb-0">
           <DatePicker
             ref="refDatePieceDialog"
             name="datePiece"
             label="Date pièce"
             :date.sync="datePiece"
             :readonly.sync="readonly"
-            :filled="readonly"
+            outlined
             :rules.sync="datePieceRules"
             autofocus
           ></DatePicker>

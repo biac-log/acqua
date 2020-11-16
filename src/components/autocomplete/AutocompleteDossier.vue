@@ -22,6 +22,7 @@
       item-value="idDossier"
       hide-no-data
       :dense="isDense"
+      outlined
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">

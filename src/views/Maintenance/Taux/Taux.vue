@@ -61,7 +61,7 @@
                 item-text="libelle"
                 item-value="code"
                 :readonly="keyReadonly"
-                :filled="keyReadonly"
+                outlined
                 autofocus
                 :hide-details="readonly"
               ></v-select>
@@ -74,7 +74,7 @@
                 item-text="libelle"
                 item-value="code"
                 :readonly="keyReadonly"
-                :filled="keyReadonly"
+                outlined
                 :hide-details="readonly"
               ></v-select>
             </v-col>
@@ -84,7 +84,7 @@
                 label="Date"
                 :date.sync="date"
                 :readonly.sync="keyReadonly"
-                :filled="keyReadonly"
+                outlined
                 :rules.sync="dateRules"
                 :hide-details="readonly"
             /></v-col>
@@ -93,7 +93,7 @@
                 label="Com"
                 v-model="com"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
               ></v-text-field
             ></v-col>
@@ -102,7 +102,7 @@
                 label="Tar"
                 v-model="tar"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
               ></v-text-field>
             </v-col>

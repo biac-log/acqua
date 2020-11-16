@@ -14,7 +14,6 @@
         v-model="dateFormatted"
         ref="refDate"
         :label="label"
-        :filled="isFilled"
         :readonly="isReadonly"
         :rules="dateRules"
         @blur.prevent="parseDate(dateFormatted)"
@@ -22,6 +21,7 @@
         :hide-details="isReadonly"
         :disabled="isDisabled"
         :tabindex="tabindex"
+        outlined
       >
         <template v-slot:prepend-inner>
           <v-btn

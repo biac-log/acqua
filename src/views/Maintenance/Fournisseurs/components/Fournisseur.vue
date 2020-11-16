@@ -61,7 +61,7 @@
                       label="Nom"
                       ref="inputNom"
                       v-model="nom"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="23"
@@ -75,7 +75,7 @@
                     <v-text-field
                       label="Match code"
                       v-model="matchCode"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="23"
@@ -87,7 +87,7 @@
                     <v-text-field
                       :label="newRecord ? 'Numéro prédit' : 'Numéro'"
                       v-model="numero"
-                      :filled="readonly"
+                      outlined
                       readonly
                       tabindex="-1"
                       dense
@@ -98,7 +98,7 @@
                     <v-text-field
                       label="Raison sociale"
                       v-model="raisonSociale"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="11"
@@ -110,7 +110,7 @@
                     <v-text-field
                       label="E-mail"
                       v-model="email"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       dense
@@ -128,7 +128,7 @@
                     <v-text-field
                       label="Adresse"
                       v-model="adresseLigne1"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="35"
@@ -140,7 +140,7 @@
                     <v-text-field
                       label="Complément d'adresse"
                       v-model="adresseLigne2"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="35"
@@ -152,7 +152,7 @@
                     <v-text-field
                       label="Code Postal"
                       v-model="codePostal"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="8"
@@ -164,7 +164,7 @@
                     <v-text-field
                       label="Localité"
                       v-model="localité"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="30"
@@ -176,7 +176,7 @@
                     <v-text-field
                       label="Pays"
                       v-model="codePays"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="3"
@@ -192,7 +192,7 @@
                     <v-text-field
                       label="Téléphone"
                       v-model="numeroTelephone"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="14"
@@ -202,7 +202,7 @@
                     <v-text-field
                       label="Fax"
                       v-model="téléfax"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="14"
@@ -212,7 +212,7 @@
                     <v-text-field
                       label="GSM"
                       v-model="gsm"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="14"
@@ -224,7 +224,7 @@
                     <v-text-field
                       label="Contact 1"
                       v-model="contact1"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="30"
@@ -234,7 +234,7 @@
                     <v-text-field
                       label="Contact 2"
                       v-model="contact2"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="30"
@@ -244,7 +244,7 @@
                     <v-text-field
                       label="Contact 3"
                       v-model="contact3"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="30"
@@ -260,7 +260,7 @@
                     <v-text-field
                       label="Commentaire 1"
                       v-model="commentaire1"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="20"
@@ -272,7 +272,7 @@
                     <v-text-field
                       label="Commentaire 2"
                       v-model="commentaire2"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="20"
@@ -284,7 +284,7 @@
                     <v-text-field
                       label="Commentaire 3"
                       v-model="commentaire3"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :counter="!readonly"
                       maxlength="20"
@@ -341,7 +341,7 @@
                     <v-text-field
                       tabindex="-1"
                       readonly
-                      :filled="readonly"
+                      outlined
                       v-model="nomCompteAssocie"
                       :hide-details="readonly"
                       label="Nom du compte associé"
@@ -349,7 +349,7 @@
                     <v-text-field
                       tabindex="-1"
                       readonly
-                      :filled="readonly"
+                      outlined
                       v-model="nomCompteMaitre"
                       :hide-details="readonly"
                       label="Nom du compte maître"
@@ -357,7 +357,7 @@
                     <v-text-field
                       tabindex="-1"
                       readonly
-                      :filled="readonly"
+                      outlined
                       v-model="nomCompteVenteAchat"
                       :hide-details="readonly"
                       label="Nom du compte vente/achat"
@@ -367,7 +367,7 @@
                     <v-text-field
                       label="IBAN"
                       v-model="compte"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :hide-details="readonly"
                       ref="ibanField"
@@ -375,7 +375,7 @@
                     <v-select
                       label="Code suivis"
                       :readonly="readonly"
-                      :filled="readonly"
+                      outlined
                       :items="codeSuivis"
                       item-text="valeur"
                       item-value="code"
@@ -385,7 +385,7 @@
                     <v-text-field
                       label="N° domiciliation"
                       v-model="numeroDomiciliation"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       maxlength="12"
                       :counter="!readonly"
@@ -396,7 +396,7 @@
                     <v-text-field
                       label="BIC"
                       v-model="bic"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       @blur="setBic"
                       minlength="8"
@@ -407,7 +407,7 @@
                     <v-text-field
                       label="Code ventilation"
                       v-model="codeVentilation"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       maxlength="1"
                       :hide-details="readonly"
@@ -426,7 +426,7 @@
                     <v-select
                       label="Code devise"
                       :readonly="readonly"
-                      :filled="readonly"
+                      outlined
                       :items="devises"
                       item-text="libelle"
                       item-value="id"
@@ -443,7 +443,7 @@
                       item-value="code"
                       @change="checkSaisieIntra()"
                       :readonly="readonly"
-                      :filled="readonly"
+                      outlined
                       :hide-details="readonly"
                     />
                   </v-col>
@@ -451,7 +451,7 @@
                     <v-text-field
                       label="Code Pays"
                       v-model="intraCodePays"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly || intraSaisieReadonly"
                       :disabled="intraSaisieReadonly"
                       :counter="!readonly"
@@ -463,7 +463,7 @@
                     <v-text-field
                       label="N° Intracommunautaire"
                       v-model="intraIdentification"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly || intraSaisieReadonly"
                       :disabled="intraSaisieReadonly"
                       :counter="!readonly"
@@ -516,7 +516,7 @@
                       />
                     </div>
                     <v-select
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       label="Paiement"
                       v-model="codePaiement"
@@ -530,7 +530,7 @@
                   </v-col>
                   <v-col cols="4" class="pr-3">
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       readonly
                       tabindex="-1"
                       v-model="nomRepresentant"
@@ -538,7 +538,7 @@
                       label="Nom représentant"
                     />
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       readonly
                       tabindex="-1"
                       v-model="nomFamille"
@@ -546,7 +546,7 @@
                       label="Nom famille"
                     />
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       readonly
                       tabindex="-1"
                       v-model="nomSecteur"
@@ -556,7 +556,7 @@
                     <v-row dense>
                       <v-col cols="6" class="pt-0 pb-0"
                         ><v-text-field
-                          :filled="readonly"
+                          outlined
                           readonly
                           tabindex="-1"
                           v-model="libellePaiement"
@@ -564,7 +564,7 @@
                       /></v-col>
                       <v-col cols="6" class="pt-0 pb-0"
                         ><v-text-field
-                          :filled="readonly"
+                          outlined
                           label="Nombre de jours"
                           v-model="nombreDeJoursPaiement"
                           :hide-details="readonly"
@@ -580,12 +580,12 @@
                       item-value="code"
                       item-text="valeur"
                       :items="codesLangues"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :hide-details="readonly"
                     />
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       label="Escompte"
                       v-model="escompte"
                       append-icon="mdi-percent-outline"
@@ -595,7 +595,7 @@
                       validate-on-blur
                     />
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       label="Remise"
                       v-model="codeRemise"
                       :readonly="readonly"
@@ -606,7 +606,7 @@
                         label="Fermeture du"
                         :date.sync="fermetureDu"
                         :readonly.sync="readonly"
-                        :filled="readonly"
+                        outlined
                         :rules.sync="fermetureDuRules"
                         :hide-details="readonly"
                         validate-on-blur
@@ -615,14 +615,14 @@
                   </v-col>
                   <v-col cols="2">
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       label="Numéro prix"
                       v-model="codePrix"
                       :readonly="readonly"
                       :hide-details="readonly"
                     />
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       label="Jours"
                       v-model="joursEscomptes"
                       :readonly="readonly"
@@ -631,7 +631,7 @@
                       validate-on-blur
                     />
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       label="Remise Globale"
                       v-model="remiseGlobaleDefaut"
                       append-icon="mdi-percent-outline"
@@ -646,7 +646,7 @@
                         label="au"
                         :date.sync="fermetureAu"
                         :readonly.sync="readonly"
-                        :filled="readonly"
+                        outlined
                         :rules.sync="fermetureAuRules"
                         :hide-details="readonly"
                         class="pt-8"
@@ -655,7 +655,7 @@
                   </v-col>
                   <v-col cols="2">
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       label="NACE"
                       v-model="codeNace"
                       maxlength="5"
@@ -663,7 +663,7 @@
                       :hide-details="readonly"
                     />
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       label="Tarif"
                       v-model="tarif"
                       maxlength="6"
@@ -671,7 +671,7 @@
                       :hide-details="readonly"
                     />
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       label="Port Franco"
                       v-model="francoMontant"
                       append-icon="mdi-currency-eur"
@@ -681,7 +681,7 @@
                       validate-on-blur
                     />
                     <v-text-field
-                      :filled="readonly"
+                      outlined
                       label="Limite de crédit"
                       v-model="limiteCredit"
                       append-icon="mdi-currency-eur"
@@ -763,7 +763,7 @@
                     <v-select
                       label="Factures groupées"
                       v-model="facturesGroupees"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :items="facturesGroupeesItems"
                       item-value="code"
@@ -776,7 +776,7 @@
                         <v-text-field
                           label="Catégorie facturation"
                           v-model="categorieFacturation"
-                          :filled="readonly"
+                          outlined
                           :readonly="readonly"
                           v-on="on"
                           dense
@@ -796,7 +796,7 @@
                         <v-text-field
                           label="# Copies factures"
                           v-model="nombreExemplaireFacture"
-                          :filled="readonly"
+                          outlined
                           :readonly="readonly"
                           v-on="on"
                           dense
@@ -812,7 +812,7 @@
                         <v-text-field
                           label="Code formulaire"
                           v-model="formulaire"
-                          :filled="readonly"
+                          outlined
                           :readonly="readonly"
                           v-on="on"
                           dense
@@ -833,7 +833,7 @@
                     <v-select
                       label="Transporteur"
                       v-model="transporteur"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       :items="transporteurs"
                       item-text="transportFR"
@@ -844,7 +844,7 @@
                     <v-combobox
                       label="Tournées"
                       dense
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       chips
                       multiple
@@ -865,7 +865,7 @@
                         <v-text-field
                           label="Période commandes"
                           v-model="periodiciteCommande"
-                          :filled="readonly"
+                          outlined
                           :readonly="readonly"
                           :suffix="readonly ? '' : 'semaines'"
                           v-on="on"
@@ -882,7 +882,7 @@
                         <v-text-field
                           label="Délai livraison"
                           v-model="delaiLivraison"
-                          :filled="readonly"
+                          outlined
                           :readonly="readonly"
                           :suffix="readonly ? '' : 'jours'"
                           v-on="on"
@@ -899,7 +899,7 @@
                     <v-text-field
                       label="Conditions transp."
                       v-model="conditionsTransport"
-                      :filled="readonly"
+                      outlined
                       :readonly="readonly"
                       dense
                       :hide-details="readonly"
@@ -908,7 +908,7 @@
                       <template v-slot:activator="{ on }">
                         <v-text-field
                           label="Emission documents"
-                          :filled="readonly"
+                          outlined
                           :readonly="readonly"
                           v-on="on"
                           dense

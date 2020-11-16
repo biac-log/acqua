@@ -16,6 +16,7 @@
           autofocus
           ref="searchFocus"
           id="indexSearch"
+          outlined
         ></v-text-field>
       </v-card-title>
 

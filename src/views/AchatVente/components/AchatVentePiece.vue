@@ -75,7 +75,6 @@
                       label="Compte de tiers"
                       @change="numeroCompteTierChange"
                       :hide-details.sync="piecereadonly"
-                      :filled.sync="piecereadonly"
                       :readonly.sync="piecereadonly"
                       :rules.sync="numeroCompteTierRules"
                       :typeCompte.sync="typeCompte"
@@ -85,7 +84,7 @@
                     <v-text-field
                       label="Nom compte tiers"
                       :value="compteTiersNom"
-                      :filled="piecereadonly"
+                      outlined
                       :hide-details="piecereadonly"
                       tabindex="-1"
                       readonly
@@ -102,7 +101,7 @@
                       maxlength="23"
                       v-model="libelle"
                       :value="libellePiece"
-                      :filled="piecereadonly"
+                      outlined
                       :readonly="piecereadonly"
                       :hide-details="piecereadonly"
                       :color="libelleWarningMessage ? 'orange' : 'primary'"
@@ -125,7 +124,7 @@
                       v-model="montantDevise"
                       validate-on-blur
                       :rules="montantRules"
-                      :filled="piecereadonly"
+                      outlined
                       :readonly="piecereadonly"
                       :hide-details="piecereadonly"
                       @blur="montantDevise = montantDevise.toNumber().toDecimalString()"
@@ -135,7 +134,7 @@
                     <v-select
                       :items="devises"
                       v-model="deviseSelected"
-                      :filled="piecereadonly"
+                      outlined
                       :readonly="piecereadonly"
                       :hide-details="piecereadonly"
                       :loading="devisesLoading"
@@ -150,7 +149,7 @@
                       label="Montant Escompte"
                       v-model="montantEscompte"
                       :rules="montantEscompteRules"
-                      :filled="piecereadonly"
+                      outlined
                       :readonly="piecereadonly"
                       :hide-details="piecereadonly"
                       @blur="montantEscompte = montantEscompte.toNumber().toDecimalString()"
@@ -162,7 +161,7 @@
                       label="Taux devise"
                       readonly
                       v-model="taux"
-                      :filled="piecereadonly"
+                      outlined
                       :hide-details="piecereadonly"
                       tabindex="-1"
                     ></v-text-field>
@@ -175,7 +174,7 @@
                       :date.sync="datePiece"
                       :readonly.sync="piecereadonly"
                       :rules.sync="datePieceRules"
-                      :filled="piecereadonly"
+                      outlined
                     ></DatePicker>
                   </v-col>
                   <v-col cols="4">
@@ -184,7 +183,7 @@
                       :date.sync="dateEcheance"
                       :readonly.sync="piecereadonly"
                       :rules.sync="dateEcheanceRules"
-                      :filled="piecereadonly"
+                      outlined
                       ref="refDateEcheance"
                     ></DatePicker>
                   </v-col>
@@ -192,7 +191,7 @@
                     <v-select
                       v-model="statutSelected"
                       :items="statuts"
-                      :filled="piecereadonly"
+                      outlined
                       :readonly="piecereadonly"
                       :loading="statutsLoading"
                       return-object
@@ -217,7 +216,7 @@
                     <v-text-field
                       label="Montant en devise comptable"
                       v-model="libelleMontantBase"
-                      filled
+                      outlined
                       readonly
                       tabindex="-1"
                       hide-details
@@ -231,7 +230,7 @@
                     <v-text-field
                       label="Solde du compte"
                       v-model="libelleSoldeCompteTiers"
-                      filled
+                      outlined
                       readonly
                       tabindex="-1"
                       hide-details
@@ -241,7 +240,7 @@
                     <v-text-field
                       label="Délai de paiement"
                       v-model="delaiPaiementLibelle"
-                      filled
+                      outlined
                       readonly
                       tabindex="-1"
                       hide-details
@@ -251,7 +250,7 @@
                     <v-text-field
                       label="% Escompte"
                       v-model="compteTiersEscomptePourcentage"
-                      filled
+                      outlined
                       readonly
                       tabindex="-1"
                       hide-details
@@ -261,7 +260,7 @@
                     <v-text-field
                       label="Nombre jours escompte"
                       v-model="compteTiersEscompteNombreJours"
-                      filled
+                      outlined
                       readonly
                       tabindex="-1"
                       hide-details
@@ -273,7 +272,7 @@
                     <v-text-field
                       label="Compte associé"
                       v-model="libelleCompteAssocie"
-                      filled
+                      outlined
                       readonly
                       tabindex="-1"
                       hide-details
@@ -283,7 +282,7 @@
                     <v-text-field
                       label="Compte achat/vente"
                       v-model="libelleCompteVenteAchat"
-                      filled
+                      outlined
                       readonly
                       tabindex="-1"
                       hide-details

@@ -31,7 +31,7 @@
                 label="Type compte"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
@@ -57,7 +57,7 @@
               <v-text-field
                 label="Nom compte"
                 v-model="nomCompte"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :rules="nomCompteRules"
                 tabindex="-1"
@@ -72,7 +72,7 @@
                 ref="reference"
                 label="Référence"
                 v-model="reference"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :disabled="typesComptesSelected.id == 'G'"
                 :hide-details="readonly"
@@ -121,7 +121,7 @@
               <v-text-field
                 label="Nom Dossier"
                 v-model="nomDossier"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :disabled="dossierIsDisabled"
                 tabindex="-1"
@@ -136,7 +136,7 @@
                 v-model="libelle"
                 counter
                 maxlength="23"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="libelleRules"
                 :hide-details="readonly"
@@ -153,7 +153,7 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
@@ -165,7 +165,7 @@
                 label="Taux devise"
                 readonly
                 v-model="taux"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 tabindex="-1"
                 dense
@@ -176,7 +176,7 @@
                 label="Numéro case TVA"
                 ref="numeroCaseTva"
                 v-model="numeroCaseTva"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
                 :hide-details="readonly"
@@ -214,7 +214,7 @@
               <v-text-field
                 label="Libellé case TVA"
                 v-model="caseTva.libelleCase"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :disabled="typesComptesSelected.id != 'G'"
                 tabindex="-1"
@@ -233,7 +233,7 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
@@ -245,7 +245,7 @@
                 ref="montant"
                 v-model="montant"
                 label="Montant"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="montantRules"
                 :hide-details="readonly"

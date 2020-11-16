@@ -33,7 +33,7 @@
                 label="Type compte"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
@@ -57,7 +57,7 @@
               <v-text-field
                 label="Nom compte"
                 v-model="nomCompte"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 tabindex="-1"
                 readonly
@@ -70,7 +70,7 @@
                 ref="refLibelle"
                 label="Libellé"
                 v-model="libelle"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :readonly="readonly"
                 tabindex="4"
@@ -81,7 +81,7 @@
                 label="Numéro case TVA"
                 ref="numeroCaseTva"
                 v-model="numeroCaseTva"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
                 :hide-details="readonly"
@@ -120,7 +120,7 @@
               <v-text-field
                 label="Libellé case TVA"
                 v-model="caseTva.libelleCase"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :disabled="typesComptesSelected.id != 'G'"
                 tabindex="-1"
@@ -144,7 +144,7 @@
               <v-text-field
                 label="Nom Dossier"
                 v-model="nomDossier"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :disabled="dossierIsDisabled"
                 tabindex="-1"
@@ -161,7 +161,7 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
@@ -173,7 +173,7 @@
                 label="Taux devise"
                 readonly
                 v-model="taux"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 tabindex="-1"
               ></v-text-field>
@@ -186,7 +186,7 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
@@ -198,7 +198,7 @@
                 ref="refMontant"
                 v-model="montant"
                 label="Montant"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="montantRules"
                 :hide-details="readonly"
@@ -212,7 +212,7 @@
             <v-col cols="4">
               <v-select
                 :items="typesOperation"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :hide-details="readonly"
                 v-model="typesOperationSelected"
@@ -229,7 +229,7 @@
                 ref="refReference"
                 label="Référence"
                 v-model="reference"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :disabled="!referenceEnabled"
                 :hide-details="readonly"
@@ -270,7 +270,7 @@
                 label="Date échéance"
                 :date.sync="dateEcheance"
                 :readonly.sync="readonly"
-                :filled.sync="readonly"
+                outlined
                 :disabled.sync="compteGeneralSelected"
                 :rules.sync="dateEcheanceRules"
                 tabindex="12"
@@ -282,7 +282,7 @@
               <v-text-field
                 v-model="chida"
                 label="Chiffre d'affaire"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="chidaRules"
                 :hide-details="readonly"
@@ -296,7 +296,7 @@
               <v-text-field
                 v-model="escompte"
                 label="Escompte"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="escompteRules"
                 :hide-details="readonly"
@@ -310,7 +310,7 @@
               <v-text-field
                 v-model="montantTVA"
                 label="Montant T.V.A"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="montantTVARules"
                 :hide-details="readonly"

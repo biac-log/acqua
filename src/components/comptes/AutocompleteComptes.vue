@@ -12,7 +12,6 @@
       @change="numeroCompteChangeAsync"
       @keydown.ctrl.f.prevent="openSearchCompte()"
       :hide-details="hideDetails && isReadonly"
-      :filled="isReadonly"
       :readonly="isReadonly"
       :loading="compteLoading || autocompleteLoading"
       :error-messages="errorCompte"
@@ -24,6 +23,7 @@
       :dense="isDense"
       :tabIndex="_tabIndex"
       :error.sync="error"
+      outlined
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">

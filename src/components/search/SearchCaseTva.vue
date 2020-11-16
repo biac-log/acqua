@@ -16,6 +16,7 @@
           autofocus
           @keydown.down.prevent="giveFocusToRow(0)"
           autocomplete="off"
+          outlined
         ></v-text-field>
       </v-card-title>
       <AgGridVue

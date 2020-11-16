@@ -75,6 +75,7 @@
           hide-details
           @keydown.enter="loadPiecesComptables()"
           id="indexSearch"
+          outlined
         ></v-text-field>
       </v-card-title>
       <v-data-table

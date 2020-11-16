@@ -67,7 +67,7 @@
                       label="Date pièce"
                       :date.sync="datePiece"
                       :readonly.sync="readonly"
-                      :filled="readonly"
+                      outlined
                       :rules.sync="datePieceRules"
                       :hide-details="readonly"
                       tabindex="1"
@@ -77,7 +77,7 @@
                     <v-text-field
                       label="Débit"
                       :value="debit | numberToString"
-                      :filled="readonly"
+                      outlined
                       :hide-details="readonly"
                       readonly
                       tabindex="-1"
@@ -87,7 +87,7 @@
                     <v-text-field
                       label="Crédit"
                       :value="credit | numberToString"
-                      :filled="readonly"
+                      outlined
                       :hide-details="readonly"
                       readonly
                       tabindex="-1"
@@ -97,7 +97,7 @@
                     <v-text-field
                       label="A ventilé"
                       :value="solde | numberToStringEvenZero"
-                      :filled="readonly"
+                      outlined
                       :hide-details="readonly"
                       readonly
                       tabindex="-1"

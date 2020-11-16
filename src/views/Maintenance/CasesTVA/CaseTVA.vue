@@ -58,7 +58,7 @@
                 label="Numéro"
                 v-model="numero"
                 :readonly="readonly && newRecord"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 maxlength="3"
                 required
@@ -71,7 +71,7 @@
                 label="Libellé"
                 v-model="libelle"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 maxlength="5"
                 required
@@ -83,7 +83,7 @@
                 label="Type case"
                 v-model="typeCase"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :items="types"
                 :rules="rules.typeCase"
@@ -94,7 +94,7 @@
                 label="Nature"
                 v-model="natureCase"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :items="natures"
                 :rules="rules.natureCase"
@@ -106,7 +106,7 @@
                 label="Code Pays"
                 v-model="codePays"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :rules="codePaysRules"
                 validate-on-blur
@@ -117,7 +117,7 @@
                 label="Taux TVA"
                 v-model="tauxTvaCase"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 suffix="%"
               />
@@ -127,7 +127,7 @@
                 label="Taux égalisé"
                 v-model="tauxEgalisationCase"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 suffix="%"
               />
@@ -137,7 +137,7 @@
                 label="Taux déclaré"
                 v-model="tauxNature"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 suffix="%"
               />

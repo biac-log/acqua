@@ -25,6 +25,7 @@
           autofocus
           @keydown.down.prevent="giveFocusToFirstDisplayRow()"
           autocomplete="off"
+          outlined
         ></v-text-field>
       </v-card-title>
       <AgGridVue

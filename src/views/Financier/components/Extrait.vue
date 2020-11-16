@@ -44,7 +44,7 @@
                   <v-text-field
                     v-model="libelleCompte"
                     label="Compte"
-                    :filled="readonly"
+                    outlined
                     readonly
                     tabindex="-1"
                     hide-details
@@ -54,7 +54,7 @@
                   <v-text-field
                     label="Solde initial"
                     v-model="soldeInitial"
-                    :filled="readonly"
+                    outlined
                     readonly
                     tabindex="-1"
                     hide-details
@@ -64,7 +64,7 @@
                   <v-text-field
                     label="Solde actuel"
                     v-model="soldeActuel"
-                    :filled="readonly"
+                    outlined
                     readonly
                     tabindex="-1"
                     hide-details
@@ -74,7 +74,7 @@
                   <v-text-field
                     label="Date pièce"
                     v-model="datePiece"
-                    :filled="readonly"
+                    outlined
                     readonly
                     tabindex="-1"
                     prepend-inner-icon="mdi-calendar"
@@ -86,7 +86,7 @@
                     ref="montant"
                     label="Montant"
                     v-model="montant"
-                    :filled="readonly"
+                    outlined
                     :readonly="readonly"
                     :suffix="journal.devise.libelle"
                     @blur="montant = montant.toNumber().toComptaString()"
@@ -102,7 +102,7 @@
                     item-text="libelle"
                     item-value="numero"
                     return-object
-                    :filled="readonly"
+                    outlined
                     :readonly="readonly"
                     :hide-details="readonly"
                     :rules="reglementsRules"
