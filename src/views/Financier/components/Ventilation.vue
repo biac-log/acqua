@@ -22,7 +22,7 @@
           </v-card>
         </v-card-text>
         <v-card-text v-else class="pb-0">
-          <v-row>
+          <v-row dense>
             <v-col cols="3">
               <v-select
                 ref="refTypesComptes"
@@ -36,7 +36,7 @@
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 @change="resetCompte"
-                dense
+                
                 autofocus
                 @keyup="changeType"
               ></v-select>
@@ -48,7 +48,7 @@
                 :typeCompte.sync="typesComptesSelected.id"
                 :rules.sync="numeroCompteRules"
                 label="Compte"
-                dense
+                
                 @change="compteChange"
               >
               </AutocompleteComptesVue>
@@ -62,11 +62,11 @@
                 :rules="nomCompteRules"
                 tabindex="-1"
                 readonly
-                dense
+                
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row dense>
             <v-col cols="7" v-if="typesComptesSelected.id != 'G'">
               <v-text-field
                 ref="reference"
@@ -80,7 +80,7 @@
                 @change="loadPieceComptable(reference)"
                 @keydown.ctrl.f.prevent="openSearchEcheancier()"
                 validate-on-blur
-                dense
+                
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -126,7 +126,7 @@
                 :disabled="dossierIsDisabled"
                 tabindex="-1"
                 readonly
-                dense
+                
               ></v-text-field>
             </v-col>
             <v-col :cols="this.typesComptesSelected.id != 'G' || this.dossierIsEnabled ? 5 : 12">
@@ -140,11 +140,11 @@
                 :readonly="readonly"
                 :rules="libelleRules"
                 :hide-details="readonly"
-                dense
+                
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row dense>
             <v-col cols="3">
               <v-select
                 :items="devises"
@@ -157,7 +157,7 @@
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
-                dense
+                
                 :suffix="devisesSelected.libelle ? taux : ''"
               ></v-select>
             </v-col>
@@ -176,7 +176,7 @@
                 @keypress.enter="loadCaseTvaAsync"
                 @change="loadCaseTvaAsync"
                 @keydown.ctrl.f.prevent="openSearchCaseTva()"
-                dense
+                
                 :error="numeroCaseTvaError != ''"
                 :error-messages="numeroCaseTvaError"
                 :suffix="caseTva.libelleCase"
@@ -215,7 +215,7 @@
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
-                dense
+                
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -228,7 +228,7 @@
                 :rules="montantRules"
                 :hide-details="readonly"
                 @blur="montant = montant.toNumber().toComptaString()"
-                dense
+                
                 @keydown.tab.prevent="cycleFocus"
               >
                 <!-- <template v-slot:append>
@@ -240,7 +240,7 @@
             </v-col>
             <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
           </v-row>
-          <v-row dense>
+          <v-row dense >
             <v-col cols="12">
               <v-alert prominent type="warning" class="ma-0 pa-0 pl-5" v-if="warningMessage">
                 <v-row align="center">
@@ -265,7 +265,7 @@
                 tabindex="-1"
                 v-if="!isNew && !readonly"
                 @click="deleteVentilation()"
-                dense
+                
                 v-on="on"
               >
                 Supprimer
