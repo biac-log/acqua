@@ -90,13 +90,16 @@
                 outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
-                :hide-details="readonly"
+                hide-details="auto"
                 :loading="tvaLoading"
                 @keypress.enter="loadCaseTva"
                 @change="loadCaseTva"
                 @keydown.ctrl.f.prevent="OpenSearchCaseTva()"
                 @keydown.f5.prevent="OpenSearchCaseTva()"
                 tabindex="6"
+                :suffix="caseTva.libelleCase"
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500" open-on-hover>
@@ -118,19 +121,8 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="2">
-              <v-text-field
-                label="Libellé case TVA"
-                v-model="caseTva.libelleCase"
-                outlined
-                hide-details="auto"
-                tabindex="-1"
-                readonly
-                persistent-hint
-                :hint="caseTva.libelleNatureCase"
-              ></v-text-field>
-              <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
-            </v-col>
+            <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
+            <v-spacer></v-spacer>
             <v-col cols="3">
               <v-select
                 class="ml-10"

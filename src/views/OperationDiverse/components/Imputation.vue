@@ -65,7 +65,7 @@
             </v-col>
           </v-row>
           <v-row dense>
-            <v-col cols="5">
+            <v-col cols="6">
               <v-text-field
                 ref="refLibelle"
                 label="Libellé"
@@ -76,7 +76,8 @@
                 tabindex="4"
               ></v-text-field>
             </v-col>
-            <v-col cols="3">
+            <v-spacer></v-spacer>
+            <v-col cols="4">
               <v-text-field
                 label="Numéro case TVA"
                 ref="numeroCaseTva"
@@ -84,7 +85,7 @@
                 outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
-                :hide-details="readonly"
+                hide-details="auto"
                 :loading="tvaLoading"
                 :disabled="typesComptesSelected.id != 'G'"
                 validate-on-blur
@@ -95,6 +96,9 @@
                 :error="numeroCaseTvaError != ''"
                 :error-messages="numeroCaseTvaError"
                 tabindex="5"
+                :suffix="caseTva.libelleCase"
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -116,20 +120,7 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="4">
-              <v-text-field
-                label="Libellé case TVA"
-                v-model="caseTva.libelleCase"
-                outlined
-                hide-details="auto"
-                :disabled="typesComptesSelected.id != 'G'"
-                tabindex="-1"
-                readonly
-                :hint="caseTva.libelleNatureCase"
-                persistent-hint
-              ></v-text-field>
-              <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
-            </v-col>
+            <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
           </v-row>
           <v-row dense>
             <v-col cols="3" v-if="dossierIsEnabled">

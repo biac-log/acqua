@@ -158,18 +158,8 @@
                 :rules="devisesRules"
                 :hide-details="readonly"
                 dense
+                :suffix="devisesSelected.libelle ? taux : ''"
               ></v-select>
-            </v-col>
-            <v-col cols="2">
-              <v-text-field
-                label="Taux devise"
-                readonly
-                v-model="taux"
-                outlined
-                :hide-details="readonly"
-                tabindex="-1"
-                dense
-              ></v-text-field>
             </v-col>
             <v-col cols="3">
               <v-text-field
@@ -179,7 +169,7 @@
                 outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
-                :hide-details="readonly"
+                hide-details="auto"
                 :loading="tvaLoading"
                 :disabled="typesComptesSelected.id != 'G'"
                 validate-on-blur
@@ -189,6 +179,9 @@
                 dense
                 :error="numeroCaseTvaError != ''"
                 :error-messages="numeroCaseTvaError"
+                :suffix="caseTva.libelleCase"
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -210,23 +203,6 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="4">
-              <v-text-field
-                label="Libellé case TVA"
-                v-model="caseTva.libelleCase"
-                outlined
-                hide-details="auto"
-                :disabled="typesComptesSelected.id != 'G'"
-                tabindex="-1"
-                readonly
-                dense
-                :hint="caseTva.libelleNatureCase"
-                persistent-hint
-              ></v-text-field>
-              <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
-            </v-col>
-          </v-row>
-          <v-row>
             <v-col cols="3">
               <v-select
                 :items="typesMouvements"
@@ -262,6 +238,7 @@
                 </template> -->
               </v-text-field>
             </v-col>
+            <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
           </v-row>
           <v-row dense>
             <v-col cols="12">

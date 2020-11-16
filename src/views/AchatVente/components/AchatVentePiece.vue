@@ -130,7 +130,7 @@
                       @blur="montantDevise = montantDevise.toNumber().toDecimalString()"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="2">
+                  <v-col cols="4">
                     <v-select
                       :items="devises"
                       v-model="deviseSelected"
@@ -142,6 +142,7 @@
                       return-object
                       item-text="libelle"
                       label="Devise pièce"
+                      :suffix="deviseSelected.libelle ? taux : ''"
                     ></v-select>
                   </v-col>
                   <v-col cols="4">
@@ -153,16 +154,6 @@
                       :readonly="piecereadonly"
                       :hide-details="piecereadonly"
                       @blur="montantEscompte = montantEscompte.toNumber().toDecimalString()"
-                      tabindex="-1"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="2">
-                    <v-text-field
-                      label="Taux devise"
-                      readonly
-                      v-model="taux"
-                      outlined
-                      :hide-details="piecereadonly"
                       tabindex="-1"
                     ></v-text-field>
                   </v-col>
