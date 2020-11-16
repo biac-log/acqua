@@ -123,9 +123,11 @@
                 label="Libellé case TVA"
                 v-model="caseTva.libelleCase"
                 outlined
-                :hide-details="readonly"
+                hide-details="auto"
                 tabindex="-1"
                 readonly
+                persistent-hint
+                :hint="caseTva.libelleNatureCase"
               ></v-text-field>
               <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
             </v-col>

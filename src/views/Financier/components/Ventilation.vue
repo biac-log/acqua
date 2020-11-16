@@ -215,11 +215,13 @@
                 label="Libellé case TVA"
                 v-model="caseTva.libelleCase"
                 outlined
-                :hide-details="readonly"
+                hide-details="auto"
                 :disabled="typesComptesSelected.id != 'G'"
                 tabindex="-1"
                 readonly
                 dense
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               ></v-text-field>
               <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
             </v-col>
@@ -348,6 +350,7 @@ import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossier.vue';
 import { ApplicationModule } from '@/store/modules/application';
+import { CaseTvaNature } from '@/models/CaseTva/CaseTvaNature';
 
 @Component({
   components: {

@@ -121,10 +121,12 @@
                 label="Libellé case TVA"
                 v-model="caseTva.libelleCase"
                 outlined
-                :hide-details="readonly"
+                hide-details="auto"
                 :disabled="typesComptesSelected.id != 'G'"
                 tabindex="-1"
                 readonly
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               ></v-text-field>
               <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
             </v-col>

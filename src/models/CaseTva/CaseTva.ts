@@ -6,6 +6,7 @@ export interface ICaseTva {
   typeCase: number;
   libelleTypeCase: string;
   codePays: string;
+  libelleNatureCase: string;
 }
 
 export class CaseTvaDTO implements ICaseTva {
@@ -16,6 +17,7 @@ export class CaseTvaDTO implements ICaseTva {
   typeCase = 0;
   libelleTypeCase = '';
   codePays = '';
+  libelleNatureCase = '';
 }
 
 export class CaseTva extends CaseTvaDTO {
