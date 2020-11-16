@@ -2,6 +2,7 @@ import { CaseTva, CaseTvaDTO } from '@/models/CaseTva/CaseTva';
 import api from '@/api/AxiosApi';
 import { CaseTvaMaintenance, CaseTvaMaintenanceDTO } from '@/models/CaseTva/CaseTvaMaintenance';
 import { CreateCaseTva } from '@/models/CaseTva/CreateCaseTva';
+import { CaseTvaNature } from '@/models/CaseTva/CaseTvaNature';
 
 export default abstract class CaseTvaApi {
   static async getCasesTVADisponibles(journal: number | string): Promise<CaseTva[]> {
@@ -33,6 +34,12 @@ export default abstract class CaseTvaApi {
       hashOldModel
     };
     const response = await api.AcQuaCore.put<boolean>('/casetva', data);
+
+    return response.data;
+  }
+
+  static async getNatures(): Promise<CaseTvaNature[]> {
+    const response = await api.AcQuaCore.get<CaseTvaNature[]>('/casetva/natures');
 
     return response.data;
   }

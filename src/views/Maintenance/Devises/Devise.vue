@@ -57,7 +57,7 @@
                 label="Libellé"
                 v-model="libelle"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 maxlength="3"
                 ref="deviseLabel"
                 autofocus
@@ -69,7 +69,7 @@
                 item-text="label"
                 item-value="value"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
               ></v-select>
               <v-checkbox label="CEE" v-model="cee" :readonly="readonly" />
             </v-form>

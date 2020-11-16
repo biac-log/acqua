@@ -16,7 +16,7 @@
                 label="Type compte"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
@@ -32,7 +32,7 @@
                 label="N° compte"
                 @change="numeroCompteChange"
                 :hide-details="readonly"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="numeroCompteRules"
                 :tabindex="3"
@@ -44,7 +44,7 @@
               <v-text-field
                 label="Nom compte"
                 v-model="nomCompte"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :rules="nomCompteRules"
                 tabindex="-1"
@@ -58,7 +58,7 @@
                 v-model="libelle"
                 counter
                 maxlength="23"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="libelleRules"
                 :hide-details="readonly"
@@ -75,7 +75,7 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
@@ -87,16 +87,19 @@
                 label="Numéro case TVA"
                 ref="numeroCaseTva"
                 v-model="numeroCaseTva"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
-                :hide-details="readonly"
+                hide-details="auto"
                 :loading="tvaLoading"
                 @keypress.enter="loadCaseTva"
                 @change="loadCaseTva"
                 @keydown.ctrl.f.prevent="OpenSearchCaseTva()"
                 @keydown.f5.prevent="OpenSearchCaseTva()"
                 tabindex="6"
+                :suffix="caseTva.libelleCase"
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500" open-on-hover>
@@ -118,17 +121,8 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="2">
-              <v-text-field
-                label="Libellé case TVA"
-                v-model="caseTva.libelleCase"
-                :filled="readonly"
-                :hide-details="readonly"
-                tabindex="-1"
-                readonly
-              ></v-text-field>
-              <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
-            </v-col>
+            <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
+            <v-spacer></v-spacer>
             <v-col cols="3">
               <v-select
                 class="ml-10"
@@ -138,7 +132,7 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
@@ -150,7 +144,7 @@
                 ref="montantComponent"
                 v-model="montant"
                 label="Montant"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="montantRules"
                 :hide-details="readonly"
@@ -186,7 +180,7 @@
               <v-text-field
                 label="Nom Dossier"
                 v-model="nomDossier"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 tabindex="-1"
                 readonly

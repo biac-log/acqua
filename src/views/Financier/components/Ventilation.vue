@@ -1,6 +1,6 @@
 <template>
   <div
-    @keydown.alt.enter.stop="sendVentilation()"
+    @keydown.alt.enter.prevent.stop="sendVentilation()"
     @click:outside="close()"
     @keydown.esc.stop="close()"
     @keydown.107.prevent.stop=""
@@ -22,7 +22,7 @@
           </v-card>
         </v-card-text>
         <v-card-text v-else class="pb-0">
-          <v-row>
+          <v-row dense>
             <v-col cols="3">
               <v-select
                 ref="refTypesComptes"
@@ -31,12 +31,12 @@
                 label="Type compte"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 @change="resetCompte"
-                dense
+                
                 autofocus
                 @keyup="changeType"
               ></v-select>
@@ -48,7 +48,7 @@
                 :typeCompte.sync="typesComptesSelected.id"
                 :rules.sync="numeroCompteRules"
                 label="Compte"
-                dense
+                
                 @change="compteChange"
               >
               </AutocompleteComptesVue>
@@ -57,22 +57,22 @@
               <v-text-field
                 label="Nom compte"
                 v-model="nomCompte"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :rules="nomCompteRules"
                 tabindex="-1"
                 readonly
-                dense
+                
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row dense>
             <v-col cols="7" v-if="typesComptesSelected.id != 'G'">
               <v-text-field
                 ref="reference"
                 label="Référence"
                 v-model="reference"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :disabled="typesComptesSelected.id == 'G'"
                 :hide-details="readonly"
@@ -80,7 +80,7 @@
                 @change="loadPieceComptable(reference)"
                 @keydown.ctrl.f.prevent="openSearchEcheancier()"
                 validate-on-blur
-                dense
+                
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -121,12 +121,12 @@
               <v-text-field
                 label="Nom Dossier"
                 v-model="nomDossier"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :disabled="dossierIsDisabled"
                 tabindex="-1"
                 readonly
-                dense
+                
               ></v-text-field>
             </v-col>
             <v-col :cols="this.typesComptesSelected.id != 'G' || this.dossierIsEnabled ? 5 : 12">
@@ -136,15 +136,15 @@
                 v-model="libelle"
                 counter
                 maxlength="23"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="libelleRules"
                 :hide-details="readonly"
-                dense
+                
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row dense>
             <v-col cols="3">
               <v-select
                 :items="devises"
@@ -153,42 +153,35 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
-                dense
+                
+                :suffix="devisesSelected.libelle ? taux : ''"
               ></v-select>
-            </v-col>
-            <v-col cols="2">
-              <v-text-field
-                label="Taux devise"
-                readonly
-                v-model="taux"
-                :filled="readonly"
-                :hide-details="readonly"
-                tabindex="-1"
-                dense
-              ></v-text-field>
             </v-col>
             <v-col cols="3">
               <v-text-field
                 label="Numéro case TVA"
                 ref="numeroCaseTva"
                 v-model="numeroCaseTva"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
-                :hide-details="readonly"
+                hide-details="auto"
                 :loading="tvaLoading"
                 :disabled="typesComptesSelected.id != 'G'"
                 validate-on-blur
                 @keypress.enter="loadCaseTvaAsync"
                 @change="loadCaseTvaAsync"
                 @keydown.ctrl.f.prevent="openSearchCaseTva()"
-                dense
+                
                 :error="numeroCaseTvaError != ''"
                 :error-messages="numeroCaseTvaError"
+                :suffix="caseTva.libelleCase"
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -210,21 +203,6 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="4">
-              <v-text-field
-                label="Libellé case TVA"
-                v-model="caseTva.libelleCase"
-                :filled="readonly"
-                :hide-details="readonly"
-                :disabled="typesComptesSelected.id != 'G'"
-                tabindex="-1"
-                readonly
-                dense
-              ></v-text-field>
-              <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
-            </v-col>
-          </v-row>
-          <v-row>
             <v-col cols="3">
               <v-select
                 :items="typesMouvements"
@@ -233,11 +211,11 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
-                dense
+                
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -245,12 +223,12 @@
                 ref="montant"
                 v-model="montant"
                 label="Montant"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="montantRules"
                 :hide-details="readonly"
                 @blur="montant = montant.toNumber().toComptaString()"
-                dense
+                
                 @keydown.tab.prevent="cycleFocus"
               >
                 <!-- <template v-slot:append>
@@ -260,8 +238,9 @@
                 </template> -->
               </v-text-field>
             </v-col>
+            <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
           </v-row>
-          <v-row dense>
+          <v-row dense >
             <v-col cols="12">
               <v-alert prominent type="warning" class="ma-0 pa-0 pl-5" v-if="warningMessage">
                 <v-row align="center">
@@ -286,7 +265,7 @@
                 tabindex="-1"
                 v-if="!isNew && !readonly"
                 @click="deleteVentilation()"
-                dense
+                
                 v-on="on"
               >
                 Supprimer
@@ -348,6 +327,7 @@ import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossier.vue';
 import { ApplicationModule } from '@/store/modules/application';
+import { CaseTvaNature } from '@/models/CaseTva/CaseTvaNature';
 
 @Component({
   components: {
@@ -705,8 +685,13 @@ export default class VentilationVue extends Vue {
     this.reference = `${element.numeroJournal}.${element.numeroPiece}`;
     this.referenceJournal = element.numeroJournal.toString();
     this.referencePiece = element.numeroPiece.toString();
-    this.typesMouvementsSelected =
-      this.typesComptesSelected.id == 'F' ? this.typesMouvements[0] : this.typesMouvements[1];
+    if (element.montantDevise > 0) {
+      this.typesMouvementsSelected =
+        this.typesComptesSelected.id == 'F' ? this.typesMouvements[0] : this.typesMouvements[1];
+    } else {
+      this.typesMouvementsSelected =
+        this.typesComptesSelected.id == 'F' ? this.typesMouvements[1] : this.typesMouvements[0];
+    }
     this.montant = Math.abs(element.montantDevise).toComptaString(2);
     for (let index = 1; index < elements.length; index++) {
       this.createVentilationFromEcheancier(elements[index]);

@@ -63,6 +63,7 @@
           single-line
           hide-details
           id="indexSearch"
+          outlined
         ></v-text-field>
       </v-card-title>
       <v-data-table

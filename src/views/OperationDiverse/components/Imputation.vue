@@ -33,11 +33,11 @@
                 label="Type compte"
                 item-text="libelle"
                 return-object
+                outlined
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 tabindex="2"
-                outlined
               ></v-select>
             </v-col>
             <v-col cols="4">
@@ -80,7 +80,8 @@
                 outlined
               ></v-text-field>
             </v-col>
-            <v-col cols="3">
+            <v-spacer></v-spacer>
+            <v-col cols="4">
               <v-text-field
                 label="Case TVA - Nature - Taux"
                 ref="numeroCaseTva"
@@ -88,7 +89,7 @@
                 outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
-                :hide-details="readonly"
+                hide-details="auto"
                 :loading="tvaLoading"
                 :disabled="typesComptesSelected.id != 'G'"
                 validate-on-blur
@@ -100,6 +101,8 @@
                 :error-messages="numeroCaseTvaError"
                 tabindex="5"
                 :suffix="caseTva.libelleCase"
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               >
                 <template v-slot:suffixe>
                   {{ caseTva.libelleCase }}
@@ -123,8 +126,8 @@
                   </v-tooltip>
                 </template>
               </v-text-field>
-              <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
             </v-col>
+            <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
           </v-row>
           <v-row dense>
             <v-col cols="3" v-if="dossierIsEnabled">
@@ -142,11 +145,11 @@
               <v-text-field
                 label="Nom Dossier"
                 v-model="nomDossier"
+                outlined
                 :hide-details="readonly"
                 :disabled="dossierIsDisabled"
                 tabindex="-1"
                 readonly
-                outlined
               ></v-text-field>
             </v-col>
           </v-row>
@@ -174,7 +177,7 @@
                 label="Taux devise"
                 readonly
                 v-model="taux"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 tabindex="-1"
               ></v-text-field>

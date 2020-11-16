@@ -25,6 +25,7 @@
           autofocus
           @keydown.down.prevent="giveFocusToRow(0)"
           autocomplete="off"
+          outlined
         ></v-text-field>
       </v-card-title>
       <v-card-text>
@@ -38,6 +39,7 @@
               tabindex="-1"
               readonly
               dense
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="2">
@@ -49,6 +51,7 @@
               tabindex="-1"
               readonly
               dense
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="2">
@@ -60,6 +63,7 @@
               tabindex="-1"
               readonly
               dense
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="2">
@@ -71,6 +75,7 @@
               tabindex="-1"
               readonly
               dense
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="2">
@@ -82,6 +87,7 @@
               tabindex="-1"
               readonly
               dense
+              outlined
             ></v-text-field>
           </v-col>
         </v-row>

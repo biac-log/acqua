@@ -64,7 +64,7 @@
                     <v-text-field
                       v-model="libelleCompte"
                       label="Compte"
-                      :filled="readonly"
+                      outlined
                       readonly
                       tabindex="-1"
                     ></v-text-field>
@@ -73,12 +73,25 @@
                     <v-text-field
                       label="Solde initial"
                       v-model="soldeInitial"
-                      :filled="readonly"
-                      readonly
-                    ></v-text-field>
+                      outlined
+                      :readonly="soldeReadonly"
+                    >
+                      <template v-slot:append>
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{on}">
+                            <v-btn icon small @click="toggleSoldeReadonly" v-if="!readonly" v-on="on"
+                              ><v-icon>mdi-pencil</v-icon></v-btn
+                            >
+                          </template>
+                          <span>
+                            Permettre l'édition du solde initial
+                          </span>
+                        </v-tooltip>
+                      </template>
+                    </v-text-field>
                   </v-col>
                   <v-col cols="3">
-                    <v-text-field label="Solde actuel" v-model="soldeActuel" :filled="readonly" readonly></v-text-field>
+                    <v-text-field label="Solde actuel" v-model="soldeActuel" outlined readonly></v-text-field>
                   </v-col>
                   <v-col cols="2">
                     <DatePicker
@@ -87,7 +100,7 @@
                       label="Date pièce"
                       :date.sync="datePiece"
                       :readonly.sync="readonly"
-                      :filled="readonly"
+                      outlined
                       :rules.sync="datePieceRules"
                     ></DatePicker>
                   </v-col>
@@ -113,7 +126,7 @@
         </v-card-text>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
-          <v-tooltip v-if="numeroPiece" top open-delay="500">
+          <v-tooltip v-if="!newRecord" top open-delay="500">
             <template v-slot:activator="{ on }">
               <v-btn
                 color="error"
@@ -214,14 +227,14 @@
             <small class="textMini">Solde initial : {{ soldeInitial }}</small>
           </v-card-title>
         </v-toolbar>
-        <v-card-text>
+        <v-card-text class="mt-2 pb-0">
           <DatePicker
             ref="refDatePieceDialog"
             name="datePiece"
             label="Date pièce"
             :date.sync="datePiece"
             :readonly.sync="readonly"
-            :filled="readonly"
+            outlined
             :rules.sync="datePieceRules"
             autofocus
           ></DatePicker>
@@ -264,6 +277,7 @@ export default class PieceComptableVue extends Vue {
   private dialog = false;
   private oldPiece!: Piece | null;
   private readonly = false;
+  private soldeReadonly = true;
   private resolve: any;
   private reject: any;
   private isValid = true;
@@ -371,7 +385,7 @@ export default class PieceComptableVue extends Vue {
         })
         .catch()
         .finally(() => {
-          this.gridExtraits?.focus();
+          if (!this.refExtraitVue.isOpened) this.gridExtraits?.focus();
         });
     }
   }
@@ -415,6 +429,7 @@ export default class PieceComptableVue extends Vue {
     this.extraits = [];
     this.oldPiece = null;
     this.readonly = false;
+    this.soldeReadonly = true;
     this.numeroPiece = '0';
     this.hash = '';
     this.soldeInitial = '';
@@ -603,6 +618,10 @@ export default class PieceComptableVue extends Vue {
   private closeDatePieceDialog() {
     this.datePieceDialog = false;
     this.createExtrait();
+  }
+
+  private toggleSoldeReadonly() {
+    this.soldeReadonly = !this.soldeReadonly;
   }
 }
 </script>

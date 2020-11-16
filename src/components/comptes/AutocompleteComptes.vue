@@ -12,7 +12,6 @@
       @change="numeroCompteChangeAsync"
       @keydown.ctrl.f.prevent="openSearchCompte()"
       :hide-details="hideDetails && isReadonly"
-      :filled="isReadonly"
       :readonly="isReadonly"
       :loading="compteLoading || autocompleteLoading"
       :error-messages="errorCompte"

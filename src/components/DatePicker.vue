@@ -14,7 +14,6 @@
         v-model="dateFormatted"
         ref="refDate"
         :label="label"
-        :filled="isFilled"
         :readonly="isReadonly"
         :rules="dateRules"
         @blur.prevent="parseDate(dateFormatted)"

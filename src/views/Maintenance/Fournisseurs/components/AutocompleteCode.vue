@@ -18,6 +18,7 @@
       @keydown.f5.prevent="openSearch()"
       v-model="codeSelected"
       :hide-details="hideDetails"
+      outlined
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">

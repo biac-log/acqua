@@ -58,7 +58,7 @@
                 label="Numéro"
                 v-model="numero"
                 :readonly="keyReadonly"
-                :filled="keyReadonly"
+                outlined
                 :hide-details="keyReadonly"
                 maxlength="2"
               />
@@ -66,7 +66,7 @@
                 label="Libellé"
                 v-model="libelle"
                 :readonly="readonly"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 maxlength="11"
                 class="mt-4"

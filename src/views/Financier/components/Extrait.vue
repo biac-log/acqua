@@ -44,7 +44,7 @@
                   <v-text-field
                     v-model="libelleCompte"
                     label="Compte"
-                    :filled="readonly"
+                    outlined
                     readonly
                     tabindex="-1"
                     hide-details
@@ -54,7 +54,7 @@
                   <v-text-field
                     label="Solde initial"
                     v-model="soldeInitial"
-                    :filled="readonly"
+                    outlined
                     readonly
                     tabindex="-1"
                     hide-details
@@ -64,7 +64,7 @@
                   <v-text-field
                     label="Solde actuel"
                     v-model="soldeActuel"
-                    :filled="readonly"
+                    outlined
                     readonly
                     tabindex="-1"
                     hide-details
@@ -74,7 +74,7 @@
                   <v-text-field
                     label="Date pièce"
                     v-model="datePiece"
-                    :filled="readonly"
+                    outlined
                     readonly
                     tabindex="-1"
                     prepend-inner-icon="mdi-calendar"
@@ -86,7 +86,7 @@
                     ref="montant"
                     label="Montant"
                     v-model="montant"
-                    :filled="readonly"
+                    outlined
                     :readonly="readonly"
                     :suffix="journal.devise.libelle"
                     @blur="montant = montant.toNumber().toComptaString()"
@@ -102,7 +102,7 @@
                     item-text="libelle"
                     item-value="numero"
                     return-object
-                    :filled="readonly"
+                    outlined
                     :readonly="readonly"
                     :hide-details="readonly"
                     :rules="reglementsRules"
@@ -182,14 +182,14 @@
           </v-row>
         </v-card-text>
         <v-card-actions class="text-center" v-if="!readonly">
-          <v-tooltip top open-delay="500">
+          <v-tooltip top open-delay="500" v-if="numeroExtrait && !readonly">
             <template v-slot:activator="{ on }">
               <v-btn
                 color="error"
                 class="ma-2 pr-4"
                 text
                 tabindex="-1"
-                v-if="!isNew && !readonly"
+                
                 @click="deleteExtrait()"
                 v-on="on"
               >
@@ -252,6 +252,10 @@ export default class extends Vue {
   private reject!: any;
   private journal: Journal = new Journal();
   private numeroPiece = '';
+
+  public get isOpened(): boolean {
+    return this.dialog;
+  }
 
   private numeroExtrait = 0;
   private typeCompte = '';
@@ -333,6 +337,9 @@ export default class extends Vue {
       (this.$refs.form as any).resetValidation();
       this.setReglement(5);
       this.initJournal(journal);
+      this.$nextTick(() => {
+        (this.$refs.montant as HTMLElement).focus();
+      });
     });
 
     return new Promise((resolve, reject) => {

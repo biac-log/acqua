@@ -331,7 +331,7 @@ export default class OperationDiverseVue extends Vue {
   private imputations: Imputation[] = [];
   private headersImputations = [
     { text: 'Compte', value: 'libelleCompte' },
-    { text: 'Libelle écriture', value: 'libelle' },
+    { text: 'Libellé écriture', value: 'libelle' },
     { text: 'Débit', value: 'debit' },
     { text: 'Crédit', value: 'credit' },
     { text: 'Case TVA', value: 'libelleCaseTVA', align: 'end' }
