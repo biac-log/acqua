@@ -225,6 +225,7 @@
                       readonly
                       tabindex="-1"
                       hide-details
+                      :suffix="libelleSoldeCompteTiers != 0 ? 'EUR' : ''"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3">
