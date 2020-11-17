@@ -43,34 +43,37 @@
     </v-card>
     <v-card class="mt-5">
       <v-card-title>
-        Pièces comptables
-        <v-tooltip top open-delay="500">
-          <template v-slot:activator="{ on }">
-            <v-btn
-              ref="btnAdd"
-              color="warning"
-              small
-              fab
-              class="ml-5"
-              :disabled="!searchIsValid"
-              @click="createNewPieceComptable()"
-              v-on="on"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </template>
-          <span>Créer une nouvelle pièce <span class="shortcutTooltip">+</span></span>
-        </v-tooltip>
-        <v-spacer></v-spacer>
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Rechercher"
-          single-line
-          hide-details
-          id="indexSearch"
-          outlined
-        ></v-text-field>
+        <v-col cols="8">
+          Pièces comptables
+          <v-tooltip top open-delay="500">
+            <template v-slot:activator="{ on }">
+              <v-btn
+                ref="btnAdd"
+                color="warning"
+                small
+                fab
+                class="ml-5"
+                :disabled="!searchIsValid"
+                @click="createNewPieceComptable()"
+                v-on="on"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </template>
+            <span>Créer une nouvelle pièce <span class="shortcutTooltip">+</span></span>
+          </v-tooltip>
+        </v-col>
+        <v-col cols="4">
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Rechercher"
+            single-line
+            hide-details
+            id="indexSearch"
+            outlined
+          ></v-text-field>
+        </v-col>
       </v-card-title>
       <v-data-table
         id="dataTable"

@@ -61,24 +61,13 @@
               <v-col cols="12" x-lg="5" lg="12">
                 <v-row dense>
                   <v-col cols="4">
-                    <v-text-field
-                      v-model="libelleCompte"
-                      label="Compte"
-                      outlined
-                      readonly
-                      tabindex="-1"
-                    ></v-text-field>
+                    <v-text-field v-model="libelleCompte" label="Compte" outlined readonly tabindex="-1"></v-text-field>
                   </v-col>
                   <v-col cols="3">
-                    <v-text-field
-                      label="Solde initial"
-                      v-model="soldeInitial"
-                      outlined
-                      :readonly="soldeReadonly"
-                    >
+                    <v-text-field label="Solde initial" v-model="soldeInitial" outlined :readonly="soldeReadonly">
                       <template v-slot:append>
                         <v-tooltip top open-delay="500">
-                          <template v-slot:activator="{on}">
+                          <template v-slot:activator="{ on }">
                             <v-btn icon small @click="toggleSoldeReadonly" v-if="!readonly" v-on="on"
                               ><v-icon>mdi-pencil</v-icon></v-btn
                             >
@@ -222,12 +211,10 @@
     >
       <v-card>
         <v-toolbar color="primary" dark flat>
-          <v-card-title class="mt-2"
-            >Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}
-            <small class="textMini">Solde initial : {{ soldeInitial }}</small>
-          </v-card-title>
+          Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}
         </v-toolbar>
-        <v-card-text class="mt-2 pb-0">
+        <v-card-text class="pa-5 pb-0">
+          <v-text-field label="Solde initial" v-model="soldeInitial" outlined readonly></v-text-field>
           <DatePicker
             ref="refDatePieceDialog"
             name="datePiece"

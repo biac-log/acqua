@@ -66,7 +66,7 @@
             </v-col>
           </v-row>
           <v-row dense>
-            <v-col cols="9">
+            <v-col cols="8">
               <v-text-field
                 ref="refLibelle"
                 label="Libellé"
@@ -80,7 +80,6 @@
                 outlined
               ></v-text-field>
             </v-col>
-            <v-spacer></v-spacer>
             <v-col cols="4">
               <v-text-field
                 label="Case TVA - Nature - Taux"
@@ -763,7 +762,7 @@ export default class ImputationVue extends Vue {
         this.numeroCaseTva = caseTva.numeroCase.toString();
         this.caseTva = caseTva;
         this.numeroCaseTvaError = '';
-        this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
+        this.$nextTick(() => this.refMontant.focus());
       })
       .catch(() => {
         this.$nextTick(() => (this.$refs.numeroCaseTva as any)?.focus());

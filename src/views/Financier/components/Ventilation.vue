@@ -36,7 +36,6 @@
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 @change="resetCompte"
-                
                 autofocus
                 @keyup="changeType"
               ></v-select>
@@ -48,7 +47,7 @@
                 :typeCompte.sync="typesComptesSelected.id"
                 :rules.sync="numeroCompteRules"
                 label="Compte"
-                
+                outlined
                 @change="compteChange"
               >
               </AutocompleteComptesVue>
@@ -62,7 +61,6 @@
                 :rules="nomCompteRules"
                 tabindex="-1"
                 readonly
-                
               ></v-text-field>
             </v-col>
           </v-row>
@@ -80,7 +78,6 @@
                 @change="loadPieceComptable(reference)"
                 @keydown.ctrl.f.prevent="openSearchEcheancier()"
                 validate-on-blur
-                
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -126,7 +123,6 @@
                 :disabled="dossierIsDisabled"
                 tabindex="-1"
                 readonly
-                
               ></v-text-field>
             </v-col>
             <v-col :cols="this.typesComptesSelected.id != 'G' || this.dossierIsEnabled ? 5 : 12">
@@ -140,7 +136,6 @@
                 :readonly="readonly"
                 :rules="libelleRules"
                 :hide-details="readonly"
-                
               ></v-text-field>
             </v-col>
           </v-row>
@@ -157,7 +152,6 @@
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
-                
                 :suffix="devisesSelected.libelle ? taux : ''"
               ></v-select>
             </v-col>
@@ -176,7 +170,6 @@
                 @keypress.enter="loadCaseTvaAsync"
                 @change="loadCaseTvaAsync"
                 @keydown.ctrl.f.prevent="openSearchCaseTva()"
-                
                 :error="numeroCaseTvaError != ''"
                 :error-messages="numeroCaseTvaError"
                 :suffix="caseTva.libelleCase"
@@ -215,7 +208,6 @@
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
-                
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -228,7 +220,6 @@
                 :rules="montantRules"
                 :hide-details="readonly"
                 @blur="montant = montant.toNumber().toComptaString()"
-                
                 @keydown.tab.prevent="cycleFocus"
               >
                 <!-- <template v-slot:append>
@@ -240,7 +231,7 @@
             </v-col>
             <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
           </v-row>
-          <v-row dense >
+          <v-row dense>
             <v-col cols="12">
               <v-alert prominent type="warning" class="ma-0 pa-0 pl-5" v-if="warningMessage">
                 <v-row align="center">
@@ -265,7 +256,6 @@
                 tabindex="-1"
                 v-if="!isNew && !readonly"
                 @click="deleteVentilation()"
-                
                 v-on="on"
               >
                 Supprimer
@@ -549,6 +539,8 @@ export default class VentilationVue extends Vue {
       this.dossierIsDisabled = true;
       this.natureCompte = '';
       this.dossierComponent?.resetDossier();
+      this.caseTva = new CaseTva();
+      this.numeroCaseTva = '';
       //this.compteComponent.blur();
       this.$nextTick(() => (this.$refs.reference as any)?.focus());
     }

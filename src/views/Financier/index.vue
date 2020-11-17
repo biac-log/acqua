@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid @keydown.107.prevent="createNewPieceComptable" >
+  <v-container fluid @keydown.107.prevent="createNewPieceComptable">
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
@@ -43,28 +43,31 @@
     </v-card>
     <v-card class="mt-5">
       <v-card-title>
-        Pièces comptables
-        <v-btn
-          ref="btnAdd"
-          color="warning"
-          small
-          fab
-          class="ml-5"
-          :disabled="!searchIsValid"
-          @click.stop="createNewPieceComptable"
-        >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Rechercher"
-          single-line
-          hide-details
-          id="indexSearch"
-          outlined
-        ></v-text-field>
+        <v-col cols="8">
+          Pièces comptables
+          <v-btn
+            ref="btnAdd"
+            color="warning"
+            small
+            fab
+            class="ml-5"
+            :disabled="!searchIsValid"
+            @click.stop="createNewPieceComptable"
+          >
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col cols="4">
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Rechercher"
+            single-line
+            hide-details
+            id="indexSearch"
+            outlined
+          ></v-text-field>
+        </v-col>
       </v-card-title>
       <v-data-table
         id="dataTable"
@@ -227,7 +230,7 @@ export default class extends Vue {
     this.refDialogPiece
       .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
-        if(!this.skipAddResult) this.displayAddResult(resp);
+        if (!this.skipAddResult) this.displayAddResult(resp);
         this.journalSelected.numeroDernierePiece = parseInt(resp);
         this.loadPiecesComptables();
       })

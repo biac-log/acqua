@@ -1,6 +1,11 @@
 <template>
   <!-- <v-dialog v-model="dialog" width="800" @click:outside="close()" @keydown.esc="close()" @keydown.alt.enter="sendContrepartie()"> -->
-  <div class="ma-0 pa-0 editContainer" @keydown.esc.stop="close()" @keydown.alt.enter.stop="sendContrepartie()">
+  <div
+    class="ma-0 pa-0 editContainer"
+    @keydown.f2.stop="generateTVA"
+    @keydown.esc.stop="close()"
+    @keydown.alt.enter.stop="sendContrepartie()"
+  >
     <div :class="dialog ? 'overlay' : ''" @click="close()" />
     <!-- <transition name="fade" leave-absolute> -->
     <v-form v-if="dialog" ref="form" v-model="isValid" lazy-validation autocomplete="off">
@@ -14,6 +19,7 @@
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
+                soldeToTva
                 item-text="libelle"
                 return-object
                 outlined
@@ -82,7 +88,7 @@
                 tabindex="-1"
               ></v-select>
             </v-col>
-            <v-col cols="2">
+            <v-col cols="3">
               <v-text-field
                 label="Numéro case TVA"
                 ref="numeroCaseTva"
@@ -213,7 +219,12 @@
             Supprimer</v-btn
           >
           <v-spacer></v-spacer>
-          <v-btn @click="generateTVA" class="ma-2 pr-4" tile outlined color="warning">Solde = TVA</v-btn>
+          <v-tooltip top open-delay="500" open-on-hover>
+            <template v-slot:activator="{ on }">
+              <v-btn @click="generateTVA" class="ma-2 pr-4" tile outlined v-on="on" color="warning">Solde = TVA</v-btn>
+            </template>
+            <span>Attribue le reste à ventiler au montant<span class="shortcutTooltip">F2</span></span>
+          </v-tooltip>
           <v-btn color="blue darken-1" class="ma-2 pr-4" tile outlined @click="close()" tabindex="-1">
             <v-icon left>mdi-close</v-icon> Fermer</v-btn
           >
@@ -405,8 +416,11 @@ export default class extends Vue {
       this.typesComptes.find((tc) => tc.id == contrepartie.typeCompte) || this.typesComptes[0];
     this.devisesSelected = this.devises.find((d) => d.id == contrepartie.codeDevise) || deviseEntete;
 
+    this.numeroCompte = contrepartie.numeroCompte != 0 ? contrepartie.numeroCompte.toString() : '';
+    this.nomCompte = contrepartie.compteLibelle;
+
     if (contrepartie) {
-      this.refNumeroCompte.init(contrepartie.numeroCompte.toString(), contrepartie.compteLibelle);
+      this.refNumeroCompte.init(this.numeroCompte, contrepartie.compteLibelle);
 
       if (contrepartie.dossier) {
         this.dossierComponent.setDossier(
@@ -420,9 +434,6 @@ export default class extends Vue {
         this.idDossier = contrepartie.dossier;
       }
     }
-
-    this.numeroCompte = contrepartie.numeroCompte ? contrepartie.numeroCompte.toString() : '';
-    this.nomCompte = contrepartie.compteLibelle;
     this.libelle = contrepartie.libelle ? contrepartie.libelle : propositionLibelle;
     this.typesMouvementsSelected =
       this.typesMouvements.find((d) => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
@@ -664,7 +675,7 @@ export default class extends Vue {
   private changeType(event: KeyboardEvent) {
     console.log(event.key);
     if (['c', 'f', 'g', 'z'].includes(event.key)) {
-      if('z' == event.key) this.typesComptesSelected = new TypeCompte({id: 'Z', libelle: 'Extra-comptable'});
+      if ('z' == event.key) this.typesComptesSelected = new TypeCompte({ id: 'Z', libelle: 'Extra-comptable' });
       this.$nextTick(() => (this.$refs.typesComptes as any).blur());
       this.$nextTick(() => this.refNumeroCompte.focus());
     }
