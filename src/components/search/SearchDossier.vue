@@ -29,7 +29,7 @@
         ></v-text-field>
       </v-card-title>
       <AgGridVue
-        style="height: 561px;"
+        style="height: 730px;"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersDossier"
