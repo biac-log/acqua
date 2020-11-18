@@ -509,6 +509,10 @@ export default class VentilationVue extends Vue {
   //#endregion
   private resetCompte() {
     this.compteComponent?.resetCompte();
+    if(this.typesComptesSelected.id != 'g') {
+      this.caseTva.refresh();
+      this.numeroCaseTva = '';
+    }
   }
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {

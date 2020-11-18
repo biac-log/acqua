@@ -464,6 +464,10 @@ export default class extends Vue {
 
   private resetCompte() {
     this.refNumeroCompte?.resetCompte();
+    if(this.typesComptesSelected.id != 'g') {
+      this.caseTva.refresh();
+      this.numeroCaseTva = '';
+    }
   }
 
   private numeroCompteChange(value: string | CompteGeneralSearch) {
