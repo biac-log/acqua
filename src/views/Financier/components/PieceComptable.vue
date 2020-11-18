@@ -54,6 +54,12 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
+        <v-progress-linear
+            :active="pieceIsLoading"
+            :indeterminate="pieceIsLoading"
+            top
+            color="primary accent-4"
+          ></v-progress-linear>
         <v-card-text class="pb-0 pt-0">
           <v-col cols="12" class="pr-5">
             <v-row fill-height no-gutters>

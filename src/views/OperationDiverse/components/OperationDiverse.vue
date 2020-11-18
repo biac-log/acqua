@@ -12,7 +12,7 @@
     @keydown.alt.enter.stop="savePiece()"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
-      <v-card>
+      <v-card :loading="pieceIsLoading">
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
             <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
@@ -54,6 +54,12 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
+        <v-progress-linear
+            :active="pieceIsLoading"
+            :indeterminate="pieceIsLoading"
+            top
+            color="primary accent-4"
+          ></v-progress-linear>
         <v-card-text class="pb-0 pt-0">
           <v-row>
             <v-col cols="6" class="pr-5">
