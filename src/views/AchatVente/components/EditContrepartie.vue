@@ -218,6 +218,7 @@
                 @click="sendContrepartie"
                 v-on="on"
                 tabindex="9"
+                id="validateContrepartie"
               >
                 <v-icon left>mdi-check</v-icon> Valider
               </v-btn>
@@ -258,8 +259,8 @@ import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue
     SearchCompteContrepartieVue,
     SearchCaseTvaVue,
     AutoCompleteDossierVue,
-    AutocompleteComptesVue
-  }
+    AutocompleteComptesVue,
+  },
 })
 export default class extends Vue {
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
@@ -307,7 +308,7 @@ export default class extends Vue {
   private numeroCaseTva = '';
   private numeroCaseTvaRules: any = [
     (v: string) => !!v || 'Case tva obligatoire',
-    (v: string) => (v.isInt() && v.toNumber() != 0) || 'Numero invalide'
+    (v: string) => (v.isInt() && v.toNumber() != 0) || 'Numero invalide',
   ];
   private caseTva: CaseTva = new CaseTva();
 
@@ -370,6 +371,12 @@ export default class extends Vue {
         tvaImpute,
         propositionLibelle
       );
+      this.$nextTick(() => {
+        const element = document.getElementById('validateContrepartie');
+        if (element != null) {
+          element.scrollIntoView();
+        }
+      });
     });
 
     return new Promise((resolve, reject) => {
@@ -403,7 +410,7 @@ export default class extends Vue {
             idDossier: contrepartie.dossier,
             nom: contrepartie.dossierNom,
             dateEntree: '',
-            dateSortie: ''
+            dateSortie: '',
           })
         );
         this.idDossier = contrepartie.dossier;
@@ -444,7 +451,7 @@ export default class extends Vue {
           new Devise({
             id: contrepartie.codeDevise,
             libelle: contrepartie.libelleDevise,
-            typeDevise: this.devisesSelected.typeDevise
+            typeDevise: this.devisesSelected.typeDevise,
           })
         );
       }
@@ -453,7 +460,7 @@ export default class extends Vue {
 
   private resetCompte() {
     this.refNumeroCompte?.resetCompte();
-    if(this.typesComptesSelected.id != 'g') {
+    if (this.typesComptesSelected.id != 'g') {
       this.caseTva.refresh();
       this.numeroCaseTva = '';
     }
@@ -655,9 +662,8 @@ export default class extends Vue {
   }
 
   private changeType(event: KeyboardEvent) {
-    console.log(event.key);
     if (['c', 'f', 'g', 'z'].includes(event.key)) {
-      if('z' == event.key) this.typesComptesSelected = new TypeCompte({id: 'Z', libelle: 'Extra-comptable'});
+      if ('z' == event.key) this.typesComptesSelected = new TypeCompte({ id: 'Z', libelle: 'Extra-comptable' });
       this.$nextTick(() => (this.$refs.typesComptes as any).blur());
       this.$nextTick(() => this.refNumeroCompte.focus());
     }

@@ -20,8 +20,8 @@
               <p class="mb-0" v-if="!numeroPiece">
                 Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}
               </p>
-              <p class="ml-10 mb-0 textMini">Période {{ periodeDisplay }}</p>
-              <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
+              <p class="ml-10 mb-0 textMini d-sm-none d-lg-flex">Période {{ periodeDisplay }}</p>
+              <p class="ml-5 mb-0 textMini d-sm-none d-lg-flex">Journal {{ journal.fullLibelle }}</p>
             </v-card-title>
             <v-spacer></v-spacer>
             <v-tooltip v-if="piecereadonly" top open-delay="500">
@@ -67,7 +67,7 @@
           ></v-progress-linear>
           <v-card-text style="height: 750px;">
             <v-row>
-              <v-col cols="5">
+              <v-col cols="5" sm="12">
                 <v-row dense>
                   <v-col cols="6">
                     <autocomplete-comptes-vue
@@ -200,6 +200,24 @@
                       tabindex="-1"
                     ></v-text-field>
                   </v-col>
+                  <v-col cols="4" class="d-lg-none d-xl-none">
+                    <v-text-field
+                      label="Période"
+                      v-model="periodeDisplay"
+                      outlined
+                      readonly
+                      tabindex="-1"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="4" class="d-lg-none d-xl-none">
+                    <v-text-field
+                      label="Journal"
+                      v-model="journal.fullLibelle"
+                      outlined
+                      readonly
+                      tabindex="-1"
+                    ></v-text-field>
+                  </v-col>
                 </v-row>
                 <v-divider></v-divider>
                 <v-card-title>Informations compte tiers</v-card-title>
@@ -269,7 +287,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="7">
+              <v-col cols="12">
                 <GridContreparties
                   ref="gridContreparties"
                   :Contreparties.sync="contreparties"

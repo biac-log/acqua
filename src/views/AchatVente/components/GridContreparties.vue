@@ -67,7 +67,7 @@ import AchatVenteApi from '@/api/AchatVenteApi';
 
 @Component({
   name: 'GridContreparties',
-  components: { EditContrepartieVue }
+  components: { EditContrepartieVue },
 })
 export default class extends Vue {
   @PropSync('IsReadOnly') public readonly!: boolean;
@@ -94,7 +94,7 @@ export default class extends Vue {
     { text: 'Débit', value: 'montantDebit', align: 'end' },
     { text: 'Crédit', value: 'montantCredit', align: 'end' },
     { text: 'Devise', value: 'libelleDevise' },
-    { text: 'Case TVA', value: 'libelleCaseTva' }
+    { text: 'Case TVA', value: 'libelleCaseTva' },
   ];
 
   private addContrepartie(contrepartie?: PieceComptableContrepartie) {
@@ -113,7 +113,7 @@ export default class extends Vue {
         this.propositionLibelle = resp.libelle;
         const maxLigne = Math.max(...this.contreparties.map((i) => i.numeroLigne));
         resp.numeroLigne = maxLigne + 1;
-        this.contreparties.push(resp);
+        this.contreparties.push(resp);        
         this.$nextTick(() => {
           if (this.ventilleBase != 0 || this.ventilleDevise != 0) this.createContrepartie();
         });
@@ -156,16 +156,17 @@ export default class extends Vue {
     if (!this.numeroCompteAchatVente && this.contreparties.length == 0) {
       this.propositionLibelle = this.nomCompteDeTier;
       this.addContrepartie();
-    } else if (this.contreparties.length == 0) { // Première contrepartie
+    } else if (this.contreparties.length == 0) {
+      // Première contrepartie
       const compteAchatVente = await CompteApi.getCompteGeneral('G', this.numeroCompteAchatVente);
       const contrepartie = new PieceComptableContrepartie();
       contrepartie.numeroCompte = compteAchatVente.numero;
       contrepartie.compteLibelle = compteAchatVente.nom;
       contrepartie.libelle = this.nomCompteDeTier;
       console.log(this.journal.codeMouvement);
-      if(this.montantBase.toNumber() >= 0){
+      if (this.montantBase.toNumber() >= 0) {
         contrepartie.codeMouvement = this.journal.codeMouvement == 'DB' ? 'CR' : 'DB';
-      }else{
+      } else {
         contrepartie.codeMouvement = this.journal.codeMouvement == 'CR' ? 'CR' : 'DB';
       }
       if (compteAchatVente.numeroCase) {
@@ -177,7 +178,8 @@ export default class extends Vue {
         }
       }
       this.addContrepartie(contrepartie);
-    } else if (this.ventilleDevise == 0 && this.ventilleBase != 0) { // Si le ventileBase n'est pas à 0, généralement à cause du taux de conversion
+    } else if (this.ventilleDevise == 0 && this.ventilleBase != 0) {
+      // Si le ventileBase n'est pas à 0, généralement à cause du taux de conversion
       const contrepartie = new PieceComptableContrepartie();
       contrepartie.libelle = this.nomCompteDeTier;
       contrepartie.codeMouvement = this.journal.codeMouvement == 'DB' ? 'DB' : 'CR';
@@ -216,9 +218,9 @@ export default class extends Vue {
     contrepartie.numeroCompte = compteTva.numero;
     contrepartie.compteLibelle = compteTva.nom;
     contrepartie.libelle = this.nomCompteDeTier;
-    if(this.montantBase.toNumber() >= 0){
+    if (this.montantBase.toNumber() >= 0) {
       contrepartie.codeMouvement = this.journal.codeMouvement == 'DB' ? 'CR' : 'DB';
-    }else{
+    } else {
       contrepartie.codeMouvement = this.journal.codeMouvement == 'CR' ? 'CR' : 'DB';
     }
     contrepartie.montantDevise = Math.abs(tvaCalcule - tvaImpute);
@@ -276,7 +278,7 @@ export default class extends Vue {
           montantsCaseTva.push({
             case: element.caseTva.numeroCase,
             caseTaux: element.caseTva.tauxTvaCase,
-            montant: element.montantCredit.toNumber() - element.montantDebit.toNumber()
+            montant: element.montantCredit.toNumber() - element.montantDebit.toNumber(),
           });
         }
       });
