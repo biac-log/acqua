@@ -3,7 +3,7 @@
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
-          <v-col cols="12" xs="12" md="4" lg="2">
+          <v-col cols="12" xs="12" sm="6" lg="2">
             <v-select
               autofocus
               label="Sélection de la période"
@@ -20,7 +20,7 @@
               @change="loadPiecesComptables"
             ></v-select>
           </v-col>
-          <v-col cols="12" xs="12" md="6" lg="3">
+          <v-col cols="12" xs="12" sm="6" lg="3">
             <v-select
               v-model="journalSelected"
               :items="journaux"

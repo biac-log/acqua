@@ -38,7 +38,7 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="7">
+            <v-col lg="7" md="12">
               <v-row dense>
                 <v-col cols="4">
                   <v-text-field v-model="libelleCompte" label="Compte" outlined readonly tabindex="-1" hide-details />
@@ -156,14 +156,14 @@
                       @click:row="editVentilation"
                       disable-sort
                       dense
-                      height="400"
+                      :height="dataTableHeight"
                     >
                     </v-data-table>
                   </v-card>
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="5">
+            <v-col lg="5" md="12">
               <VentilationVue
                 ref="refVentilationVue"
                 :Ventilations.sync="ventilations"
@@ -242,6 +242,10 @@ export default class extends Vue {
 
   public get isOpened(): boolean {
     return this.dialog;
+  }
+
+  public get dataTableHeight(): number {
+    return this.$vuetify.breakpoint.name == 'sm' || this.$vuetify.breakpoint.name == 'md' ? 200 : 400;
   }
 
   private numeroExtrait = 0;

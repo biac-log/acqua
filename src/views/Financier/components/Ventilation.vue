@@ -281,6 +281,7 @@
                 @click="sendVentilation"
                 @keydown.tab.prevent="focusFirstElement"
                 v-on="on"
+                id="validateVentilation"
               >
                 <v-icon left>mdi-check</v-icon> Valider
               </v-btn>
@@ -437,6 +438,12 @@ export default class VentilationVue extends Vue {
       (this.$refs.form as any)?.resetValidation();
       this.init(ventilation, journal);
       // this.compteComponent?.focus();
+      this.$nextTick(() => {
+        const element = document.getElementById('validateVentilation');
+        if (element != null) {
+          element.scrollIntoView();
+        }
+      });
     });
 
     return new Promise((resolve, reject) => {

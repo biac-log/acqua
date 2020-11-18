@@ -75,7 +75,7 @@
                       tabindex="-1"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="3">
+                  <v-col lg="3" sm="2">
                     <v-text-field
                       label="Solde initial"
                       v-model="soldeInitial"
@@ -96,10 +96,10 @@
                       </template>
                     </v-text-field>
                   </v-col>
-                  <v-col cols="3">
+                  <v-col lg="3" sm="3">
                     <v-text-field label="Solde actuel" v-model="soldeActuel" outlined readonly></v-text-field>
                   </v-col>
-                  <v-col cols="2">
+                  <v-col lg="2" sm="3">
                     <DatePicker
                       ref="refDatePiece"
                       name="datePiece"
