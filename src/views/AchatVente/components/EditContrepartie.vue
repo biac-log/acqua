@@ -26,7 +26,7 @@
                 @keyup="changeType"
               ></v-select>
             </v-col>
-            <v-col cols="3">
+            <v-col cols="5">
               <autocomplete-comptes-vue
                 ref="refNumeroCompte"
                 label="N° compte"
@@ -40,17 +40,6 @@
               />
             </v-col>
             <SearchCompteContrepartieVue ref="compteDialog"></SearchCompteContrepartieVue>
-            <v-col cols="3">
-              <v-text-field
-                label="Nom compte"
-                v-model="nomCompte"
-                outlined
-                :hide-details="readonly"
-                :rules="nomCompteRules"
-                tabindex="-1"
-                readonly
-              ></v-text-field>
-            </v-col>
             <v-col>
               <v-text-field
                 ref="libelle"

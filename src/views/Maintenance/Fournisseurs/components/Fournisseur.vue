@@ -301,7 +301,7 @@
               <fieldset id="comptabilite">
                 <legend>Comptabilité</legend>
                 <v-row dense>
-                  <v-col cols="3" class="pb-0">
+                  <v-col cols="6" class="pb-0">
                     <div :class="readonly ? '' : 'autocomplete-edition'">
                       <!-- Not the best, but it corrects the alignments .. -->
                       <autocomplete-comptes-vue
@@ -337,7 +337,7 @@
                       />
                     </div>
                   </v-col>
-                  <v-col cols="3" class="pb-0 pr-3">
+                  <!-- <v-col cols="3" class="pb-0 pr-3">
                     <v-text-field
                       tabindex="-1"
                       readonly
@@ -362,7 +362,7 @@
                       :hide-details="readonly"
                       label="Nom du compte vente/achat"
                     />
-                  </v-col>
+                  </v-col> -->
                   <v-col cols="3" class="pb-0 pl-3">
                     <v-text-field
                       label="IBAN"
@@ -1395,9 +1395,9 @@ export default class FournisseurVue extends Vue {
 
     this.getLoading = false;
 
-    this.autocompleteCompteAssocie.init(this.compteAssocie.toString(), '');
-    this.autocompleteCompteMaitre.init(this.compteMaitre.toString(), '');
-    this.autocompleteCompteVenteAchat.init(this.compteVenteAchat.toString(), '');
+    this.autocompleteCompteAssocie.init(this.compteAssocie.toString(), this.nomCompteAssocie);
+    this.autocompleteCompteMaitre.init(this.compteMaitre.toString(), this.nomCompteMaitre);
+    this.autocompleteCompteVenteAchat.init(this.compteVenteAchat.toString(), this.nomCompteVenteAchat);
     this.autocompleteCodeRepresentant.init(fournisseurDTO.codeRepresentant.toString());
     this.autocompleteCodeFamille.init(fournisseurDTO.codeFamille.toString());
     this.autocompleteCodeSecteur.init(fournisseurDTO.codeSecteur.toString());

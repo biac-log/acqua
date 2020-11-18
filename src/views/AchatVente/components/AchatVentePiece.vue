@@ -69,7 +69,7 @@
             <v-row>
               <v-col cols="5">
                 <v-row dense>
-                  <v-col cols="4">
+                  <v-col cols="6">
                     <autocomplete-comptes-vue
                       ref="autocompleteCompteTier"
                       label="Compte de tiers"
@@ -80,19 +80,7 @@
                       :typeCompte.sync="typeCompte"
                     />
                   </v-col>
-                  <v-col cols="8">
-                    <v-text-field
-                      label="Nom compte tiers"
-                      :value="compteTiersNom"
-                      outlined
-                      :hide-details="piecereadonly"
-                      tabindex="-1"
-                      readonly
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-                <v-row dense>
-                  <v-col cols="12">
+                  <v-col cols="6">
                     <v-text-field
                       label="Libelle"
                       ref="libellePiece"
@@ -533,6 +521,7 @@ export default class extends Vue {
     journal: Journal,
     entete?: EntetePieceComptable
   ): Promise<{ action: DialogActionResult; data: EntetePieceComptable }> {
+
     this.dialog = true;
     if (entete) {
       this.piecereadonly = true;
@@ -619,7 +608,7 @@ export default class extends Vue {
     try {
       const pieceComptable = await AchatVenteApi.getPieceComptable(this.journal.numero, this.numeroPiece);
       this.setPiece(pieceComptable);
-      this.autocompleteCompteTier.init(pieceComptable.compteTiersNumero.toString(), '');
+      this.autocompleteCompteTier.init(pieceComptable.compteTiersNumero.toString(), this.compteTiersNom);
     } catch (err) {
       this.errorMessage = displayAxiosError(err);
     } finally {

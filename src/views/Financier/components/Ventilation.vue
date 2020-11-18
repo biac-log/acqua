@@ -23,8 +23,7 @@
         </v-card-text>
         <v-card-text v-else class="pb-0">
           <v-row dense>
-            <v-col cols="3">
-              <v-select
+            <v-col cols="4">              <v-select
                 ref="refTypesComptes"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
@@ -41,7 +40,7 @@
                 @keyup="changeType"
               ></v-select>
             </v-col>
-            <v-col cols="4">
+            <v-col cols="5">
               <AutocompleteComptesVue
                 ref="compteComponent"
                 :readonly.sync="readonly"
@@ -52,18 +51,6 @@
                 @change="compteChange"
               >
               </AutocompleteComptesVue>
-            </v-col>
-            <v-col cols="5">
-              <v-text-field
-                label="Nom compte"
-                v-model="nomCompte"
-                outlined
-                :hide-details="readonly"
-                :rules="nomCompteRules"
-                tabindex="-1"
-                readonly
-                
-              ></v-text-field>
             </v-col>
           </v-row>
           <v-row dense>

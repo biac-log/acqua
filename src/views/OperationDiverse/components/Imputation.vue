@@ -40,7 +40,7 @@
                 tabindex="2"
               ></v-select>
             </v-col>
-            <v-col cols="4">
+            <v-col cols="6">
               <AutocompleteComptesVue
                 ref="autocompleteCompte"
                 :Readonly.sync="readonly"
@@ -52,16 +52,6 @@
                 tabindex="3"
               >
               </AutocompleteComptesVue>
-            </v-col>
-            <v-col cols="5">
-              <v-text-field
-                label="Nom compte"
-                v-model="nomCompte"
-                outlined
-                :hide-details="readonly"
-                tabindex="-1"
-                readonly
-              ></v-text-field>
             </v-col>
           </v-row>
           <v-row dense>
