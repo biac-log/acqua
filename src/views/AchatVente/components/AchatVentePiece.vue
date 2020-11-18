@@ -67,7 +67,7 @@
           ></v-progress-linear>
           <v-card-text style="height: 750px;">
             <v-row>
-              <v-col cols="5" sm="12">
+              <v-col lg="5" sm="12">
                 <v-row dense>
                   <v-col cols="6">
                     <autocomplete-comptes-vue
@@ -287,7 +287,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="12">
+              <v-col lg="7" sm="12"> 
                 <GridContreparties
                   ref="gridContreparties"
                   :Contreparties.sync="contreparties"
