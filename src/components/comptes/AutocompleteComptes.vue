@@ -24,6 +24,7 @@
       :tabIndex="_tabIndex"
       :error.sync="error"
       outlined
+      :suffix="nomCompte"
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">
@@ -80,6 +81,7 @@ export default class AutocompleteComptes extends Vue {
   private comptesSearch: { numero: string | number; nom: string }[] = [];
   private searchCompte = '';
   private numeroCompteSelected: { numero: string | number; nom: string } | null = null;
+  private nomCompte = '';
   private errorCompte = '';
   private error = false;
   private castNumero(item: { numero: number }) {
@@ -228,6 +230,7 @@ export default class AutocompleteComptes extends Vue {
       this.comptesSearch = [];
       this.comptesSearch.push(compte);
       this.numeroCompteSelected = compte;
+      this.nomCompte = compte.nom;
       this.error = false;
       (this.comboboxCompte as any).errorBucket = [];
       this.blur();
@@ -248,6 +251,7 @@ export default class AutocompleteComptes extends Vue {
 
   public resetCompte() {
     this.numeroCompteSelected = null;
+    this.nomCompte = '';
     this.errorCompte = '';
     this.emitChange('');
   }
