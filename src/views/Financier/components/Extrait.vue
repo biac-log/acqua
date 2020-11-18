@@ -41,16 +41,9 @@
             <v-col cols="7">
               <v-row dense>
                 <v-col cols="4">
-                  <v-text-field
-                    v-model="libelleCompte"
-                    label="Compte"
-                    outlined
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  />
+                  <v-text-field v-model="libelleCompte" label="Compte" outlined readonly tabindex="-1" hide-details />
                 </v-col>
-                <v-col cols="1">
+                <v-col cols="2">
                   <v-text-field
                     label="Solde initial"
                     v-model="soldeInitial"
@@ -60,7 +53,7 @@
                     hide-details
                   />
                 </v-col>
-                <v-col cols="1">
+                <v-col cols="2">
                   <v-text-field
                     label="Solde actuel"
                     v-model="soldeActuel"
@@ -81,6 +74,8 @@
                     hide-details
                   />
                 </v-col>
+              </v-row>
+              <v-row>
                 <v-col cols="2">
                   <v-text-field
                     ref="montant"
@@ -184,15 +179,7 @@
         <v-card-actions class="text-center" v-if="!readonly">
           <v-tooltip top open-delay="500" v-if="numeroExtrait && !readonly">
             <template v-slot:activator="{ on }">
-              <v-btn
-                color="error"
-                class="ma-2 pr-4"
-                text
-                tabindex="-1"
-                
-                @click="deleteExtrait()"
-                v-on="on"
-              >
+              <v-btn color="error" class="ma-2 pr-4" text tabindex="-1" @click="deleteExtrait()" v-on="on">
                 Supprimer
               </v-btn>
             </template>
@@ -235,7 +222,7 @@ import DatePicker from '@/components/DatePicker.vue';
 
 @Component({
   name: 'Extrait',
-  components: { VentilationVue, DatePicker }
+  components: { VentilationVue, DatePicker },
 })
 export default class extends Vue {
   @Ref() readonly refVentilationVue!: VentilationVue;
@@ -271,13 +258,13 @@ export default class extends Vue {
   private reglementSelected: Reglement = new Reglement();
   private reglementsRules = [
     (v: Reglement) => !!v || 'Règlement obligatoire',
-    (v: Reglement) => v.numero != 0 || 'Règlement obligatoire'
+    (v: Reglement) => v.numero != 0 || 'Règlement obligatoire',
   ];
 
   private montant = '';
   private montantRules: any = [
     (v: string) => !!v || 'Montant obligatoire',
-    (v: string) => v.isDecimal() || 'Montant invalide'
+    (v: string) => v.isDecimal() || 'Montant invalide',
   ];
 
   private ventilations: Ventilation[] = [];
@@ -290,7 +277,7 @@ export default class extends Vue {
     { text: 'Débit', value: 'montantDebit', width: 100, align: 'end' },
     { text: 'Crédit', value: 'montantCredit', width: 100, align: 'end' },
     { text: 'Devise', value: 'libelleDevise', width: 70 },
-    { text: 'TVA', value: 'libelleTva', width: 100 }
+    { text: 'TVA', value: 'libelleTva', width: 100 },
   ];
 
   private ventileBase = 0;
