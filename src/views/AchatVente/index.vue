@@ -289,7 +289,7 @@ export default class extends Vue {
           this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, 'success');
         } else if (resp.action == DialogActionResult.Delete && entete) {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
-          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, 'error');
+          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b>supprimée.`, 'error');
         }
       })
       .finally(() => {
