@@ -21,7 +21,9 @@
         :hide-details="isReadonly"
         :disabled="isDisabled"
         :tabindex="tabindex"
-        outlined
+        :outlined="outlined"
+        validate-on-blur
+        @update:error="validateField"
       >
         <template v-slot:prepend-inner>
           <v-btn
@@ -55,6 +57,7 @@ export default class extends Vue {
 
   @Prop() readonly label: string | undefined;
   @Prop() readonly tabindex: number | undefined;
+  @Prop() readonly outlined!: boolean;
   @PropSync('readonly') private isReadonly!: boolean;
   @PropSync('date') public syncedDate!: DateTime | null;
   @PropSync('rules') public dateRules!: any;
@@ -77,13 +80,20 @@ export default class extends Vue {
         dateString = `${date.substring(0, 4)}${annee}`;
       }
       const dateToSelect = new DateTime(dateString);
-      if (dateToSelect.toString('YYYY-MM-DD') == this.dateSelected)
+      if (dateToSelect.toString('YYYY-MM-DD') == this.dateSelected) {
         this.$nextTick(() => (this.dateFormatted = dateToSelect.toString()));
+      }
       this.dateSelected = dateToSelect.toString('YYYY-MM-DD');
     }
   }
 
-  @Watch('dateSelected')
+  private validateField() {
+    //Utilisé lors de l'erreur quand on retape la même date mais partiellement
+    //Ex : 01-01-2020 par défaut on écrit 01 => erreur alors qu'il ne faut pas
+    this.$nextTick(() => (this.$refs.refDate as any).validate(true));
+  }
+
+  @Watch('dateSelected', { deep: true })
   private dateSelectedChanged(val: string) {
     if (val) {
       const date = new DateTime(val);
@@ -96,7 +106,7 @@ export default class extends Vue {
     }
   }
 
-  @Watch('syncedDate')
+  @Watch('syncedDate', { deep: true })
   private syncedDateChanged(val: DateTime | null) {
     const currentDate = new DateTime(this.dateFormatted);
     if (!val?.isValid()) this.dateSelected = '';

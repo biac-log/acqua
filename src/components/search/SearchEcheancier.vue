@@ -29,16 +29,14 @@
         ></v-text-field>
       </v-card-title>
       <v-card-text>
-        <v-row>
+        <v-row dense>
           <v-col cols="2">
             <v-text-field
               label="Solde"
               v-model="allEcheanciers.soldeDisplay"
-              filled
               hide-details
               tabindex="-1"
               readonly
-              dense
               outlined
             ></v-text-field>
           </v-col>
@@ -46,11 +44,9 @@
             <v-text-field
               label="Numéro tél."
               v-model="allEcheanciers.numeroTelephone"
-              filled
               hide-details
               tabindex="-1"
               readonly
-              dense
               outlined
             ></v-text-field>
           </v-col>
@@ -58,11 +54,9 @@
             <v-text-field
               label="Montant échu"
               v-model="allEcheanciers.montantEchuDisplay"
-              filled
               hide-details
               tabindex="-1"
               readonly
-              dense
               outlined
             ></v-text-field>
           </v-col>
@@ -70,11 +64,9 @@
             <v-text-field
               label="Montant non échu"
               v-model="allEcheanciers.montantNonEchuDisplay"
-              filled
               hide-details
               tabindex="-1"
               readonly
-              dense
               outlined
             ></v-text-field>
           </v-col>
@@ -86,7 +78,6 @@
               hide-details
               tabindex="-1"
               readonly
-              dense
               outlined
             ></v-text-field>
           </v-col>

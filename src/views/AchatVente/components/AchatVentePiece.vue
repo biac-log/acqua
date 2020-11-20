@@ -78,6 +78,7 @@
                       :readonly.sync="piecereadonly"
                       :rules.sync="numeroCompteTierRules"
                       :typeCompte.sync="typeCompte"
+                      outlined
                     />
                   </v-col>
                   <v-col cols="6">
@@ -759,7 +760,7 @@ export default class extends Vue {
         if (numeroPiece != 0) {
           this.libelleWarningMessage = `Attention, ce libellé est déjà utilisé par la pièce ${numeroPiece}`;
           (this.$refs.confirmLibellelDialog as Confirm)
-            .open('Attention', `Attention, ce libellé est déjà utilisé par la pièce ${numeroPiece}`, 'error', "OK")
+            .open('Attention', `Attention, ce libellé est déjà utilisé par la pièce ${numeroPiece}`, 'error', 'OK')
             .then(() => {
               this.$nextTick(() => (this.$refs.montant as any)?.focus());
             });
@@ -821,14 +822,19 @@ export default class extends Vue {
     }
   }
 
-  private async initDateEcheance(numeroCompteTier: string, typeComptetier: string, datePiece: DateTime, focusDateEcheance: boolean) {
+  private async initDateEcheance(
+    numeroCompteTier: string,
+    typeComptetier: string,
+    datePiece: DateTime,
+    focusDateEcheance: boolean
+  ) {
     if (this.numeroCompteTier && this.typeCompte && datePiece.isValid()) {
       await AchatVenteApi.getDateEcheance(typeComptetier, numeroCompteTier, datePiece)
         .then((dateEcheance) => {
           this.dateEcheance = dateEcheance;
-          if(focusDateEcheance){
+          if (focusDateEcheance) {
             this.refDateEcheance.selectText();
-          } 
+          }
         })
         .catch((err) => {
           this.errorMessage = displayAxiosError(err);

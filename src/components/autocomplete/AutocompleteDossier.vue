@@ -22,7 +22,7 @@
       item-value="idDossier"
       hide-no-data
       :dense="isDense"
-      outlined
+      :outlined="outlined"
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">
@@ -58,6 +58,7 @@ import { Component, Vue, Watch, Ref, PropSync, Prop } from 'vue-property-decorat
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import DossierApi from '@/api/DossierApi';
 import SearchDossierVue from '@/components/search/SearchDossier.vue';
+import { property } from 'lodash';
 
 @Component({ components: { SearchDossierVue } })
 export default class AutoCompleteDossierVue extends Vue {
@@ -69,6 +70,7 @@ export default class AutoCompleteDossierVue extends Vue {
   @PropSync('dense', { type: Boolean, default: false }) isDense!: boolean;
   @PropSync('hide-details', { default: true }) isHideDetails!: boolean;
   @Prop() required!: boolean;
+  @Prop() outlined!: boolean;
 
   private dossierLoading = false;
   private idDossier = '';

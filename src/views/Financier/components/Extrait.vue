@@ -38,32 +38,9 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col lg="7" md="12">
-              <v-row dense>
+            <v-col lg="7" sm="12">
+              <v-row>
                 <v-col cols="4">
-                  <v-text-field v-model="libelleCompte" label="Compte" outlined readonly tabindex="-1" hide-details />
-                </v-col>
-                <v-col cols="2">
-                  <v-text-field
-                    label="Solde initial"
-                    v-model="soldeInitial"
-                    outlined
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="2">
-                  <v-text-field
-                    label="Solde actuel"
-                    v-model="soldeActuel"
-                    outlined
-                    readonly
-                    tabindex="-1"
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="2">
                   <v-text-field
                     label="Date pièce"
                     v-model="datePiece"
@@ -74,9 +51,32 @@
                     hide-details
                   />
                 </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    label="Solde initial"
+                    v-model="soldeInitial"
+                    outlined
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    label="Solde actuel"
+                    v-model="soldeActuel"
+                    outlined
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  />
+                </v-col>
               </v-row>
-              <v-row>
-                <v-col cols="2">
+              <v-row dense>
+                <v-col cols="6">
+                  <v-text-field v-model="libelleCompte" label="Compte" outlined readonly tabindex="-1" hide-details />
+                </v-col>
+                <v-col cols="3">
                   <v-text-field
                     ref="montant"
                     label="Montant"
@@ -89,7 +89,7 @@
                     autofocus
                   ></v-text-field>
                 </v-col>
-                <v-col cols="2">
+                <v-col cols="3">
                   <v-select
                     :items="reglements"
                     v-model="reglementSelected"

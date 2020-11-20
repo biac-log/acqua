@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="600" v-model="dialog" @click:outside="close" @keydown.esc="close()">
+  <v-dialog width="700" v-model="dialog" @click:outside="close" @keydown.esc="close()">
     <v-card :loading="isLoading">
       <v-card-title>
         Case Tva
@@ -20,7 +20,7 @@
         ></v-text-field>
       </v-card-title>
       <AgGridVue
-        style="height: 561px;"
+        style="height: 730px;"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersCasesTva"

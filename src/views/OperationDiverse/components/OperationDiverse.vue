@@ -3,7 +3,7 @@
     v-model="dialog"
     scrollable
     eager
-    width="80%"
+    width="85%"
     :persistent="!readonly || saveLoading || deleteLoading"
     @click:outside="clickOutside"
     @keydown.f2.stop="modifierPiece()"
@@ -62,53 +62,54 @@
           ></v-progress-linear>
         <v-card-text class="pb-0 pt-0">
           <v-row>
-            <v-col cols="6" class="pr-5">
+            <v-col cols="12" lg="7" md="12" class="pr-5">
               <v-row fill-height no-gutters>
-                <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
                 <v-row dense>
-                  <v-col cols="4">
+                  <v-col cols="3">
                     <DatePicker
                       ref="refDatePiece"
                       name="datePiece"
                       label="Date pièce"
                       :date.sync="datePiece"
                       :readonly.sync="readonly"
-                      outlined
                       :rules.sync="datePieceRules"
                       :hide-details="readonly"
-                      tabindex="1"
+                      outlined
                     ></DatePicker>
                   </v-col>
-                  <v-col cols="4">
+                  <v-col cols="3">
+                    <v-text-field
+                      label="Libellé"
+                      v-model="libellePiece"
+                      :hide-details="readonly"
+                      counter
+                      maxlength="23"
+                      outlined
+                      :readonly="readonly"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="3">
                     <v-text-field
                       label="Débit"
                       :value="debit | numberToString"
-                      outlined
                       :hide-details="readonly"
                       readonly
                       tabindex="-1"
+                      outlined
+                      :suffix="journal.devise.libelle"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="4">
+                  <v-col cols="3">
                     <v-text-field
                       label="Crédit"
                       :value="credit | numberToString"
-                      outlined
                       :hide-details="readonly"
                       readonly
                       tabindex="-1"
+                      outlined
+                      :suffix="journal.devise.libelle"
                     ></v-text-field>
                   </v-col>
-                  <!-- <v-col cols="3">
-                    <v-text-field
-                      label="A ventilé"
-                      :value="solde | numberToStringEvenZero"
-                      outlined
-                      :hide-details="readonly"
-                      readonly
-                      tabindex="-1"
-                    ></v-text-field>
-                  </v-col> -->
                 </v-row>
                 <v-row dense>
                   <v-col cols="12">
@@ -127,7 +128,6 @@
                                 :disabled="readonly"
                                 @click.stop="createImputation()"
                                 v-on="on"
-                                tabindex="2"
                               >
                                 <v-icon>mdi-plus</v-icon>
                               </v-btn>
@@ -153,7 +153,8 @@
                         dense
                         disable-pagination
                         hide-default-footer
-                        height="352"
+                        disable-sort
+                        :height="$vuetify.breakpoint.lgAndUp ? 352 : ''"
                       >
                         <template v-slot:[`item.debit`]="{ item }">
                           <span>{{ item.debit | numberToString }}</span>
@@ -167,7 +168,7 @@
                 </v-row>
               </v-row>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="12" lg="5" md="12">
               <ImputationVue
                 ref="refImputationVue"
                 :DatePiece.sync="datePiece"
@@ -178,6 +179,9 @@
             </v-col>
           </v-row>
         </v-card-text>
+        <v-card-actions>
+          <AlertMessageVue ref="warningMessage" type="warning"></AlertMessageVue>
+        </v-card-actions>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
           <v-tooltip v-if="numeroPiece" top open-delay="500">
@@ -254,7 +258,6 @@
                 :loading="saveLoading"
                 :disabled="!isValid || deleteLoading"
                 @click="savePiece()"
-                tabindex="3"
               >
                 <v-icon left>mdi-content-save</v-icon>Sauvegarder
               </v-btn>
@@ -320,6 +323,7 @@ export default class OperationDiverseVue extends Vue {
     (v: string) => DateTime.isValid(v) || 'Date invalide',
     (v: string) => this.validateDatePiece(v) || 'La date est hors période'
   ];
+  private libellePiece = '';
 
   get credit() {
     return sum(this.imputations.filter((c) => c.codeMouvement == 'CR').map((i) => i.montantDevise));
@@ -354,6 +358,7 @@ export default class OperationDiverseVue extends Vue {
   }
 
   private validateDatePiece(date: string): boolean {
+    console.log(date);
     const dateTime = new DateTime(date);
     return dateTime.isBetween(this.periode.dateDebut, this.periode.dateFin);
   }
@@ -443,6 +448,7 @@ export default class OperationDiverseVue extends Vue {
     this.oldPiece = piece;
     this.numeroPiece = piece.numeroPiece.toString();
     this.datePiece = new DateTime(piece.datePiece);
+    this.libellePiece = piece.libelle;
     this.imputations = piece.imputations;
     this.hash = piece.hash;
   }
@@ -456,8 +462,10 @@ export default class OperationDiverseVue extends Vue {
     this.oldPiece = null;
     this.readonly = false;
     this.numeroPiece = '';
+    this.libellePiece = '';
     this.hash = '';
     (this.$refs.extraits as any)?.reset();
+    (this.$refs.form as any).resetValidation();
   }
 
   private deletePiece() {
@@ -549,6 +557,7 @@ export default class OperationDiverseVue extends Vue {
     pieceToSave.numeroJournal = this.journal.numero;
     pieceToSave.periode = this.periode.typePeriodeComptable;
     pieceToSave.datePiece = this.datePiece.toJsonDateTime();
+    pieceToSave.libellePiece = this.libellePiece;
     this.imputations.forEach((i) => pieceToSave.imputations.push(i.toSaveModel()));
     pieceToSave.hash = this.hash;
     return pieceToSave;
