@@ -909,7 +909,7 @@ export default class extends Vue {
       else if (this.gridContreparties.errorInTVA())
         return await (this.$refs.confirmDialog as Confirm).open(
           'Attention, contrôle de tva',
-          `La tva calculée est différente de la tva imputée, voulez-vous continuer ?`,
+          `La tva calculée est différente de la tva imputée, voulez-vous sauvegarder ?`,
           'error',
           'Sauvegarder'
         );
