@@ -90,7 +90,7 @@ export default class extends Vue {
   private headersContreparties = [
     { text: 'N° Compte', value: 'libelleNumero' },
     { text: 'Nom compte', value: 'compteLibelle' },
-    { text: 'Libelle', value: 'libelle' },
+    { text: 'Libellé', value: 'libelle' },
     { text: 'Débit', value: 'montantDebit', align: 'end' },
     { text: 'Crédit', value: 'montantCredit', align: 'end' },
     { text: 'Devise', value: 'libelleDevise' },

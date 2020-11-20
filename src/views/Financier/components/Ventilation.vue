@@ -39,7 +39,7 @@
                 @keyup="changeType"
               ></v-select>
             </v-col>
-            <v-col cols="5">
+            <v-col cols="8">
               <AutocompleteComptesVue
                 ref="compteComponent"
                 :readonly.sync="readonly"
@@ -365,7 +365,7 @@ export default class VentilationVue extends Vue {
   private devisesRules: any = [(v: string) => !!v || 'Devise obligatoire'];
   private taux = '';
   private libelle = '';
-  private libelleRules: any = [(v: string) => !!v || 'Libelle obligatoire'];
+  private libelleRules: any = [(v: string) => !!v || 'Libellé obligatoire'];
   private typesMouvements: TypeMouvement[] = getTypesMouvements();
   private typesMouvementsSelected: TypeMouvement = new TypeMouvement();
   private typesMouvementsRules: any = [(v: string) => !!v || 'Type obligatoire'];

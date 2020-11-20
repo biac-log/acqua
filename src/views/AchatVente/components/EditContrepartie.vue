@@ -49,7 +49,7 @@
             <v-col>
               <v-text-field
                 ref="libelle"
-                label="Libelle"
+                label="Libellé"
                 v-model="libelle"
                 counter
                 maxlength="23"
@@ -310,7 +310,7 @@ export default class extends Vue {
   private devisesSelected: Devise = new Devise();
   private devisesRules: any = [(v: string) => !!v || 'Devise obligatoire'];
   private libelle = '';
-  private libelleRules: any = [(v: string) => !!v || 'Libelle obligatoire'];
+  private libelleRules: any = [(v: string) => !!v || 'Libellé obligatoire'];
   private typesMouvements: TypeMouvement[] = getTypesMouvements();
   private typesMouvementsSelected: TypeMouvement = new TypeMouvement();
   private typesMouvementsRules: any = [(v: string) => !!v || 'Type obligatoire'];

@@ -64,7 +64,7 @@ export default class DevisesVue extends Vue {
   private devises: DeviseMaintenance[] = [];
   private headers = [
     { text: 'Id', value: 'id' },
-    { text: 'Libelle', value: 'libelle' },
+    { text: 'Libellé', value: 'libelle' },
     { text: 'Type', value: 'typeDevise' },
     { text: 'CEE', value: 'cee' }
   ];

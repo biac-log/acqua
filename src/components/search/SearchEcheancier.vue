@@ -206,7 +206,7 @@ export default class extends Vue {
       valueFormatter: this.montantBaseToString,
       hide: true
     },
-    { headerName: 'Libelle', field: 'libelle', filter: true, width: 150, type: 'dateColumn' },
+    { headerName: 'Libellé', field: 'libelle', filter: true, width: 150, type: 'dateColumn' },
     {
       headerName: 'Date échéance',
       field: 'dateEcheanceDate',

@@ -83,7 +83,7 @@
                   </v-col>
                   <v-col cols="6">
                     <v-text-field
-                      label="Libelle"
+                      label="Libellé"
                       ref="libellePiece"
                       autocomplete="off"
                       counter

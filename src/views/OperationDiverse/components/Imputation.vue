@@ -428,7 +428,7 @@ export default class ImputationVue extends Vue {
   private natureCompte = '';
 
   private libelle = '';
-  private libelleRules: any = [(v: string) => !!v || 'Libelle obligatoire'];
+  private libelleRules: any = [(v: string) => !!v || 'Libellé obligatoire'];
 
   private idDossier = '';
   private nomDossier = '';

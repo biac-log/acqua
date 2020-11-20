@@ -172,7 +172,7 @@ export default class extends Vue {
     { text: 'Numéro compte', value: 'numeroCompte' },
     { text: 'Nom compte', value: 'nomCompte' },
     { text: 'Date pièce', value: 'datePieceDate' },
-    { text: 'Libelle', value: 'libelle' },
+    { text: 'Libellé', value: 'libelle' },
     { text: 'Date échéance', value: 'dateEcheanceDate' },
     { text: 'Montant', value: 'montant', align: 'end' },
     { text: 'Escompte', value: 'escompteDisplay', align: 'end' },
