@@ -403,7 +403,7 @@ export default class PieceComptableVue extends Vue {
   }
 
   private init(piece: Piece) {
-    this.oldPiece = piece;
+    this.oldPiece = new Piece(piece); // Set it to a new Piece so the inner arrays aren't linked
     this.numeroPiece = piece.numeroPiece.toString();
     this.libelleCompte = `${piece.numeroCompteFinancier.toString()} ${piece.nomCompteFinancier}`;
     this.datePiece = new DateTime(piece.datePiece);

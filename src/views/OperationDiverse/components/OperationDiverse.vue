@@ -446,7 +446,7 @@ export default class OperationDiverseVue extends Vue {
   }
 
   private init(piece: PieceComptable) {
-    this.oldPiece = piece;
+    this.oldPiece = new PieceComptable(piece);
     this.numeroPiece = piece.numeroPiece.toString();
     this.datePiece = new DateTime(piece.datePiece);
     this.libellePiece = piece.libelle;
