@@ -340,6 +340,7 @@ export default class OperationDiverseVue extends Vue {
     { text: 'Libellé écriture', value: 'libelle' },
     { text: 'Débit', value: 'debit' },
     { text: 'Crédit', value: 'credit' },
+    { text: 'Devise', value: 'libelleDevise' },
     { text: 'Case TVA', value: 'libelleCaseTVA', align: 'end' }
   ];
 
