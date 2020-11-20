@@ -210,7 +210,7 @@
           <v-spacer></v-spacer>
           <v-tooltip top open-delay="500" open-on-hover>
             <template v-slot:activator="{ on }">
-              <v-btn @click="generateTVA" class="ma-2 pr-4" tile outlined v-on="on" color="warning">Solde = TVA</v-btn>
+              <v-btn v-if="!readonly" @click="generateTVA" class="ma-2 pr-4" tile outlined v-on="on" color="warning">Solde = TVA</v-btn>
             </template>
             <span>Attribue le reste à ventiler au montant<span class="shortcutTooltip">F2</span></span>
           </v-tooltip>
