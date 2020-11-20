@@ -535,7 +535,7 @@ export default class extends Vue {
       this.$nextTick(() => {
         if (this.isValid) {
           this.dialog = false;
-          this.resolve(new PromiseResponse<Extrait>(this.getModel(), true)); // Send true to trigger openNew again
+          this.resolve(new PromiseResponse<Extrait>(this.getModel(), this.ventileDevise != 0)); // Send true to trigger openNew again if ventileBase = 0
         }
       });
     }
