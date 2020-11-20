@@ -297,7 +297,7 @@ export default class extends Vue {
     extrait: Extrait,
     soldeInitial: string,
     soldeActuel: string
-  ): Promise<Extrait> {
+  ): Promise<PromiseResponse<Extrait>> {
     this.reset();
     this.dialog = true;
     this.isNew = false;

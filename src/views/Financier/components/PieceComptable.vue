@@ -55,11 +55,11 @@
           </v-btn>
         </v-toolbar>
         <v-progress-linear
-            :active="pieceIsLoading"
-            :indeterminate="pieceIsLoading"
-            top
-            color="primary accent-4"
-          ></v-progress-linear>
+          :active="pieceIsLoading"
+          :indeterminate="pieceIsLoading"
+          top
+          color="primary accent-4"
+        ></v-progress-linear>
         <v-card-text class="pb-0 pt-0">
           <v-col cols="12" class="pr-5">
             <v-row fill-height no-gutters>
@@ -386,14 +386,14 @@ export default class PieceComptableVue extends Vue {
   private editExtrait(extrait: Extrait) {
     this.refExtraitVue
       .open(this.journal, this.numeroPiece, extrait, this.soldeInitial, this.soldeActuel)
-      .then((resp: Extrait) => {
-        if (resp)
+      .then((resp: PromiseResponse<Extrait>) => {
+        if (resp.data) {
           Vue.set(
             this.extraits,
             this.extraits.findIndex((d) => d == extrait),
-            resp
+            resp.data
           );
-        else this.extraits.splice(this.extraits.indexOf(extrait), 1);
+        } else this.extraits.splice(this.extraits.indexOf(extrait), 1);
       })
       .catch()
       .finally(() => {
