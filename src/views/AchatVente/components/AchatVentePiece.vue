@@ -758,9 +758,9 @@ export default class extends Vue {
     if (!this.piecereadonly && this.libelle && this.libelle != this.libelleFromInit) {
       AchatVenteApi.validateLibelle(this.libelle, this.typeCompte, this.numeroCompteTier).then((numeroPiece) => {
         if (numeroPiece != 0) {
-          this.libelleWarningMessage = `Attention, ce libellé est déjà utilisé par la pièce ${numeroPiece}`;
+          this.libelleWarningMessage = `Attention, ce libellé est déjà utilisé par la pièce ${this.journal.numero}.${numeroPiece}`;
           (this.$refs.confirmLibellelDialog as Confirm)
-            .open('Attention', `Attention, ce libellé est déjà utilisé par la pièce ${numeroPiece}`, 'error', 'OK')
+            .open('Attention', `Attention, ce libellé est déjà utilisé par la pièce ${this.journal.numero}.${numeroPiece}`, 'error', 'OK')
             .then(() => {
               this.$nextTick(() => (this.$refs.montant as any)?.focus());
             });
