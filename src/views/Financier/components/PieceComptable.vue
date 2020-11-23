@@ -255,6 +255,7 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
 import { sum } from 'lodash';
 import { PromiseResponse } from '@/models/PromiseResponse';
+import { nextTick } from 'vue/types/umd';
 
 @Component({
   components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue }
@@ -608,9 +609,12 @@ export default class PieceComptableVue extends Vue {
     if (this.readonly) this.closeDialog();
   }
 
-  private closeDatePieceDialog() {
-    this.datePieceDialog = false;
-    this.createExtrait();
+  private closeDatePieceDialog() { // Almost working, need to refocus the field when it's invalid
+    this.refDatePieceDialog.blur();
+    if (this.refDatePieceDialog.isDateValid()) {
+      this.datePieceDialog = false;
+      this.createExtrait();
+    }
   }
 
   private toggleSoldeReadonly() {

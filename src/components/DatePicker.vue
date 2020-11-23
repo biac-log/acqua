@@ -117,8 +117,16 @@ export default class extends Vue {
     this.$nextTick(() => (this.$refs.refDate as any).focus());
   }
 
+  public blur() {
+    this.$nextTick(() => (this.$refs.refDate as any).blur());
+  }
+
   public selectText() {
     this.$nextTick(() => (this.$refs.refDate as Vue).$el.querySelector('input')?.select());
+  }
+
+  public isDateValid() {
+    return new DateTime(this.dateFormatted).isValid();
   }
 }
 </script>
