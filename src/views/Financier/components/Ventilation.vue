@@ -676,14 +676,14 @@ export default class VentilationVue extends Vue {
     this.reference = `${element.numeroJournal}.${element.numeroPiece}`;
     this.referenceJournal = element.numeroJournal.toString();
     this.referencePiece = element.numeroPiece.toString();
-    if (element.montantDevise > 0) {
+    if (element.soldeDevise > 0) {
       this.typesMouvementsSelected =
         this.typesComptesSelected.id == 'F' ? this.typesMouvements[0] : this.typesMouvements[1];
     } else {
       this.typesMouvementsSelected =
         this.typesComptesSelected.id == 'F' ? this.typesMouvements[1] : this.typesMouvements[0];
     }
-    this.montant = Math.abs(element.montantDevise).toComptaString(2);
+    this.montant = Math.abs(element.soldeDevise).toComptaString(2);
     for (let index = 1; index < elements.length; index++) {
       this.createVentilationFromEcheancier(elements[index]);
     }

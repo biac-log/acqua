@@ -391,7 +391,7 @@ export default class extends Vue {
         this.montantAVentileBase -
         Math.abs(
           _(rowSelected)
-            .map((r) => r.data.montantDevise)
+            .map((r) => r.data.soldeDevise)
             .sum()
         );
     } else {
@@ -399,7 +399,7 @@ export default class extends Vue {
         this.montantAVentileBase -
         Math.abs(
           _(rowSelected)
-            .map((r) => r.data.montantBase)
+            .map((r) => r.data.soldeBase)
             .sum()
         );
     }
