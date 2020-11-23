@@ -241,7 +241,7 @@ export default class extends Vue {
 
   private displayAddResult(numeroPiece: string) {
     (this.$refs.PieceAddResultVue as PieceAddResultVue)
-      .open(this.journalSelected.numero, parseInt(numeroPiece), this.periodeSelected.typePeriodeComptable)
+      .open(this.journalSelected.numero, parseInt(numeroPiece), this.periodeSelected.typePeriodeComptable, this.journalSelected.numeroCompteBanque)
       .then((numero) => {
         if (parseInt(numeroPiece) != numero) {
           this.loadPiecesComptables();

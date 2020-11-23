@@ -25,8 +25,11 @@
         </v-row>
         <v-row justify="center">
           <h3>
-            Le numéro de pièce créée est le <b>{{ journal }}.{{ numero }}</b>
+            Le numéro de pièce créée est le <b>{{ journal }}.{{ numero }}.</b>
           </h3>
+          <h4>
+            Solde actuel : <b>{{ soldeActuel | numberToComptaString }}</b>
+          </h4>
         </v-row>
       </v-card-text>
       <v-card-actions class="mt-4 pa-0">
@@ -123,6 +126,7 @@ export default class extends Vue {
     (v: string) => !!v || 'Numéro obligatoire',
     (v: string) => (!!v.toNumber() && v.length == 6) || 'Numéro invalide'
   ];
+  private soldeActuel = 0;
 
   private numeroLoading = false;
   private errorMessage = '';
@@ -133,7 +137,7 @@ export default class extends Vue {
   private resolve: any;
   private reject: any;
 
-  public open(journal: number, numero: number, periode: string): Promise<number> {
+  public async open(journal: number, numero: number, periode: string, numeroCompte: number): Promise<number> {
     setTimeout(() => {
       (this.$refs.btnClose as any).$el.focus();
     });
@@ -143,6 +147,7 @@ export default class extends Vue {
     this.periode = periode;
     this.nouveauNumero = numero.toString();
     this.dialog = true;
+    this.soldeActuel = await FinancierApi.getSoldeCompte(numeroCompte);
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
