@@ -85,13 +85,15 @@
                   </v-col>
                   <v-col cols="6" class="pb-0 pt-0">
                     <v-text-field
-                      :label="newRecord ? 'Numéro prédit' : 'Numéro'"
+                      label="Numéro"
                       v-model="numero"
                       outlined
-                      readonly
-                      tabindex="-1"
+                      :readonly="numeroReadonly"
+                      :tabindex="numeroReadonly ? -1 : null"
                       dense
-                      :hide-details="readonly"
+                      :hide-details="numeroReadonly"
+                      :append-icon="readonly ? '' : 'mdi-pencil'"
+                      @click:append="numeroReadonly = !numeroReadonly"
                     />
                   </v-col>
                   <v-col cols="6" class="pb-0 pt-0">
@@ -314,6 +316,7 @@
                         :hide-details="readonly"
                         :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                         outlined
+                        :rules="[]"
                       />
                     </div>
                     <autocomplete-comptes-vue
@@ -325,6 +328,7 @@
                       :hide-details="readonly"
                       :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                       outlined
+                      :rules="[]"
                     />
                     <div :style="readonly ? '' : 'margin-top: 8px;'">
                       <!-- Not the best, but it corrects the alignments .. -->
@@ -337,6 +341,7 @@
                         :hide-details="readonly"
                         :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                         outlined
+                        :rules="[]"
                       />
                     </div>
                   </v-col>
@@ -1041,7 +1046,7 @@ export default class FournisseurVue extends Vue {
   private rules = Fournisseur.rules;
 
   /// Fournisseur model
-  private numero = 0;
+  private numero = '';
   private nom = '';
   private matchCode = '';
   private adresseLigne1 = '';
@@ -1118,6 +1123,7 @@ export default class FournisseurVue extends Vue {
 
   private readonly = true;
   private newRecord = false;
+  private numeroReadonly = true;
 
   private libellesAssujettis: LibelleTiers[] = [];
   private intraSaisieReadonly = true;
@@ -1156,7 +1162,7 @@ export default class FournisseurVue extends Vue {
   }
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
-    this.numero = searchFournisseur.numero;
+    this.numero = searchFournisseur.numero.toString();
     this.nom = searchFournisseur.nom;
 
     this.display = true;
@@ -1181,7 +1187,7 @@ export default class FournisseurVue extends Vue {
     this.fournisseurBase = new Fournisseur();
     this.newRecord = true;
 
-    this.numero = this.fournisseurParams.nextNumero;
+    this.numero = this.fournisseurParams.nextNumero.toString();
     this.compteAssocie = this.fournisseurParams.numeroCompteAssocieDefaut;
     this.nomCompteAssocie = this.fournisseurParams.nomCompteAssocieDefaut;
 
@@ -1204,7 +1210,7 @@ export default class FournisseurVue extends Vue {
   }
 
   private setFournisseur(fournisseur: Fournisseur) {
-    this.numero = fournisseur.numero;
+    this.numero = fournisseur.numero.toString();
     this.nom = fournisseur.nom;
     this.matchCode = fournisseur.matchCode;
     this.adresseLigne1 = fournisseur.adresseLigne1;
@@ -1294,7 +1300,7 @@ export default class FournisseurVue extends Vue {
   }
 
   private mapFournisseur() {
-    this.fournisseur.numero = this.numero;
+    this.fournisseur.numero = this.numero.toNumber();
     this.fournisseur.nom = this.nom;
     this.fournisseur.matchCode = this.matchCode;
     this.fournisseur.adresseLigne1 = this.adresseLigne1;
@@ -1426,6 +1432,16 @@ export default class FournisseurVue extends Vue {
     this.mapFournisseur();
 
     if (this.newRecord) {
+      if(this.numero.toNumber() != this.fournisseurParams.nextNumero) {
+        await FournisseurApi.checkNumero(this.numero.toNumber()).then((resp) => {
+          if(resp) {
+            this.alertMessage.show(
+            "Le numéro fourni est déjà utilisé",
+          );
+            return false;
+          }
+        })
+      }
       await FournisseurApi.createFournisseur(this.fournisseur)
         .then((numeroFournisseur) => {
           this.fournisseurParams.nextNumero = numeroFournisseur + 1;

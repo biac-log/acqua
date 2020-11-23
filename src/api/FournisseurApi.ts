@@ -55,4 +55,10 @@ export abstract class FournisseurApi {
     await api.AcQuaCore.put<UpdateFournisseurDTO>(`Fournisseur`, data);
     return true;
   }
+
+  static async checkNumero(numero: number): Promise<boolean> {
+    const resp = await api.AcQuaCore.get<boolean>(`Fournisseur/CheckNumero/${numero}`);
+
+    return resp.data;
+  }
 }
