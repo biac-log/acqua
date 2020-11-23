@@ -101,6 +101,12 @@
             <v-radio label="Montant compta" value="base"></v-radio>
           </v-radio-group>
           <v-spacer></v-spacer>
+          <div class="text-h6 pr-1">
+            Montant à ventiler :
+            <b>
+              {{ montantAVentileDevise | numberToStringEvenZero }}
+            </b>
+          </div>
           <div class="text-h6">
             Reste à ventiler :
             <b :class="resteAVentile > 0 ? 'amountPositive' : 'amountNull'">
