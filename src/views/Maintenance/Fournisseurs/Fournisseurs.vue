@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>
         Fournisseurs
-        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click.stop="addFournisseur" v-focus>
+        <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click.stop="addFournisseur">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
