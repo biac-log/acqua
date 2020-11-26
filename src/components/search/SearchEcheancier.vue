@@ -125,6 +125,7 @@
               :gridOptions="gridOptions"
               @selection-changed="calculAVentile"
               @grid-ready="onGridReady"
+              :rowSelection="multipleSelection ? 'multiple' : 'single'"
             ></AgGridVue>
           </v-col>
         </v-row>
@@ -149,7 +150,7 @@
 
 <script lang="ts">
 import { AgGridVue } from 'ag-grid-vue';
-import { Component, Vue, PropSync, Watch } from 'vue-property-decorator';
+import { Component, Vue, PropSync, Watch, Prop } from 'vue-property-decorator';
 import { GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
 import EcheancierApi from '@/api/EcheancierApi';
 import { Echeancier, EcheancierElement } from '@/models/Echeancier';
@@ -165,6 +166,7 @@ export default class extends Vue {
 
   @PropSync('MontantAVentileDevise', { default: 0 }) private montantAVentileDevise!: number;
   @PropSync('MontantAVentileBase', { default: 0 }) private montantAVentileBase!: number;
+  @Prop({default: true}) private multipleSelection!: boolean;
 
   private typeLoad!: string;
   private numeroEcheancierToLoad!: string;

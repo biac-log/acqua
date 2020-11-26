@@ -256,7 +256,7 @@
                   </v-tooltip>
                 </template>
               </v-text-field>
-              <SearchEcheancierVue ref="searchEcheancierDialog"></SearchEcheancierVue>
+              <SearchEcheancierVue ref="searchEcheancierDialog" :multipleSelection="false"></SearchEcheancierVue>
             </v-col>
             <v-col cols="4">
               <DatePicker
