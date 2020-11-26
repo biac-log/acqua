@@ -197,6 +197,7 @@
                 @blur="montant = montant.toNumber().toComptaString()"
                 tabindex="9"
                 outlined
+                :suffix="montant.toNumber() != 0 && devisesSelected ? devisesSelected.libelle : ''"
               >
               </v-text-field>
             </v-col>
