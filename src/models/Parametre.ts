@@ -1,6 +1,7 @@
 export class ParametreDTO {
   public modeDossier = false;
   public deviseParDate = false;
+  public modeLuxembourg = false;
 }
 
 export class Parametre extends ParametreDTO {
