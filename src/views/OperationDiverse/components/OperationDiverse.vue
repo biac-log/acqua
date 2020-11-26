@@ -415,8 +415,9 @@ export default class OperationDiverseVue extends Vue {
 
   private createImputation() {
     if (!this.readonly) {
+      const previousLibelle = this.imputations[this.imputations.length - 1]?.libelle ?? "";
       this.refImputationVue
-        .openNew()
+        .openNew(previousLibelle)
         .then((resp: Imputation) => {
           if (resp) {
             const maxLigne = this.imputations?.length

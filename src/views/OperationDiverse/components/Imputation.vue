@@ -524,7 +524,7 @@ export default class ImputationVue extends Vue {
     });
   }
 
-  public openNew(): Promise<Imputation> {
+  public openNew(previousLibelle: string): Promise<Imputation> {
     this.imputationIsSelected = true;
     this.isAdd = true;
     (this.$refs.form as any).resetValidation();
@@ -532,6 +532,7 @@ export default class ImputationVue extends Vue {
     this.autocompleteDossier?.resetDossier();
 
     this.setImputation(new Imputation());
+    this.libelle = previousLibelle;
     this.$nextTick(() => this.firstElement?.focus());
 
     return new Promise((resolve, reject) => {
@@ -589,6 +590,7 @@ export default class ImputationVue extends Vue {
       this.autocompleteDossier?.resetDossier();
       this.autocompleteCompte?.blur();
       this.refLibelle?.focus();
+      if(!this.libelle) this.libelle = compte.nom;
     }
   }
 
