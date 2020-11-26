@@ -55,11 +55,11 @@
           </v-btn>
         </v-toolbar>
         <v-progress-linear
-            :active="pieceIsLoading"
-            :indeterminate="pieceIsLoading"
-            top
-            color="primary accent-4"
-          ></v-progress-linear>
+          :active="pieceIsLoading"
+          :indeterminate="pieceIsLoading"
+          top
+          color="primary accent-4"
+        ></v-progress-linear>
         <v-card-text class="pb-0 pt-0">
           <v-row>
             <v-col cols="12" lg="7" md="12" class="pr-5">
@@ -283,7 +283,7 @@ import {
   Journal,
   PieceComptable,
   Imputation,
-  OperationDiverseToSave
+  OperationDiverseToSave,
 } from '@/models/OperationDiverse';
 import { DateTime } from '@/models/DateTime';
 import AlertMessageVue from '@/components/AlertMessage.vue';
@@ -295,7 +295,7 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import { sum } from 'lodash';
 
 @Component({
-  components: { ImputationVue, DatePicker, Confirm, AlertMessageVue }
+  components: { ImputationVue, DatePicker, Confirm, AlertMessageVue },
 })
 export default class OperationDiverseVue extends Vue {
   @Ref() refImputationVue!: ImputationVue;
@@ -322,7 +322,7 @@ export default class OperationDiverseVue extends Vue {
   private datePieceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période',
   ];
   private libellePiece = '';
 
@@ -342,14 +342,15 @@ export default class OperationDiverseVue extends Vue {
     { text: 'Débit', value: 'debit' },
     { text: 'Crédit', value: 'credit' },
     { text: 'Devise', value: 'libelleDevise' },
-    { text: 'Case TVA', value: 'libelleCaseTVA', align: 'end' }
+    { text: 'Divers', value: 'libelleReference' },
+    { text: 'Case TVA', value: 'libelleCaseTVA', align: 'end' },
   ];
 
   private forcerNumero = false;
   private numeroToForce = '';
   private numeroToForceRules: any = [
     (v: string) => !!v || 'Numéro obligatoire',
-    (v: string) => !!v.toNumber() || 'Numéro invalide'
+    (v: string) => !!v.toNumber() || 'Numéro invalide',
   ];
 
   private saveLoading = false;
@@ -415,7 +416,7 @@ export default class OperationDiverseVue extends Vue {
 
   private createImputation() {
     if (!this.readonly) {
-      const previousLibelle = this.imputations[this.imputations.length - 1]?.libelle ?? "";
+      const previousLibelle = this.imputations[this.imputations.length - 1]?.libelle ?? '';
       this.refImputationVue
         .openNew(previousLibelle)
         .then((resp: Imputation) => {
