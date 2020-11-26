@@ -15,7 +15,7 @@
       <v-card :loading="pieceIsLoading">
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
-            <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
+            <p class="mb-0" v-if="!newRecord">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
             <p class="mb-0" v-else>Nouvelle pièce</p>
             <p class="ml-10 mb-0 textMini">{{ periode.libellePeriodeFull }}</p>
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
@@ -184,7 +184,7 @@
         </v-card-actions>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
-          <v-tooltip v-if="numeroPiece" top open-delay="500">
+          <v-tooltip v-if="!newRecord" top open-delay="500">
             <template v-slot:activator="{ on }">
               <v-btn
                 color="error"
@@ -311,6 +311,7 @@ export default class OperationDiverseVue extends Vue {
   private resolve: any;
   private reject: any;
   private isValid = true;
+  private newRecord = false;
 
   private periode = new PeriodeComptable();
   private journal = new Journal();
@@ -369,6 +370,7 @@ export default class OperationDiverseVue extends Vue {
     this.dialog = true;
     this.readonly = false;
     this.reset();
+    this.newRecord = true;
     this.periode = periode;
     this.journal = journal;
     this.numeroPiece = (journal.numeroDernierePiece + 1).toString();
@@ -389,6 +391,7 @@ export default class OperationDiverseVue extends Vue {
   public open(periode: PeriodeComptable, journal: Journal, numeroPieceToLoad: number): Promise<EntetePieceComptable> {
     this.dialog = true;
     this.readonly = true;
+    this.newRecord = false;
     this.periode = periode;
     this.journal = journal;
     this.pieceIsLoading = true;
@@ -467,6 +470,7 @@ export default class OperationDiverseVue extends Vue {
     this.hash = '';
     (this.$refs.extraits as any)?.reset();
     (this.$refs.form as any).resetValidation();
+    this.newRecord = false;
   }
 
   private deletePiece() {
