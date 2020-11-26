@@ -38,6 +38,7 @@
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 tabindex="2"
+                @keyup="changeType"
               ></v-select>
             </v-col>
             <v-col cols="6">
@@ -828,6 +829,14 @@ export default class ImputationVue extends Vue {
     if (this.imputationIsSelected) {
       this.imputationIsSelected = false;
       if (this.reject) this.reject();
+    }
+  }
+
+  private changeType(event: KeyboardEvent) {
+    if (['c', 'f', 'g', 'z'].includes(event.key)) {
+      if ('z' == event.key) this.typesComptesSelected = new TypeCompte({ id: 'Z', libelle: 'Extra-comptable' });
+      this.$nextTick(() => this.firstElement.blur());
+      this.$nextTick(() => this.autocompleteCompte?.focus());
     }
   }
 }
