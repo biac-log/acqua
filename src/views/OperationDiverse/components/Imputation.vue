@@ -271,7 +271,7 @@
               ></DatePicker>
             </v-col>
           </v-row>
-          <v-row dense>
+          <v-row dense v-if="!modeLuxembourg">
             <v-col>
               <v-text-field
                 v-model="chida"
@@ -496,6 +496,10 @@ export default class ImputationVue extends Vue {
     return !this.dossierIsEnabled;
   }
 
+  get modeLuxembourg() {
+    return ApplicationModule.parametre.luxembourg;
+  }
+
   private warningMessage = '';
   private resolve: any;
   private reject: any;
@@ -507,6 +511,7 @@ export default class ImputationVue extends Vue {
     DeviseApi.getAllDevises().then((resp) => {
       this.devises = resp.filter((d) => d.libelle);
     });
+    console.log(this.modeLuxembourg);
   }
 
   public open(imputation: Imputation): Promise<Imputation> {
