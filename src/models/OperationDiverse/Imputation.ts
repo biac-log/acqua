@@ -4,7 +4,7 @@ import { OperationDiverseImputationToSave } from './OperationDiverseImputationTo
 
 export class ImputationDTO {
   numeroVentilation = 0;
-  typeCompte = '';
+  typeCompte = 'G';
   numeroCompte = 0;
   nomCompte = '';
   natureCompte = '';
