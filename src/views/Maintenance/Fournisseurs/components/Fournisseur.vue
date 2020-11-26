@@ -1432,32 +1432,31 @@ export default class FournisseurVue extends Vue {
     this.mapFournisseur();
 
     if (this.newRecord) {
-      if(this.numero.toNumber() != this.fournisseurParams.nextNumero) {
-        await FournisseurApi.checkNumero(this.numero.toNumber()).then((resp) => {
-          if(resp) {
-            this.alertMessage.show(
-            "Le numéro fourni est déjà utilisé",
-          );
-            return false;
-          }
-        })
+      let exists = false;
+      if (this.numero.toNumber() != this.fournisseurParams.nextNumero) {
+        exists = await FournisseurApi.checkNumero(this.numero.toNumber());
       }
-      await FournisseurApi.createFournisseur(this.fournisseur)
-        .then((numeroFournisseur) => {
-          this.fournisseurParams.nextNumero = numeroFournisseur + 1;
-          this.fournisseur = this.fournisseurBase;
-          this.closeDialog();
-        })
-        .catch((err) => {
-          this.alertMessage.show(
-            'Une erreur est survenue lors de la sauvegarde du fournisseur',
-            displayAxiosError(err)
-          );
-          this.readonly = false;
-        })
-        .finally(() => {
-          this.saveLoading = false;
-        });
+      if (exists) {
+        this.alertMessage.show('Ce numéro est déjà utilisé par un fournisseur');
+        this.saveLoading = false;
+      } else {
+        await FournisseurApi.createFournisseur(this.fournisseur)
+          .then((numeroFournisseur) => {
+            this.fournisseurParams.nextNumero = numeroFournisseur + 1;
+            this.fournisseur = this.fournisseurBase;
+            this.closeDialog();
+          })
+          .catch((err) => {
+            this.alertMessage.show(
+              'Une erreur est survenue lors de la sauvegarde du fournisseur',
+              displayAxiosError(err)
+            );
+            this.readonly = false;
+          })
+          .finally(() => {
+            this.saveLoading = false;
+          });
+      }
     } else {
       await FournisseurApi.updateFournisseur(new UpdateFournisseur(this.fournisseur), this.fournisseurBase)
         .then(() => {
