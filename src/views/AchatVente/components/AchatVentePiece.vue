@@ -989,6 +989,7 @@ export default class extends Vue {
                 action: DialogActionResult.Delete,
                 data: this.getModelForGrid()
               });
+              this.resetForm();
             })
             .catch((err) => {
               this.errorMessage = displayAxiosError(err);
