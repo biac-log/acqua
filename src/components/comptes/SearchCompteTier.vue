@@ -29,7 +29,7 @@
         ></v-text-field>
       </v-card-title>
       <AgGridVue
-        style="height: 730px;"
+        style="height: 730px"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersComptes"
@@ -39,6 +39,7 @@
       >
       </AgGridVue>
     </v-card>
+    <Confirm ref="confirmDialog"></Confirm>
   </v-dialog>
 </template>
 
@@ -48,10 +49,11 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { CompteSearch } from '@/models/Compte/CompteSearch';
 import { GridOptions, GridApi } from 'ag-grid-community';
 import CompteApi from '@/api/CompteApi';
+import Confirm from '@/components/Confirm.vue';
 
 @Component({
   name: 'SearchCompteTier',
-  components: { AgGridVue }
+  components: { AgGridVue, Confirm },
 })
 export default class extends Vue {
   private dialog = false;
@@ -65,7 +67,7 @@ export default class extends Vue {
     { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
     { headerName: 'Raison sociale', field: 'raisonSocial', filter: true, width: 140 },
     { headerName: 'Adresse', field: 'adresse', filter: true, flex: 1 },
-    { headerName: 'Bloqué', field: 'compteBloqueDisplay', filter: true, width: 100 }
+    { headerName: 'Bloqué', field: 'compteBloqueDisplay', filter: true, width: 100 },
   ];
 
   private resolve!: any;
@@ -85,7 +87,7 @@ export default class extends Vue {
     onRowDoubleClicked: this.rowDoubleClick,
     getRowStyle(params: any) {
       if (params.node.data.compteBloque) return { 'background-color': '#ffd6cc' };
-    }
+    },
   };
 
   public open(typeToLoad: string, filter: string): Promise<CompteSearch> {
@@ -146,7 +148,7 @@ export default class extends Vue {
       case KEY_DOWN:
         previousCell = params.previousCellPosition;
         // set selected cell on current cell + 1
-        this.gridOptions?.api?.forEachNode(function(node) {
+        this.gridOptions?.api?.forEachNode(function (node) {
           if (previousCell.rowIndex + 1 === node.rowIndex) {
             node.setSelected(true);
           }
@@ -159,7 +161,7 @@ export default class extends Vue {
         } else {
           previousCell = params.previousCellPosition;
           // set selected cell on current cell - 1
-          this.gridOptions?.api?.forEachNode(function(node) {
+          this.gridOptions?.api?.forEachNode(function (node) {
             if (previousCell.rowIndex - 1 === node.rowIndex) {
               node.setSelected(true);
             }
@@ -202,7 +204,7 @@ export default class extends Vue {
       id = this?.gridOptions?.api?.getLastDisplayedRow() || 0;
 
     let ds = 0;
-    this.gridOptions?.api?.forEachNode(function(node) {
+    this.gridOptions?.api?.forEachNode(function (node) {
       if (node.rowIndex === id) {
         node.setSelected(true);
         ds = node.rowIndex;
@@ -234,11 +236,20 @@ export default class extends Vue {
     (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 
-  private sendCompte(compte: CompteSearch) {
-    this.filtreCompte = '';
-    this.dialog = false;
-    this.reinitGrid();
-    this.resolve(compte);
+  private async sendCompte(compte: CompteSearch) {
+    if (compte.compteBloque) {
+      if (await this.confirmCompteBloque()) {
+        this.filtreCompte = '';
+        this.dialog = false;
+        this.reinitGrid();
+        this.resolve(compte);
+      }
+    } else {
+      this.filtreCompte = '';
+      this.dialog = false;
+      this.reinitGrid();
+      this.resolve(compte);
+    }
   }
 
   private close() {
@@ -246,6 +257,15 @@ export default class extends Vue {
     this.dialog = false;
     this.reinitGrid();
     this.reject();
+  }
+
+  private async confirmCompteBloque() {
+    return await (this.$refs.confirmDialog as Confirm).open(
+      'Attention, compte bloqué',
+      `Ce compte est bloqué, voulez-vous le sélectionner quand même ?`,
+      'error',
+      'Sélectionner'
+    );
   }
 }
 </script>
