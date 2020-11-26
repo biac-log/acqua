@@ -571,6 +571,7 @@ export default class ImputationVue extends Vue {
 
   private resetCompte() {
     this.autocompleteCompte?.resetCompte();
+    this.dateEcheance = this.typesComptesSelected.id != "G" ? this.datePiece : null; // Init dateEcheance to datePiece when not General
   }
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
