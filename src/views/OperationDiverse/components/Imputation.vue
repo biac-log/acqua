@@ -11,15 +11,11 @@
       <span tabindex="1" @focus="focusFirstElement" />
       <v-card outlined id="editImputation">
         <v-toolbar color="primary" dark flat dense>
-          <v-card-title class="pa-2">
-            Imputation
-          </v-card-title>
+          <v-card-title class="pa-2"> Imputation </v-card-title>
         </v-toolbar>
         <v-card-text v-if="!imputationIsSelected">
           <v-card>
-            <v-card-text>
-              Veuillez ajouter ou sélectionner une imputation.
-            </v-card-text>
+            <v-card-text> Veuillez ajouter ou sélectionner une imputation. </v-card-text>
           </v-card>
         </v-card-text>
         <v-card-text v-show="imputationIsSelected" class="pb-0">
@@ -38,7 +34,7 @@
                 :hide-details="readonly"
                 :rules="typesComptesRules"
                 tabindex="2"
-                @keyup="changeType"
+                @keyup="changeTypeCompte"
               ></v-select>
             </v-col>
             <v-col cols="6">
@@ -174,6 +170,7 @@
             </v-col> -->
             <v-col cols="3">
               <v-select
+                ref="refTypeMouvement"
                 :items="typesMouvements"
                 v-model="typesMouvementsSelected"
                 label="Type de mouvement"
@@ -185,6 +182,7 @@
                 :hide-details="readonly"
                 tabindex="8"
                 outlined
+                @keyup="changeTypeMouvement"
               ></v-select>
             </v-col>
             <v-col cols="5">
@@ -400,7 +398,7 @@ import SearchCaseTvaVue from '@/components/search/SearchCaseTva.vue';
 import { FinancierApi } from '@/api/FinancierApi';
 
 @Component({
-  components: { AutocompleteComptesVue, AutocompleteDossierVue, SearchEcheancierVue, DatePicker, SearchCaseTvaVue }
+  components: { AutocompleteComptesVue, AutocompleteDossierVue, SearchEcheancierVue, DatePicker, SearchCaseTvaVue },
 })
 export default class ImputationVue extends Vue {
   @Ref('autocompleteCompte') private autocompleteCompte?: AutocompleteComptesVue;
@@ -410,6 +408,7 @@ export default class ImputationVue extends Vue {
   @Ref('refLibelle') readonly refLibelle!: HTMLElement;
   @Ref('refMontant') readonly refMontant!: HTMLElement;
   @Ref('refReference') readonly refReference!: HTMLElement;
+  @Ref('refTypeMouvement') readonly refTypeMouvement!: HTMLElement;
 
   @PropSync('isReadonly', { default: true }) private readonly!: boolean;
   @PropSync('DatePiece') public datePiece!: DateTime;
@@ -446,7 +445,7 @@ export default class ImputationVue extends Vue {
   private montant = '';
   private montantRules: any = [
     (v: string) => !!v || 'Montant obligatoire',
-    (v: string) => v.isDecimal() || 'Montant invalide'
+    (v: string) => v.isDecimal() || 'Montant invalide',
   ];
 
   private caseTva: CaseTva = new CaseTva();
@@ -466,7 +465,7 @@ export default class ImputationVue extends Vue {
   }
   private reference = '';
   private referenceRules: any = [
-    (v: string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || 'Référence invalide'
+    (v: string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || 'Référence invalide',
   ];
   private referenceJournal = 0;
   private referencePiece = 0;
@@ -476,7 +475,7 @@ export default class ImputationVue extends Vue {
   private dateEcheance: DateTime | null = null;
   private dateEcheanceRules: any = [
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDateEcheance(v) || 'La date est hors période'
+    (v: string) => this.validateDateEcheance(v) || 'La date est hors période',
   ];
 
   private chida = '';
@@ -832,11 +831,19 @@ export default class ImputationVue extends Vue {
     }
   }
 
-  private changeType(event: KeyboardEvent) {
+  private changeTypeCompte(event: KeyboardEvent) {
     if (['c', 'f', 'g', 'z'].includes(event.key)) {
       if ('z' == event.key) this.typesComptesSelected = new TypeCompte({ id: 'Z', libelle: 'Extra-comptable' });
       this.$nextTick(() => this.firstElement.blur());
       this.$nextTick(() => this.autocompleteCompte?.focus());
+    }
+  }
+  private changeTypeMouvement(event: KeyboardEvent) {
+    if (['d', 'c'].includes(event.key)) {
+      if ('d' == event.key) this.typesMouvementsSelected = new TypeMouvement({ id: 'DB', libelle: 'Débit' });
+      if ('c' == event.key) this.typesMouvementsSelected = new TypeMouvement({ id: 'CR', libelle: 'Crédit' });
+      this.$nextTick(() => this.refTypeMouvement.blur());
+      this.$nextTick(() => this.refMontant.focus());
     }
   }
 }
