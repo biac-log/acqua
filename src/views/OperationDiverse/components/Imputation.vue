@@ -565,6 +565,7 @@ export default class ImputationVue extends Vue {
     this.typesMouvementsSelected =
       this.typesMouvements.find((t) => t.id == imputation.codeMouvement) || this.typesMouvements[0];
     this.caseTva = new CaseTva(imputation.caseTva);
+    this.numeroCaseTva = imputation.caseTva.numeroCase.toComptaString();
     this.typesOperationSelected = this.typesOperation.find((t) => t.numero == imputation.operationNumero) || null;
     this.montant = imputation.montantDevise.toDecimalString();
     this.reference = imputation.libelleReference;
@@ -579,6 +580,10 @@ export default class ImputationVue extends Vue {
   private resetCompte() {
     this.autocompleteCompte?.resetCompte();
     this.dateEcheance = this.typesComptesSelected.id != 'G' ? this.datePiece : null; // Init dateEcheance to datePiece when not General
+    if (this.typesComptesSelected.id != 'G') {
+      this.caseTva = new CaseTva();
+      this.numeroCaseTva = '';
+    }
   }
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
@@ -595,6 +600,8 @@ export default class ImputationVue extends Vue {
       this.nomCompte = compte.nom;
       this.numeroCompte = compte.numero.toString();
       this.natureCompte = '';
+      this.caseTva = new CaseTva();
+      this.numeroCaseTva = '';
       this.autocompleteDossier?.resetDossier();
       this.autocompleteCompte?.blur();
       this.refLibelle?.focus();
@@ -681,16 +688,16 @@ export default class ImputationVue extends Vue {
     this.errorReference = '';
 
     if (piece && piece.length >= 8) {
-      const regex = new RegExp("^\\d{1,2}[.]\\d{6}$");
+      const regex = new RegExp('^\\d{1,2}[.]\\d{6}$');
       let numeroJournal = 0;
       let numeroPiece = 0;
-      if(regex.test(piece)){
-        const splitPiece = piece.split('.')
+      if (regex.test(piece)) {
+        const splitPiece = piece.split('.');
         numeroJournal = splitPiece[0].toNumber();
         numeroPiece = splitPiece[1].toNumber();
         this.reference = piece;
-      }else{
-        numeroJournal = piece.substring(0,2).toNumber();
+      } else {
+        numeroJournal = piece.substring(0, 2).toNumber();
         numeroPiece = piece.substring(2).toNumber();
         this.reference = `${numeroJournal}.${numeroPiece}`;
       }
@@ -847,6 +854,8 @@ export default class ImputationVue extends Vue {
   }
 
   public close() {
+    this.caseTva = new CaseTva();
+    this.numeroCaseTva = '';
     this.numeroCaseTvaError = '';
     if (this.imputationIsSelected) {
       this.imputationIsSelected = false;
