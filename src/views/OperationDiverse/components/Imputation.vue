@@ -396,6 +396,7 @@ import { CaseTva } from '@/models/CaseTva';
 import CaseTvaApi from '@/api/CaseTvaApi';
 import SearchCaseTvaVue from '@/components/search/SearchCaseTva.vue';
 import { FinancierApi } from '@/api/FinancierApi';
+import EcheancierApi from '@/api/EcheancierApi';
 
 @Component({
   components: { AutocompleteComptesVue, AutocompleteDossierVue, SearchEcheancierVue, DatePicker, SearchCaseTvaVue },
@@ -577,7 +578,7 @@ export default class ImputationVue extends Vue {
 
   private resetCompte() {
     this.autocompleteCompte?.resetCompte();
-    this.dateEcheance = this.typesComptesSelected.id != "G" ? this.datePiece : null; // Init dateEcheance to datePiece when not General
+    this.dateEcheance = this.typesComptesSelected.id != 'G' ? this.datePiece : null; // Init dateEcheance to datePiece when not General
   }
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
@@ -597,7 +598,7 @@ export default class ImputationVue extends Vue {
       this.autocompleteDossier?.resetDossier();
       this.autocompleteCompte?.blur();
       this.refLibelle?.focus();
-      if(!this.previousLibelle) this.libelle = compte.nom;
+      if (!this.previousLibelle) this.libelle = compte.nom;
     }
   }
 
@@ -679,19 +680,32 @@ export default class ImputationVue extends Vue {
     this.referencePiece = 0;
     this.errorReference = '';
 
-    if (piece && piece.length == 8) {
-      const numeroJournal = piece.substring(0, 2);
-      const numeroPiece = piece.substring(2, 8);
-      this.reference = `${numeroJournal}.${numeroPiece}`;
+    if (piece && piece.length >= 8) {
+      const regex = new RegExp("^\\d{1,2}[.]\\d{6}$");
+      let numeroJournal = 0;
+      let numeroPiece = 0;
+      if(regex.test(piece)){
+        const splitPiece = piece.split('.')
+        numeroJournal = splitPiece[0].toNumber();
+        numeroPiece = splitPiece[1].toNumber();
+        this.reference = piece;
+      }else{
+        numeroJournal = piece.substring(0,2).toNumber();
+        numeroPiece = piece.substring(2).toNumber();
+        this.reference = `${numeroJournal}.${numeroPiece}`;
+      }
       this.loadingReference = true;
 
-      FinancierApi.getPieceAchatVente(numeroJournal.toNumber(), numeroPiece.toNumber())
-        .then((piece) => {
-          if (piece) {
-            this.referenceJournal = piece.numeroJournal;
-            this.referencePiece = piece.numeroPiece;
+      EcheancierApi.pieceExiste(this.typesComptesSelected.id, this.numeroCompte.toNumber(), numeroJournal, numeroPiece)
+        .then((exists) => {
+          if (exists) {
+            this.referenceJournal = numeroJournal;
+            this.referencePiece = numeroPiece;
             this.refMontant?.focus();
-          } else this.errorReference = "La pièce n'existe pas";
+          } else {
+            this.errorReference = "La pièce n'existe pas";
+            this.refReference?.focus();
+          }
         })
         .catch(() => {
           this.errorReference = "La pièce n'existe pas";
