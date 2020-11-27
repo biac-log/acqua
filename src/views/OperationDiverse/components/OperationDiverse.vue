@@ -508,14 +508,15 @@ export default class OperationDiverseVue extends Vue {
   }
 
   private async savePiece() {
-    (this.$refs.form as any).validate();
-    this.$nextTick(async () => {
-      if (this.isValid) {
-        const pieceToSave = this.getModelToSave();
-        if (!this.oldPiece) this.addPiece(pieceToSave);
-        else this.updatePiece(pieceToSave);
-      }
-    });
+    console.log(this.errorInTVA());
+    // (this.$refs.form as any).validate();
+    // this.$nextTick(async () => {
+    //   if (this.isValid) {
+    //     const pieceToSave = this.getModelToSave();
+    //     if (!this.oldPiece) this.addPiece(pieceToSave);
+    //     else this.updatePiece(pieceToSave);
+    //   }
+    // });
   }
 
   private addPiece(piece: OperationDiverseToSave) {
@@ -605,6 +606,42 @@ export default class OperationDiverseVue extends Vue {
 
   private clickOutside() {
     if (this.readonly) this.closeDialog();
+  }
+
+  private getTvaCalcule(): number {
+    if (!this.imputations) return 0;
+
+    const montantsCaseTva: { case: number; caseTaux: number; montant: number }[] = [];
+    this.imputations.forEach((element) => {
+      const montantCase = montantsCaseTva.find((c) => c.case == element.caseTva.numeroCase);
+      if (montantCase) montantCase.montant += element.credit - element.debit;
+      else if (element.caseTva.typeCase > 0 && element.caseTva.typeCase < 4) {
+        montantsCaseTva.push({
+          case: element.caseTva.numeroCase,
+          caseTaux: element.caseTva.tauxTvaCase,
+          montant: element.credit - element.debit,
+        });
+      }
+    });
+
+    return montantsCaseTva
+      .map((c) => ((c.montant * c.caseTaux) / 100).toDecimalString(2).toNumber())
+      .reduce((a, b) => a + b, 0)
+      .toDecimalString(this.journal.devise.typeDevise == 'E' ? 0 : 2)
+      .toNumber();
+  }
+
+  private getTvaImpute(): number {
+    if (!this.imputations) return 0;
+
+    return this.imputations
+      .filter((c) => [50, 51].includes(c.caseTva.typeCase) && c.codeDevise == this.journal.devise.id)
+      .map((c) => c.credit - c.debit)
+      .reduce((a, b) => a + b, 0);
+  }
+
+  private errorInTVA(): boolean {
+    return this.getTvaCalcule() != this.getTvaImpute();
   }
 }
 </script>
