@@ -430,6 +430,7 @@ export default class ImputationVue extends Vue {
 
   private libelle = '';
   private libelleRules: any = [(v: string) => !!v || 'Libellé obligatoire'];
+  private previousLibelle = '';
 
   private idDossier = '';
   private nomDossier = '';
@@ -511,7 +512,6 @@ export default class ImputationVue extends Vue {
     DeviseApi.getAllDevises().then((resp) => {
       this.devises = resp.filter((d) => d.libelle);
     });
-    console.log(this.modeLuxembourg);
   }
 
   public open(imputation: Imputation): Promise<Imputation> {
@@ -537,6 +537,7 @@ export default class ImputationVue extends Vue {
     this.autocompleteDossier?.resetDossier();
 
     this.setImputation(new Imputation());
+    this.previousLibelle = previousLibelle;
     this.libelle = previousLibelle;
     this.$nextTick(() => this.firstElement?.focus());
 
@@ -596,7 +597,7 @@ export default class ImputationVue extends Vue {
       this.autocompleteDossier?.resetDossier();
       this.autocompleteCompte?.blur();
       this.refLibelle?.focus();
-      if(!this.libelle) this.libelle = compte.nom;
+      if(!this.previousLibelle) this.libelle = compte.nom;
     }
   }
 
