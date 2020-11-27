@@ -508,15 +508,29 @@ export default class OperationDiverseVue extends Vue {
   }
 
   private async savePiece() {
-    console.log(this.errorInTVA());
-    // (this.$refs.form as any).validate();
-    // this.$nextTick(async () => {
-    //   if (this.isValid) {
-    //     const pieceToSave = this.getModelToSave();
-    //     if (!this.oldPiece) this.addPiece(pieceToSave);
-    //     else this.updatePiece(pieceToSave);
-    //   }
-    // });
+    (this.$refs.form as any).validate();
+    this.$nextTick(async () => {
+      if (this.isValid && (await this.confirmTva())) {
+        const pieceToSave = this.getModelToSave();
+        if (!this.oldPiece) this.addPiece(pieceToSave);
+        else this.updatePiece(pieceToSave);
+      }
+    });
+  }
+
+  private async confirmTva(): Promise<boolean> {
+    try {
+      if (this.errorInTVA())
+        return await (this.confirmDialog as Confirm).open(
+          'Attention, contrôle de tva',
+          `La tva calculée est différente de la tva imputée, voulez-vous sauvegarder ?`,
+          'error',
+          'Sauvegarder'
+        );
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   private addPiece(piece: OperationDiverseToSave) {
