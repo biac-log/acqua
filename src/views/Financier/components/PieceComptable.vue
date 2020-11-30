@@ -78,9 +78,7 @@
                               ><v-icon>mdi-pencil</v-icon></v-btn
                             >
                           </template>
-                          <span>
-                            Permettre l'édition du solde initial
-                          </span>
+                          <span> Permettre l'édition du solde initial </span>
                         </v-tooltip>
                       </template>
                     </v-text-field>
@@ -194,9 +192,9 @@
                 color="success"
                 :loading="saveLoading"
                 :disabled="!isValid || deleteLoading"
-                @click="savePiece()"
+                @click="validateDialog"
               >
-                <v-icon left>mdi-content-save</v-icon>Sauvegarder
+                <v-icon left>mdi-content-save</v-icon>Valider
               </v-btn>
             </template>
             <span>
@@ -258,7 +256,7 @@ import { PromiseResponse } from '@/models/PromiseResponse';
 import { nextTick } from 'vue/types/umd';
 
 @Component({
-  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue }
+  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue },
 })
 export default class PieceComptableVue extends Vue {
   @Ref() refExtraitVue!: ExtraitVue;
@@ -286,7 +284,7 @@ export default class PieceComptableVue extends Vue {
   private datePieceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période',
   ];
 
   private extraits: Extrait[] = [];
@@ -297,7 +295,7 @@ export default class PieceComptableVue extends Vue {
   private numeroToForce = '';
   private numeroToForceRules: any = [
     (v: string) => !!v || 'Numéro obligatoire',
-    (v: string) => !!v.toNumber() || 'Numéro invalide'
+    (v: string) => !!v.toNumber() || 'Numéro invalide',
   ];
 
   private saveLoading = false;
@@ -375,6 +373,7 @@ export default class PieceComptableVue extends Vue {
           this.extraits.push(resp.data);
           this.$nextTick(() => {
             if (resp.triggerEvent) this.createExtrait();
+            else this.savePiece();
           });
         })
         .catch()
@@ -484,14 +483,10 @@ export default class PieceComptableVue extends Vue {
 
   private addPiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
-    this.readonly = true;
     FinancierApi.addPieceComptable(piece)
-      .then((numeroPiece) => {
-        this.numeroPiece = numeroPiece.toString();
-        this.resolve(numeroPiece);
-        (this.$refs.form as any).resetValidation();
-        this.dialog = false;
-        this.reset();
+      .then((resp) => {
+        this.numeroPiece = resp.numeroPiece.toString();
+        this.hash = resp.hash;
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la sauvegarde de la pièce', displayAxiosError(err));
@@ -504,12 +499,12 @@ export default class PieceComptableVue extends Vue {
 
   private updatePiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
-    this.readonly = true;
     FinancierApi.updatePieceComptable(piece)
-      .then(() => {
-        this.resolve(piece.numeroPiece);
-        this.dialog = false;
-        this.reset();
+      .then((hash) => {
+        this.hash = hash;
+        // this.resolve(piece.numeroPiece);
+        // this.dialog = false;
+        // this.reset();
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la mise à jour de la pièce', displayAxiosError(err));
@@ -599,6 +594,13 @@ export default class PieceComptableVue extends Vue {
     }
   }
 
+  private validateDialog() {
+    this.resolve(this.numeroPiece);
+    (this.$refs.form as any).resetValidation();
+    this.dialog = false;
+    this.reset();
+  }
+
   private closeDialog() {
     this.reset();
     this.dialog = false;
@@ -609,7 +611,8 @@ export default class PieceComptableVue extends Vue {
     if (this.readonly) this.closeDialog();
   }
 
-  private closeDatePieceDialog() { // Almost working, need to refocus the field when it's invalid
+  private closeDatePieceDialog() {
+    // Almost working, need to refocus the field when it's invalid
     this.refDatePieceDialog.blur();
     if (this.refDatePieceDialog.isDateValid()) {
       this.datePieceDialog = false;
