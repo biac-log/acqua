@@ -74,7 +74,6 @@
             <v-text-field
               label="Condition paiement"
               v-model="allEcheanciers.conditionPaiement"
-              filled
               hide-details
               tabindex="-1"
               readonly
