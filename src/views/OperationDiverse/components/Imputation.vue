@@ -708,7 +708,6 @@ export default class ImputationVue extends Vue {
           if (exists) {
             this.referenceJournal = numeroJournal;
             this.referencePiece = numeroPiece;
-            this.refMontant?.focus();
           } else {
             this.errorReference = "La pièce n'existe pas";
             this.refReference?.focus();
