@@ -544,7 +544,7 @@ export default class extends Vue {
   private deleteExtrait() {
     if (!this.isNew && !this.readonly) {
       this.dialog = false;
-      this.resolve();
+      this.resolve(new PromiseResponse(null, false));
     }
   }
 

@@ -394,6 +394,7 @@ export default class PieceComptableVue extends Vue {
             resp.data
           );
         } else this.extraits.splice(this.extraits.indexOf(extrait), 1);
+        this.savePiece();
       })
       .catch()
       .finally(() => {
@@ -484,10 +485,11 @@ export default class PieceComptableVue extends Vue {
   private addPiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
     FinancierApi.addPieceComptable(piece)
-      .then((resp) => {
-        this.numeroPiece = resp.numeroPiece.toString();
-        this.hash = resp.hash;
+      .then((createdPiece) => {
+        this.numeroPiece = createdPiece.numeroPiece.toString();
+        this.hash = createdPiece.hash;
         (this.$parent as any).notifier('Ligne sauvegardée avec succès','success')
+        this.oldPiece = new Piece(createdPiece);
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la sauvegarde de la pièce', displayAxiosError(err));
@@ -502,9 +504,16 @@ export default class PieceComptableVue extends Vue {
   private updatePiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
     FinancierApi.updatePieceComptable(piece)
-      .then((hash) => {
-        this.hash = hash;
-        (this.$parent as any).notifier('Pièce mise à jour avec succès','success')
+      .then((updatedPiece) => {
+        this.hash = updatedPiece.hash;
+        let message = '';
+        if(this.oldPiece) {
+          if(this.oldPiece?.extraits.length < updatedPiece.extraits.length) message = 'Ligne ajoutée avec succès';
+          else if(this.oldPiece.extraits.length > updatedPiece.extraits.length) message = 'Ligne supprimée avec succès';
+          else message = 'Pièce mise à jour avec succès';
+        }
+        (this.$parent as any).notifier(message,'success');
+        this.oldPiece = new Piece(updatedPiece);
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la mise à jour de la pièce', displayAxiosError(err));
