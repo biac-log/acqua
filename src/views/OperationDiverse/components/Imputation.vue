@@ -151,7 +151,7 @@
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
-                tabindex="7"
+                tabindex="-1"
                 class="d-flex"
                 :suffix="taux"
                 outlined
