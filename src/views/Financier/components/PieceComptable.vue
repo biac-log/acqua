@@ -487,10 +487,12 @@ export default class PieceComptableVue extends Vue {
       .then((resp) => {
         this.numeroPiece = resp.numeroPiece.toString();
         this.hash = resp.hash;
+        (this.$parent as any).notifier('Ligne sauvegardée avec succès','success')
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la sauvegarde de la pièce', displayAxiosError(err));
         this.readonly = false;
+        (this.$parent as any).notifier('Erreur lors de l\'ajout de la ligne','error')
       })
       .finally(() => {
         this.saveLoading = false;
@@ -502,13 +504,12 @@ export default class PieceComptableVue extends Vue {
     FinancierApi.updatePieceComptable(piece)
       .then((hash) => {
         this.hash = hash;
-        // this.resolve(piece.numeroPiece);
-        // this.dialog = false;
-        // this.reset();
+        (this.$parent as any).notifier('Pièce mise à jour avec succès','success')
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la mise à jour de la pièce', displayAxiosError(err));
         this.readonly = false;
+        (this.$parent as any).notifier('Erreur lors de la mise à jour de la pièce','error')
       })
       .finally(() => {
         this.saveLoading = false;
