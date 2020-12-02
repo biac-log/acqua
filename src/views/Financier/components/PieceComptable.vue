@@ -312,7 +312,7 @@ export default class PieceComptableVue extends Vue {
   }
 
   private hash = '';
-  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<string> {
+  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<{numeroDernierePiece: number; delete: boolean}> {
     this.dialog = true;
     this.$nextTick(() => {
       this.newRecord = true;
@@ -605,7 +605,7 @@ export default class PieceComptableVue extends Vue {
   }
 
   private validateDialog() {
-    this.resolve({numeroDernierePiece: this.numeroPiece, delete: false});
+    this.resolve({numeroDernierePiece: this.numeroPiece.toNumber(), delete: false});
     (this.$refs.form as any).resetValidation();
     this.dialog = false;
     this.reset();
