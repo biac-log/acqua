@@ -338,7 +338,7 @@ export default class PieceComptableVue extends Vue {
     });
   }
 
-  public open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<number> {
+  public open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<{numeroDernierePiece: number; delete: boolean}> {
     this.newRecord = false;
     this.dialog = true;
     this.readonly = true;
@@ -456,9 +456,9 @@ export default class PieceComptableVue extends Vue {
             this.journal.numero,
             this.numeroPiece.toNumber()
           )
-            .then(() => {
+            .then((numeroDernierePiece) => {
               this.dialog = false;
-              this.resolve();
+              this.resolve({numeroDernierePiece: numeroDernierePiece, delete: true});
             })
             .catch((err) => {
               this.readonly = false;
@@ -605,16 +605,16 @@ export default class PieceComptableVue extends Vue {
   }
 
   private validateDialog() {
-    this.resolve(this.numeroPiece);
+    this.resolve({numeroDernierePiece: this.numeroPiece, delete: false});
     (this.$refs.form as any).resetValidation();
     this.dialog = false;
     this.reset();
   }
 
   private closeDialog() {
-    this.reset();
     this.dialog = false;
-    this.reject();
+    this.reject({newRecord: this.newRecord, numeroPiece: this.numeroPiece});
+    this.reset();
   }
 
   private clickOutside() {

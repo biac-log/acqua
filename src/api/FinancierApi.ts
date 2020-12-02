@@ -71,11 +71,11 @@ export abstract class FinancierApi {
     return response.data;
   }
 
-  static async deletePieceComptable(periode: string, numeroJournal: number, numeroPiece: number): Promise<boolean> {
-    await api.AcQuaCore.delete<any>(
+  static async deletePieceComptable(periode: string, numeroJournal: number, numeroPiece: number): Promise<number> {
+    const resp = await api.AcQuaCore.delete<number>(
       `Financier/DeletePieceComptable?periode=${periode}&journal=${numeroJournal}&piece=${numeroPiece}`
     );
-    return true;
+    return resp.data;
   }
 
   static async addPieceComptable(piece: PieceSaveDTO): Promise<PieceDTO> {

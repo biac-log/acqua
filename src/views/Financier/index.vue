@@ -212,11 +212,12 @@ export default class extends Vue {
     this.refDialogPiece
       .open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
       .then((resp) => {
-        if (resp) {
+        if (!resp.delete) {
           this.notifier(`Pièce numéro <b>${resp}</b> mise à jour.`, 'success');
         } else {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
           this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimée.`, 'error');
+          this.journalSelected.numeroDernierePiece = resp.numeroDernierePiece;
         }
       })
       .catch()
@@ -233,6 +234,11 @@ export default class extends Vue {
         if (!this.skipAddResult) this.displayAddResult(resp);
         this.journalSelected.numeroDernierePiece = parseInt(resp);
         this.loadPiecesComptables();
+      }).catch((resp) => {
+        if(resp.newRecord) {
+          this.journalSelected.numeroDernierePiece = parseInt(resp.numeroPiece);
+          this.loadPiecesComptables();
+        }
       })
       .finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
