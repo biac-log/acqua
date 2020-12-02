@@ -565,7 +565,7 @@ export default class ImputationVue extends Vue {
     this.typesMouvementsSelected =
       this.typesMouvements.find((t) => t.id == imputation.codeMouvement) || this.typesMouvements[0];
     this.caseTva = new CaseTva(imputation.caseTva);
-    this.numeroCaseTva = imputation.caseTva.numeroCase.toComptaString();
+    this.numeroCaseTva = imputation.caseTva.numeroCase.toIntString();
     this.typesOperationSelected = this.typesOperation.find((t) => t.numero == imputation.operationNumero) || null;
     this.montant = imputation.montantDevise.toDecimalString();
     this.reference = imputation.libelleReference;
