@@ -856,6 +856,7 @@ export default class ImputationVue extends Vue {
     this.caseTva = new CaseTva();
     this.numeroCaseTva = '';
     this.numeroCaseTvaError = '';
+    this.errorReference = '';
     if (this.imputationIsSelected) {
       this.imputationIsSelected = false;
       if (this.reject) this.reject();
