@@ -20,7 +20,7 @@
         </v-card-text>
         <v-card-text v-show="imputationIsSelected" class="pb-0">
           <v-row dense>
-            <v-col cols="3">
+            <v-col cols="4">
               <v-select
                 ref="firstElement"
                 :items="typesComptes"
@@ -37,7 +37,7 @@
                 @keyup="changeTypeCompte"
               ></v-select>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="8">
               <AutocompleteComptesVue
                 ref="autocompleteCompte"
                 :readonly.sync="readonly"
