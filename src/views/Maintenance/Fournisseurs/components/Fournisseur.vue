@@ -94,6 +94,9 @@
                       :hide-details="numeroReadonly"
                       :append-icon="readonly ? '' : 'mdi-pencil'"
                       @click:append="numeroReadonly = !numeroReadonly"
+                      @blur="checkNumeroExists"
+                      ref="numeroInput"
+                      :error-messages="numeroErrors"
                     />
                   </v-col>
                   <v-col cols="6" class="pb-0 pt-0">
@@ -106,6 +109,7 @@
                       maxlength="11"
                       dense
                       :hide-details="readonly"
+                      ref="raisonInput"
                     />
                   </v-col>
                   <v-col cols="12" class="pb-0 pt-0">
@@ -1044,6 +1048,7 @@ export default class FournisseurVue extends Vue {
   private fournisseurParams!: FournisseurParams;
 
   private rules = Fournisseur.rules;
+  private numeroErrors: string[] = [];
 
   /// Fournisseur model
   private numero = '';
@@ -1581,6 +1586,19 @@ export default class FournisseurVue extends Vue {
 
   private clickOutside() {
     if (this.readonly) this.closeDialog();
+  }
+
+  private async checkNumeroExists(){
+    const exists = await FournisseurApi.checkNumero(this.numero.toNumber());
+
+    if(exists){
+      this.numeroErrors.push('Ce numéro existe déjà');
+      (this.$refs.numeroInput as HTMLElement).focus();
+    }else{
+      this.numeroErrors = [];
+      this.numeroReadonly = true;
+      (this.$refs.raisonInput as HTMLElement).focus();
+    }
   }
 }
 </script>
