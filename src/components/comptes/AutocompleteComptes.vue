@@ -186,6 +186,7 @@ export default class AutocompleteComptes extends Vue {
   private openSearchCompte(): void {
     if (this._typeCompte) {
       this.comboboxCompte.blur();
+      this.errorCompte = '';
       if (this._typeCompte == 'G' || this._typeCompte == 'Z') this.openSearchCompteGeneral();
       else this.openSearchCompteTier();
     }
