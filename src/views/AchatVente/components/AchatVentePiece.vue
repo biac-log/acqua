@@ -455,6 +455,8 @@ export default class extends Vue {
     nom: ''
   };
 
+  private oldPiece: PieceComptable = new PieceComptable();
+
   private numeroCompteTierRules: any = [(v: any) => !!v || 'Numéro obligatoire'];
   private libelleFromInit = '';
   private libelle = '';
@@ -619,6 +621,7 @@ export default class extends Vue {
     this.compteAssocieNom = '';
     this.hash = '';
     (this.$refs.form as any).resetValidation();
+    this.oldPiece = new PieceComptable();
   }
 
   private async getPiece() {
@@ -636,6 +639,8 @@ export default class extends Vue {
   }
 
   private setPiece(pieceComptable: PieceComptable) {
+    this.oldPiece = new PieceComptable(pieceComptable);
+
     this.contreparties = pieceComptable.contreparties;
 
     this.numeroCompteTier = pieceComptable.compteTiersNumero.toString();
@@ -1065,12 +1070,11 @@ export default class extends Vue {
     return entete;
   }
 
-  private cancelEdit() {
-    this.piecereadonly = true;
+  private cancelEdit() {    
     if (this.numeroPiece.toNumber() == 0) {
       this.$nextTick(() => {
         this.confirmDialog
-          .open('Annuler', `Êtes-vous sur de vouloir annuler  ?`, 'warning', 'Annuler la création')
+          .open('Annuler', `Êtes-vous sûr de vouloir annuler  ?`, 'warning', 'Annuler la création')
           .then((resp) => {
             if (resp) {
               this.closeDialog();
@@ -1082,6 +1086,9 @@ export default class extends Vue {
             this.$nextTick(() => this.autocompleteCompteTier?.focus());
           });
       });
+    }else {
+      this.setPiece(this.oldPiece);
+      this.piecereadonly = true;
     }
   }
 
