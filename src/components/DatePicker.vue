@@ -24,6 +24,7 @@
         :outlined="outlined"
         validate-on-blur
         @update:error="validateField"
+        :error-messages="errorMessages"
       >
         <template v-slot:prepend-inner>
           <v-btn
@@ -48,7 +49,7 @@ import { Component, Vue, PropSync, Prop, Watch } from 'vue-property-decorator';
 import { DateTime } from '../models/DateTime';
 
 @Component({
-  name: 'DatePicker'
+  name: 'DatePicker',
 })
 export default class extends Vue {
   private menuDate = false;
@@ -63,6 +64,8 @@ export default class extends Vue {
   @PropSync('rules') public dateRules!: any;
   @PropSync('filled') public isFilled?: boolean;
   @PropSync('disabled', { default: false }) public isDisabled!: boolean;
+
+  private errorMessages: string[] = [];
 
   private parseDate(date: string) {
     if (!date) this.dateSelected = '';
@@ -126,7 +129,15 @@ export default class extends Vue {
   }
 
   public isDateValid() {
-    return new DateTime(this.dateFormatted).isValid();
+    this.parseDate(this.dateFormatted);
+    if (new DateTime(this.dateSelected).isValid()) {
+      this.errorMessages = [];
+      return true;
+    } else {
+      this.errorMessages.push('Date invalide');
+      this.focus();
+      return false;
+    }
   }
 }
 </script>

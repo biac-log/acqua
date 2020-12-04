@@ -622,8 +622,6 @@ export default class PieceComptableVue extends Vue {
   }
 
   private closeDatePieceDialog() {
-    // Almost working, need to refocus the field when it's invalid
-    this.refDatePieceDialog.blur();
     if (this.refDatePieceDialog.isDateValid()) {
       this.datePieceDialog = false;
       this.createExtrait();
