@@ -86,7 +86,7 @@ export default class AutocompleteComptes extends Vue {
   private error = false;
   private castNumero(item: { numero: number }) {
     //Car search-input doit être un string
-    return item.numero.toIntString();
+    return item.numero != 0 ? item.numero.toString() : '';
   }
 
   private initialisation = false;
