@@ -96,7 +96,8 @@ export default class AutocompleteComptes extends Vue {
       const compteToSelect = {
         numero: numero ? numero : '',
         nom,
-        numeroNom: numero ? `${numero} ${nom}` : ''
+        numeroNom: numero ? `${numero} ${nom}` : '',
+        bloque: false
       };
       this.setCompte(compteToSelect);
     } else this.resetCompte();
@@ -104,7 +105,7 @@ export default class AutocompleteComptes extends Vue {
   }
 
   //#region Compte
-  private async numeroCompteChangeAsync(value: string | { numero: string | number; nom: string } | undefined | null) {
+  private async numeroCompteChangeAsync(value: string | { numero: string | number; nom: string, bloque: boolean; } | undefined | null) {
     this.errorCompte = '';
     if (!value)
       //Si vide
@@ -226,7 +227,7 @@ export default class AutocompleteComptes extends Vue {
     this.setCompte(compteGeneral);
   }
 
-  private setCompte(compte: { numero: number | string; nom: string }) {
+  private setCompte(compte: { numero: number | string; nom: string; bloque: boolean }) {
     if (compte) {
       this.comptesSearch = [];
       this.comptesSearch.push(compte);
@@ -234,7 +235,12 @@ export default class AutocompleteComptes extends Vue {
       this.nomCompte = compte.nom;
       this.error = false;
       (this.comboboxCompte as any).errorBucket = [];
-      this.blur();
+      if(compte.bloque) {
+        this.error = true;
+        this.errorCompte = 'Compte bloqué'
+      }else{
+        this.blur();
+      }
     }
   }
 

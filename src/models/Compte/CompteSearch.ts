@@ -24,4 +24,9 @@ export class CompteSearch extends CompteSearchDTO {
   get compteBloqueDisplay() {
     return this.compteBloque ? 'Bloqué' : '';
   }
+
+  // Alias
+  get bloque(): boolean {
+    return this.compteBloque;
+  }
 }

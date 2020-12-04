@@ -14,6 +14,7 @@ export interface ICompteDeTier {
   compteVenteAchatNumero: number;
   compteVenteAchatNom: string;
   codeTaxe: number;
+  bloque: boolean;
 }
 
 export class CompteDeTierDTO implements ICompteDeTier {
@@ -32,6 +33,7 @@ export class CompteDeTierDTO implements ICompteDeTier {
   compteVenteAchatNumero = 0;
   compteVenteAchatNom = '';
   codeTaxe = 0;
+  bloque = false;
 }
 
 export class CompteDeTier extends CompteDeTierDTO {
