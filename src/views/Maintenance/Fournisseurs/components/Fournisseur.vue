@@ -53,7 +53,7 @@
           <fieldset id="signaletique">
             <legend>Signalétique</legend>
             <v-row dense>
-              <v-col cols="3" class="pr-3">
+              <v-col sm="6" lg="3" class="pr-3">
                 <v-row dense>
                   <v-col cols="6" class="pb-0 pt-0">
                     <v-text-field
@@ -127,7 +127,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" class="pr-3 pl-3">
+              <v-col sm="6" lg="3" class="pr-3 pl-3">
                 <v-row dense>
                   <v-col cols="12" class="pb-0 pt-0">
                     <v-text-field
@@ -191,7 +191,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" class="pr-3 pl-3">
+              <v-col sm="6" lg="3" class="pr-3 pl-3">
                 <v-row dense>
                   <v-col cols="6" class="pb-0 pt-0">
                     <v-text-field
@@ -259,7 +259,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" class="pl-3">
+              <v-col sm="6" lg="3" class="pl-3">
                 <v-row dense>
                   <v-col cols="12" class="pb-0 pt-0">
                     <v-text-field
@@ -302,7 +302,7 @@
             </v-row>
           </fieldset>
           <v-row dense>
-            <v-col cols="6">
+            <v-col sm="12" lg="6">
               <fieldset id="comptabilite">
                 <legend>Comptabilité</legend>
                 <v-row dense>
@@ -450,7 +450,7 @@
                 </v-row>
               </fieldset>
             </v-col>
-            <v-col cols="6">
+            <v-col sm="12" lg="6">
               <fieldset id="commercial">
                 <legend>Commercial</legend>
                 <v-row dense>
@@ -667,7 +667,7 @@
           <fieldset id="logistique">
             <legend>Logistique</legend>
             <v-row dense>
-              <v-col cols="3" dense>
+              <v-col sm="6" lg="3" dense>
                 <v-row dense>
                   <v-col cols="6">
                     <v-tooltip top open-delay="500">
@@ -726,7 +726,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" dense>
+              <v-col sm="6" lg="3" dense>
                 <v-row dense>
                   <v-col cols="6" class="pl-3">
                     <v-select
@@ -796,7 +796,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" dense class="pl-3 pr-3">
+              <v-col sm="6" lg="3" dense class="pl-3 pr-3">
                 <v-row dense>
                   <v-col cols="12">
                     <v-select
@@ -825,7 +825,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col cols="3" class="pl-3">
+              <v-col sm="6" lg="3" class="pl-3">
                 <v-row dense>
                   <v-col cols="6">
                     <v-tooltip top open-delay="500">
