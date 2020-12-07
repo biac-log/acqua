@@ -55,7 +55,7 @@
             <v-row dense>
               <v-col sm="6" lg="3" class="pr-3">
                 <v-row dense>
-                  <v-col cols="6" class="pb-0 pt-0">
+                  <v-col cols="6">
                     <v-text-field
                       autofocus
                       label="Nom"
@@ -71,7 +71,7 @@
                       validate-on-blur
                     />
                   </v-col>
-                  <v-col cols="6" class="pb-0 pt-0">
+                  <v-col cols="6">
                     <v-text-field
                       label="Match code"
                       v-model="matchCode"
@@ -83,7 +83,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="6" class="pb-0 pt-0">
+                  <v-col cols="6">
                     <v-text-field
                       label="Numéro"
                       v-model="numero"
@@ -99,7 +99,7 @@
                       :error-messages="numeroErrors"
                     />
                   </v-col>
-                  <v-col cols="6" class="pb-0 pt-0">
+                  <v-col cols="6">
                     <v-text-field
                       label="Raison sociale"
                       v-model="raisonSociale"
@@ -112,7 +112,7 @@
                       ref="raisonInput"
                     />
                   </v-col>
-                  <v-col cols="12" class="pb-0 pt-0">
+                  <v-col cols="12">
                     <v-text-field
                       label="E-mail"
                       v-model="email"
@@ -129,7 +129,7 @@
               </v-col>
               <v-col sm="6" lg="3" class="pr-3 pl-3">
                 <v-row dense>
-                  <v-col cols="12" class="pb-0 pt-0">
+                  <v-col cols="12">
                     <v-text-field
                       label="Adresse"
                       v-model="adresseLigne1"
@@ -141,7 +141,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="12" class="pb-0 pt-0">
+                  <v-col cols="12">
                     <v-text-field
                       label="Complément d'adresse"
                       v-model="adresseLigne2"
@@ -153,7 +153,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="4" class="pb-0 pt-0">
+                  <v-col cols="4">
                     <v-text-field
                       label="Code Postal"
                       v-model="codePostal"
@@ -165,7 +165,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="4" class="pb-0 pt-0">
+                  <v-col cols="4">
                     <v-text-field
                       label="Localité"
                       v-model="localité"
@@ -177,7 +177,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="4" class="pb-0 pt-0">
+                  <v-col cols="4">
                     <v-text-field
                       label="Pays"
                       v-model="codePays"
@@ -193,7 +193,7 @@
               </v-col>
               <v-col sm="6" lg="3" class="pr-3 pl-3">
                 <v-row dense>
-                  <v-col cols="6" class="pb-0 pt-0">
+                  <v-col cols="6" class="input-spacing">
                     <v-text-field
                       label="Téléphone"
                       v-model="numeroTelephone"
@@ -225,7 +225,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="6" class="pb-0 pt-0">
+                  <v-col cols="6" class="input-spacing">
                     <v-text-field
                       label="Contact 1"
                       v-model="contact1"
@@ -261,7 +261,7 @@
               </v-col>
               <v-col sm="6" lg="3" class="pl-3">
                 <v-row dense>
-                  <v-col cols="12" class="pb-0 pt-0">
+                  <v-col cols="12">
                     <v-text-field
                       label="Commentaire 1"
                       v-model="commentaire1"
@@ -273,7 +273,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="12" class="pb-0 pt-0">
+                  <v-col cols="12">
                     <v-text-field
                       label="Commentaire 2"
                       v-model="commentaire2"
@@ -285,7 +285,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="12" class="pb-0 pt-0">
+                  <v-col cols="12">
                     <v-text-field
                       label="Commentaire 3"
                       v-model="commentaire3"
@@ -306,7 +306,7 @@
               <fieldset id="comptabilite">
                 <legend>Comptabilité</legend>
                 <v-row dense>
-                  <v-col cols="6">
+                  <v-col cols="6" :class="readonly ? 'input-spacing' : ''">
                     <autocomplete-comptes-vue
                       :readonly.sync="readonly"
                       typeCompte.sync="G"
@@ -339,7 +339,7 @@
                       :rules="[]"
                     />
                   </v-col>
-                  <v-col cols="3" class="pb-0 pl-3">
+                  <v-col cols="3" class="pb-0 pl-3" :class="readonly ? 'input-spacing' : ''">
                     <v-text-field
                       label="IBAN"
                       v-model="compte"
@@ -368,7 +368,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3">
+                  <v-col cols="3" :class="readonly ? 'input-spacing' : ''">
                     <v-text-field
                       label="BIC"
                       v-model="bic"
@@ -398,7 +398,7 @@
                       dense
                     />
                   </v-col>
-                  <v-col cols="3" class="pt-0">
+                  <v-col cols="3" >
                     <v-select
                       label="Code devise"
                       :readonly="readonly"
@@ -410,7 +410,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3" class="pt-0 pr-3">
+                  <v-col cols="3" class=" pr-3">
                     <v-select
                       label="Code assujetti"
                       v-model="codeAssujetti"
@@ -423,7 +423,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="2" class="pt-0 pl-3">
+                  <v-col cols="2" class=" pl-3">
                     <v-text-field
                       label="Code Pays"
                       v-model="intraCodePays"
@@ -435,7 +435,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="4" class="pt-0">
+                  <v-col cols="4" >
                     <v-text-field
                       label="N° Intracommunautaire"
                       v-model="intraIdentification"
@@ -454,7 +454,7 @@
               <fieldset id="commercial">
                 <legend>Commercial</legend>
                 <v-row dense>
-                  <v-col cols="2">
+                  <v-col cols="2" :class="readonly ? 'input-spacing': ''">
                     <autocomplete-code-vue
                       ref="autocompleteCodeRepresentant"
                       label="Code représentant"
@@ -497,7 +497,7 @@
                       ref="paiementField"
                     />
                   </v-col>
-                  <v-col cols="4" class="pr-3">
+                  <v-col cols="4" class="pr-3" :class="readonly ? 'input-spacing': ''">
                     <v-text-field
                       outlined
                       readonly
@@ -523,7 +523,7 @@
                       label="Nom secteur"
                     />
                     <v-row dense>
-                      <v-col cols="6" class="pt-0 pb-0"
+                      <v-col cols="6" class=" pb-0"
                         ><v-text-field
                           outlined
                           readonly
@@ -531,7 +531,7 @@
                           v-model="libellePaiement"
                           :hide-details="readonly"
                       /></v-col>
-                      <v-col cols="6" class="pt-0 pb-0"
+                      <v-col cols="6" class=" pb-0"
                         ><v-text-field
                           outlined
                           label="Nombre de jours"
@@ -542,7 +542,7 @@
                       /></v-col>
                     </v-row>
                   </v-col>
-                  <v-col cols="2" class="pl-3">
+                  <v-col cols="2" class="pl-3" :class="readonly ? 'input-spacing': ''">
                     <v-select
                       label="Langue"
                       v-model="codeLangue"
@@ -570,7 +570,7 @@
                       :readonly="readonly"
                       :hide-details="readonly"
                     />
-                    <div :class="readonly ? 'pt-2' : 'datepicker-edition'">
+                    <div>
                       <date-picker
                         label="Fermeture du"
                         :date.sync="fermetureDu"
@@ -582,7 +582,7 @@
                       />
                     </div>
                   </v-col>
-                  <v-col cols="2">
+                  <v-col cols="2" :class="readonly ? 'input-spacing': ''">
                     <v-text-field
                       outlined
                       label="Numéro prix"
@@ -609,7 +609,7 @@
                       :rules="rules.remiseGlobaleDefaut"
                       validate-on-blur
                     />
-                    <div :class="readonly ? 'pt-2' : 'datepicker-edition'">
+                    <div>
                       <date-picker
                         id="fermetureAu"
                         label="au"
@@ -622,7 +622,7 @@
                       />
                     </div>
                   </v-col>
-                  <v-col cols="2">
+                  <v-col cols="2" :class="readonly ? 'input-spacing': ''">
                     <v-text-field
                       outlined
                       label="NACE"
@@ -728,7 +728,7 @@
               </v-col>
               <v-col sm="6" lg="3" dense>
                 <v-row dense>
-                  <v-col cols="6" class="pl-3">
+                  <v-col cols="6" class="pl-3" :class="readonly ? 'input-spacing': ''">
                     <v-select
                       label="Factures groupées"
                       v-model="facturesGroupees"
@@ -759,7 +759,7 @@
                       >
                     </v-tooltip>
                   </v-col>
-                  <v-col cols="6" class="pr-3">
+                  <v-col cols="6" class="pr-3" :class="readonly ? 'input-spacing': ''">
                     <v-tooltip top open-delay="500">
                       <template v-slot:activator="{ on }">
                         <v-text-field
@@ -798,7 +798,7 @@
               </v-col>
               <v-col sm="6" lg="3" dense class="pl-3 pr-3">
                 <v-row dense>
-                  <v-col cols="12">
+                  <v-col cols="12" :class="readonly ? 'input-spacing': ''">
                     <v-select
                       label="Transporteur"
                       v-model="transporteur"
@@ -825,9 +825,9 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col sm="6" lg="3" class="pl-3">
+              <v-col sm="6" lg="3" class="pl-3" >
                 <v-row dense>
-                  <v-col cols="6">
+                  <v-col cols="6" :class="readonly ? 'input-spacing': ''">
                     <v-tooltip top open-delay="500">
                       <template v-slot:activator="{ on }">
                         <v-text-field
@@ -863,7 +863,7 @@
                       <span>Nombre moyen de jours de délai de livraison</span>
                     </v-tooltip>
                   </v-col>
-                  <v-col cols="6">
+                  <v-col cols="6" :class="readonly ? 'input-spacing': ''">
                     <v-text-field
                       label="Conditions transp."
                       v-model="conditionsTransport"
@@ -1560,6 +1560,11 @@ export default class FournisseurVue extends Vue {
 </script>
 
 <style scoped>
+.input-spacing > .v-input, .input-spacing > .autocompleteCompte, .input-spacing > .autocompleteCode {
+  padding-bottom: 8px !important;
+}
+
+
 fieldset {
   padding-left: 11px;
   padding-right: 11px;
