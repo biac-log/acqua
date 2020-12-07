@@ -118,7 +118,6 @@
                       v-model="email"
                       outlined
                       :readonly="readonly"
-                      :counter="!readonly"
                       dense
                       :hide-details="readonly"
                       type="email"
