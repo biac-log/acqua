@@ -361,7 +361,6 @@ export default class OperationDiverseVue extends Vue {
   }
 
   private validateDatePiece(date: string): boolean {
-    console.log(date);
     const dateTime = new DateTime(date);
     return dateTime.isBetween(this.periode.dateDebut, this.periode.dateFin);
   }

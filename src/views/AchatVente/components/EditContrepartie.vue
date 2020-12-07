@@ -28,7 +28,6 @@
                 :rules="typesComptesRules"
                 @change="resetCompte"
                 tabindex="2"
-                autofocus
                 @keyup="changeType"
               ></v-select>
             </v-col>
@@ -230,6 +229,7 @@
                 v-on="on"
                 tabindex="9"
                 id="validateContrepartie"
+                @keydown.tab.prevent="focusFirstElement"
               >
                 <v-icon left>mdi-check</v-icon> Valider
               </v-btn>
@@ -387,6 +387,7 @@ export default class extends Vue {
         if (element != null) {
           element.scrollIntoView();
         }
+        (this.$refs.typesComptes as any).focus();
       });
     });
 
@@ -660,7 +661,7 @@ export default class extends Vue {
   }
 
   private focusFirstElement() {
-    this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+    this.$nextTick(() => (this.$refs.typesComptes as any)?.focus());
   }
 
   private focusLastElement() {

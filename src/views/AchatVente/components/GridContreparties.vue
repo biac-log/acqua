@@ -163,7 +163,6 @@ export default class extends Vue {
       contrepartie.numeroCompte = compteAchatVente.numero;
       contrepartie.compteLibelle = compteAchatVente.nom;
       contrepartie.libelle = this.nomCompteDeTier;
-      console.log(this.journal.codeMouvement);
       if (this.montantBase.toNumber() >= 0) {
         contrepartie.codeMouvement = this.journal.codeMouvement == 'DB' ? 'CR' : 'DB';
       } else {

@@ -111,7 +111,6 @@ export default class AutocompleteCodeVue extends Vue {
   }
 
   public focus() {
-    console.log('focus');
     this.$nextTick(() => this.comboboxCode?.focus());
   }
 }
