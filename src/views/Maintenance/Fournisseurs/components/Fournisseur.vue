@@ -306,22 +306,18 @@
               <fieldset id="comptabilite">
                 <legend>Comptabilité</legend>
                 <v-row dense>
-                  <v-col cols="6" class="pb-0">
-                    <div :class="readonly ? '' : 'autocomplete-edition'">
-                      <!-- Not the best, but it corrects the alignments .. -->
-                      <autocomplete-comptes-vue
-                        :readonly="readonly"
-                        typeCompte="G"
-                        label="N° de compte associé"
-                        @change="setCompteAssocie"
-                        v-model="compteAssocie"
-                        ref="autocompleteCompteAssocie"
-                        :hide-details="readonly"
-                        :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
-                        outlined
-                        :rules="[]"
-                      />
-                    </div>
+                  <v-col cols="6">                    
+                    <autocomplete-comptes-vue
+                      :readonly.sync="readonly"
+                      typeCompte.sync="G"
+                      label="N° de compte associé"
+                      @change="setCompteAssocie"
+                      v-model="compteAssocie"
+                      ref="autocompleteCompteAssocie"
+                      :hide-details.sync="readonly"
+                      outlined
+                      :rules="[]"
+                    />
                     <autocomplete-comptes-vue
                       :readonly="readonly"
                       typeCompte="C"
@@ -329,52 +325,21 @@
                       @change="setCompteMaitre"
                       ref="autocompleteCompteMaitre"
                       :hide-details="readonly"
-                      :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
                       outlined
                       :rules="[]"
                     />
-                    <div :style="readonly ? '' : 'margin-top: 8px;'">
-                      <!-- Not the best, but it corrects the alignments .. -->
-                      <autocomplete-comptes-vue
-                        :readonly="readonly"
-                        typeCompte="G"
-                        label="N° de compte vente/achat"
-                        @change="setCompteVenteAchat"
-                        ref="autocompleteCompteVenteAchat"
-                        :hide-details="readonly"
-                        :class="readonly ? 'autocompleteCompte-spacing' : 'edition'"
-                        outlined
-                        :rules="[]"
-                      />
-                    </div>
+                    <autocomplete-comptes-vue
+                      :readonly="readonly"
+                      typeCompte="G"
+                      label="N° de compte vente/achat"
+                      @change="setCompteVenteAchat"
+                      ref="autocompleteCompteVenteAchat"
+                      :hide-details="readonly"
+                      outlined
+                      :rules="[]"
+                    />
                   </v-col>
-                  <!-- <v-col cols="3" class="pb-0 pr-3">
-                    <v-text-field
-                      tabindex="-1"
-                      readonly
-                      outlined
-                      v-model="nomCompteAssocie"
-                      :hide-details="readonly"
-                      label="Nom du compte associé"
-                    />
-                    <v-text-field
-                      tabindex="-1"
-                      readonly
-                      outlined
-                      v-model="nomCompteMaitre"
-                      :hide-details="readonly"
-                      label="Nom du compte maître"
-                    />
-                    <v-text-field
-                      tabindex="-1"
-                      readonly
-                      outlined
-                      v-model="nomCompteVenteAchat"
-                      :hide-details="readonly"
-                      label="Nom du compte vente/achat"
-                    />
-                  </v-col> -->
-                  <v-col cols="3" class="pb-0 pl-3">
+                  <v-col cols="3" class=" pb-0 pl-3">
                     <v-text-field
                       label="IBAN"
                       v-model="compte"
@@ -403,7 +368,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3" class="pb-0">
+                  <v-col cols="3">
                     <v-text-field
                       label="BIC"
                       v-model="bic"
@@ -1009,7 +974,7 @@ import { DateTime } from '@/models/DateTime';
 
 @Component({
   name: 'FournisseurVue',
-  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue, AutocompleteCodeVue, DatePicker }
+  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue, AutocompleteCodeVue, DatePicker },
 })
 export default class FournisseurVue extends Vue {
   @Ref() readonly inputNom: any;
@@ -1145,7 +1110,7 @@ export default class FournisseurVue extends Vue {
     { code: 'N', valeur: 'Jamais de regroupement' },
     { code: 'Y', valeur: 'Toujours' },
     { code: 'A', valeur: 'Par adresse de livraison' },
-    { code: 'C', valeur: 'Par commande' }
+    { code: 'C', valeur: 'Par commande' },
   ];
 
   private transporteurs: Transporteur[] = [];
@@ -1587,13 +1552,13 @@ export default class FournisseurVue extends Vue {
     if (this.readonly) this.closeDialog();
   }
 
-  private async checkNumeroExists(){
+  private async checkNumeroExists() {
     const exists = await FournisseurApi.checkNumero(this.numero.toNumber());
 
-    if(exists){
+    if (exists) {
       this.numeroErrors.push('Ce numéro existe déjà');
       (this.$refs.numeroInput as HTMLElement).focus();
-    }else{
+    } else {
       this.numeroErrors = [];
       this.numeroReadonly = true;
       (this.$refs.raisonInput as HTMLElement).focus();
@@ -1603,32 +1568,6 @@ export default class FournisseurVue extends Vue {
 </script>
 
 <style scoped>
-.v-input,
-.autocompleteCompte-spacing,
-.autocompleteCode-spacing {
-  padding-top: 8px !important;
-  padding-bottom: 8px !important;
-}
-
-.datepicker-col {
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
-.datepicker-edition {
-  margin-top: -4px;
-}
-
-fieldset {
-  padding-right: 5px;
-  padding-left: 5px;
-}
-
-.autocomplete-edition {
-  margin-top: -4px;
-  margin-bottom: 8px;
-}
-
 fieldset {
   padding-left: 11px;
   padding-right: 11px;
