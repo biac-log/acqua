@@ -306,7 +306,7 @@
               <fieldset id="comptabilite">
                 <legend>Comptabilité</legend>
                 <v-row dense>
-                  <v-col cols="6">                    
+                  <v-col cols="6">
                     <autocomplete-comptes-vue
                       :readonly.sync="readonly"
                       typeCompte.sync="G"
@@ -339,7 +339,7 @@
                       :rules="[]"
                     />
                   </v-col>
-                  <v-col cols="3" class=" pb-0 pl-3">
+                  <v-col cols="3" class="pb-0 pl-3">
                     <v-text-field
                       label="IBAN"
                       v-model="compte"
@@ -455,18 +455,15 @@
                 <legend>Commercial</legend>
                 <v-row dense>
                   <v-col cols="2">
-                    <div :style="readonly ? '' : 'margin-top: -4px; margin-bottom: 8px;'">
-                      <autocomplete-code-vue
-                        ref="autocompleteCodeRepresentant"
-                        label="Code représentant"
-                        :readonly.sync="readonly"
-                        typeCode="codeRepresentant"
-                        v-model="codeRepresentant"
-                        @select="selectRepresentant"
-                        :class="readonly ? 'autocompleteCode-spacing' : ''"
-                        :hide-details="readonly"
-                      />
-                    </div>
+                    <autocomplete-code-vue
+                      ref="autocompleteCodeRepresentant"
+                      label="Code représentant"
+                      :readonly.sync="readonly"
+                      typeCode="codeRepresentant"
+                      v-model="codeRepresentant"
+                      @select="selectRepresentant"
+                      :hide-details="readonly"
+                    />
                     <autocomplete-code-vue
                       ref="autocompleteCodeFamille"
                       label="Code famille"
@@ -474,23 +471,19 @@
                       typeCode="codeFamille"
                       v-model="codeFamille"
                       @select="selectFamille"
-                      :class="readonly ? 'autocompleteCode-spacing' : ''"
                       :hide-details="readonly"
                       dense
                     />
-                    <div :style="readonly ? '' : 'margin-top: 8px; margin-bottom: 12px;'">
-                      <autocomplete-code-vue
-                        ref="autocompleteCodeSecteur"
-                        label="Code secteur"
-                        :readonly.sync="readonly"
-                        typeCode="codeSecteur"
-                        v-model="codeSecteur"
-                        @select="selectSecteur"
-                        :class="readonly ? 'autocompleteCode-spacing' : ''"
-                        :hide-details="readonly"
-                        dense
-                      />
-                    </div>
+                    <autocomplete-code-vue
+                      ref="autocompleteCodeSecteur"
+                      label="Code secteur"
+                      :readonly.sync="readonly"
+                      typeCode="codeSecteur"
+                      v-model="codeSecteur"
+                      @select="selectSecteur"
+                      :hide-details="readonly"
+                      dense
+                    />
                     <v-select
                       outlined
                       :readonly="readonly"
@@ -805,7 +798,7 @@
               </v-col>
               <v-col cols="3" dense class="pl-3 pr-3">
                 <v-row dense>
-                  <v-col cols="12" dense>
+                  <v-col cols="12">
                     <v-select
                       label="Transporteur"
                       v-model="transporteur"
@@ -815,7 +808,7 @@
                       item-text="transportFR"
                       item-value="id"
                       dense
-                      hide-details
+                      :hide-details="readonly"
                     ></v-select>
                     <v-combobox
                       label="Tournées"
@@ -828,7 +821,6 @@
                       v-model="tournees"
                       append-icon=""
                       :rules="rules.tournees"
-                      :class="readonly ? '' : 'mt-2'"
                     ></v-combobox>
                   </v-col>
                 </v-row>
@@ -843,7 +835,7 @@
                           v-model="periodiciteCommande"
                           outlined
                           :readonly="readonly"
-                          :suffix="readonly ? '' : 'semaines'"
+                          :suffix="periodiciteCommande != '0' ? '' : 'semaines'"
                           v-on="on"
                           dense
                           :hide-details="readonly"
@@ -860,7 +852,7 @@
                           v-model="delaiLivraison"
                           outlined
                           :readonly="readonly"
-                          :suffix="readonly ? '' : 'jours'"
+                          :suffix="delaiLivraison != '0' ? '' : 'jours'"
                           v-on="on"
                           dense
                           :hide-details="readonly"
