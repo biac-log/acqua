@@ -339,7 +339,7 @@
                       :rules="[]"
                     />
                   </v-col>
-                  <v-col cols="3" class="pb-0 pl-3" :class="readonly ? 'input-spacing' : ''">
+                  <v-col cols="3" class="pl-3" :class="readonly ? 'input-spacing' : ''">
                     <v-text-field
                       label="IBAN"
                       v-model="compte"
@@ -398,7 +398,7 @@
                       dense
                     />
                   </v-col>
-                  <v-col cols="3" >
+                  <v-col cols="3" :class="`pt-0 correct-alignment-top ${readonly ? 'correct-alignment-bottom' : ''}`">
                     <v-select
                       label="Code devise"
                       :readonly="readonly"
@@ -410,7 +410,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3" class=" pr-3">
+                  <v-col cols="3" :class="`pr-3 pt-0 correct-alignment-top ${readonly ? 'correct-alignment-bottom' : ''}`">
                     <v-select
                       label="Code assujetti"
                       v-model="codeAssujetti"
@@ -423,7 +423,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="2" class=" pl-3">
+                  <v-col cols="2" :class="`pl-3 pt-0 correct-alignment-top ${readonly ? 'correct-alignment-bottom' : ''}`">
                     <v-text-field
                       label="Code Pays"
                       v-model="intraCodePays"
@@ -435,7 +435,7 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="4" >
+                  <v-col cols="4" :class="`pt-0 correct-alignment-top ${readonly ? 'correct-alignment-bottom' : ''}`">
                     <v-text-field
                       label="N° Intracommunautaire"
                       v-model="intraIdentification"
@@ -454,7 +454,7 @@
               <fieldset id="commercial">
                 <legend>Commercial</legend>
                 <v-row dense>
-                  <v-col cols="2" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="2" :class="readonly ? 'input-spacing' : ''">
                     <autocomplete-code-vue
                       ref="autocompleteCodeRepresentant"
                       label="Code représentant"
@@ -484,20 +484,16 @@
                       :hide-details="readonly"
                       dense
                     />
-                    <v-select
+                    <v-text-field
                       outlined
-                      :readonly="readonly"
-                      label="Paiement"
-                      v-model="codePaiement"
-                      :items="codesPaiement"
-                      item-text="code"
-                      item-value="code"
-                      @change="changeCodePaiement"
+                      label="Nombre de jours"
+                      v-model="nombreDeJoursPaiement"
                       :hide-details="readonly"
-                      ref="paiementField"
+                      :rules="rules.nombreDeJoursPaiement"
+                      validate-on-blur
                     />
                   </v-col>
-                  <v-col cols="4" class="pr-3" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="4" class="pr-3" :class="readonly ? 'input-spacing' : ''">
                     <v-text-field
                       outlined
                       readonly
@@ -522,27 +518,20 @@
                       :hide-details="readonly"
                       label="Nom secteur"
                     />
-                    <v-row dense>
-                      <v-col cols="6" class=" pb-0"
-                        ><v-text-field
-                          outlined
-                          readonly
-                          tabindex="-1"
-                          v-model="libellePaiement"
-                          :hide-details="readonly"
-                      /></v-col>
-                      <v-col cols="6" class=" pb-0"
-                        ><v-text-field
-                          outlined
-                          label="Nombre de jours"
-                          v-model="nombreDeJoursPaiement"
-                          :hide-details="readonly"
-                          :rules="rules.nombreDeJoursPaiement"
-                          validate-on-blur
-                      /></v-col>
-                    </v-row>
+                    <v-select
+                      outlined
+                      :readonly="readonly"
+                      label="Paiement"
+                      v-model="codePaiement"
+                      :items="codesPaiement"
+                      item-text="code"
+                      item-value="code"
+                      @change="changeCodePaiement"
+                      :hide-details="readonly"
+                      ref="paiementField"
+                    />
                   </v-col>
-                  <v-col cols="2" class="pl-3" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="2" class="pl-3" :class="readonly ? 'input-spacing' : ''">
                     <v-select
                       label="Langue"
                       v-model="codeLangue"
@@ -582,7 +571,7 @@
                       />
                     </div>
                   </v-col>
-                  <v-col cols="2" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="2" :class="readonly ? 'input-spacing' : ''">
                     <v-text-field
                       outlined
                       label="Numéro prix"
@@ -622,7 +611,7 @@
                       />
                     </div>
                   </v-col>
-                  <v-col cols="2" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="2" :class="readonly ? 'input-spacing' : ''">
                     <v-text-field
                       outlined
                       label="NACE"
@@ -728,7 +717,7 @@
               </v-col>
               <v-col sm="6" lg="3" dense>
                 <v-row dense>
-                  <v-col cols="6" class="pl-3" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="6" class="pl-3" :class="readonly ? 'input-spacing' : ''">
                     <v-select
                       label="Factures groupées"
                       v-model="facturesGroupees"
@@ -759,7 +748,7 @@
                       >
                     </v-tooltip>
                   </v-col>
-                  <v-col cols="6" class="pr-3" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="6" class="pr-3" :class="readonly ? 'input-spacing' : ''">
                     <v-tooltip top open-delay="500">
                       <template v-slot:activator="{ on }">
                         <v-text-field
@@ -798,7 +787,7 @@
               </v-col>
               <v-col sm="6" lg="3" dense class="pl-3 pr-3">
                 <v-row dense>
-                  <v-col cols="12" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="12" :class="readonly ? 'input-spacing' : ''">
                     <v-select
                       label="Transporteur"
                       v-model="transporteur"
@@ -825,9 +814,9 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col sm="6" lg="3" class="pl-3" >
+              <v-col sm="6" lg="3" class="pl-3">
                 <v-row dense>
-                  <v-col cols="6" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="6" :class="readonly ? 'input-spacing' : ''">
                     <v-tooltip top open-delay="500">
                       <template v-slot:activator="{ on }">
                         <v-text-field
@@ -863,7 +852,7 @@
                       <span>Nombre moyen de jours de délai de livraison</span>
                     </v-tooltip>
                   </v-col>
-                  <v-col cols="6" :class="readonly ? 'input-spacing': ''">
+                  <v-col cols="6" :class="readonly ? 'input-spacing' : ''">
                     <v-text-field
                       label="Conditions transp."
                       v-model="conditionsTransport"
@@ -1560,10 +1549,18 @@ export default class FournisseurVue extends Vue {
 </script>
 
 <style scoped>
-.input-spacing > .v-input, .input-spacing > .autocompleteCompte, .input-spacing > .autocompleteCode {
+.input-spacing > .v-input,
+.input-spacing > .autocompleteCompte,
+.input-spacing > .autocompleteCode {
   padding-bottom: 8px !important;
 }
 
+.correct-alignment-top {
+  margin-top: -4px !important;
+}
+.correct-alignment-bottom {
+  padding-bottom: 12px !important;
+}
 
 fieldset {
   padding-left: 11px;
