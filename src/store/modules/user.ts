@@ -6,6 +6,7 @@ import { UserLogin } from '@/models/Login/UserLogin';
 import { JsonConvert } from 'json2typescript';
 import jwtDecode from 'jwt-decode';
 import api from '@/api/AxiosApi';
+import {SocieteModule} from './companies'
 
 export interface IUserState {
   token: string;
@@ -37,6 +38,7 @@ class User extends VuexModule implements IUserState {
   private setUser(user: Utilisateur): void {
     this.utilisateur = user;
     this.username = user.NomPrenom;
+    SocieteModule.fetchSocietes();
   }
 
   @Mutation
