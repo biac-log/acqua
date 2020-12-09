@@ -241,7 +241,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
-import { PeriodeComptable, EntetePieceComptable, Journal, Piece, Extrait } from '@/models/Financier';
+import { PeriodeComptable, Journal, Piece, Extrait } from '@/models/Financier';
 import { DateTime } from '@/models/DateTime';
 import AlertMessageVue from '@/components/AlertMessage.vue';
 import DatePicker from '@/components/DatePicker.vue';
@@ -253,10 +253,9 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
 import { sum } from 'lodash';
 import { PromiseResponse } from '@/models/PromiseResponse';
-import { nextTick } from 'vue/types/umd';
 
 @Component({
-  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue },
+  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue }
 })
 export default class PieceComptableVue extends Vue {
   @Ref() refExtraitVue!: ExtraitVue;
@@ -284,7 +283,7 @@ export default class PieceComptableVue extends Vue {
   private datePieceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDatePiece(v) || 'La date est hors période',
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
   ];
 
   private extraits: Extrait[] = [];
@@ -295,7 +294,7 @@ export default class PieceComptableVue extends Vue {
   private numeroToForce = '';
   private numeroToForceRules: any = [
     (v: string) => !!v || 'Numéro obligatoire',
-    (v: string) => !!v.toNumber() || 'Numéro invalide',
+    (v: string) => !!v.toNumber() || 'Numéro invalide'
   ];
 
   private saveLoading = false;
@@ -312,7 +311,10 @@ export default class PieceComptableVue extends Vue {
   }
 
   private hash = '';
-  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<{numeroDernierePiece: number; delete: boolean}> {
+  public async openNew(
+    periode: PeriodeComptable,
+    journal: Journal
+  ): Promise<{ numeroDernierePiece: number; delete: boolean }> {
     this.dialog = true;
     this.$nextTick(() => {
       this.newRecord = true;
@@ -338,7 +340,11 @@ export default class PieceComptableVue extends Vue {
     });
   }
 
-  public open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<{numeroDernierePiece: number; delete: boolean}> {
+  public open(
+    periode: PeriodeComptable,
+    journal: Journal,
+    numeroPieteToLoad: number
+  ): Promise<{ numeroDernierePiece: number; delete: boolean }> {
     this.newRecord = false;
     this.dialog = true;
     this.readonly = true;
@@ -458,7 +464,7 @@ export default class PieceComptableVue extends Vue {
           )
             .then((numeroDernierePiece) => {
               this.dialog = false;
-              this.resolve({numeroDernierePiece: numeroDernierePiece, delete: true});
+              this.resolve({ numeroDernierePiece, delete: true });
             })
             .catch((err) => {
               this.readonly = false;
@@ -488,13 +494,13 @@ export default class PieceComptableVue extends Vue {
       .then((createdPiece) => {
         this.numeroPiece = createdPiece.numeroPiece.toString();
         this.hash = createdPiece.hash;
-        (this.$parent as any).notifier('Ligne sauvegardée avec succès','success')
+        (this.$parent as any).notifier('Ligne sauvegardée avec succès', 'success');
         this.oldPiece = new Piece(createdPiece);
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la sauvegarde de la pièce', displayAxiosError(err));
         this.readonly = false;
-        (this.$parent as any).notifier('Erreur lors de l\'ajout de la ligne','error')
+        (this.$parent as any).notifier("Erreur lors de l'ajout de la ligne", 'error');
       })
       .finally(() => {
         this.saveLoading = false;
@@ -507,18 +513,19 @@ export default class PieceComptableVue extends Vue {
       .then((updatedPiece) => {
         this.hash = updatedPiece.hash;
         let message = '';
-        if(this.oldPiece) {
-          if(this.oldPiece?.extraits.length < updatedPiece.extraits.length) message = 'Ligne ajoutée avec succès';
-          else if(this.oldPiece.extraits.length > updatedPiece.extraits.length) message = 'Ligne supprimée avec succès';
+        if (this.oldPiece) {
+          if (this.oldPiece?.extraits.length < updatedPiece.extraits.length) message = 'Ligne ajoutée avec succès';
+          else if (this.oldPiece.extraits.length > updatedPiece.extraits.length)
+            message = 'Ligne supprimée avec succès';
           else message = 'Pièce mise à jour avec succès';
         }
-        (this.$parent as any).notifier(message,'success');
+        (this.$parent as any).notifier(message, 'success');
         this.oldPiece = new Piece(updatedPiece);
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la mise à jour de la pièce', displayAxiosError(err));
         this.readonly = false;
-        (this.$parent as any).notifier('Erreur lors de la mise à jour de la pièce','error')
+        (this.$parent as any).notifier('Erreur lors de la mise à jour de la pièce', 'error');
       })
       .finally(() => {
         this.saveLoading = false;
@@ -605,7 +612,7 @@ export default class PieceComptableVue extends Vue {
   }
 
   private validateDialog() {
-    this.resolve({numeroDernierePiece: this.numeroPiece.toNumber(), delete: false});
+    this.resolve({ numeroDernierePiece: this.numeroPiece.toNumber(), delete: false });
     (this.$refs.form as any).resetValidation();
     this.dialog = false;
     this.reset();
@@ -613,7 +620,7 @@ export default class PieceComptableVue extends Vue {
 
   private closeDialog() {
     this.dialog = false;
-    this.reject({newRecord: this.newRecord, numeroPiece: this.numeroPiece});
+    this.reject({ newRecord: this.newRecord, numeroPiece: this.numeroPiece });
     this.reset();
   }
 

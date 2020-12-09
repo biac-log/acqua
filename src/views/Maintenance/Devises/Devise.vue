@@ -299,7 +299,7 @@ export default class DeviseVue extends Vue {
   }
 
   private clickOutside() {
-    if(this.readonly) this.closeDialog();
+    if (this.readonly) this.closeDialog();
   }
 }
 </script>

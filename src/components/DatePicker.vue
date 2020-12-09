@@ -49,7 +49,7 @@ import { Component, Vue, PropSync, Prop, Watch } from 'vue-property-decorator';
 import { DateTime } from '../models/DateTime';
 
 @Component({
-  name: 'DatePicker',
+  name: 'DatePicker'
 })
 export default class extends Vue {
   private menuDate = false;

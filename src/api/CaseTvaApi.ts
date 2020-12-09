@@ -1,7 +1,6 @@
 import { CaseTva, CaseTvaDTO } from '@/models/CaseTva/CaseTva';
 import api from '@/api/AxiosApi';
 import { CaseTvaMaintenance, CaseTvaMaintenanceDTO } from '@/models/CaseTva/CaseTvaMaintenance';
-import { CreateCaseTva } from '@/models/CaseTva/CreateCaseTva';
 import { CaseTvaNature } from '@/models/CaseTva/CaseTvaNature';
 
 export default abstract class CaseTvaApi {
@@ -23,7 +22,7 @@ export default abstract class CaseTvaApi {
   }
 
   static async create(item: CaseTvaMaintenance): Promise<boolean> {
-    const response = await api.AcQuaCore.post<boolean>('/casetva', item);
+    await api.AcQuaCore.post<boolean>('/casetva', item);
 
     return true;
   }

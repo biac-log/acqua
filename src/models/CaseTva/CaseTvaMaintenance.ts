@@ -45,12 +45,15 @@ export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {
     return libelle;
   }
 
-    static rules = {
-        numero: [(v: string) => !!v || 'Numéro requis', (v: string) => v.length <= 3 || 'Max. 3 caractères' ],
-        libelle: [(v: string) => !!v || 'Libellé requis', (v: string) => v.length <= 5 || 'Max. 5 caractères' ],
-        typeCase: [(v: string) => !!v || 'Type requis', (v: string) => CaseTvaMaintenance.types.find((t) => t.value == v) != null || 'Valeur incorrecte'],
-        natureCase: [(v: string) => !!v || 'Nature requise'],        
-    };
+  static rules = {
+    numero: [(v: string) => !!v || 'Numéro requis', (v: string) => v.length <= 3 || 'Max. 3 caractères'],
+    libelle: [(v: string) => !!v || 'Libellé requis', (v: string) => v.length <= 5 || 'Max. 5 caractères'],
+    typeCase: [
+      (v: string) => !!v || 'Type requis',
+      (v: string) => CaseTvaMaintenance.types.find((t) => t.value == v) != null || 'Valeur incorrecte'
+    ],
+    natureCase: [(v: string) => !!v || 'Nature requise']
+  };
 
   static types = [
     new TypeCase('Taxé', '1'),
@@ -61,5 +64,29 @@ export class CaseTvaMaintenance extends CaseTvaMaintenanceDTO {
     new TypeCase('Taxe Luxe', '51')
   ];
 
-    static requiresCountryCode = ["VE","AI","II","FI","IT","PV","PA","PF","PI","VX","BX","FX","AX","PX","SX","IX","TX","XL","XE","XA","XI","YV","YA"];
+  static requiresCountryCode = [
+    'VE',
+    'AI',
+    'II',
+    'FI',
+    'IT',
+    'PV',
+    'PA',
+    'PF',
+    'PI',
+    'VX',
+    'BX',
+    'FX',
+    'AX',
+    'PX',
+    'SX',
+    'IX',
+    'TX',
+    'XL',
+    'XE',
+    'XA',
+    'XI',
+    'YV',
+    'YA'
+  ];
 }

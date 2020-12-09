@@ -358,7 +358,7 @@ export default class TauxVue extends Vue {
   }
 
   private clickOutside() {
-    if(this.readonly) this.closeDialog();
+    if (this.readonly) this.closeDialog();
   }
 }
 </script>

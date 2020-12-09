@@ -234,8 +234,9 @@ export default class extends Vue {
         if (!this.skipAddResult) this.displayAddResult(resp.numeroDernierePiece.toString());
         this.journalSelected.numeroDernierePiece = resp.numeroDernierePiece;
         this.loadPiecesComptables();
-      }).catch((resp) => {
-        if(resp.newRecord) {
+      })
+      .catch((resp) => {
+        if (resp.newRecord) {
           this.journalSelected.numeroDernierePiece = parseInt(resp.numeroPiece);
           this.loadPiecesComptables();
         }
@@ -247,7 +248,12 @@ export default class extends Vue {
 
   private displayAddResult(numeroPiece: string) {
     (this.$refs.PieceAddResultVue as PieceAddResultVue)
-      .open(this.journalSelected.numero, parseInt(numeroPiece), this.periodeSelected.typePeriodeComptable, this.journalSelected.numeroCompteBanque)
+      .open(
+        this.journalSelected.numero,
+        parseInt(numeroPiece),
+        this.periodeSelected.typePeriodeComptable,
+        this.journalSelected.numeroCompteBanque
+      )
       .then((numero) => {
         if (parseInt(numeroPiece) != numero) {
           this.loadPiecesComptables();

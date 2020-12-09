@@ -212,7 +212,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref, Watch } from 'vue-property-decorator';
+import { Component, Vue, Ref } from 'vue-property-decorator';
 import { CaseTvaMaintenance, TypeCase } from '@/models/CaseTva/CaseTvaMaintenance';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
@@ -271,7 +271,7 @@ export default class CaseTvaVue extends Vue {
   private intrastat = false;
 
   private rules = CaseTvaMaintenance.rules;
-  private codePaysRules = [(v: string) => this.countryCodeRequired() || 'Requis'];
+  private codePaysRules = [() => this.countryCodeRequired() || 'Requis'];
 
   private types: TypeCase[] = CaseTvaMaintenance.types;
   private natures: CaseTvaNature[] = [];
@@ -321,7 +321,7 @@ export default class CaseTvaVue extends Vue {
     });
   }
 
-  private async loadNatures(){
+  private async loadNatures() {
     this.natures = await CaseTvaApi.getNatures();
   }
 
@@ -441,5 +441,4 @@ export default class CaseTvaVue extends Vue {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

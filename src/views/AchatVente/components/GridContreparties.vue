@@ -67,7 +67,7 @@ import AchatVenteApi from '@/api/AchatVenteApi';
 
 @Component({
   name: 'GridContreparties',
-  components: { EditContrepartieVue },
+  components: { EditContrepartieVue }
 })
 export default class extends Vue {
   @PropSync('IsReadOnly') public readonly!: boolean;
@@ -94,7 +94,7 @@ export default class extends Vue {
     { text: 'Débit', value: 'montantDebit', align: 'end' },
     { text: 'Crédit', value: 'montantCredit', align: 'end' },
     { text: 'Devise', value: 'libelleDevise' },
-    { text: 'Case TVA', value: 'libelleCaseTva' },
+    { text: 'Case TVA', value: 'libelleCaseTva' }
   ];
 
   private addContrepartie(contrepartie?: PieceComptableContrepartie) {
@@ -113,7 +113,7 @@ export default class extends Vue {
         this.propositionLibelle = resp.libelle;
         const maxLigne = Math.max(...this.contreparties.map((i) => i.numeroLigne));
         resp.numeroLigne = maxLigne + 1;
-        this.contreparties.push(resp);        
+        this.contreparties.push(resp);
         this.$nextTick(() => {
           if (this.ventilleBase != 0 || this.ventilleDevise != 0) this.createContrepartie();
         });
@@ -277,7 +277,7 @@ export default class extends Vue {
           montantsCaseTva.push({
             case: element.caseTva.numeroCase,
             caseTaux: element.caseTva.tauxTvaCase,
-            montant: element.montantCredit.toNumber() - element.montantDebit.toNumber(),
+            montant: element.montantCredit.toNumber() - element.montantDebit.toNumber()
           });
         }
       });

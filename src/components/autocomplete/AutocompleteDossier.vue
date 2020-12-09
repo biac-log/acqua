@@ -58,7 +58,6 @@ import { Component, Vue, Watch, Ref, PropSync, Prop } from 'vue-property-decorat
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import DossierApi from '@/api/DossierApi';
 import SearchDossierVue from '@/components/search/SearchDossier.vue';
-import { property } from 'lodash';
 
 @Component({ components: { SearchDossierVue } })
 export default class AutoCompleteDossierVue extends Vue {

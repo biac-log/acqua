@@ -33,7 +33,7 @@
 <script lang="ts">
 import LibelleReglementApi from '@/api/LibelleReglementApi';
 import { LibelleReglement } from '@/models/LibelleReglement/LibelleReglement';
-import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
+import { Component, Vue, Ref } from 'vue-property-decorator';
 import LibelleReglementVue from '@/views/Maintenance/LibellesReglement/LibelleReglement.vue';
 
 @Component({
@@ -54,7 +54,7 @@ export default class LibellesReglementVue extends Vue {
   private items: LibelleReglement[] = [];
   private headers = [
     { text: 'Numéro', value: 'numero' },
-    { text: 'Libellé', value: 'libelle' },
+    { text: 'Libellé', value: 'libelle' }
   ];
 
   private async loadItems() {

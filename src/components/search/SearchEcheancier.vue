@@ -165,7 +165,7 @@ export default class extends Vue {
 
   @PropSync('MontantAVentileDevise', { default: 0 }) private montantAVentileDevise!: number;
   @PropSync('MontantAVentileBase', { default: 0 }) private montantAVentileBase!: number;
-  @Prop({default: true}) private multipleSelection!: boolean;
+  @Prop({ default: true }) private multipleSelection!: boolean;
 
   private typeLoad!: string;
   private numeroEcheancierToLoad!: string;

@@ -209,7 +209,9 @@
           <v-spacer></v-spacer>
           <v-tooltip top open-delay="500" open-on-hover>
             <template v-slot:activator="{ on }">
-              <v-btn v-if="!readonly" @click="generateTVA" class="ma-2 pr-4" tile outlined v-on="on" color="warning">Solde = TVA</v-btn>
+              <v-btn v-if="!readonly" @click="generateTVA" class="ma-2 pr-4" tile outlined v-on="on" color="warning"
+                >Solde = TVA</v-btn
+              >
             </template>
             <span>Attribue le reste à ventiler au montant<span class="shortcutTooltip">F2</span></span>
           </v-tooltip>
@@ -270,8 +272,8 @@ import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue
     SearchCompteContrepartieVue,
     SearchCaseTvaVue,
     AutoCompleteDossierVue,
-    AutocompleteComptesVue,
-  },
+    AutocompleteComptesVue
+  }
 })
 export default class extends Vue {
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
@@ -319,7 +321,7 @@ export default class extends Vue {
   private numeroCaseTva = '';
   private numeroCaseTvaRules: any = [
     (v: string) => !!v || 'Case tva obligatoire',
-    (v: string) => (v.isInt() && v.toNumber() != 0) || 'Numero invalide',
+    (v: string) => (v.isInt() && v.toNumber() != 0) || 'Numero invalide'
   ];
   private caseTva: CaseTva = new CaseTva();
 
@@ -425,7 +427,7 @@ export default class extends Vue {
             idDossier: contrepartie.dossier,
             nom: contrepartie.dossierNom,
             dateEntree: '',
-            dateSortie: '',
+            dateSortie: ''
           })
         );
         this.idDossier = contrepartie.dossier;
@@ -463,7 +465,7 @@ export default class extends Vue {
           new Devise({
             id: contrepartie.codeDevise,
             libelle: contrepartie.libelleDevise,
-            typeDevise: this.devisesSelected.typeDevise,
+            typeDevise: this.devisesSelected.typeDevise
           })
         );
       }

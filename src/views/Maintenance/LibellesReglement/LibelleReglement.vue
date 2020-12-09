@@ -279,10 +279,9 @@ export default class LibelleReglementVue extends Vue {
   }
 
   private clickOutside() {
-    if(this.readonly) this.closeDialog();
+    if (this.readonly) this.closeDialog();
   }
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

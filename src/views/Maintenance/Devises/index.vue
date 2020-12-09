@@ -42,8 +42,7 @@
 <script lang="ts">
 import DeviseApi from '@/api/DeviseApi';
 import { DeviseMaintenance } from '@/models/Devise/DeviseMaintenance';
-import { Pagination } from '@/models/Pagination';
-import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
+import { Component, Vue, Ref } from 'vue-property-decorator';
 import DeviseVue from '@/views/Maintenance/Devises/Devise.vue';
 
 @Component({

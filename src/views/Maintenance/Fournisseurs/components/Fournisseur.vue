@@ -410,7 +410,10 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="3" :class="`pr-3 pt-0 correct-alignment-top ${readonly ? 'correct-alignment-bottom' : ''}`">
+                  <v-col
+                    cols="3"
+                    :class="`pr-3 pt-0 correct-alignment-top ${readonly ? 'correct-alignment-bottom' : ''}`"
+                  >
                     <v-select
                       label="Code assujetti"
                       v-model="codeAssujetti"
@@ -423,7 +426,10 @@
                       :hide-details="readonly"
                     />
                   </v-col>
-                  <v-col cols="2" :class="`pl-3 pt-0 correct-alignment-top ${readonly ? 'correct-alignment-bottom' : ''}`">
+                  <v-col
+                    cols="2"
+                    :class="`pl-3 pt-0 correct-alignment-top ${readonly ? 'correct-alignment-bottom' : ''}`"
+                  >
                     <v-text-field
                       label="Code Pays"
                       v-model="intraCodePays"
@@ -955,7 +961,7 @@ import { DateTime } from '@/models/DateTime';
 
 @Component({
   name: 'FournisseurVue',
-  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue, AutocompleteCodeVue, DatePicker },
+  components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue, AutocompleteCodeVue, DatePicker }
 })
 export default class FournisseurVue extends Vue {
   @Ref() readonly inputNom: any;
@@ -1091,7 +1097,7 @@ export default class FournisseurVue extends Vue {
     { code: 'N', valeur: 'Jamais de regroupement' },
     { code: 'Y', valeur: 'Toujours' },
     { code: 'A', valeur: 'Par adresse de livraison' },
-    { code: 'C', valeur: 'Par commande' },
+    { code: 'C', valeur: 'Par commande' }
   ];
 
   private transporteurs: Transporteur[] = [];

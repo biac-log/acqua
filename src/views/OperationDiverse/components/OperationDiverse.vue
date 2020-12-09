@@ -283,7 +283,7 @@ import {
   Journal,
   PieceComptable,
   Imputation,
-  OperationDiverseToSave,
+  OperationDiverseToSave
 } from '@/models/OperationDiverse';
 import { DateTime } from '@/models/DateTime';
 import AlertMessageVue from '@/components/AlertMessage.vue';
@@ -295,7 +295,7 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import { sum } from 'lodash';
 
 @Component({
-  components: { ImputationVue, DatePicker, Confirm, AlertMessageVue },
+  components: { ImputationVue, DatePicker, Confirm, AlertMessageVue }
 })
 export default class OperationDiverseVue extends Vue {
   @Ref() refImputationVue!: ImputationVue;
@@ -322,7 +322,7 @@ export default class OperationDiverseVue extends Vue {
   private datePieceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDatePiece(v) || 'La date est hors période',
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
   ];
   private libellePiece = '';
 
@@ -343,14 +343,14 @@ export default class OperationDiverseVue extends Vue {
     { text: 'Crédit', value: 'credit' },
     { text: 'Devise', value: 'libelleDevise' },
     { text: 'Divers', value: 'libelleReference' },
-    { text: 'Case TVA', value: 'libelleCaseTVA', align: 'end' },
+    { text: 'Case TVA', value: 'libelleCaseTVA', align: 'end' }
   ];
 
   private forcerNumero = false;
   private numeroToForce = '';
   private numeroToForceRules: any = [
     (v: string) => !!v || 'Numéro obligatoire',
-    (v: string) => !!v.toNumber() || 'Numéro invalide',
+    (v: string) => !!v.toNumber() || 'Numéro invalide'
   ];
 
   private saveLoading = false;
@@ -632,7 +632,7 @@ export default class OperationDiverseVue extends Vue {
         montantsCaseTva.push({
           case: element.caseTva.numeroCase,
           caseTaux: element.caseTva.tauxTvaCase,
-          montant: element.credit - element.debit,
+          montant: element.credit - element.debit
         });
       }
     });

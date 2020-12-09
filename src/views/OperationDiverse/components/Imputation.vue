@@ -395,11 +395,10 @@ import { PeriodeComptable } from '@/models/AchatVente';
 import { CaseTva } from '@/models/CaseTva';
 import CaseTvaApi from '@/api/CaseTvaApi';
 import SearchCaseTvaVue from '@/components/search/SearchCaseTva.vue';
-import { FinancierApi } from '@/api/FinancierApi';
 import EcheancierApi from '@/api/EcheancierApi';
 
 @Component({
-  components: { AutocompleteComptesVue, AutocompleteDossierVue, SearchEcheancierVue, DatePicker, SearchCaseTvaVue },
+  components: { AutocompleteComptesVue, AutocompleteDossierVue, SearchEcheancierVue, DatePicker, SearchCaseTvaVue }
 })
 export default class ImputationVue extends Vue {
   @Ref('autocompleteCompte') private autocompleteCompte?: AutocompleteComptesVue;
@@ -447,7 +446,7 @@ export default class ImputationVue extends Vue {
   private montant = '';
   private montantRules: any = [
     (v: string) => !!v || 'Montant obligatoire',
-    (v: string) => v.isDecimal() || 'Montant invalide',
+    (v: string) => v.isDecimal() || 'Montant invalide'
   ];
 
   private caseTva: CaseTva = new CaseTva();
@@ -467,7 +466,7 @@ export default class ImputationVue extends Vue {
   }
   private reference = '';
   private referenceRules: any = [
-    (v: string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || 'Référence invalide',
+    (v: string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || 'Référence invalide'
   ];
   private referenceJournal = 0;
   private referencePiece = 0;
@@ -477,7 +476,7 @@ export default class ImputationVue extends Vue {
   private dateEcheance: DateTime | null = null;
   private dateEcheanceRules: any = [
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDateEcheance(v) || 'La date est hors période',
+    (v: string) => this.validateDateEcheance(v) || 'La date est hors période'
   ];
 
   private chida = '';

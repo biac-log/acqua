@@ -95,4 +95,4 @@ interface Array<T> {
 
 Array.prototype.isEmpty = function() {
   return this.length == 0;
-}
+};

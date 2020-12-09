@@ -8,15 +8,15 @@ export default abstract class LibelleReglementApi {
   }
 
   static async create(item: LibelleReglement): Promise<boolean> {
-    const response = await api.AcQuaCore.post<boolean>('/parametres/libellesreglement', item);
+    await api.AcQuaCore.post<boolean>('/parametres/libellesreglement', item);
 
     return true;
   }
 
   static async update(updatedLibelleReglement: LibelleReglement, hashOldModel: string): Promise<boolean> {
     const data = {
-      updatedModel : updatedLibelleReglement,
-      hashOldModel : hashOldModel
+      updatedModel: updatedLibelleReglement,
+      hashOldModel
     };
     const response = await api.AcQuaCore.put<boolean>('/parametres/libellesreglement', data);
 

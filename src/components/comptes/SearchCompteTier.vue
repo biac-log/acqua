@@ -53,7 +53,7 @@ import Confirm from '@/components/Confirm.vue';
 
 @Component({
   name: 'SearchCompteTier',
-  components: { AgGridVue, Confirm },
+  components: { AgGridVue, Confirm }
 })
 export default class extends Vue {
   private dialog = false;
@@ -67,7 +67,7 @@ export default class extends Vue {
     { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
     { headerName: 'Raison sociale', field: 'raisonSocial', filter: true, width: 140 },
     { headerName: 'Adresse', field: 'adresse', filter: true, flex: 1 },
-    { headerName: 'Bloqué', field: 'compteBloqueDisplay', filter: true, width: 100 },
+    { headerName: 'Bloqué', field: 'compteBloqueDisplay', filter: true, width: 100 }
   ];
 
   private resolve!: any;
@@ -87,7 +87,7 @@ export default class extends Vue {
     onRowDoubleClicked: this.rowDoubleClick,
     getRowStyle(params: any) {
       if (params.node.data.compteBloque) return { 'background-color': '#ffd6cc' };
-    },
+    }
   };
 
   public open(typeToLoad: string, filter: string): Promise<CompteSearch> {
@@ -148,7 +148,7 @@ export default class extends Vue {
       case KEY_DOWN:
         previousCell = params.previousCellPosition;
         // set selected cell on current cell + 1
-        this.gridOptions?.api?.forEachNode(function (node) {
+        this.gridOptions?.api?.forEachNode(function(node) {
           if (previousCell.rowIndex + 1 === node.rowIndex) {
             node.setSelected(true);
           }
@@ -161,7 +161,7 @@ export default class extends Vue {
         } else {
           previousCell = params.previousCellPosition;
           // set selected cell on current cell - 1
-          this.gridOptions?.api?.forEachNode(function (node) {
+          this.gridOptions?.api?.forEachNode(function(node) {
             if (previousCell.rowIndex - 1 === node.rowIndex) {
               node.setSelected(true);
             }
@@ -204,7 +204,7 @@ export default class extends Vue {
       id = this?.gridOptions?.api?.getLastDisplayedRow() || 0;
 
     let ds = 0;
-    this.gridOptions?.api?.forEachNode(function (node) {
+    this.gridOptions?.api?.forEachNode(function(node) {
       if (node.rowIndex === id) {
         node.setSelected(true);
         ds = node.rowIndex;

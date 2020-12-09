@@ -17,6 +17,6 @@ export class LibelleReglement extends LibelleReglementDTO {
   }
 
   public static rules = {
-    numero: [(v: string) => !v || !!v.toNumber() || v.toNumber() > 1 || v.toNumber() < 99 || 'Nombre invalide',],
-  }
+    numero: [(v: string) => !v || !!v.toNumber() || v.toNumber() > 1 || v.toNumber() < 99 || 'Nombre invalide']
+  };
 }

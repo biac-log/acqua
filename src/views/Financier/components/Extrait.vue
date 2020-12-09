@@ -222,7 +222,7 @@ import DatePicker from '@/components/DatePicker.vue';
 
 @Component({
   name: 'Extrait',
-  components: { VentilationVue, DatePicker },
+  components: { VentilationVue, DatePicker }
 })
 export default class extends Vue {
   @Ref() readonly refVentilationVue!: VentilationVue;
@@ -262,13 +262,13 @@ export default class extends Vue {
   private reglementSelected: Reglement = new Reglement();
   private reglementsRules = [
     (v: Reglement) => !!v || 'Règlement obligatoire',
-    (v: Reglement) => v.numero != 0 || 'Règlement obligatoire',
+    (v: Reglement) => v.numero != 0 || 'Règlement obligatoire'
   ];
 
   private montant = '';
   private montantRules: any = [
     (v: string) => !!v || 'Montant obligatoire',
-    (v: string) => v.isDecimal() || 'Montant invalide',
+    (v: string) => v.isDecimal() || 'Montant invalide'
   ];
 
   private ventilations: Ventilation[] = [];
@@ -281,7 +281,7 @@ export default class extends Vue {
     { text: 'Débit', value: 'montantDebit', width: 100, align: 'end' },
     { text: 'Crédit', value: 'montantCredit', width: 100, align: 'end' },
     { text: 'Devise', value: 'libelleDevise', width: 70 },
-    { text: 'TVA', value: 'libelleTva', width: 100 },
+    { text: 'TVA', value: 'libelleTva', width: 100 }
   ];
 
   private ventileBase = 0;

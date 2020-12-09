@@ -23,7 +23,8 @@
         </v-card-text>
         <v-card-text v-else class="pb-0">
           <v-row dense>
-            <v-col cols="4">              <v-select
+            <v-col cols="4">
+              <v-select
                 ref="refTypesComptes"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
@@ -306,7 +307,6 @@ import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossier.vue';
 import { ApplicationModule } from '@/store/modules/application';
-import { CaseTvaNature } from '@/models/CaseTva/CaseTvaNature';
 
 @Component({
   components: {
@@ -494,7 +494,7 @@ export default class VentilationVue extends Vue {
   //#endregion
   private resetCompte() {
     this.compteComponent?.resetCompte();
-    if(this.typesComptesSelected.id != 'g') {
+    if (this.typesComptesSelected.id != 'g') {
       this.caseTva.refresh();
       this.numeroCaseTva = '';
     }

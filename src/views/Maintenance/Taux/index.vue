@@ -33,7 +33,7 @@
 <script lang="ts">
 import TauxApi from '@/api/TauxApi';
 import { Taux } from '@/models/Taux/Taux';
-import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
+import { Component, Vue, Ref } from 'vue-property-decorator';
 import TauxVue from '@/views/Maintenance/Taux/Taux.vue';
 
 @Component({

@@ -139,7 +139,7 @@ export class Fournisseur extends FournisseurDTO {
     tournees: [
       (v: string[]) => v.length <= 3 || '3 valeurs max.',
       (v: string[]) => v.every((f) => f.isInt()) || 'Nombres uniquement',
-      (v: string[]) => v.every((f) => f.length <= 3) || 'Valeurs limitées à 3 caractères',
+      (v: string[]) => v.every((f) => f.length <= 3) || 'Valeurs limitées à 3 caractères'
     ]
   };
 }

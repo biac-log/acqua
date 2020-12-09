@@ -28,10 +28,10 @@
           <v-icon color="green">{{ item.intrastat ? 'mdi-check' : '' }}</v-icon>
         </template>
         <template v-slot:[`item.tauxTvaCase`]="{ item }">
-          {{ item.tauxTvaCase | numberToString}}
+          {{ item.tauxTvaCase | numberToString }}
         </template>
         <template v-slot:[`item.tauxEgalisationCase`]="{ item }">
-          {{ item.tauxEgalisationCase | numberToString}}
+          {{ item.tauxEgalisationCase | numberToString }}
         </template>
         <!-- 
         <template v-slot:[`item.facturesAchat`]="{ item }">
@@ -55,7 +55,7 @@
 <script lang="ts">
 import CaseTvaApi from '@/api/CaseTvaApi';
 import { CaseTvaMaintenance } from '@/models/CaseTva/CaseTvaMaintenance';
-import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
+import { Component, Vue, Ref } from 'vue-property-decorator';
 import CaseTvaVue from '@/views/Maintenance/CasesTVA/CaseTVA.vue';
 
 @Component({
@@ -75,20 +75,20 @@ export default class CasesTvaVue extends Vue {
   private isLoading = false;
   private items: CaseTvaMaintenance[] = [];
   private headers = [
-    {text: 'Numéro', value: 'numeroCase'},
+    { text: 'Numéro', value: 'numeroCase' },
     { text: 'Libellé', value: 'libelleCase' },
-    {text: 'Type', value: 'typeCase'},
-    {text: 'Taux TVA', value: 'tauxTvaCase'},
-    {text: 'Taux Egalisé', value: 'tauxEgalisationCase'},
+    { text: 'Type', value: 'typeCase' },
+    { text: 'Taux TVA', value: 'tauxTvaCase' },
+    { text: 'Taux Egalisé', value: 'tauxEgalisationCase' },
     // {text: 'NC Ventes', value: 'ncSurVente'},
     // {text: 'Factures Ventes', value: 'facturesVentes'},
     // {text: 'Factures Achat', value: 'facturesAchat'},
     // {text: 'NC Achat', value: 'ncSurAchat'},
     // {text: 'Financiers', value: 'financiers'},
     // {text: 'O.D', value: 'od'},
-    {text: 'Code Pays', value: 'codePays'},
-    {text: 'Intrastat', value: 'intrastat'},
-  ];  
+    { text: 'Code Pays', value: 'codePays' },
+    { text: 'Intrastat', value: 'intrastat' }
+  ];
 
   private async loadItems() {
     this.isLoadingItems = true;

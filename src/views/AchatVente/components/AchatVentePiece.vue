@@ -288,7 +288,7 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col lg="7" sm="12"> 
+              <v-col lg="7" sm="12">
                 <GridContreparties
                   ref="gridContreparties"
                   :Contreparties.sync="contreparties"
@@ -542,7 +542,6 @@ export default class extends Vue {
     journal: Journal,
     entete?: EntetePieceComptable
   ): Promise<{ action: DialogActionResult; data: EntetePieceComptable }> {
-
     this.dialog = true;
     if (entete) {
       this.piecereadonly = true;
@@ -765,7 +764,12 @@ export default class extends Vue {
         if (numeroPiece != 0) {
           this.libelleWarningMessage = `Attention, ce libellé est déjà utilisé par la pièce ${this.journal.numero}.${numeroPiece}`;
           (this.$refs.confirmLibellelDialog as Confirm)
-            .open('Attention', `Attention, ce libellé est déjà utilisé par la pièce ${this.journal.numero}.${numeroPiece}`, 'error', 'OK')
+            .open(
+              'Attention',
+              `Attention, ce libellé est déjà utilisé par la pièce ${this.journal.numero}.${numeroPiece}`,
+              'error',
+              'OK'
+            )
             .then(() => {
               this.$nextTick(() => (this.$refs.montant as any)?.focus());
             });
@@ -1070,7 +1074,7 @@ export default class extends Vue {
     return entete;
   }
 
-  private cancelEdit() {    
+  private cancelEdit() {
     if (this.numeroPiece.toNumber() == 0) {
       this.$nextTick(() => {
         this.confirmDialog
@@ -1086,7 +1090,7 @@ export default class extends Vue {
             this.$nextTick(() => this.autocompleteCompteTier?.focus());
           });
       });
-    }else {
+    } else {
       this.setPiece(this.oldPiece);
       this.piecereadonly = true;
     }

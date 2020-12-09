@@ -9,8 +9,15 @@ export default abstract class EcheancierApi {
     return new Echeancier(response.data);
   }
 
-  static async pieceExiste(typeCompte: string, numeroCompte: number, journal: number, numeroPiece: number): Promise<boolean>{
-    const response = await api.AcQuaCore.get<boolean>(`/echeancier/pieceexiste?typeCompte=${typeCompte}&numeroCompte=${numeroCompte}&journal=${journal}&numeroPiece=${numeroPiece}`);
+  static async pieceExiste(
+    typeCompte: string,
+    numeroCompte: number,
+    journal: number,
+    numeroPiece: number
+  ): Promise<boolean> {
+    const response = await api.AcQuaCore.get<boolean>(
+      `/echeancier/pieceexiste?typeCompte=${typeCompte}&numeroCompte=${numeroCompte}&journal=${journal}&numeroPiece=${numeroPiece}`
+    );
     return response.data;
   }
 }

@@ -173,8 +173,7 @@ export const asyncRoutes: RouteConfig[] = [
       },
       {
         path: 'casestva',
-        component: () =>
-          import(/* webpackChunkName: "casestva" */ '@/views/Maintenance/CasesTVA/index.vue'),
+        component: () => import(/* webpackChunkName: "casestva" */ '@/views/Maintenance/CasesTVA/index.vue'),
         name: 'Cases TVA',
         meta: {
           title: 'Cases TVA',
