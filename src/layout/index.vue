@@ -68,6 +68,18 @@
           </template>
         </v-autocomplete>
       </span>
+      <span style="width: 300px; padding-top: 25px">
+        <v-select
+          class="mr-10"
+          outlined
+          dense
+          :v-if="societes.length > 1"
+          label="Société"
+          :items="societes"
+          item-text="name"
+          v-model="societeSelected"
+        ></v-select>
+      </span>
       {{ username }}
       <v-btn icon class="ml-5" @click="logout">
         <v-icon>mdi-logout</v-icon>
@@ -87,14 +99,16 @@ import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { AppMain } from './components';
 import { UserModule } from '@/store/modules/user';
+import { SocieteModule } from '@/store/modules/companies';
 import { RouteConfig } from 'vue-router';
 import { PermissionModule } from '@/store/modules/permissions';
+import { Societe } from '@/models/Societe/societe';
 
 @Component({
   name: 'Layout',
   components: {
-    AppMain
-  }
+    AppMain,
+  },
 })
 export default class extends Vue {
   private drawer = true;
@@ -170,6 +184,18 @@ export default class extends Vue {
 
   get username() {
     return UserModule.username;
+  }
+
+  get societes() {
+    return SocieteModule.societes;
+  }
+
+  get societeSelected() {
+    return SocieteModule.societeSelected;
+  }
+
+  set societeSelected(societe: Societe) {
+    SocieteModule.selectSociete(societe);
   }
 
   private logout() {

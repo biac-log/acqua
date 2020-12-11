@@ -25,6 +25,11 @@ class SocieteMod extends VuexModule implements ISocieteState {
 
         return resp;
     }
+
+    @Mutation
+    public selectSociete(societe: Societe) {
+        this.societeSelected = societe;
+    }
 }
 
 export const SocieteModule = getModule(SocieteMod);
