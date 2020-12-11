@@ -1,6 +1,7 @@
 import {VuexModule, Module, Mutation, Action, getModule} from 'vuex-module-decorators';
 import store from '@/store'
 import {Societe } from '@/models/Societe/societe'
+import SocietesApi from '@/api/SocietesApi'
 
 export interface ISocieteState {
     societes: Societe[];
@@ -19,12 +20,10 @@ class SocieteMod extends VuexModule implements ISocieteState {
     }
 
     @Action({commit: 'setSocietes'})
-    fetchSocietes(){
-        return [
-            new Societe(),
-            new Societe(),
-            new Societe(),
-        ];
+    async fetchSocietes(){
+        const resp = await SocietesApi.getSocietes();
+
+        return resp;
     }
 }
 
