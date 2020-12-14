@@ -11,12 +11,14 @@ export default class AxiosApi {
 
   private static _acQuaCore: AxiosInstance | null;
   private static _databaseName = SocieteModule.databaseName || "";
+  private static _apolloPath = SocieteModule.apolloPath || "";
   static get AcQuaCore() {
-    if (!this._acQuaCore || !this._databaseName) {
+    if (!this._acQuaCore || !this._databaseName || !this._apolloPath) {
       this._databaseName = SocieteModule.databaseName;
+      this._apolloPath = SocieteModule.apolloPath;
       this._acQuaCore = axios.create({
         baseURL: process.env.VUE_APP_ApiAcQuaCore,
-        headers: { Authorization: `Bearer ${UserModule.token}`, 'Database-Name': `${this._databaseName}` }
+        headers: { Authorization: `Bearer ${UserModule.token}`, 'Database-Name': this._databaseName, 'Apollo-Path': this._apolloPath }
       });
     }
     return this._acQuaCore;

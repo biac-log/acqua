@@ -34,6 +34,10 @@ class SocieteMod extends VuexModule implements ISocieteState {
     get databaseName() {
         return this.societeSelected.databaseName;
     }
+
+    get apolloPath() {
+        return this.societeSelected.apolloPath;
+    }
 }
 
 export const SocieteModule = getModule(SocieteMod);
