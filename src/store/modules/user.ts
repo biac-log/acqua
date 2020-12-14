@@ -36,11 +36,9 @@ class User extends VuexModule implements IUserState {
   }
 
   @Mutation
-  private async setUser(user: Utilisateur): Promise<void> {
+  private setUser(user: Utilisateur): void {
     this.utilisateur = user;
     this.username = user.NomPrenom;
-    await SocieteModule.fetchSocietes(); // Fetch societes so we can add the dbName and apolloPath headers to AxiosApi
-    await ApplicationModule.initParametre(); // init after headers are added
   }
 
   @Mutation

@@ -78,6 +78,7 @@
           :items="societes"
           item-text="name"
           v-model="societeSelected"
+          return-object
         ></v-select>
       </span>
       {{ username }}

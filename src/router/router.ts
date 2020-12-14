@@ -5,6 +5,7 @@ import { PermissionModule } from '@/store/modules/permissions';
 import Layout from '@/layout/index.vue';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import { SocieteModule } from '@/store/modules/companies';
 
 NProgress.configure({ showSpinner: false });
 
@@ -222,6 +223,10 @@ const router = createRouter();
 router.beforeEach(async (to: Route, from: Route, next: any) => {
   NProgress.start();
   if (UserModule.token) {
+    if(SocieteModule.societes.isEmpty()) {
+      console.log('foo')
+      await SocieteModule.fetchSocietes();
+    }
     if (!UserModule.utilisateur || (PermissionModule.routes && PermissionModule.routes.length === 0)) {
       try {
         await UserModule.loadUser();
@@ -248,7 +253,7 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
       // Other pages that do not have permission to access are redirected to the login page.
       next(`/login`);
     }
-  }
+  }  
 });
 
 router.afterEach((to: Route) => {

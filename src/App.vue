@@ -8,6 +8,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import ServiceWorkerUpdatePopup from '@/components/ServiceWorkerUpdatePopup.vue';
+import { ApplicationModule } from './store/modules/application';
 
 @Component({
   name: 'App',
@@ -15,6 +16,7 @@ import ServiceWorkerUpdatePopup from '@/components/ServiceWorkerUpdatePopup.vue'
 })
 export default class App extends Vue {
   mounted() {
+    ApplicationModule.initParametre(); // init after headers are added
     // Prevent focus loss on alt press. Prevents for Chrome, on Firefox you can regain focus when re-pressing alt key.
     document.addEventListener('keydown', (e) => {
       if (18 == e.keyCode && ['INPUT', 'BUTTON'].includes((e.target as Element).nodeName)) {

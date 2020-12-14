@@ -2,6 +2,7 @@ import {VuexModule, Module, Mutation, Action, getModule} from 'vuex-module-decor
 import store from '@/store'
 import {Societe } from '@/models/Societe/societe'
 import SocietesApi from '@/api/SocietesApi'
+import AxiosApi from '@/api/AxiosApi';
 
 export interface ISocieteState {
     societes: Societe[];
@@ -19,12 +20,20 @@ class SocieteMod extends VuexModule implements ISocieteState {
         this.societeSelected = societes[0];
     }
 
-    @Action({commit: 'setSocietes', rawError: true})
+    @Action({rawError: true})
     async fetchSocietes(){
         const resp = await SocietesApi.getSocietes();
+        this.setSocietes(this.societes);
 
-        return resp;
+        AxiosApi.refreshAcQuaCore();
     }
+
+    @Action
+    public refreshSocieteSelected(societe: Societe) {
+        this.selectSociete(societe);
+        AxiosApi.refreshAcQuaCore();
+    }
+
 
     @Mutation
     public selectSociete(societe: Societe) {
@@ -32,11 +41,11 @@ class SocieteMod extends VuexModule implements ISocieteState {
     }
 
     get databaseName() {
-        return this.societeSelected.databaseName;
+        return this.societeSelected?.databaseName || '';
     }
 
     get apolloPath() {
-        return this.societeSelected.apolloPath;
+        return this.societeSelected?.apolloPath || '';
     }
 }
 
