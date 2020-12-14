@@ -19,7 +19,7 @@ class SocieteMod extends VuexModule implements ISocieteState {
         this.societeSelected = societes[0];
     }
 
-    @Action({commit: 'setSocietes'})
+    @Action({commit: 'setSocietes', rawError: true})
     async fetchSocietes(){
         const resp = await SocietesApi.getSocietes();
 
@@ -29,6 +29,10 @@ class SocieteMod extends VuexModule implements ISocieteState {
     @Mutation
     public selectSociete(societe: Societe) {
         this.societeSelected = societe;
+    }
+
+    get databaseName() {
+        return this.societeSelected.databaseName;
     }
 }
 

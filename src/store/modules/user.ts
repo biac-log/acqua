@@ -7,6 +7,7 @@ import { JsonConvert } from 'json2typescript';
 import jwtDecode from 'jwt-decode';
 import api from '@/api/AxiosApi';
 import {SocieteModule} from './companies'
+import {ApplicationModule} from './application'
 
 export interface IUserState {
   token: string;
@@ -35,10 +36,11 @@ class User extends VuexModule implements IUserState {
   }
 
   @Mutation
-  private setUser(user: Utilisateur): void {
+  private async setUser(user: Utilisateur): Promise<void> {
     this.utilisateur = user;
     this.username = user.NomPrenom;
-    SocieteModule.fetchSocietes();
+    await SocieteModule.fetchSocietes(); // Fetch societes so we can add the dbName and apolloPath headers to AxiosApi
+    await ApplicationModule.initParametre(); // init after headers are added
   }
 
   @Mutation
@@ -60,12 +62,12 @@ class User extends VuexModule implements IUserState {
     userInfo.application = 'ACQUA';
     return new Promise((resolve, reject) => {
       api.Authentication.post<Token>('/Authentication/LoginApp', userInfo)
-        .then((resp) => {
+        .then(async (resp) => {
           this.setToken(resp.data);
           const tokenDecode = jwtDecode(resp.data.value);
           const jsonConvert: JsonConvert = new JsonConvert();
           const user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
-          this.setUser(user);
+          await this.setUser(user);
           resolve(resp);
         })
         .catch((err) => {
@@ -80,19 +82,19 @@ class User extends VuexModule implements IUserState {
   }
 
   @Action
-  public loadUser() {
-    return new Promise((resolve, reject) => {
+  public async loadUser() {
+    // return new Promise((resolve, reject) => {
       try {
         const tokenDecode = jwtDecode(this.token);
         const jsonConvert: JsonConvert = new JsonConvert();
         const user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
-        this.setUser(user);
-        resolve();
+        await this.setUser(user);
+        // resolve();
       } catch (err) {
         this.resetToken();
-        reject();
+        // reject();
       }
-    });
+    // });
   }
 
   @Action

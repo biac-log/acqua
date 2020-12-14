@@ -1,19 +1,22 @@
 import axios, { AxiosInstance } from 'axios';
 import { UserModule } from '@/store/modules/user';
+import { SocieteModule } from '@/store/modules/companies';
 
 export default class AxiosApi {
   static get axiosBase() {
     return axios.create({
-      headers: { Authorization: `Bearer ${UserModule.token}` }
+      headers: { Authorization: `Bearer ${UserModule.token}`, }
     });
   }
 
   private static _acQuaCore: AxiosInstance | null;
+  private static _databaseName = SocieteModule.databaseName || "";
   static get AcQuaCore() {
-    if (!this._acQuaCore) {
+    if (!this._acQuaCore || !this._databaseName) {
+      this._databaseName = SocieteModule.databaseName;
       this._acQuaCore = axios.create({
         baseURL: process.env.VUE_APP_ApiAcQuaCore,
-        headers: { Authorization: `Bearer ${UserModule.token}` }
+        headers: { Authorization: `Bearer ${UserModule.token}`, 'Database-Name': `${this._databaseName}` }
       });
     }
     return this._acQuaCore;
