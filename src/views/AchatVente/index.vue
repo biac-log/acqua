@@ -190,6 +190,19 @@ export default class extends Vue {
   mounted() {
     this.loadPeriodes();
     this.loadJournaux();
+    const unsubscribe = this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'selectSociete') {
+        this.reset();
+      }
+    });
+  }
+
+  private reset() {
+    this.piecesComptables = [];
+    this.journalSelected = new Journal();
+    this.periodeSelected = new PeriodeComptable();
+    this.loadPeriodes();
+    this.loadJournaux();
   }
 
   private async loadPeriodes() {
