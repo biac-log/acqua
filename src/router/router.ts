@@ -224,7 +224,6 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
   NProgress.start();
   if (UserModule.token) {
     if(SocieteModule.societes.isEmpty()) {
-      console.log('foo')
       await SocieteModule.fetchSocietes();
     }
     if (!UserModule.utilisateur || (PermissionModule.routes && PermissionModule.routes.length === 0)) {

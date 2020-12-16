@@ -25,6 +25,7 @@ class SocieteMod extends VuexModule implements ISocieteState {
         this.societeSelected = societe;
 
         localStorage.setItem('societeSelected', JSON.stringify(societe));
+        AxiosApi.refreshAcQuaCore();
     }
 
     @Mutation
@@ -39,7 +40,6 @@ class SocieteMod extends VuexModule implements ISocieteState {
         const resp = await SocietesApi.getSocietes();
         this.setSocietes(resp);
         if(!this.societeSelected.name) this.selectSociete(resp[0]);
-        // AxiosApi.refreshAcQuaCore();
     }
 
     @Action
@@ -47,13 +47,7 @@ class SocieteMod extends VuexModule implements ISocieteState {
         localStorage.removeItem('societeSelected');
         this.clearSocietes();
     }
-
-    // @Action
-    // public refreshSocieteSelected(societe: Societe) {
-    //     this.selectSociete(societe);
-    //     // AxiosApi.refreshAcQuaCore();
-    // }
-
+    
     /** Getters */
     get databaseName() {
         return this.societeSelected?.databaseName || '';

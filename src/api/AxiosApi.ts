@@ -11,7 +11,6 @@ export default class AxiosApi {
 
   private static _acQuaCore: AxiosInstance | null;
   static get AcQuaCore() {
-    console.log(SocieteModule.databaseName);
     if (!this._acQuaCore ) {
       this._acQuaCore = axios.create({
         baseURL: process.env.VUE_APP_ApiAcQuaCore,
@@ -22,7 +21,6 @@ export default class AxiosApi {
   }
 
   public static refreshAcQuaCore() {
-    console.log('moo')
     this._acQuaCore = axios.create({
       baseURL: process.env.VUE_APP_ApiAcQuaCore,
       headers: { Authorization: `Bearer ${UserModule.token}`, 'Database-Name': SocieteModule.databaseName, 'Apollo-Path': SocieteModule.apolloPath }
