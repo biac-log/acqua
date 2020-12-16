@@ -1,8 +1,7 @@
 export class SocieteDTO {
     id = 0;
     name = '';
-    apolloPath = '';
-    databaseName = '';
+    slug = '';
 }
 
 export class Societe extends SocieteDTO {

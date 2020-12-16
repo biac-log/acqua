@@ -49,12 +49,8 @@ class SocieteMod extends VuexModule implements ISocieteState {
     }
     
     /** Getters */
-    get databaseName() {
-        return this.societeSelected?.databaseName || '';
-    }
-
-    get apolloPath() {
-        return this.societeSelected?.apolloPath || '';
+    get companySlug() {
+        return this.societeSelected?.slug || '';
     }
 
     private get storedSociete() {

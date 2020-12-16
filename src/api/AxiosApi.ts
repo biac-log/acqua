@@ -14,7 +14,7 @@ export default class AxiosApi {
     if (!this._acQuaCore ) {
       this._acQuaCore = axios.create({
         baseURL: process.env.VUE_APP_ApiAcQuaCore,
-        headers: { Authorization: `Bearer ${UserModule.token}`, 'Database-Name': SocieteModule.databaseName, 'Apollo-Path': SocieteModule.apolloPath }
+        headers: { Authorization: `Bearer ${UserModule.token}`, 'Company-Name': SocieteModule.companySlug }
       });
     }
     return this._acQuaCore;
@@ -23,7 +23,7 @@ export default class AxiosApi {
   public static refreshAcQuaCore() {
     this._acQuaCore = axios.create({
       baseURL: process.env.VUE_APP_ApiAcQuaCore,
-      headers: { Authorization: `Bearer ${UserModule.token}`, 'Database-Name': SocieteModule.databaseName, 'Apollo-Path': SocieteModule.apolloPath }
+      headers: { Authorization: `Bearer ${UserModule.token}`, 'Company-Name': SocieteModule.companySlug }
     });
   }
 
