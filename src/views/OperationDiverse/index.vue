@@ -113,7 +113,7 @@
       <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
       <template v-slot:action="{ attrs }">
-        <v-btn icon dark @click="console.log(attrs)" v-bind="attrs"><v-icon>mdi-close</v-icon></v-btn>
+        <v-btn icon dark @click="snackbar = false" v-bind="attrs"><v-icon>mdi-close</v-icon></v-btn>
       </template>
     </v-snackbar>
   </v-container>
