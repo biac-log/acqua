@@ -7,7 +7,7 @@ import { JsonConvert } from 'json2typescript';
 import jwtDecode from 'jwt-decode';
 import api from '@/api/AxiosApi';
 import {SocieteModule} from './companies'
-import {ApplicationModule} from './application'
+import { Societe } from '@/models/Societe/societe';
 
 export interface IUserState {
   token: string;
@@ -98,6 +98,7 @@ class User extends VuexModule implements IUserState {
   @Action
   public logout() {
     this.resetToken();
+    SocieteModule.reset();
     api.reset();
   }
 }

@@ -11,41 +11,62 @@ export interface ISocieteState {
 
 @Module({dynamic: true, store, name: 'companies'})
 class SocieteMod extends VuexModule implements ISocieteState {
-    public societeSelected = new Societe();
+    public societeSelected = this.storedSociete;
     public societes: Societe[] = [];
 
+    /** Mutations  **/ 
     @Mutation
     private setSocietes(societes: Societe[]){
-        this.societes = Array.from(societes);
-        this.societeSelected = societes[0];
+        this.societes = Array.from(societes);        
     }
-
-    @Action({rawError: true})
-    async fetchSocietes(){
-        const resp = await SocietesApi.getSocietes();
-        this.setSocietes(this.societes);
-
-        AxiosApi.refreshAcQuaCore();
-    }
-
-    @Action
-    public refreshSocieteSelected(societe: Societe) {
-        this.selectSociete(societe);
-        AxiosApi.refreshAcQuaCore();
-    }
-
 
     @Mutation
     public selectSociete(societe: Societe) {
         this.societeSelected = societe;
+
+        localStorage.setItem('societeSelected', JSON.stringify(societe));
     }
 
+    @Mutation
+    private clearSocietes(){
+        this.societes = [];
+        this.societeSelected = new Societe();
+    }
+
+    /** Actions */
+    @Action({rawError: true})
+    async fetchSocietes(){
+        const resp = await SocietesApi.getSocietes();
+        this.setSocietes(resp);
+        if(!this.societeSelected.name) this.selectSociete(resp[0]);
+        // AxiosApi.refreshAcQuaCore();
+    }
+
+    @Action
+    reset() {
+        localStorage.removeItem('societeSelected');
+        this.clearSocietes();
+    }
+
+    // @Action
+    // public refreshSocieteSelected(societe: Societe) {
+    //     this.selectSociete(societe);
+    //     // AxiosApi.refreshAcQuaCore();
+    // }
+
+    /** Getters */
     get databaseName() {
         return this.societeSelected?.databaseName || '';
     }
 
     get apolloPath() {
         return this.societeSelected?.apolloPath || '';
+    }
+
+    private get storedSociete() {
+        const string = localStorage.getItem('societeSelected') || '';
+        const societe = string ? new Societe(JSON.parse(string)) : new Societe();
+        return societe;
     }
 }
 
