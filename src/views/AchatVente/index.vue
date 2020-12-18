@@ -187,14 +187,20 @@ export default class extends Vue {
   private currentPage = 1;
   private pageCount = 0;
 
+  private unsubscribe!: Function;
+
   mounted() {
     this.loadPeriodes();
     this.loadJournaux();
-    const unsubscribe = this.$store.subscribe((mutation, state) => {
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
       if(mutation.type === 'selectSociete') {
         this.reset();
       }
     });
+  }
+
+  beforeDestroy() {
+    this.unsubscribe();
   }
 
   private reset() {

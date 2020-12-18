@@ -175,7 +175,26 @@ export default class extends Vue {
   private totalItems = 0;
   private isLoadingPieces = false;
 
+  private unsubscribe!: Function;
+
   mounted() {
+    this.loadPeriodes();
+    this.loadJournaux();
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'selectSociete') {
+        this.reset();
+      }
+    });
+  }
+
+  beforeDestroy() {
+    this.unsubscribe();
+  }
+
+  private reset() {
+    this.piecesComptables = [];
+    this.journalSelected = new Journal();
+    this.periodeSelected = new PeriodeComptable();
     this.loadPeriodes();
     this.loadJournaux();
   }
