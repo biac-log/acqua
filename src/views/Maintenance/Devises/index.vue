@@ -52,7 +52,23 @@ import DeviseVue from '@/views/Maintenance/Devises/Devise.vue';
 export default class DevisesVue extends Vue {
   @Ref() readonly deviseDialog!: DeviseVue;
 
+  private unsubscribe!: Function;
+
   mounted() {
+    this.loadDevises();
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'selectSociete') {
+        this.reset();
+      }
+    });
+  }
+
+  beforeDestroy() {
+    this.unsubscribe();
+  }
+
+  private reset() {
+    this.devises = [];
     this.loadDevises();
   }
 

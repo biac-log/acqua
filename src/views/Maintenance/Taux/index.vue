@@ -43,7 +43,23 @@ import TauxVue from '@/views/Maintenance/Taux/Taux.vue';
 export default class TauxIndexVue extends Vue {
   @Ref() readonly tauxDialog!: TauxVue;
 
+  private unsubscribe!: Function;
+
   mounted() {
+    this.loadTaux();
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'selectSociete') {
+        this.reset();
+      }
+    });
+  }
+
+  beforeDestroy() {
+    this.unsubscribe();
+  }
+
+  private reset() {
+    this.taux = [];
     this.loadTaux();
   }
 

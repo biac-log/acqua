@@ -43,7 +43,23 @@ import LibelleReglementVue from '@/views/Maintenance/LibellesReglement/LibelleRe
 export default class LibellesReglementVue extends Vue {
   @Ref() readonly itemDialog!: LibelleReglementVue;
 
+  private unsubscribe!: Function;
+
   mounted() {
+    this.loadItems();
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'selectSociete') {
+        this.reset();
+      }
+    });
+  }
+
+  beforeDestroy() {
+    this.unsubscribe();
+  }
+
+  private reset() {
+    this.items = [];
     this.loadItems();
   }
 

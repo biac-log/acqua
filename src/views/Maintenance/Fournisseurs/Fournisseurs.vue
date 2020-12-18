@@ -66,6 +66,26 @@ export default class extends Vue {
   @Ref() readonly fournisseurDialog!: FournisseurVue;
   @Ref() readonly searchFocus!: any;
 
+  private unsubscribe!: Function;
+
+  mounted() {
+    this.loadFournisseurs();
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'selectSociete') {
+        this.reset();
+      }
+    });
+  }
+
+  beforeDestroy() {
+    this.unsubscribe();
+  }
+
+  private reset() {
+    this.fournisseurs = [];
+    this.loadFournisseurs();
+  }
+
   @Watch('options')
   onOptionsChanged() {
     this.loadFournisseurs();

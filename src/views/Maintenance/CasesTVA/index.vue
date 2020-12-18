@@ -65,7 +65,23 @@ import CaseTvaVue from '@/views/Maintenance/CasesTVA/CaseTVA.vue';
 export default class CasesTvaVue extends Vue {
   @Ref() readonly itemDialog!: CaseTvaVue;
 
+  private unsubscribe!: Function;
+
   mounted() {
+    this.loadItems();
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'selectSociete') {
+        this.reset();
+      }
+    });
+  }
+
+  beforeDestroy() {
+    this.unsubscribe();
+  }
+
+  private reset() {
+    this.items = [];
     this.loadItems();
   }
 
