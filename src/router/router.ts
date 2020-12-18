@@ -131,16 +131,16 @@ export const asyncRoutes: RouteConfig[] = [
           affix: true
         }
       },
-      {
-        path: 'clients',
-        component: () => import(/* webpackChunkName: "clients" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
-        name: 'Clients',
-        meta: {
-          title: 'Clients',
-          icon: 'mdi-account-supervisor-circle',
-          affix: true
-        }
-      },
+      // {
+      //   path: 'clients',
+      //   component: () => import(/* webpackChunkName: "clients" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
+      //   name: 'Clients',
+      //   meta: {
+      //     title: 'Clients',
+      //     icon: 'mdi-account-supervisor-circle',
+      //     affix: true
+      //   }
+      // },
       {
         path: 'devises',
         component: () => import(/* webpackChunkName: "devises" */ '@/views/Maintenance/Devises/index.vue'),
