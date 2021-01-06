@@ -30,18 +30,22 @@
       >
       </v-data-table>
     </v-card>
-    <!-- <FournisseurVue ref="fournisseurDialog" /> -->
+    <societe-vue ref="societeDialog" />
   </v-container>
 </template>
 
 <script lang="ts">
 import { SocieteModule } from '@/store/modules/companies';
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Ref } from 'vue-property-decorator';
+import SocieteVue from '@/views/Societes/components/Societe.vue'
 
 @Component({
   name: 'Societes',
+  components: {SocieteVue}
 })
 export default class Societes extends Vue {
+  @Ref() private societeDialog!: SocieteVue;
+
   private search = '';
   private options: any = {};
   private isLoading = false;
@@ -51,7 +55,7 @@ export default class Societes extends Vue {
   ];
 
   private addSociete() {
-    console.log('add');
+    this.societeDialog.openNew();
   }
 
   private openSociete() {

@@ -6,4 +6,14 @@ export default abstract class SocietesApi {
     const response = await api.AcQuaCore.get<Societe[]>(`Societes`);
     return response.data.map((societeDTO) => new Societe(societeDTO));
   }
+
+  static async createSocietes(societe: Societe): Promise<boolean> {
+    const response = await api.AcQuaCore.post<boolean>(`Societes`);
+    return response.data;
+  }
+
+  static async updateSocietes(): Promise<boolean> {
+    const response = await api.AcQuaCore.get<boolean>(`Societes`);
+    return response.data;
+  }
 }
