@@ -51,7 +51,7 @@ export default class Societes extends Vue {
   private isLoading = false;
   private headers = [
     { text: 'Nom', value: 'name' },
-    { text: 'Slug', value: 'slug' },
+    { text: 'Identifiant', value: 'identifiant' },
   ];
 
   private addSociete() {

@@ -1,7 +1,7 @@
 export class SocieteDTO {
     id = 0;
     name = '';
-    slug = '';
+    identifiant = '';
 }
 
 export class Societe extends SocieteDTO {

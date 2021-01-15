@@ -52,8 +52,8 @@
         <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-form ref="form" v-model="isValid" lazy-validation class="pt-2">
-            <v-text-field outlined v-model="name" label="Nom" @change="slug = name.toSlug()"/>
-            <v-text-field outlined v-model="slug" label="Identifiant" readonly/>
+            <v-text-field outlined v-model="name" label="Nom" @change="identifiant = name.toSlug()"/>
+            <v-text-field outlined v-model="identifiant" label="Identifiant" readonly/>
 
         </v-form>
       </v-card-text>
@@ -153,7 +153,7 @@ export default class SocieteVue extends Vue {
 
   /// Societe model
   private name = '';
-  private slug = '';
+  private identifiant = '';
   
   private readonly = true;
   private newRecord = false;
