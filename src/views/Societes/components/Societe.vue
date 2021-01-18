@@ -69,6 +69,8 @@
                 :readonly="readonly"
                 v-on="on"
                 required
+                @blur="checkSocieteExists"
+                :error-messages="identifiantErrors"
             /></template>
             <span
               >Cet identifiant servira pour le nom du dossier contenant les fichiers ainsi que le nom de la base de
@@ -151,6 +153,7 @@ import { Devise } from '@/models/Financier';
 import DeviseApi from '@/api/DeviseApi';
 import DatePicker from '@/components/DatePicker.vue';
 import { ApplicationModule } from '@/store/modules/application';
+import { SocieteModule } from '@/store/modules/companies';
 
 @Component({
   name: 'SocieteVue',
@@ -187,6 +190,8 @@ export default class SocieteVue extends Vue {
   private pathApollo = '';
   private dbName = '';
   private apolloInstanceName = '';
+
+  private identifiantErrors: string[] = [];
 
   private readonly = true;
   private newRecord = false;
@@ -251,6 +256,7 @@ export default class SocieteVue extends Vue {
     this.setModel(new Societe());
     this.pathApollo = '';
     this.dbName = '';
+    this.identifiantErrors = [];
     this.reject();
   }
 
@@ -277,6 +283,7 @@ export default class SocieteVue extends Vue {
         await SocieteApi.createSociete(this.societe)
           .then(() => {
             this.societe = this.societeBase;
+            SocieteModule.fetchSocietes();
             this.closeDialog();
           })
           .catch((err) => {
@@ -315,6 +322,18 @@ export default class SocieteVue extends Vue {
   private buildPaths() {
     this.pathApollo = ApplicationModule.parametre.pathApolloPlaceholder.replace('\\{path}', `\\${this.identifiant}`);
     this.dbName = `AcQuaCoreDB-${this.identifiant}`;
+  }
+
+  private async checkSocieteExists() {
+    const exists = await SocieteApi.checkSocieteExiste(this.identifiant);
+
+    if (exists) {
+      this.identifiantErrors.push('Cet identifiant est déjà utilisé');
+      // (this.$refs.numeroInput as HTMLElement).focus();
+    } else {
+      this.identifiantErrors = [];
+      // (this.$refs.raisonInput as HTMLElement).focus();
+    }
   }
 }
 </script>

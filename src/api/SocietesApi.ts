@@ -16,4 +16,10 @@ export default abstract class SocietesApi {
     const response = await api.AcQuaCore.get<boolean>(`Societes`);
     return response.data;
   }
+
+  static async checkSocieteExiste(identifiant: string): Promise<boolean> {
+    const response = await api.AcQuaCore.get<boolean>(`Societes/${identifiant}`);
+
+    return response.data;
+  }
 }
