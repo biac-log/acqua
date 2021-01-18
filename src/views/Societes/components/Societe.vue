@@ -59,6 +59,7 @@
             @change="identifiant = name.toSlug()"
             :readonly="readonly"
             required
+            :rules="rules.name"
           />
           <v-tooltip top open-delay="500">
             <template v-slot:activator="{ on }"
@@ -71,6 +72,7 @@
                 required
                 @blur="checkSocieteExists"
                 :error-messages="identifiantErrors"
+                :rules="rules.identifiant"
             /></template>
             <span
               >Cet identifiant servira pour le nom du dossier contenant les fichiers ainsi que le nom de la base de
@@ -80,12 +82,13 @@
           <!--<v-tooltip top open-delay="500">
             <template v-slot:activator="{ on }"
               >--><v-text-field
-                outlined
-                v-model="apolloInstanceName"
-                label="Nom de l'instance"
-                :readonly="readonly"
-                required
-            /><!--</template>
+            outlined
+            v-model="apolloInstanceName"
+            label="Nom de l'instance"
+            :readonly="readonly"
+            required
+            :rules="rules.instanceName"
+          /><!--</template>
             <span></span
           ></v-tooltip>-->
           <v-tooltip top open-delay="500">
@@ -191,6 +194,7 @@ export default class SocieteVue extends Vue {
   private dbName = '';
   private apolloInstanceName = '';
 
+  private rules = Societe.rules;
   private identifiantErrors: string[] = [];
 
   private readonly = true;
@@ -280,19 +284,19 @@ export default class SocieteVue extends Vue {
     this.mapModel();
 
     if (this.newRecord) {
-        await SocieteApi.createSociete(this.societe)
-          .then(() => {
-            this.societe = this.societeBase;
-            SocieteModule.fetchSocietes();
-            this.closeDialog();
-          })
-          .catch((err) => {
-            this.alertMessage.show('Une erreur est survenue lors de la sauvegarde de la société', displayAxiosError(err));
-            this.readonly = false;
-          })
-          .finally(() => {
-            this.saveLoading = false;
-          });
+      await SocieteApi.createSociete(this.societe)
+        .then(() => {
+          this.societe = this.societeBase;
+          SocieteModule.fetchSocietes();
+          this.closeDialog();
+        })
+        .catch((err) => {
+          this.alertMessage.show('Une erreur est survenue lors de la sauvegarde de la société', displayAxiosError(err));
+          this.readonly = false;
+        })
+        .finally(() => {
+          this.saveLoading = false;
+        });
     } else {
       //   await SocieteApi.update(this.societe, this.societeBase.hash)
       //     .then(() => {
@@ -325,14 +329,16 @@ export default class SocieteVue extends Vue {
   }
 
   private async checkSocieteExists() {
-    const exists = await SocieteApi.checkSocieteExiste(this.identifiant);
+    if (this.identifiant != '') {
+      const exists = await SocieteApi.checkSocieteExiste(this.identifiant);
 
-    if (exists) {
-      this.identifiantErrors.push('Cet identifiant est déjà utilisé');
-      // (this.$refs.numeroInput as HTMLElement).focus();
-    } else {
-      this.identifiantErrors = [];
-      // (this.$refs.raisonInput as HTMLElement).focus();
+      if (exists) {
+        this.identifiantErrors.push('Cet identifiant est déjà utilisé');
+        // (this.$refs.numeroInput as HTMLElement).focus();
+      } else {
+        this.identifiantErrors = [];
+        // (this.$refs.raisonInput as HTMLElement).focus();
+      }
     }
   }
 }
