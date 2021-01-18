@@ -3,6 +3,7 @@ export class SocieteDTO {
     name = '';
     identifiant = '';
     apolloInstanceName = '';
+    hash = '';
 }
 
 export class Societe extends SocieteDTO {

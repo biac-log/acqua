@@ -56,7 +56,7 @@
             outlined
             v-model="name"
             label="Nom"
-            @change="identifiant = name.toSlug()"
+            @change="initIdentifiant"
             :readonly="readonly"
             required
             :rules="rules.name"
@@ -188,6 +188,7 @@ export default class SocieteVue extends Vue {
   private societeBase: Societe = new Societe(); // Used for the reset method
 
   /// Societe model
+  private id = 0;
   private name = '';
   private identifiant = '';
   private pathApollo = '';
@@ -239,6 +240,7 @@ export default class SocieteVue extends Vue {
   }
 
   private setModel(societe: Societe) {
+    this.id = societe.id;
     this.name = societe.name;
     this.identifiant = societe.identifiant;
     this.apolloInstanceName = societe.apolloInstanceName;
@@ -250,6 +252,8 @@ export default class SocieteVue extends Vue {
     this.societe.name = this.name;
     this.societe.identifiant = this.identifiant;
     this.societe.apolloInstanceName = this.apolloInstanceName;
+    this.societe.id = this.id;
+    this.societe.hash = this.societeBase.hash;
   }
 
   private closeDialog() {
@@ -298,13 +302,13 @@ export default class SocieteVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-      //   await SocieteApi.update(this.societe, this.societeBase.hash)
-      //     .then(() => {
-      //       this.readonly = true;
-      //       this.successMessage.show('Le societe a été mis à jour avec succès.', '');
-      //       this.resolve(true);
-      //     })
-      //     .finally(() => (this.saveLoading = false));
+        await SocieteApi.updateSociete(this.societe, this.societeBase.hash)
+          .then(() => {
+            this.readonly = true;
+            this.successMessage.show('La société a été mise à jour avec succès.', '');
+            this.resolve(true);
+          })
+          .finally(() => (this.saveLoading = false));
     }
   }
 
@@ -340,6 +344,10 @@ export default class SocieteVue extends Vue {
         // (this.$refs.raisonInput as HTMLElement).focus();
       }
     }
+  }
+
+  private initIdentifiant(){
+    if(this.newRecord) this.identifiant = this.name.toSlug()
   }
 }
 </script>

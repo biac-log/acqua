@@ -12,8 +12,12 @@ export default abstract class SocietesApi {
     return response.data;
   }
 
-  static async updateSociete(): Promise<boolean> {
-    const response = await api.AcQuaCore.get<boolean>(`Societes`);
+  static async updateSociete(societe: Societe, hash: string): Promise<boolean> {
+    const data = {
+      'updatedModel': societe,
+      'hashOldModel': hash
+    };
+    const response = await api.AcQuaCore.put<boolean>(`Societes`, data);
     return response.data;
   }
 
