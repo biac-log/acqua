@@ -6,10 +6,10 @@
         <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click.stop="addSociete">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
-        <span class="ml-5">
+        <small class="ml-5">
           Chemin Apollo : 
           <i>{{pathApolloPlaceholder}}</i>
-        </span>
+        </small>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
