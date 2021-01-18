@@ -2,6 +2,7 @@ export class SocieteDTO {
     id = 0;
     name = '';
     identifiant = '';
+    apolloInstanceName = '';
 }
 
 export class Societe extends SocieteDTO {

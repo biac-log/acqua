@@ -52,10 +52,47 @@
         <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-form ref="form" v-model="isValid" lazy-validation class="pt-2">
-            <v-text-field outlined v-model="name" label="Nom" @change="identifiant = name.toSlug()" :readonly="readonly"/>
-            <v-text-field outlined v-model="identifiant" label="Identifiant" :readonly="readonly" @change="buildPaths" />
-            <v-text-field outlined v-model="pathApollo" label="Dossier Apollo" readonly />
-            <v-text-field outlined v-model="dbName" label="Base de données" readonly />
+          <v-text-field
+            outlined
+            v-model="name"
+            label="Nom"
+            @change="identifiant = name.toSlug()"
+            :readonly="readonly"
+            required
+          />
+          <v-tooltip top open-delay="500">
+            <template v-slot:activator="{ on }"
+              ><v-text-field
+                outlined
+                v-model="identifiant"
+                label="Identifiant"
+                :readonly="readonly"
+                v-on="on"
+                required
+            /></template>
+            <span
+              >Cet identifiant servira pour le nom du dossier contenant les fichiers ainsi que le nom de la base de
+              données.</span
+            ></v-tooltip
+          >
+          <!--<v-tooltip top open-delay="500">
+            <template v-slot:activator="{ on }"
+              >--><v-text-field
+                outlined
+                v-model="apolloInstanceName"
+                label="Nom de l'instance"
+                :readonly="readonly"
+                required
+            /><!--</template>
+            <span></span
+          ></v-tooltip>-->
+          <v-tooltip top open-delay="500">
+            <template v-slot:activator="{ on }"
+              ><v-text-field outlined v-model="pathApollo" label="Dossier Apollo" readonly v-on="on" />
+            </template>
+            <span>Emplacement où les fichiers seront stockés.</span></v-tooltip
+          >
+          <v-text-field outlined v-model="dbName" label="Base de données" readonly />
         </v-form>
       </v-card-text>
       <v-card-actions v-if="!readonly">
@@ -104,7 +141,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref } from 'vue-property-decorator';
+import { Component, Vue, Ref, Watch } from 'vue-property-decorator';
 import { Societe } from '@/models/Societe/societe';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import AlertMessageVue from '@/components/AlertMessage.vue';
@@ -117,7 +154,7 @@ import { ApplicationModule } from '@/store/modules/application';
 
 @Component({
   name: 'SocieteVue',
-  components: { AlertMessageVue, DatePicker }
+  components: { AlertMessageVue, DatePicker },
 })
 export default class SocieteVue extends Vue {
   @Ref() readonly societeLabel: any;
@@ -149,11 +186,12 @@ export default class SocieteVue extends Vue {
   private identifiant = '';
   private pathApollo = '';
   private dbName = '';
-  
+  private apolloInstanceName = '';
+
   private readonly = true;
   private newRecord = false;
 
-public open(societe: Societe): Promise<boolean> {
+  public open(societe: Societe): Promise<boolean> {
     this.readonly = true;
     this.societe = new Societe();
     this.societeBase = societe;
@@ -174,7 +212,7 @@ public open(societe: Societe): Promise<boolean> {
     });
   }
 
-  public async openNew(): Promise<number> {
+  public async openNew(): Promise<boolean> {
     this.readonly = false;
     this.setModel(new Societe());
     this.societeBase = new Societe();
@@ -192,14 +230,17 @@ public open(societe: Societe): Promise<boolean> {
   }
 
   private setModel(societe: Societe) {
-      this.name = societe.name;
-      this.identifiant = societe.identifiant;
-      this.pathApollo = ApplicationModule.parametre.pathApolloPlaceholder.replace("\\{path}", `\\${societe.identifiant}`);
-      this.dbName = `AcQuaCoreDB-${societe.identifiant}`;
+    this.name = societe.name;
+    this.identifiant = societe.identifiant;
+    this.apolloInstanceName = societe.apolloInstanceName;
+    this.pathApollo = ApplicationModule.parametre.pathApolloPlaceholder.replace('\\{path}', `\\${societe.identifiant}`);
+    this.dbName = `AcQuaCoreDB-${societe.identifiant}`;
   }
 
   private mapModel() {
-      console.log('map')
+    this.societe.name = this.name;
+    this.societe.identifiant = this.identifiant;
+    this.societe.apolloInstanceName = this.apolloInstanceName;
   }
 
   private closeDialog() {
@@ -233,26 +274,26 @@ public open(societe: Societe): Promise<boolean> {
     this.mapModel();
 
     if (this.newRecord) {
-    //   await SocieteApi.createSociete(this.societe)
-    //     .then(() => {
-    //       this.societe = this.societeBase;
-    //       this.closeDialog();
-    //     })
-    //     .catch((err) => {
-    //       this.alertMessage.show('Une erreur est survenue lors de la sauvegarde du Model', displayAxiosError(err));
-    //       this.readonly = false;
-    //     })
-    //     .finally(() => {
-    //       this.saveLoading = false;
-    //     });
+        await SocieteApi.createSociete(this.societe)
+          .then(() => {
+            this.societe = this.societeBase;
+            this.closeDialog();
+          })
+          .catch((err) => {
+            this.alertMessage.show('Une erreur est survenue lors de la sauvegarde de la société', displayAxiosError(err));
+            this.readonly = false;
+          })
+          .finally(() => {
+            this.saveLoading = false;
+          });
     } else {
-    //   await SocieteApi.update(this.societe, this.societeBase.hash)
-    //     .then(() => {
-    //       this.readonly = true;
-    //       this.successMessage.show('Le societe a été mis à jour avec succès.', '');
-    //       this.resolve(true);
-    //     })
-    //     .finally(() => (this.saveLoading = false));
+      //   await SocieteApi.update(this.societe, this.societeBase.hash)
+      //     .then(() => {
+      //       this.readonly = true;
+      //       this.successMessage.show('Le societe a été mis à jour avec succès.', '');
+      //       this.resolve(true);
+      //     })
+      //     .finally(() => (this.saveLoading = false));
     }
   }
 
@@ -261,6 +302,7 @@ public open(societe: Societe): Promise<boolean> {
     if (this.newRecord) {
       this.closeDialog();
     } else {
+      this.setModel(this.societeBase);
       this.readonly = true;
     }
   }
@@ -269,8 +311,9 @@ public open(societe: Societe): Promise<boolean> {
     if (this.readonly) this.closeDialog();
   }
 
+  @Watch('identifiant')
   private buildPaths() {
-    this.pathApollo = ApplicationModule.parametre.pathApolloPlaceholder.replace("\\{path}", `\\${this.identifiant}`);
+    this.pathApollo = ApplicationModule.parametre.pathApolloPlaceholder.replace('\\{path}', `\\${this.identifiant}`);
     this.dbName = `AcQuaCoreDB-${this.identifiant}`;
   }
 }
