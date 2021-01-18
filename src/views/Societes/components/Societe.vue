@@ -16,7 +16,7 @@
         <v-spacer></v-spacer>
         <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierModel" v-on="on">
+            <v-btn class="mr-2" color="success" :disabled="isLoading" @click="modifierModel" v-on="on">
               <v-icon left>mdi-pencil</v-icon>Modifier
             </v-btn>
           </template>
@@ -43,7 +43,7 @@
             <span class="shortcutTooltip">del</span>
           </span>
         </v-tooltip> -->
-        <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
+        <v-btn ref="buttonClose" class="ml-5" icon color="white" @click="closeDialog()">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </v-toolbar>
@@ -52,9 +52,10 @@
         <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
         <v-form ref="form" v-model="isValid" lazy-validation class="pt-2">
-            <v-text-field outlined v-model="name" label="Nom" @change="identifiant = name.toSlug()"/>
-            <v-text-field outlined v-model="identifiant" label="Identifiant" readonly/>
-
+            <v-text-field outlined v-model="name" label="Nom" @change="identifiant = name.toSlug()" :readonly="readonly"/>
+            <v-text-field outlined v-model="identifiant" label="Identifiant" :readonly="readonly" @change="buildPaths" />
+            <v-text-field outlined v-model="pathApollo" label="Dossier Apollo" readonly />
+            <v-text-field outlined v-model="dbName" label="Base de données" readonly />
         </v-form>
       </v-card-text>
       <v-card-actions v-if="!readonly">
@@ -93,7 +94,7 @@
             </v-btn>
           </template>
           <span>
-            Sauvegarder le societe
+            Sauvegarder la société
             <span class="shortcutTooltip">alt + enter</span>
           </span>
         </v-tooltip>
@@ -125,14 +126,6 @@ export default class SocieteVue extends Vue {
 
   @Ref() societeDialog!: any;
 
-  get deviseParDate() {
-    return ApplicationModule.parametre.deviseParDate;
-  }
-
-  get keyReadonly() {
-    return this.readonly || !this.newRecord;
-  }
-
   private display = false;
   private isValid = true;
 
@@ -154,6 +147,8 @@ export default class SocieteVue extends Vue {
   /// Societe model
   private name = '';
   private identifiant = '';
+  private pathApollo = '';
+  private dbName = '';
   
   private readonly = true;
   private newRecord = false;
@@ -197,7 +192,10 @@ public open(societe: Societe): Promise<boolean> {
   }
 
   private setModel(societe: Societe) {
-      console.log('set')
+      this.name = societe.name;
+      this.identifiant = societe.identifiant;
+      this.pathApollo = ApplicationModule.parametre.pathApolloPlaceholder.replace("\\{path}", `\\${societe.identifiant}`);
+      this.dbName = `AcQuaCoreDB-${societe.identifiant}`;
   }
 
   private mapModel() {
@@ -210,19 +208,10 @@ public open(societe: Societe): Promise<boolean> {
     this.alertMessage.clear();
     this.successMessage.clear();
     this.setModel(new Societe());
+    this.pathApollo = '';
+    this.dbName = '';
     this.reject();
   }
-
-  // private async loadSociete(id: number) {
-  //   this.getLoading = true;
-
-  //   const societe = await SocieteApi.getSociete();
-
-  //   this.setModel(societe);
-  //   this.societeBase = societe;
-
-  //   this.getLoading = false;
-  // }
 
   private modifierModel() {
     if (!this.getLoading) {
@@ -276,14 +265,13 @@ public open(societe: Societe): Promise<boolean> {
     }
   }
 
-//   private async getDevises() {
-//     if (this.devises.length <= 1) {
-//       this.devises = await DeviseApi.getAllDevises();
-//     }
-//   }
-
   private clickOutside() {
     if (this.readonly) this.closeDialog();
+  }
+
+  private buildPaths() {
+    this.pathApollo = ApplicationModule.parametre.pathApolloPlaceholder.replace("\\{path}", `\\${this.identifiant}`);
+    this.dbName = `AcQuaCoreDB-${this.identifiant}`;
   }
 }
 </script>

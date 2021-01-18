@@ -6,6 +6,10 @@
         <v-btn ref="btnAdd" color="warning" small fab class="ml-5" @click.stop="addSociete">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
+        <span class="ml-5">
+          Chemin Apollo : 
+          <i>{{pathApolloPlaceholder}}</i>
+        </span>
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -38,6 +42,8 @@
 import { SocieteModule } from '@/store/modules/companies';
 import { Component, Vue, Ref } from 'vue-property-decorator';
 import SocieteVue from '@/views/Societes/components/Societe.vue'
+import {Societe} from '@/models/Societe/societe'
+import {ApplicationModule} from '@/store/modules/application'
 
 @Component({
   name: 'Societes',
@@ -53,13 +59,14 @@ export default class Societes extends Vue {
     { text: 'Nom', value: 'name' },
     { text: 'Identifiant', value: 'identifiant' },
   ];
+  private pathApolloPlaceholder = ApplicationModule.parametre.pathApolloPlaceholder.replace("\\{path}", '');
 
   private addSociete() {
     this.societeDialog.openNew();
   }
 
-  private openSociete() {
-    console.log('open')
+  private async openSociete(societe: Societe) {
+    this.societeDialog.open(societe);
   }
 
   private get items() {
