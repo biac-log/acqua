@@ -109,8 +109,13 @@ String.prototype.toSlug = function() {
 
 interface Array<T> {
   isEmpty(): boolean;
+  last(): T;
 }
 
 Array.prototype.isEmpty = function() {
   return this.length == 0;
+};
+
+Array.prototype.last = function() {
+  return this[this.length -1];
 };

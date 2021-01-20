@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="display" ref="generateSocieteDialog" max-width="60%" eager>
+  <v-dialog v-model="display" ref="generateSocieteDialog" max-width="30%" eager>
     <v-card>
       <v-toolbar color="primary" dark flat>
         <v-card-title>Générer les sociétés</v-card-title>
@@ -12,9 +12,15 @@
       <v-card-text>
         <!-- <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" /> -->
-        <ul>
-            <li v-for="dossier in dossiers" :key="dossier">{{dossier}}</li>
-        </ul>
+        <v-row v-for="dossier in dossiers" :key="dossier" dense align="center">
+          <v-col
+            ><span>{{ dossier }}</span></v-col
+          >
+          <v-col>
+              <v-icon v-if="checkSocieteExiste(dossier)">mdi-check</v-icon>
+              <v-checkbox v-else @change="toggleSociete(dossier)"></v-checkbox>
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -35,7 +41,7 @@
           </template>
           <span>Annuler les modifications</span>
         </v-tooltip> -->
-        <!-- <v-tooltip top open-delay="500">
+        <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
               ref="btnValidate"
@@ -44,18 +50,18 @@
               tile
               color="success"
               :loading="saveLoading"
-              :disabled="deleteLoading"
-              @click="saveModel()"
+              :disabled="selectedDossiers.isEmpty()"
+              @click="generate()"
               tabindex="17"
             >
-              <v-icon left>mdi-content-save</v-icon>Sauvegarder
+              <v-icon left>mdi-content-save</v-icon>Générer
             </v-btn>
           </template>
           <span>
-            Sauvegarder la société
+            Générer les sociétés
             <span class="shortcutTooltip">alt + enter</span>
           </span>
-        </v-tooltip> -->
+        </v-tooltip>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -63,6 +69,7 @@
 
 <script lang="ts">
 import SocietesApi from '@/api/SocietesApi';
+import { SocieteModule } from '@/store/modules/companies';
 import { Component, Vue } from 'vue-property-decorator';
 @Component({
   name: 'GenerateSocietes',
@@ -72,6 +79,7 @@ export default class GenerateSocietes extends Vue {
   private display = false;
   private isLoading = false;
   private dossiers: string[] = [];
+  private selectedDossiers: string[] = [];
 
   public async open() {
     this.display = true;
@@ -79,13 +87,31 @@ export default class GenerateSocietes extends Vue {
   }
 
   private async loadDossiers() {
-      this.isLoading = true;
-      this.dossiers = await SocietesApi.getDirectories();
-      this.isLoading = false;
+    this.isLoading = true;
+    this.dossiers = await SocietesApi.getDirectories();
+    this.isLoading = false;
   }
 
   private closeDialog() {
     this.display = false;
+  }
+
+  private checkSocieteExiste(dossier: string): boolean{
+      return SocieteModule.societes.some(s => (s.name.toLowerCase() || s.identifiant.toLowerCase()) == this.societeIdentifiant(dossier));
+  }
+
+  private societeIdentifiant(path: string): string {
+      const array = path.split("\\");
+      return array.last().toLowerCase();
+  }
+
+  private toggleSociete(societe: string){
+      if(this.selectedDossiers.includes(societe)) {
+          const index = this.selectedDossiers.indexOf(societe);
+          this.selectedDossiers.splice(index, 1);
+      }else{
+          this.selectedDossiers.push(societe);
+      }
   }
 }
 </script>
