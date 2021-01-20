@@ -10,8 +10,11 @@
       </v-toolbar>
       <v-progress-linear :active="isLoading" indeterminate top color="primary accent-4"></v-progress-linear>
       <v-card-text>
-        <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
-        <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
+        <!-- <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
+        <AlertMessageVue ref="successMessage" class="alertMessage" type="success" /> -->
+        <ul>
+            <li v-for="dossier in dossiers" :key="dossier">{{dossier}}</li>
+        </ul>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -59,6 +62,7 @@
 </template>
 
 <script lang="ts">
+import SocietesApi from '@/api/SocietesApi';
 import { Component, Vue } from 'vue-property-decorator';
 @Component({
   name: 'GenerateSocietes',
@@ -67,9 +71,17 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class GenerateSocietes extends Vue {
   private display = false;
   private isLoading = false;
+  private dossiers: string[] = [];
 
-  public open() {
+  public async open() {
     this.display = true;
+    this.loadDossiers();
+  }
+
+  private async loadDossiers() {
+      this.isLoading = true;
+      this.dossiers = await SocietesApi.getDirectories();
+      this.isLoading = false;
   }
 
   private closeDialog() {

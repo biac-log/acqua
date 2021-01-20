@@ -26,4 +26,10 @@ export default abstract class SocietesApi {
 
     return response.data;
   }
+
+  static async getDirectories(): Promise<string[]> {
+    const response = await api.AcQuaCore.get<string[]>(`Societes/Dossiers/Get`);
+
+    return response.data;
+  }
 }
