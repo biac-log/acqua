@@ -17,8 +17,9 @@
             ><span>{{ dossier }}</span></v-col
           >
           <v-col>
-              <v-icon v-if="checkSocieteExiste(dossier)">mdi-check</v-icon>
-              <v-checkbox v-else @change="toggleSociete(dossier)"></v-checkbox>
+            <v-icon v-if="checkSocieteExiste(dossier)">mdi-check</v-icon>
+            <v-progress-circular v-else-if="saveLoading" indeterminate color="primary" />
+            <v-checkbox v-else @change="toggleSociete(dossier)"></v-checkbox>
           </v-col>
         </v-row>
       </v-card-text>
@@ -51,7 +52,7 @@
               color="success"
               :loading="saveLoading"
               :disabled="selectedDossiers.isEmpty()"
-              @click="generate()"
+              @click="generateSocietes()"
               tabindex="17"
             >
               <v-icon left>mdi-content-save</v-icon>Générer
@@ -69,6 +70,7 @@
 
 <script lang="ts">
 import SocietesApi from '@/api/SocietesApi';
+import { Societe } from '@/models/Societe/societe';
 import { SocieteModule } from '@/store/modules/companies';
 import { Component, Vue } from 'vue-property-decorator';
 @Component({
@@ -80,6 +82,7 @@ export default class GenerateSocietes extends Vue {
   private isLoading = false;
   private dossiers: string[] = [];
   private selectedDossiers: string[] = [];
+  private saveLoading = false;
 
   public async open() {
     this.display = true;
@@ -96,22 +99,39 @@ export default class GenerateSocietes extends Vue {
     this.display = false;
   }
 
-  private checkSocieteExiste(dossier: string): boolean{
-      return SocieteModule.societes.some(s => (s.name.toLowerCase() || s.identifiant.toLowerCase()) == this.societeIdentifiant(dossier));
+  private checkSocieteExiste(dossier: string): boolean {
+    return SocieteModule.societes.some(
+      (s) => (s.name.toLowerCase() || s.identifiant.toLowerCase()) == this.societeIdentifiant(dossier)
+    );
   }
 
   private societeIdentifiant(path: string): string {
-      const array = path.split("\\");
-      return array.last().toLowerCase();
+    const array = path.split('\\');
+    return array.last().toLowerCase();
   }
 
-  private toggleSociete(societe: string){
-      if(this.selectedDossiers.includes(societe)) {
-          const index = this.selectedDossiers.indexOf(societe);
-          this.selectedDossiers.splice(index, 1);
-      }else{
-          this.selectedDossiers.push(societe);
-      }
+  private toggleSociete(societe: string) {
+    if (this.selectedDossiers.includes(societe)) {
+      const index = this.selectedDossiers.indexOf(societe);
+      this.selectedDossiers.splice(index, 1);
+    } else {
+      this.selectedDossiers.push(societe);
+    }
+  }
+
+  private async generateSocietes() {
+    this.saveLoading = true;
+    let dossier;
+    for(dossier of this.selectedDossiers){
+        const newSociete = new Societe();
+        newSociete.name = this.societeIdentifiant(dossier);
+        newSociete.identifiant = this.societeIdentifiant(dossier).toSlug();
+        newSociete.apolloInstanceName = this.societeIdentifiant(dossier);
+        await SocietesApi.createSociete(newSociete);
+        await SocieteModule.fetchSocietes();
+    }
+    this.saveLoading = false;
+    this.selectedDossiers = [];
   }
 }
 </script>
