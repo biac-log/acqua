@@ -21,3 +21,6 @@ yarn-error.log*
 *.sw?
 src/debug.log
 *.log
+
+# Ignore les fichiers générés par visual studio
+.vs/
