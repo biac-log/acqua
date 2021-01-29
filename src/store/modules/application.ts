@@ -10,6 +10,7 @@ export interface IApplicationState {
 @Module({ dynamic: true, store, name: 'application' })
 class Application extends VuexModule implements IApplicationState {
   public parametre = new Parametre();
+  public singleUserMode = process.env.VUE_APP_SINGLE_USER_MODE;
 
   @Mutation
   private setParametre(parametre: Parametre) {
