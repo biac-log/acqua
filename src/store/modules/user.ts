@@ -79,6 +79,29 @@ class User extends VuexModule implements IUserState {
     });
   }
 
+  @Action({ rawError: true })
+  public loginSingleUser(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      api.AcQuaCore.get<Token>('/SingleUserToken')
+        .then(async (resp) => {
+          this.setToken(resp.data);
+          const tokenDecode = jwtDecode(resp.data.value);
+          const jsonConvert: JsonConvert = new JsonConvert();
+          const user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
+          await this.setUser(user);
+          resolve(resp);
+        })
+        .catch((err) => {
+          this.loginFail();
+          let errorMessage = "Impossible de récupérer le token";
+          if (err.response && err.response.status === 400) {
+            errorMessage = err.response.data.Message;
+          }
+          reject(errorMessage);
+        });
+    });
+  }
+
   @Action
   public async loadUser() {
     // return new Promise((resolve, reject) => {
