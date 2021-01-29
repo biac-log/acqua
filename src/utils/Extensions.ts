@@ -9,6 +9,7 @@ interface String {
   isInt(required?: boolean): boolean;
   isDecimal(required?: boolean): boolean;
   toNumber(): number;
+  toSlug(): string; 
 }
 
 Number.prototype.toDecimalString = function(nbDecimal = 2) {
@@ -89,10 +90,32 @@ String.prototype.toNumber = function() {
       .replace(',', '.');
 };
 
+String.prototype.toSlug = function() {
+  const trimmedString = this.replace(/^\s+|\s+$/g, '');
+  let toLower = trimmedString.toLowerCase();
+
+  const from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+  const to   = "aaaaaeeeeeiiiiooooouuuunc------";
+  for (let i=0, l=from.length ; i<l ; i++) {
+    toLower = toLower.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+  }
+
+  const returnString = toLower.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+    .replace(/-+/g, '-'); // collapse dashes
+
+  return returnString;
+};
+
 interface Array<T> {
   isEmpty(): boolean;
+  last(): T;
 }
 
 Array.prototype.isEmpty = function() {
   return this.length == 0;
+};
+
+Array.prototype.last = function() {
+  return this[this.length -1];
 };

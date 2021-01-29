@@ -49,8 +49,8 @@ class SocieteMod extends VuexModule implements ISocieteState {
     }
     
     /** Getters */
-    get companySlug() {
-        return this.societeSelected?.slug || '';
+    get companyIdentifiant() {
+        return this.societeSelected?.identifiant || '';
     }
 
     private get storedSociete() {
