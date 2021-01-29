@@ -15,7 +15,7 @@ export const filterAsyncRoutes = (routes: RouteConfig[], roles: string[]) => {
   const res: RouteConfig[] = [];
   routes.forEach((route) => {
     const r = { ...route };
-    if (hasPermission(roles, r)) {
+    if (hasPermission(roles, r) || process.env.VUE_APP_SINGLE_USER_MODE) {
       if (r.children) {
         r.children = filterAsyncRoutes(r.children, roles);
       }
