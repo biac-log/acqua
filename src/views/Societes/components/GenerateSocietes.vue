@@ -1,5 +1,12 @@
 <template>
-  <v-dialog v-model="display" ref="generateSocieteDialog" max-width="30%" eager>
+  <v-dialog
+    v-model="display"
+    ref="generateSocieteDialog"
+    max-width="30%"
+    eager
+    :persistent="saveLoading"
+    @click:outside="clickOutside"
+  >
     <v-card>
       <v-toolbar color="primary" dark flat>
         <v-card-title>Générer les sociétés</v-card-title>
@@ -12,7 +19,22 @@
       <v-card-text>
         <!-- <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" /> -->
-        <v-row v-for="dossier in dossiers" :key="dossier" dense align="center">
+        <v-data-table :headers="headers" :items="dossiers" disable-pagination hide-default-footer>
+          <template v-slot:[`item.created`]="{ item }">
+            <v-icon v-if="item.created && !item.error">mdi-check</v-icon>
+            <v-progress-circular v-else-if="saveLoading" indeterminate color="primary" />
+            <v-tooltip top open-delay="500" v-else-if="item.error">
+              <template v-slot:activator="{ on }"><v-icon v-on="on">mdi-close</v-icon> </template>
+              <span>{{ error }}</span></v-tooltip
+            >
+            <v-checkbox v-else @change="toggleSociete(item.path)"></v-checkbox>
+          </template>
+          <!-- <template v-slot:[`item.synced`]="{ item }">
+            <v-icon v-if="item.synced">mdi-check</v-icon>
+            <v-progress-circular v-else-if="saveLoading && !item.c" indeterminate color="primary" />            
+          </template> -->
+        </v-data-table>
+        <!-- <v-row v-for="dossier in dossiers" :key="dossier" dense align="center">
           <v-col
             ><span>{{ dossier }}</span></v-col
           >
@@ -21,7 +43,7 @@
             <v-progress-circular v-else-if="saveLoading" indeterminate color="primary" />
             <v-checkbox v-else @change="toggleSociete(dossier)"></v-checkbox>
           </v-col>
-        </v-row>
+        </v-row> -->
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -70,7 +92,9 @@
 
 <script lang="ts">
 import SocietesApi from '@/api/SocietesApi';
+import SynchronisationApi from '@/api/SynchronisationApi';
 import { Societe } from '@/models/Societe/societe';
+import { SocieteGen } from '@/models/Societe/SocieteGen';
 import { SocieteModule } from '@/store/modules/companies';
 import { Component, Vue } from 'vue-property-decorator';
 @Component({
@@ -80,9 +104,14 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class GenerateSocietes extends Vue {
   private display = false;
   private isLoading = false;
-  private dossiers: string[] = [];
-  private selectedDossiers: string[] = [];
+  private dossiers: SocieteGen[] = [];
+  private selectedDossiers: SocieteGen[] = [];
   private saveLoading = false;
+
+  private headers = [
+    { text: 'Dossier', value: 'path' },
+    { text: '', value: 'created' },
+  ];
 
   public async open() {
     this.display = true;
@@ -111,27 +140,41 @@ export default class GenerateSocietes extends Vue {
   }
 
   private toggleSociete(societe: string) {
-    if (this.selectedDossiers.includes(societe)) {
-      const index = this.selectedDossiers.indexOf(societe);
+    const add = new SocieteGen(societe);
+    if (this.selectedDossiers.includes(add)) {
+      const index = this.selectedDossiers.indexOf(add);
       this.selectedDossiers.splice(index, 1);
     } else {
-      this.selectedDossiers.push(societe);
+      this.selectedDossiers.push(add);
     }
   }
 
   private async generateSocietes() {
     this.saveLoading = true;
-    let dossier;
-    for(dossier of this.selectedDossiers){
-        const newSociete = new Societe();
-        newSociete.name = this.societeIdentifiant(dossier);
-        newSociete.identifiant = this.societeIdentifiant(dossier).toSlug();
-        newSociete.apolloInstanceName = this.societeIdentifiant(dossier);
-        await SocietesApi.createSociete(newSociete);
-        await SocieteModule.fetchSocietes();
+    let dossier: SocieteGen;
+    for (dossier of this.selectedDossiers) {
+      const newSociete = new Societe();
+      newSociete.name = this.societeIdentifiant(dossier.path);
+      newSociete.identifiant = this.societeIdentifiant(dossier.path).toSlug();
+      newSociete.apolloInstanceName = this.societeIdentifiant(dossier.path);
+      await SocietesApi.createSociete(newSociete)
+        .then(async () => {
+          dossier.created = true;
+          await SynchronisationApi.SyncAll().catch(() => {
+            dossier.error = 'Une erreur est survenue pendant la synchronisation';
+          });
+        })
+        .catch(() => {
+          dossier.error = 'Une erreur est survenue pendant la création';
+        });
+      await SocieteModule.fetchSocietes();
     }
     this.saveLoading = false;
     this.selectedDossiers = [];
+  }
+
+  private clickOutside() {
+    if (!this.saveLoading) this.closeDialog();
   }
 }
 </script>

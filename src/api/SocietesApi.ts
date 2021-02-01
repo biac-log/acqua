@@ -1,5 +1,6 @@
-import { Societe, SocieteDTO } from '@/models/Societe/societe';
+import { Societe } from '@/models/Societe/societe';
 import api from '@/api/AxiosApi';
+import { SocieteGen } from '@/models/Societe/SocieteGen';
 
 export default abstract class SocietesApi {
   static async getSocietes(): Promise<Societe[]> {
@@ -27,9 +28,9 @@ export default abstract class SocietesApi {
     return response.data;
   }
 
-  static async getDirectories(): Promise<string[]> {
+  static async getDirectories(): Promise<SocieteGen[]> {
     const response = await api.AcQuaCore.get<string[]>(`Societes/Dossiers/Get`);
 
-    return response.data;
+    return response.data.map((s) => new SocieteGen(s));
   }
 }
