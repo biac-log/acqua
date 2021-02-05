@@ -699,7 +699,14 @@ export default class VentilationVue extends Vue {
     ventilation.referenceJournal = element.numeroJournal;
     ventilation.referencePiece = element.numeroPiece;
     ventilation.libelle = this.reglement.libelle;
-    ventilation.codeMouvement = element.montantDevise < 0 ? 'DB' : 'CR';
+    if (element.soldeDevise > 0) {
+      ventilation.codeMouvement =
+        this.typesComptesSelected.id == 'F' ? 'DB' : 'CR';
+    } else {
+      ventilation.codeMouvement =
+        this.typesComptesSelected.id == 'F' ? 'CR' : 'DB';
+    }
+    // ventilation.codeMouvement = element.montantDevise < 0 ? 'DB' : 'CR';
     ventilation.montantDevise = Math.abs(element.montantDevise);
     ventilation.montantBase = Math.abs(element.montantBase);
     ventilation.codeDevise = element.codeDevise;
