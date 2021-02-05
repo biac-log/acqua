@@ -82,7 +82,7 @@
         ></v-select>
       </span>
       {{ username }}
-      <v-btn icon class="ml-5" @click="logout">
+      <v-btn v-if="!singleUserMode" icon class="ml-5" @click="logout">
         <v-icon>mdi-logout</v-icon>
       </v-btn>
     </v-app-bar>
@@ -104,6 +104,7 @@ import { SocieteModule } from '@/store/modules/companies';
 import { RouteConfig } from 'vue-router';
 import { PermissionModule } from '@/store/modules/permissions';
 import { Societe } from '@/models/Societe/societe';
+import { ApplicationModule } from '@/store/modules/application';
 
 @Component({
   name: 'Layout',
@@ -117,6 +118,10 @@ export default class extends Vue {
   private source = '';
   private currentRoute: any = '';
   private previousName = 'Accueil';
+
+  private get singleUserMode() {
+    return ApplicationModule.singleUserMode;
+  }
 
   mounted() {
     this.currentRoute = this.$route.name;

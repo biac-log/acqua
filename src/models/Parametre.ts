@@ -2,6 +2,7 @@ export class ParametreDTO {
   public modeDossier = false;
   public deviseParDate = false;
   public luxembourg = false;
+  public pathApolloPlaceholder = '';
 }
 
 export class Parametre extends ParametreDTO {

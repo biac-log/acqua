@@ -6,6 +6,7 @@ import Layout from '@/layout/index.vue';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import { SocieteModule } from '@/store/modules/companies';
+import { ApplicationModule } from '@/store/modules/application';
 
 NProgress.configure({ showSpinner: false });
 
@@ -243,6 +244,7 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
   if (UserModule.token) {
     if (SocieteModule.societes.isEmpty()) {
       await SocieteModule.fetchSocietes();
+      ApplicationModule.initParametre(); // init after headers are added
     }
     if (!UserModule.utilisateur || (PermissionModule.routes && PermissionModule.routes.length === 0)) {
       try {
@@ -263,6 +265,9 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
     }
   } else {
     // Has no token
+    if(process.env.VUE_APP_SINGLE_USER_MODE) {
+      await UserModule.loginSingleUser().then(() => next('/'));
+    }
     if (whiteList.indexOf(to.path) !== -1) {
       // In the free login whitelist, go directly
       next();
