@@ -250,7 +250,11 @@ export default class extends Vue {
     this.refDialogPiece
       .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
-        if (!this.skipAddResult) this.displayAddResult(resp.numeroDernierePiece.toString());
+        if (!this.skipAddResult && !resp.delete) this.displayAddResult(resp.numeroDernierePiece.toString());
+        if(resp.delete) {
+          this.notifier(`Pièce supprimée.`, 'error');
+          this.journalSelected.numeroDernierePiece = resp.numeroDernierePiece;
+        }
         this.journalSelected.numeroDernierePiece = resp.numeroDernierePiece;
         this.loadPiecesComptables();
       })
