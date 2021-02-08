@@ -253,14 +253,12 @@ export default class extends Vue {
         if (!this.skipAddResult && !resp.delete) this.displayAddResult(resp.numeroDernierePiece.toString());
         if(resp.delete) {
           this.notifier(`Pièce supprimée.`, 'error');
-          this.journalSelected.numeroDernierePiece = resp.numeroDernierePiece;
         }
         this.journalSelected.numeroDernierePiece = resp.numeroDernierePiece;
         this.loadPiecesComptables();
       })
       .catch((resp) => {
         if (resp.newRecord) {
-          this.journalSelected.numeroDernierePiece = parseInt(resp.numeroPiece);
           this.loadPiecesComptables();
         }
       })
