@@ -7,6 +7,7 @@ import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import { SocieteModule } from '@/store/modules/companies';
 import { ApplicationModule } from '@/store/modules/application';
+import AxiosApi from '@/api/AxiosApi';
 
 NProgress.configure({ showSpinner: false });
 
@@ -266,7 +267,10 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
   } else {
     // Has no token
     if(process.env.VUE_APP_SINGLE_USER_MODE) {
-      await UserModule.loginSingleUser().then(() => next('/'));
+      await UserModule.loginSingleUser().then(() => {
+        AxiosApi.refreshAcQuaCore();
+        next('/');
+      });
     }
     if (whiteList.indexOf(to.path) !== -1) {
       // In the free login whitelist, go directly
