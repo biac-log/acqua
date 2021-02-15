@@ -430,11 +430,18 @@ export default class extends Vue {
     ventilation.libelleDevise = this.journal.devise.libelle;
     ventilation.montantDevise = Math.abs(this.ventileDevise);
     ventilation.montantBase = Math.abs(this.ventileDevise * (this.taux | 1));
-    if(this.ventilations.length > 0) {
+
+    if(this.ventilations.length > 0) { // S'il existe déjà des ventilations
       const lastVentilation = this.ventilations[this.ventilations.length -1];
+      if(this.ventilations.some((vent) => vent.caseTva.typeCase === 1) // S'il y a une ventilation avec une case TVA de type 1
+        && this.ventileBase <= (this.getTvaCalcule() - this.getTvaImpute())) { // Et si le solde à ventiler est inférieur à (TVA calculée - TVA imputée)
+        await AchatVenteApi.getCompteTva(this.journal.numero, lastVentilation.numeroCompte);
+        console.log('foo')
+      }else{ // Sinon on propose le mouvement et type compte de la dernière ventilation
       ventilation.codeMouvement = lastVentilation.codeMouvement;
       ventilation.typeCompte = lastVentilation.typeCompte;
     }
+    } // Si c'est la première ligne
     else if (this.montant.toNumber() > 0) {
       ventilation.codeMouvement = 'CR';
       ventilation.typeCompte = 'C';
