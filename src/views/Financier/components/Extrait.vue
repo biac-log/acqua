@@ -430,7 +430,12 @@ export default class extends Vue {
     ventilation.libelleDevise = this.journal.devise.libelle;
     ventilation.montantDevise = Math.abs(this.ventileDevise);
     ventilation.montantBase = Math.abs(this.ventileDevise * (this.taux | 1));
-    if (this.montant.toNumber() > 0) {
+    if(this.ventilations.length > 0) {
+      const lastVentilation = this.ventilations[this.ventilations.length -1];
+      ventilation.codeMouvement = lastVentilation.codeMouvement;
+      ventilation.typeCompte = lastVentilation.typeCompte;
+    }
+    else if (this.montant.toNumber() > 0) {
       ventilation.codeMouvement = 'CR';
       ventilation.typeCompte = 'C';
     } else {

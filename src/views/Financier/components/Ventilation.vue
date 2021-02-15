@@ -16,7 +16,7 @@
             <template v-slot:activator="{ on }">
               <v-icon v-on="on">mdi-help-circle</v-icon>
             </template>
-              <p v-for="param in paramsFinanciers" :key="param">{{param.numeroCompte}} - {{param.libelle}}</p>
+              <p v-for="param in paramsFinanciers" :key="param.numeroCompte">{{param.numeroCompte}} - {{param.libelle}}</p>
           </v-tooltip>
         </v-toolbar>
         <v-card-text v-if="!ventilationIsSelected">
