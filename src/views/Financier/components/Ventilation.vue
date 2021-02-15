@@ -10,15 +10,18 @@
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
       <v-card outlined id="editVentilation">
         <v-toolbar color="primary" dark flat dense>
-          <v-card-title class="pa-2">
-            Ventilation
-          </v-card-title>
+          <v-card-title class="pa-2"> Ventilation </v-card-title>
+          <v-spacer />
+          <v-tooltip bottom v-if="typesComptesSelected == typesComptes[2] && ventilationIsSelected"> <!-- Show if typesComptes == G -->
+            <template v-slot:activator="{ on }">
+              <v-icon v-on="on">mdi-help-circle</v-icon>
+            </template>
+              <p v-for="param in paramsFinanciers" :key="param">{{param.numeroCompte}} - {{param.libelle}}</p>
+          </v-tooltip>
         </v-toolbar>
         <v-card-text v-if="!ventilationIsSelected">
           <v-card>
-            <v-card-text>
-              Veuillez ajouter ou sélectionner une ventilation.
-            </v-card-text>
+            <v-card-text> Veuillez ajouter ou sélectionner une ventilation. </v-card-text>
           </v-card>
         </v-card-text>
         <v-card-text v-else class="pb-0">
@@ -307,6 +310,8 @@ import { DossierSearch } from '@/models/Dossier/DossierSearch';
 import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossier.vue';
 import { ApplicationModule } from '@/store/modules/application';
+import ParametreApi from '@/api/ParametresApi';
+import { ParametreFinancier } from '@/models/ParametreFinancier';
 
 @Component({
   components: {
@@ -314,8 +319,8 @@ import { ApplicationModule } from '@/store/modules/application';
     SearchEcheancierVue,
     SearchDossierVue,
     AutocompleteComptesVue,
-    AutoCompleteDossierVue
-  }
+    AutoCompleteDossierVue,
+  },
 })
 export default class VentilationVue extends Vue {
   @Ref() readonly compteComponent!: AutocompleteComptesVue;
@@ -372,7 +377,7 @@ export default class VentilationVue extends Vue {
   private montant = '';
   private montantRules: any = [
     (v: string) => !!v || 'Montant obligatoire',
-    (v: string) => v.isDecimal() || 'Montant invalide'
+    (v: string) => v.isDecimal() || 'Montant invalide',
   ];
 
   private caseTva: CaseTva = new CaseTva();
@@ -387,7 +392,7 @@ export default class VentilationVue extends Vue {
   private referenceJournal = '';
   private referencePiece = '';
   private referenceRules: any = [
-    (v: string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || 'Référence invalide'
+    (v: string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || 'Référence invalide',
   ];
   private referenceWarning = '';
 
@@ -398,10 +403,15 @@ export default class VentilationVue extends Vue {
   private tvaCalcule = 0;
   private tvaImpute = 0;
 
+  private paramsFinanciers: ParametreFinancier[] = [];
+
   mounted() {
     FinancierApi.getTypesComptes().then((resp) => {
       this.typesComptes = resp;
     });
+    ParametreApi.getParamsFinanciers().then((resp) => {
+      this.paramsFinanciers = resp;
+    })
   }
 
   //#region Open
@@ -464,7 +474,7 @@ export default class VentilationVue extends Vue {
             idDossier: ventilation.dossier,
             nom: ventilation.dossierNom,
             dateEntree: '',
-            dateSortie: ''
+            dateSortie: '',
           })
         );
         this.idDossier = ventilation.dossier;
@@ -625,7 +635,7 @@ export default class VentilationVue extends Vue {
           new Devise({
             id: ventilation.codeDevise,
             libelle: ventilation.libelleDevise,
-            typeDevise: this.devisesSelected.typeDevise
+            typeDevise: this.devisesSelected.typeDevise,
           })
         );
         this.devisesSelected = this.devises.find((d) => d.id == ventilation.codeDevise) || this.devises[0];
@@ -686,7 +696,7 @@ export default class VentilationVue extends Vue {
     }
     this.montant = Math.abs(element.soldeDevise).toComptaString(2);
     // Init other ventilations if there were more than one element
-    for (let index = 1; index < elements.length; index++) {      
+    for (let index = 1; index < elements.length; index++) {
       this.createVentilationFromEcheancier(elements[index]);
     }
   }
@@ -702,11 +712,9 @@ export default class VentilationVue extends Vue {
     ventilation.referencePiece = element.numeroPiece;
     ventilation.libelle = this.reglement.libelle;
     if (element.soldeDevise > 0) {
-      ventilation.codeMouvement =
-        this.typesComptesSelected.id == 'F' ? 'CR' : 'DB';
+      ventilation.codeMouvement = this.typesComptesSelected.id == 'F' ? 'CR' : 'DB';
     } else {
-      ventilation.codeMouvement =
-        this.typesComptesSelected.id == 'F' ? 'DB' : 'CR';
+      ventilation.codeMouvement = this.typesComptesSelected.id == 'F' ? 'DB' : 'CR';
     }
     // ventilation.codeMouvement = element.montantDevise < 0 ? 'DB' : 'CR';
     ventilation.montantDevise = Math.abs(element.montantDevise);
