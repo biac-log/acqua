@@ -287,6 +287,9 @@ export default class extends Vue {
   private ventileBase = 0;
   private ventileDevise = 0;
 
+  private dernierType = '';
+  private derniereBase = '';
+
   mounted() {
     this.loadReglements();
   }
@@ -355,16 +358,24 @@ export default class extends Vue {
         this.refVentilationVue
           .openNew(this.getVentilationToAdd(), this.journal)
           .then((ventil) => {
+            // On garde le type de compte/ nature case tva de la ventilation en mÃ©moire pour la ventilation TVA
+            if(['C', 'F'].some((type) => type == ventil.typeCompte) && this.dernierType != ventil.typeCompte )  {
+              this.dernierType = ventil.typeCompte;
+            }
+            if(['V', 'A'].some((base) => base == ventil.caseTva.natureCase) && this.derniereBase != ventil.caseTva.natureCase )  {
+              this.derniereBase = ventil.caseTva.natureCase;
+            }
+
             const maxLigne = this.ventilations?.length
               ? Math.max(...this.ventilations.map((i) => i.numeroVentilation))
               : 0;
             ventil.numeroVentilation = maxLigne + 1;
             this.ventilations.push(ventil);
             this.$nextTick(() => {
-              if (this.ventileDevise != 0) {
-                this.createVentilation();
+              if (this.ventileDevise != 0) { // S'il reste un montant Ã  ventiler
+                this.createVentilation(); // On rÃ©ouvre la crÃ©ation d'une ventilation
               } else {
-                this.sendExtrait();
+                this.sendExtrait(); // Sinon on crÃ©e l'extrait
               }
             });
           })
@@ -435,7 +446,6 @@ export default class extends Vue {
       const lastVentilation = this.ventilations[this.ventilations.length -1];
       if(this.ventilations.some((vent) => vent.caseTva.typeCase === 1) // S'il y a une ventilation avec une case TVA de type 1
         && this.ventileBase <= (this.getTvaCalcule() - this.getTvaImpute())) { // Et si le solde à ventiler est inférieur à (TVA calculée - TVA imputée)
-        await AchatVenteApi.getCompteTva(this.journal.numero, lastVentilation.numeroCompte);
         console.log('foo')
       }else{ // Sinon on propose le mouvement et type compte de la dernière ventilation
       ventilation.codeMouvement = lastVentilation.codeMouvement;
