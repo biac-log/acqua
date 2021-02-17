@@ -220,6 +220,7 @@ import { PromiseResponse } from '@/models/PromiseResponse';
 import DeviseApi from '@/api/DeviseApi';
 import DatePicker from '@/components/DatePicker.vue';
 import { ApplicationModule } from '@/store/modules/application';
+import { CaseTva } from '@/models/CaseTva';
 
 @Component({
   name: 'Extrait',
@@ -481,6 +482,7 @@ export default class extends Vue {
         // Sinon on propose le mouvement et type compte de la dernière ventilation
         ventilation.codeMouvement = lastVentilation.codeMouvement;
         ventilation.typeCompte = lastVentilation.typeCompte;
+        if (ventilation.typeCompte == 'G') ventilation.caseTva = this.getCaseTvaVentilations() ?? new CaseTva();
       }
     } // Si c'est la première ligne
     else if (this.montant.toNumber() > 0) {
@@ -631,6 +633,10 @@ export default class extends Vue {
       )
       .map((c) => c.montantCredit.toNumber() - c.montantDebit.toNumber())
       .reduce((a, b) => a + b, 0);
+  }
+
+  public getCaseTvaVentilations(): CaseTva | undefined {
+    return this.ventilations.find((vent) => vent.codeCaseTVA)?.caseTva;
   }
 
   private deleteExtrait() {

@@ -16,7 +16,7 @@
             <template v-slot:activator="{ on }">
               <v-icon v-on="on">mdi-help-circle</v-icon>
             </template>
-              <p v-for="param in paramsFinanciers" :key="param.numeroCompte">{{param.numeroCompte}} - {{param.libelle}}</p>
+              <p v-for="param in paramsFinanciers" :key="param.key">{{param.numeroCompte}} - {{param.libelle}}</p>
           </v-tooltip>
         </v-toolbar>
         <v-card-text v-if="!ventilationIsSelected">
@@ -312,6 +312,8 @@ import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossie
 import { ApplicationModule } from '@/store/modules/application';
 import ParametreApi from '@/api/ParametresApi';
 import { ParametreFinancier } from '@/models/ParametreFinancier';
+import ExtraitVue from './Extrait.vue';
+import CompteApi from '@/api/CompteApi';
 
 @Component({
   components: {
@@ -465,8 +467,16 @@ export default class VentilationVue extends Vue {
     this.nomCompte = ventilation?.nomCompte ? ventilation.nomCompte : '';
 
     if (ventilation) {
-      if (ventilation.numeroCompte)
+      if (ventilation.numeroCompte){
         this.compteComponent?.init(ventilation.numeroCompte.toString(), ventilation.nomCompte);
+
+        if(ventilation.typeCompte == "G") {
+          const compteG = await CompteApi.getCompteGeneral('G',ventilation.numeroCompte);
+          const caseTva = await CaseTvaApi.getCaseTVA(compteG.numeroCase, this.numeroJournal);
+          ventilation.caseTva.numeroCase = caseTva.numeroCase;
+          ventilation.caseTva = caseTva;
+        }
+      }
 
       if (ventilation.dossier) {
         this.dossierComponent.setDossier(
@@ -504,9 +514,11 @@ export default class VentilationVue extends Vue {
   //#endregion
   private resetCompte() {
     this.compteComponent?.resetCompte();
-    if (this.typesComptesSelected.id != 'g') {
+    if (this.typesComptesSelected.id != 'G') {
       this.caseTva.refresh();
       this.numeroCaseTva = '';
+    }else{
+      this.caseTva = this.getCaseTvaVentilations() ?? new CaseTva();
     }
   }
 
@@ -578,6 +590,7 @@ export default class VentilationVue extends Vue {
         this.numeroCaseTva = '';
       }
       //this.calculMontant();
+      this.montant = (Math.abs(this.montant.toNumber())/(1+(this.caseTva.tauxTvaCase/100))).toString();
     }
   }
 
@@ -840,6 +853,12 @@ export default class VentilationVue extends Vue {
       this.$nextTick(() => this.compteComponent.focus());
     }
   }
+
+  public getCaseTvaVentilations(): CaseTva | undefined {
+    return this.ventilations.find((vent) => vent.codeCaseTVA)?.caseTva;
+  }
+
+
 }
 </script>
 
