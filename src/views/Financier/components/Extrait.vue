@@ -222,7 +222,7 @@ import DatePicker from '@/components/DatePicker.vue';
 
 @Component({
   name: 'Extrait',
-  components: { VentilationVue, DatePicker }
+  components: { VentilationVue, DatePicker },
 })
 export default class extends Vue {
   @Ref() readonly refVentilationVue!: VentilationVue;
@@ -262,13 +262,13 @@ export default class extends Vue {
   private reglementSelected: Reglement = new Reglement();
   private reglementsRules = [
     (v: Reglement) => !!v || 'Règlement obligatoire',
-    (v: Reglement) => v.numero != 0 || 'Règlement obligatoire'
+    (v: Reglement) => v.numero != 0 || 'Règlement obligatoire',
   ];
 
   private montant = '';
   private montantRules: any = [
     (v: string) => !!v || 'Montant obligatoire',
-    (v: string) => v.isDecimal() || 'Montant invalide'
+    (v: string) => v.isDecimal() || 'Montant invalide',
   ];
 
   private ventilations: Ventilation[] = [];
@@ -281,7 +281,7 @@ export default class extends Vue {
     { text: 'Débit', value: 'montantDebit', width: 100, align: 'end' },
     { text: 'Crédit', value: 'montantCredit', width: 100, align: 'end' },
     { text: 'Devise', value: 'libelleDevise', width: 70 },
-    { text: 'TVA', value: 'libelleTva', width: 100 }
+    { text: 'TVA', value: 'libelleTva', width: 100 },
   ];
 
   private ventileBase = 0;
@@ -359,10 +359,13 @@ export default class extends Vue {
           .openNew(this.getVentilationToAdd(), this.journal)
           .then((ventil) => {
             // On garde le type de compte/ nature case tva de la ventilation en mÃ©moire pour la ventilation TVA
-            if(['C', 'F'].some((type) => type == ventil.typeCompte) && this.dernierType != ventil.typeCompte )  {
+            if (['C', 'F'].some((type) => type == ventil.typeCompte) && this.dernierType != ventil.typeCompte) {
               this.dernierType = ventil.typeCompte;
             }
-            if(['V', 'A'].some((base) => base == ventil.caseTva.natureCase) && this.derniereBase != ventil.caseTva.natureCase )  {
+            if (
+              ['V', 'A'].some((base) => base == ventil.caseTva.natureCase) &&
+              this.derniereBase != ventil.caseTva.natureCase
+            ) {
               this.derniereBase = ventil.caseTva.natureCase;
             }
 
@@ -372,10 +375,11 @@ export default class extends Vue {
             ventil.numeroVentilation = maxLigne + 1;
             this.ventilations.push(ventil);
             this.$nextTick(() => {
-              if (this.ventileDevise != 0) { // S'il reste un montant Ã  ventiler
-                this.createVentilation(); // On rÃ©ouvre la crÃ©ation d'une ventilation
+              if (this.ventileDevise != 0) {
+                // S'il reste un montant à ventiler
+                this.createVentilation(); // On réouvre la création d'une ventilation
               } else {
-                this.sendExtrait(); // Sinon on crÃ©e l'extrait
+                this.sendExtrait(); // Sinon on crée l'extrait
               }
             });
           })
@@ -442,15 +446,28 @@ export default class extends Vue {
     ventilation.montantDevise = Math.abs(this.ventileDevise);
     ventilation.montantBase = Math.abs(this.ventileDevise * (this.taux | 1));
 
-    if(this.ventilations.length > 0) { // S'il existe déjà des ventilations
-      const lastVentilation = this.ventilations[this.ventilations.length -1];
-      if(this.ventilations.some((vent) => vent.caseTva.typeCase === 1) // S'il y a une ventilation avec une case TVA de type 1
-        && this.ventileBase <= (this.getTvaCalcule() - this.getTvaImpute())) { // Et si le solde à ventiler est inférieur à (TVA calculée - TVA imputée)
-        console.log('foo')
-      }else{ // Sinon on propose le mouvement et type compte de la dernière ventilation
-      ventilation.codeMouvement = lastVentilation.codeMouvement;
-      ventilation.typeCompte = lastVentilation.typeCompte;
-    }
+    if (this.ventilations.length > 0) {
+      // S'il existe déjà des ventilations
+      const lastVentilation = this.ventilations[this.ventilations.length - 1];
+      if (
+        this.ventilations.some((vent) => vent.caseTva.typeCase === 1) && // S'il y a une ventilation avec une case TVA de type 1
+        this.ventileBase <= this.getTvaCalcule() - this.getTvaImpute() // Et si le solde à ventiler est inférieur à (TVA calculée - TVA imputée)
+      ) {
+        ventilation.typeCompte = "G";
+
+        if(this.dernierType == "C" || this.derniereBase == "V") {
+          console.log('TVA CLIENT')
+        }else if(this.dernierType == "F" || this.derniereBase == "A"){
+          console.log('TVA FOURNISSEUR')
+        }else{
+          this.ventileDevise < 0 ? console.log('TVA FOURNISSEUR') : console.log('TVA CLIENT');
+        }
+        
+      } else {
+        // Sinon on propose le mouvement et type compte de la dernière ventilation
+        ventilation.codeMouvement = lastVentilation.codeMouvement;
+        ventilation.typeCompte = lastVentilation.typeCompte;
+      }
     } // Si c'est la première ligne
     else if (this.montant.toNumber() > 0) {
       ventilation.codeMouvement = 'CR';
@@ -576,7 +593,7 @@ export default class extends Vue {
           montantsCaseTva.push({
             case: element.caseTva.numeroCase,
             caseTaux: element.caseTva.tauxTvaCase,
-            montant: element.montantCredit.toNumber() - element.montantDebit.toNumber()
+            montant: element.montantCredit.toNumber() - element.montantDebit.toNumber(),
           });
         }
       });
