@@ -1,9 +1,11 @@
 export interface IParametreFinancier {
+  key: string;
   numeroCompte: number;
   libelle: string;
 }
 
 export class ParametreFinancierDTO implements IParametreFinancier {
+  key = '';
   numeroCompte = 0;
   libelle = '';
 }

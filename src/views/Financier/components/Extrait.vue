@@ -219,6 +219,7 @@ import { DateTime } from '@/models/DateTime';
 import { PromiseResponse } from '@/models/PromiseResponse';
 import DeviseApi from '@/api/DeviseApi';
 import DatePicker from '@/components/DatePicker.vue';
+import { ApplicationModule } from '@/store/modules/application';
 
 @Component({
   name: 'Extrait',
@@ -292,6 +293,7 @@ export default class extends Vue {
 
   mounted() {
     this.loadReglements();
+    ApplicationModule.initParametresFinanciers();
   }
 
   public open(
@@ -451,18 +453,29 @@ export default class extends Vue {
       const lastVentilation = this.ventilations[this.ventilations.length - 1];
       if (
         this.ventilations.some((vent) => vent.caseTva.typeCase === 1) && // S'il y a une ventilation avec une case TVA de type 1
-        this.ventileBase <= this.getTvaCalcule() - this.getTvaImpute() // Et si le solde à ventiler est inférieur à (TVA calculée - TVA imputée)
+        Math.abs(this.ventileBase) <= Math.abs(this.getTvaCalcule() - this.getTvaImpute()) // Et si le solde à ventiler est inférieur à (TVA calculée - TVA imputée)
       ) {
-        ventilation.typeCompte = "G";
+        ventilation.typeCompte = 'G';
 
-        if(this.dernierType == "C" || this.derniereBase == "V") {
-          console.log('TVA CLIENT')
-        }else if(this.dernierType == "F" || this.derniereBase == "A"){
-          console.log('TVA FOURNISSEUR')
-        }else{
-          this.ventileDevise < 0 ? console.log('TVA FOURNISSEUR') : console.log('TVA CLIENT');
+        if (this.dernierType == 'C' || this.derniereBase == 'V') {
+          const param = ApplicationModule.compteTvaClient;
+          ventilation.numeroCompte = param.numeroCompte;
+          ventilation.nomCompte = param.libelle;
+        } else if (this.dernierType == 'F' || this.derniereBase == 'A') {
+          const param = ApplicationModule.compteTvaFournisseur;
+          ventilation.numeroCompte = param.numeroCompte;
+          ventilation.nomCompte = param.libelle;
+        } else {
+          if (this.ventileDevise < 0) {
+            const param = ApplicationModule.compteTvaClient;
+            ventilation.numeroCompte = param.numeroCompte;
+            ventilation.nomCompte = param.libelle;
+          } else {
+            const param = ApplicationModule.compteTvaFournisseur;
+            ventilation.numeroCompte = param.numeroCompte;
+            ventilation.nomCompte = param.libelle;
+          }
         }
-        
       } else {
         // Sinon on propose le mouvement et type compte de la dernière ventilation
         ventilation.codeMouvement = lastVentilation.codeMouvement;
