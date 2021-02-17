@@ -57,7 +57,7 @@
             </v-col>
           </v-row>
           <v-row dense>
-            <v-col cols="7" v-if="typesComptesSelected.id != 'G'">
+            <v-col cols="7" v-if="['F','C'].some((type) => type == typesComptesSelected.id)">
               <v-text-field
                 ref="reference"
                 label="Référence"
