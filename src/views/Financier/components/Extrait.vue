@@ -290,6 +290,7 @@ export default class extends Vue {
 
   private dernierType = '';
   private derniereBase = '';
+  private derniereDevise!: number;
 
   mounted() {
     this.loadReglements();
@@ -443,7 +444,7 @@ export default class extends Vue {
   public getVentilationToAdd(): Ventilation {
     const ventilation = new Ventilation();
     ventilation.libelle = this.reglementSelected.libelle;
-    ventilation.codeDevise = this.journal.devise.id;
+    ventilation.codeDevise = this.derniereDevise ?? this.journal.devise.id;
     ventilation.libelleDevise = this.journal.devise.libelle;
     ventilation.montantDevise = Math.abs(this.ventileDevise);
     ventilation.montantBase = Math.abs(this.ventileDevise * (this.taux | 1));
