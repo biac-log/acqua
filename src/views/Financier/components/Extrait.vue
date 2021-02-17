@@ -553,6 +553,45 @@ export default class extends Vue {
     }
   }
 
+  public getTvaCalcule(ventilationToIgnore?: Ventilation): number {
+    if (!this.ventilations) return 0;
+
+    const montantsCaseTva: { case: number; caseTaux: number; montant: number }[] = [];
+    this.ventilations
+      .filter((c) => c !== ventilationToIgnore)
+      .forEach((element) => {
+        const montantCase = montantsCaseTva.find((c) => c.case == element.caseTva.numeroCase);
+        if (montantCase) montantCase.montant += element.montantCredit.toNumber() - element.montantDebit.toNumber();
+        else if (element.caseTva.typeCase > 0 && element.caseTva.typeCase < 4) {
+          montantsCaseTva.push({
+            case: element.caseTva.numeroCase,
+            caseTaux: element.caseTva.tauxTvaCase,
+            montant: element.montantCredit.toNumber() - element.montantDebit.toNumber()
+          });
+        }
+      });
+
+    return montantsCaseTva
+      .map((c) => ((c.montant * c.caseTaux) / 100).toDecimalString(2).toNumber())
+      .reduce((a, b) => a + b, 0)
+      .toDecimalString(this.journal.devise.typeDevise == 'E' ? 0 : 2)
+      .toNumber();
+  }
+
+  public getTvaImpute(ventilationToIgnore?: Ventilation): number {
+    if (!this.ventilations) return 0;
+
+    return this.ventilations
+      .filter(
+        (c) =>
+          (c.caseTva.typeCase == 50 || c.caseTva.typeCase == 51) &&
+          c.codeDevise == this.journal.devise.id &&
+          c !== ventilationToIgnore
+      )
+      .map((c) => c.montantCredit.toNumber() - c.montantDebit.toNumber())
+      .reduce((a, b) => a + b, 0);
+  }
+
   private deleteExtrait() {
     if (!this.isNew && !this.readonly) {
       this.dialog = false;
