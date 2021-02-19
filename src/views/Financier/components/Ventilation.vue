@@ -11,14 +11,6 @@
       <v-card outlined id="editVentilation">
         <v-toolbar color="primary" dark flat dense>
           <v-card-title class="pa-2"> Ventilation </v-card-title>
-          <v-spacer />
-          <v-tooltip bottom v-if="typesComptesSelected == typesComptes[2] && ventilationIsSelected">
-            <!-- Show if typesComptes == G -->
-            <template v-slot:activator="{ on }">
-              <v-icon v-on="on">mdi-help-circle</v-icon>
-            </template>
-            <p v-for="param in paramsFinanciers" :key="param.key">{{ param.numeroCompte }} - {{ param.libelle }}</p>
-          </v-tooltip>
         </v-toolbar>
         <v-card-text v-if="!ventilationIsSelected">
           <v-card>
@@ -44,7 +36,7 @@
                 @keyup="changeType"
               ></v-select>
             </v-col>
-            <v-col cols="8">
+            <v-col :cols="typesComptesSelected == typesComptes[2] ? 7 : 8">
               <AutocompleteComptesVue
                 ref="compteComponent"
                 :readonly.sync="readonly"
@@ -56,6 +48,10 @@
               >
               </AutocompleteComptesVue>
             </v-col>
+            <v-col v-if="typesComptesSelected == typesComptes[2]">
+              <v-icon @click="openSuggestion">mdi-help-circle-outline</v-icon>
+            </v-col>
+            <compte-general-suggestion ref="compteGeneralSuggestion" />
           </v-row>
           <v-row dense>
             <v-col cols="7" v-if="['F', 'C'].some((type) => type == typesComptesSelected.id)">
@@ -296,7 +292,7 @@ import { TypeCompte, Devise, TypeMouvement, getTypesMouvements } from '@/models/
 import SearchCaseTvaVue from '@/components/search/SearchCaseTva.vue';
 import SearchEcheancierVue from '@/components/search/SearchEcheancier.vue';
 import SearchDossierVue from '@/components/search/SearchDossier.vue';
-import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
+import { CompteGeneralSearch, CompteGeneralSearchDTO } from '@/models/Compte/CompteGeneralSearch';
 import { Ventilation, Journal, PieceAchatVente } from '@/models/Financier';
 import { FinancierApi } from '@/api/FinancierApi';
 import CaseTvaApi from '@/api/CaseTvaApi';
@@ -315,6 +311,7 @@ import ParametreApi from '@/api/ParametresApi';
 import { ParametreFinancier } from '@/models/ParametreFinancier';
 import ExtraitVue from './Extrait.vue';
 import CompteApi from '@/api/CompteApi';
+import CompteGeneralSuggestion from './CompteGeneralSuggestion.vue';
 
 @Component({
   components: {
@@ -323,6 +320,7 @@ import CompteApi from '@/api/CompteApi';
     SearchDossierVue,
     AutocompleteComptesVue,
     AutoCompleteDossierVue,
+    CompteGeneralSuggestion,
   },
 })
 export default class VentilationVue extends Vue {
@@ -332,6 +330,7 @@ export default class VentilationVue extends Vue {
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
   @Ref() readonly refTypesComptes!: HTMLElement;
   @Ref() readonly btnValidate!: HTMLElement;
+  @Ref() readonly compteGeneralSuggestion!: CompteGeneralSuggestion;
 
   @PropSync('isReadOnly') public readonly!: boolean;
   @PropSync('Ventilations') public ventilations!: Ventilation[];
@@ -526,6 +525,7 @@ export default class VentilationVue extends Vue {
   }
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
+    console.log('Compte CHange')
     if (!compte) {
       this.nomCompte = '';
     } else if (
@@ -869,6 +869,17 @@ export default class VentilationVue extends Vue {
     if (this.caseTva.typeCase == 1)
       this.montant = (Math.abs(this.montantInit) / (1 + this.caseTva.tauxTvaCase / 100)).toString();
       this.selectTextMontant();
+  }
+
+  public openSuggestion() {
+    this.compteGeneralSuggestion.open().then((compte) => {
+      this.compteComponent.init(compte.numeroCompte.toString(), compte.libelle);
+      const compteGdto = new CompteGeneralSearchDTO();
+      compteGdto.numero = compte.numeroCompte;
+      compteGdto.nom = compte.libelle;
+      const compteG = new CompteGeneralSearch(compteGdto);
+      this.compteChange(compteG)
+    });
   }
 }
 </script>
