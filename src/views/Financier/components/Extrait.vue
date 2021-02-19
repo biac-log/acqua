@@ -482,7 +482,7 @@ export default class extends Vue {
         // Sinon on propose le mouvement et type compte de la dernière ventilation
         ventilation.codeMouvement = lastVentilation.codeMouvement;
         ventilation.typeCompte = lastVentilation.typeCompte;
-        if (ventilation.typeCompte == 'G') ventilation.caseTva = this.getCaseTvaVentilations() ?? new CaseTva();
+        // if (ventilation.typeCompte == 'G') ventilation.caseTva = this.getCaseTvaVentilations() ?? new CaseTva();
         if(this.ventilations.some((vent) => vent.caseTva.typeCase === 1)) { // S'il y a déjà des ventilations avec des bases taxables
           ventilation.montantDevise = this.ventileDevise - Math.abs(this.getTvaCalcule()); // On soustrait cette partie taxable du montant restant à ventiler
         }

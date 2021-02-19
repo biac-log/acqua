@@ -12,11 +12,12 @@
         <v-toolbar color="primary" dark flat dense>
           <v-card-title class="pa-2"> Ventilation </v-card-title>
           <v-spacer />
-          <v-tooltip bottom v-if="typesComptesSelected == typesComptes[2] && ventilationIsSelected"> <!-- Show if typesComptes == G -->
+          <v-tooltip bottom v-if="typesComptesSelected == typesComptes[2] && ventilationIsSelected">
+            <!-- Show if typesComptes == G -->
             <template v-slot:activator="{ on }">
               <v-icon v-on="on">mdi-help-circle</v-icon>
             </template>
-              <p v-for="param in paramsFinanciers" :key="param.key">{{param.numeroCompte}} - {{param.libelle}}</p>
+            <p v-for="param in paramsFinanciers" :key="param.key">{{ param.numeroCompte }} - {{ param.libelle }}</p>
           </v-tooltip>
         </v-toolbar>
         <v-card-text v-if="!ventilationIsSelected">
@@ -57,7 +58,7 @@
             </v-col>
           </v-row>
           <v-row dense>
-            <v-col cols="7" v-if="['F','C'].some((type) => type == typesComptesSelected.id)">
+            <v-col cols="7" v-if="['F', 'C'].some((type) => type == typesComptesSelected.id)">
               <v-text-field
                 ref="reference"
                 label="Référence"
@@ -381,6 +382,7 @@ export default class VentilationVue extends Vue {
     (v: string) => !!v || 'Montant obligatoire',
     (v: string) => v.isDecimal() || 'Montant invalide',
   ];
+  private montantInit = 0;
 
   private caseTva: CaseTva = new CaseTva();
   private numeroCaseTva = '';
@@ -413,7 +415,7 @@ export default class VentilationVue extends Vue {
     });
     ParametreApi.getParamsFinanciers().then((resp) => {
       this.paramsFinanciers = resp;
-    })
+    });
   }
 
   //#region Open
@@ -467,11 +469,12 @@ export default class VentilationVue extends Vue {
     this.nomCompte = ventilation?.nomCompte ? ventilation.nomCompte : '';
 
     if (ventilation) {
-      if (ventilation.numeroCompte){
+      this.montantInit = ventilation.montantDevise;
+      if (ventilation.numeroCompte) {
         this.compteComponent?.init(ventilation.numeroCompte.toString(), ventilation.nomCompte);
 
-        if(ventilation.typeCompte == "G") {
-          const compteG = await CompteApi.getCompteGeneral('G',ventilation.numeroCompte);
+        if (ventilation.typeCompte == 'G') {
+          const compteG = await CompteApi.getCompteGeneral('G', ventilation.numeroCompte);
           const caseTva = await CaseTvaApi.getCaseTVA(compteG.numeroCase, this.numeroJournal);
           ventilation.caseTva.numeroCase = caseTva.numeroCase;
           ventilation.caseTva = caseTva;
@@ -517,9 +520,9 @@ export default class VentilationVue extends Vue {
     if (this.typesComptesSelected.id != 'G') {
       this.caseTva.refresh();
       this.numeroCaseTva = '';
-    }else{
+    } /**else {
       this.caseTva = this.getCaseTvaVentilations() ?? new CaseTva();
-    }
+    } **/
   }
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
@@ -535,7 +538,7 @@ export default class VentilationVue extends Vue {
       this.natureCompte = '';
       this.dossierComponent?.resetDossier();
       //this.compteComponent.blur();
-      this.$nextTick(() => (this.$refs.montant as any)?.focus());
+      this.$nextTick(() => this.selectTextMontant());
     } else if (compte instanceof CompteGeneralSearch) {
       this.nomCompte = compte.nom;
       this.numeroCompte = compte.numero.toString();
@@ -552,7 +555,7 @@ export default class VentilationVue extends Vue {
         this.dossierIsDisabled = true;
         this.dossierComponent?.resetDossier();
         //this.compteComponent.blur();
-        this.$nextTick(() => (this.$refs.montant as any)?.focus());
+        this.$nextTick(() => this.selectTextMontant());
       }
     } else if (compte instanceof CompteSearch || compte instanceof CompteDeTier) {
       this.nomCompte = compte.nom;
@@ -576,7 +579,7 @@ export default class VentilationVue extends Vue {
       } n'est pas actif à la date du ${this.datePiece.toString()}`;
     else this.warningMessage = '';
 
-    this.$nextTick(() => (this.$refs.montant as any)?.focus());
+    this.$nextTick(() => this.selectTextMontant());
   }
 
   private async setCompteGeneralCaseTvaAsync(compte: CompteGeneralSearch) {
@@ -589,8 +592,7 @@ export default class VentilationVue extends Vue {
         this.caseTva = new CaseTva();
         this.numeroCaseTva = '';
       }
-      //this.calculMontant();
-      this.montant = (Math.abs(this.montant.toNumber())/(1+(this.caseTva.tauxTvaCase/100))).toString();
+      this.calculMontant();
     }
   }
 
@@ -608,7 +610,7 @@ export default class VentilationVue extends Vue {
         .then((piece) => {
           if (piece) {
             this.initFromPieceComptable(piece);
-            this.$nextTick(() => (this.$refs.montant as any)?.focus());
+            this.$nextTick(() => this.selectTextMontant());
           }
         })
         .catch();
@@ -683,7 +685,7 @@ export default class VentilationVue extends Vue {
             if (this.montant.toNumber() == this.ventileDevise) {
               this.sendVentilation();
             } else {
-              (this.$refs.montant as any)?.focus();
+              this.selectTextMontant();
             }
           });
         })
@@ -750,7 +752,7 @@ export default class VentilationVue extends Vue {
           this.numeroCaseTva = caseTva.numeroCase.toString();
           this.caseTva = caseTva;
           this.numeroCaseTvaError = '';
-          //this.calculMontant();
+          this.calculMontant();
         }
       } else {
         this.caseTva.refresh();
@@ -772,6 +774,7 @@ export default class VentilationVue extends Vue {
         this.numeroCaseTva = caseTva.numeroCase.toString();
         this.caseTva = caseTva;
         this.numeroCaseTvaError = '';
+        this.calculMontant();
         this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
       })
       .catch(() => {
@@ -854,11 +857,19 @@ export default class VentilationVue extends Vue {
     }
   }
 
-  public getCaseTvaVentilations(): CaseTva | undefined {
-    return this.ventilations.find((vent) => vent.codeCaseTVA)?.caseTva;
+  // public getCaseTvaVentilations(): CaseTva | undefined {
+  //   return this.ventilations.find((vent) => vent.codeCaseTVA)?.caseTva;
+  // }
+
+  public selectTextMontant() {
+    this.$nextTick(() => (this.$refs.montant as Vue).$el.querySelector('input')?.select());
   }
 
-
+  public calculMontant() {
+    if (this.caseTva.typeCase == 1)
+      this.montant = (Math.abs(this.montantInit) / (1 + this.caseTva.tauxTvaCase / 100)).toString();
+      this.selectTextMontant();
+  }
 }
 </script>
 
