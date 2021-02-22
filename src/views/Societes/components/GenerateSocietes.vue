@@ -128,6 +128,9 @@ export default class GenerateSocietes extends Vue {
         newSociete.identifiant = this.societeIdentifiant(dossier).toSlug();
         newSociete.apolloInstanceName = this.societeIdentifiant(dossier);
         await SocietesApi.createSociete(newSociete);
+        if(SocieteModule.societes.length <= 0) {
+            SocieteModule.selectSociete(newSociete);
+          }
         await SocieteModule.fetchSocietes();
     }
     this.saveLoading = false;
