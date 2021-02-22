@@ -257,13 +257,12 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
           await SocieteModule.fetchSocietes()
             .then(() => {
               ApplicationModule.initParametre(); // init after headers are added
-              next();
+              next({ ...to, replace: true });
             })
             .catch(() => {
               next('/societes/index')
             });
         } else {
-          console.log('next ...to')
           next({ ...to, replace: true });
         }
       } catch (err) {
@@ -274,29 +273,22 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
         // Init societes
         await SocieteModule.fetchSocietes()
           .then(() => {
-            console.log('then');
             ApplicationModule.initParametre(); // init after headers are added
             next();
           })
           .catch(() => {
-            console.log('path', to.path.toUpperCase());
-            console.log('Subsequentcaught, is f-ing path different ?', !to.path.toUpperCase().includes('/SOCIETES'));
             if (from.path.toUpperCase().includes('/SOCIETES')) {
-              console.log('next(false)');
               next(false);
             }
             else 
             if (!to.path.toUpperCase().includes('/SOCIETES')) {
-              console.log('next(societes');
               next('/societes/index');
             }
             else {
-              console.log('next !path different');
               next();
             }
           });
       }else{
-        console.log('next')
         next();
       }
     }
