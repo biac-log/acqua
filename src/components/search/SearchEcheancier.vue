@@ -116,7 +116,7 @@
         <v-row>
           <v-col cols="12">
             <AgGridVue
-              style="height: 561px;"
+              style="height: 519px;"
               id="dataTable"
               class="ag-theme-alpine"
               :columnDefs="headersEcheanciers"
@@ -255,7 +255,7 @@ export default class extends Vue {
     navigateToNextCell: this.navigateToNextCell,
     pagination: true,
     // paginationAutoPageSize: true,
-    paginationPageSize: 15,
+    paginationPageSize: 10,
     suppressRowClickSelection: true,
     enableSorting: true,
     columnTypes: {
