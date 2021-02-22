@@ -243,16 +243,6 @@ const router = createRouter();
 router.beforeEach(async (to: Route, from: Route, next: any) => {
   NProgress.start();
   if (UserModule.token) {
-    if (SocieteModule.societes.isEmpty()) {
-      // Init societes
-      await SocieteModule.fetchSocietes()
-
-      if(SocieteModule.empty && to.path.toUpperCase() != '/SOCIETES/INDEX') {
-        next('/societes')
-      }else{
-        ApplicationModule.initParametre(); // init after headers are added
-      }
-    }
     if (!UserModule.utilisateur || (PermissionModule.routes && PermissionModule.routes.length === 0)) {
       try {
         await UserModule.loadUser();
@@ -261,14 +251,53 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
         router.addRoutes(PermissionModule.dynamicRoutes);
         if (to.path.toUpperCase() == '/LOGIN') {
           next({ path: '/' });
+        }
+        if (SocieteModule.societes.isEmpty()) {
+          // Init societes
+          await SocieteModule.fetchSocietes()
+            .then(() => {
+              console.log('then');
+              ApplicationModule.initParametre(); // init after headers are added
+            })
+            .catch(() => {
+              next('/societes/index')
+            });
         } else {
+          console.log('next ...to')
           next({ ...to, replace: true });
         }
       } catch (err) {
         next(`/login`);
       }
     } else {
-      next();
+      if (SocieteModule.societes.isEmpty()) {
+        // Init societes
+        await SocieteModule.fetchSocietes()
+          .then(() => {
+            console.log('then');
+            ApplicationModule.initParametre(); // init after headers are added
+          })
+          .catch(() => {
+            console.log('path', to.path.toUpperCase());
+            console.log('Subsequentcaught, is f-ing path different ?', !to.path.toUpperCase().includes('/SOCIETES'));
+            if (from.path.toUpperCase().includes('/SOCIETES')) {
+              console.log('next(false)');
+              next(false);
+            }
+            else 
+            if (!to.path.toUpperCase().includes('/SOCIETES')) {
+              console.log('next(societes');
+              next('/societes/index');
+            }
+            else {
+              console.log('next !path different');
+              next();
+            }
+          });
+      }else{
+        console.log('next')
+        next();
+      }
     }
   } else {
     // Has no token
