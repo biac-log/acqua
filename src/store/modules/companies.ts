@@ -13,6 +13,7 @@ export interface ISocieteState {
 class SocieteMod extends VuexModule implements ISocieteState {
     public societeSelected = this.storedSociete;
     public societes: Societe[] = [];
+    public empty = false;
 
     /** Mutations  **/ 
     @Mutation
@@ -38,8 +39,12 @@ class SocieteMod extends VuexModule implements ISocieteState {
     @Action({rawError: true})
     async fetchSocietes(){
         const resp = await SocietesApi.getSocietes();
-        this.setSocietes(resp);
-        if(!this.societeSelected.name) this.selectSociete(resp[0]);
+        if(!resp.isEmpty()){
+            this.setSocietes(resp);
+            if(!this.societeSelected.name) this.selectSociete(resp[0]);
+        }else{
+            this.empty = true;
+        }
     }
 
     @Action

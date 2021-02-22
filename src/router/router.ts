@@ -221,7 +221,7 @@ export const asyncRoutes: RouteConfig[] = [
         }
       }
     ]
-  },
+  }
 ];
 
 const createRouter = () =>
@@ -244,8 +244,14 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
   NProgress.start();
   if (UserModule.token) {
     if (SocieteModule.societes.isEmpty()) {
-      await SocieteModule.fetchSocietes();
-      ApplicationModule.initParametre(); // init after headers are added
+      // Init societes
+      await SocieteModule.fetchSocietes()
+
+      if(SocieteModule.empty && to.path.toUpperCase() != '/SOCIETES/INDEX') {
+        next('/societes')
+      }else{
+        ApplicationModule.initParametre(); // init after headers are added
+      }
     }
     if (!UserModule.utilisateur || (PermissionModule.routes && PermissionModule.routes.length === 0)) {
       try {
@@ -266,7 +272,7 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
     }
   } else {
     // Has no token
-    if(process.env.VUE_APP_SINGLE_USER_MODE) {
+    if (process.env.VUE_APP_SINGLE_USER_MODE) {
       await UserModule.loginSingleUser().then(() => {
         AxiosApi.refreshAcQuaCore();
         next('/');
