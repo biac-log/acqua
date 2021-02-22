@@ -871,6 +871,7 @@ export default class VentilationVue extends Vue {
   public calculMontant() {
     if (this.caseTva.typeCase == 1)
       this.montant = (Math.abs(this.montantInit) / (1 + this.caseTva.tauxTvaCase / 100)).toString();
+    this.montant = this.montant.toNumber().toComptaString();
     this.selectTextMontant();
   }
 
