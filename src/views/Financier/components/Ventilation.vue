@@ -525,7 +525,6 @@ export default class VentilationVue extends Vue {
   }
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
-    console.log('Compte CHange')
     if (!compte) {
       this.nomCompte = '';
     } else if (
@@ -872,12 +871,10 @@ export default class VentilationVue extends Vue {
   }
 
   public openSuggestion() {
-    this.compteGeneralSuggestion.open().then((compte) => {
+    this.compteGeneralSuggestion.open().then(async (compte) => {
+
       this.compteComponent.init(compte.numeroCompte.toString(), compte.libelle);
-      const compteGdto = new CompteGeneralSearchDTO();
-      compteGdto.numero = compte.numeroCompte;
-      compteGdto.nom = compte.libelle;
-      const compteG = new CompteGeneralSearch(compteGdto);
+      const compteG = await CompteApi.getCompteGeneral('G', compte.numeroCompte);
       this.compteChange(compteG)
     });
   }
