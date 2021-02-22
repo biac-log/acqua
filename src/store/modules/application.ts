@@ -38,12 +38,12 @@ class Application extends VuexModule implements IApplicationState {
 
   get compteTvaClient() {
     // return this.getParamFinancierByKey('TvaClient');
-    return this.parametresFinanciers.find((param) => param.key == 'TvaClient') || new ParametreFinancier();
+    return this.parametresFinanciers.find((param) => param.key == 'Tva Client') || new ParametreFinancier();
   }
 
   get compteTvaFournisseur() {
     // return this.getParamFinancierByKey('TvaFournisseur');
-    return this.parametresFinanciers.find((param) => param.key == 'TvaFournisseur') || new ParametreFinancier();
+    return this.parametresFinanciers.find((param) => param.key == 'Tva Fournisseur') || new ParametreFinancier();
   }
 
   private getParamFinancierByKey(key: string){
