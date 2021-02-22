@@ -256,8 +256,8 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
           // Init societes
           await SocieteModule.fetchSocietes()
             .then(() => {
-              console.log('then');
               ApplicationModule.initParametre(); // init after headers are added
+              next();
             })
             .catch(() => {
               next('/societes/index')
@@ -276,6 +276,7 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
           .then(() => {
             console.log('then');
             ApplicationModule.initParametre(); // init after headers are added
+            next();
           })
           .catch(() => {
             console.log('path', to.path.toUpperCase());
