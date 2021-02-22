@@ -1,6 +1,6 @@
 import AxiosApi from './AxiosApi';
 import { Parametre } from '@/models/Parametre';
-import { ParametreFinancier } from '@/models/ParametreFinancier';
+import { ParametreFinancier, ParametreFinancierDTO } from '@/models/ParametreFinancier';
 
 export default abstract class ParametreApi {
   static async get(): Promise<Parametre> {
@@ -9,7 +9,7 @@ export default abstract class ParametreApi {
   }
 
   static async getParamsFinanciers(): Promise<ParametreFinancier[]> {
-    const resp = await AxiosApi.AcQuaCore.get<ParametreFinancier[]>('/ParamsFinanciers');
-    return resp.data;
+    const resp = await AxiosApi.AcQuaCore.get<ParametreFinancierDTO[]>('/ParamsFinanciers');
+    return resp.data.map((dto) => new ParametreFinancier(dto));
   }
 }

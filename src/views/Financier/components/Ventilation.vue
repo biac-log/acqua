@@ -11,6 +11,13 @@
       <v-card outlined id="editVentilation">
         <v-toolbar color="primary" dark flat dense>
           <v-card-title class="pa-2"> Ventilation </v-card-title>
+          <v-spacer />
+          <v-btn
+            v-if="ventilationIsSelected && typesComptesSelected == typesComptes[2]"
+            color="success"
+            @click="openSuggestion"
+            >Comptes prédéfinis</v-btn
+          >
         </v-toolbar>
         <v-card-text v-if="!ventilationIsSelected">
           <v-card>
@@ -36,7 +43,7 @@
                 @keyup="changeType"
               ></v-select>
             </v-col>
-            <v-col :cols="typesComptesSelected == typesComptes[2] ? 7 : 8">
+            <v-col cols="8">
               <AutocompleteComptesVue
                 ref="compteComponent"
                 :readonly.sync="readonly"
@@ -47,9 +54,6 @@
                 @change="compteChange"
               >
               </AutocompleteComptesVue>
-            </v-col>
-            <v-col v-if="typesComptesSelected == typesComptes[2]">
-              <v-icon @click="openSuggestion">mdi-help-circle-outline</v-icon>
             </v-col>
             <compte-general-suggestion ref="compteGeneralSuggestion" />
           </v-row>
@@ -867,16 +871,20 @@ export default class VentilationVue extends Vue {
   public calculMontant() {
     if (this.caseTva.typeCase == 1)
       this.montant = (Math.abs(this.montantInit) / (1 + this.caseTva.tauxTvaCase / 100)).toString();
-      this.selectTextMontant();
+    this.selectTextMontant();
   }
 
   public openSuggestion() {
-    this.compteGeneralSuggestion.open().then(async (compte) => {
-
-      this.compteComponent.init(compte.numeroCompte.toString(), compte.libelle);
-      const compteG = await CompteApi.getCompteGeneral('G', compte.numeroCompte);
-      this.compteChange(compteG)
-    });
+    this.compteGeneralSuggestion
+      .open()
+      .then(async (compte) => {
+        this.compteComponent.init(compte.numeroCompte.toString(), compte.libelle);
+        const compteG = await CompteApi.getCompteGeneral('G', compte.numeroCompte);
+        this.compteChange(compteG);
+      })
+      .catch((_) => {
+        this.compteComponent.focus();
+      });
   }
 }
 </script>

@@ -2,24 +2,30 @@
   <v-dialog v-model="dialog" max-width="750" transition="dialog-transition">
     <v-card>
       <v-toolbar
-        ><v-card-title> Comptes pour les saisies financières</v-card-title> <v-spacer /><v-btn></v-btn
-      ></v-toolbar>
-      <v-card-text>
-        <AgGridVue
-        style="height: 730px;"
-        id="dataTable"
-        class="ag-theme-alpine"
-        :columnDefs="headers"
-        :rowData="paramsFinanciers"
-        rowSelection="single"
-        :gridOptions="gridOptions"
+        ><v-card-title> Comptes pour les saisies financières</v-card-title> <v-spacer /><v-btn
+          color="error"
+          fab
+          small
+          class="ml-5"
+          @click="closeDialog"
+          ><v-icon>mdi-close</v-icon></v-btn
+        ></v-toolbar
       >
-      </AgGridVue>
-        <!-- <v-data-table :items="paramsFinanciers" :headers="headers" @dblclick:row="selectCompte"
-          ><template v-slot:[`item.key`]="{ item }">
-            <span>{{ item.key.replace(/([a-z])([A-Z])/g, '$1 $2') }}</span>
-          </template></v-data-table
-        > -->
+      <v-card-text>
+        <v-row>
+          <v-col cols="12"
+            ><AgGridVue
+              style="height: 600px"
+              id="dataTable"
+              class="ag-theme-alpine"
+              :columnDefs="headers"
+              :rowData="paramsFinanciers"
+              rowSelection="single"
+              :gridOptions="gridOptions"
+            >
+            </AgGridVue
+          ></v-col>
+        </v-row>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -28,22 +34,21 @@
 <script lang="ts">
 import { ApplicationModule } from '@/store/modules/application';
 import { Component, Vue } from 'vue-property-decorator';
-import { CompteSimple } from '@/models/Financier/Get/CompteSimple';
-import { GridOptions} from 'ag-grid-community';
+import { GridOptions, ValueFormatterParams } from 'ag-grid-community';
 import { AgGridVue } from 'ag-grid-vue';
 import { ParametreFinancier } from '@/models/ParametreFinancier';
 
 @Component({
   name: 'CompteGeneralSuggestion',
-  components: {AgGridVue}
+  components: { AgGridVue },
 })
 export default class CompteGeneralSuggestion extends Vue {
   private dialog = false;
   private paramsFinanciers = ApplicationModule.parametresFinanciers;
   private headers = [
-    { headerName: 'Type', field: 'key', filter: true, width: 120 },
-    { headerName: 'N° Compte', field: 'numeroCompte', filter: true, flex: 1 },
-    { headerName: 'Libellé', field: 'libelle', filter: true, width: 120 },
+    { headerName: 'Type', field: 'key', filter: true },
+    { headerName: 'N° Compte', field: 'numeroCompte', filter: true },
+    { headerName: 'Libellé', field: 'libelle', filter: true, flex: 1 },
   ];
 
   private gridOptions: GridOptions = {
@@ -53,10 +58,9 @@ export default class CompteGeneralSuggestion extends Vue {
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
-    pagination: true,
+    pagination: false,
     // paginationAutoPageSize: true,
     onRowDoubleClicked: this.rowDoubleClick,
-    paginationPageSize: 15
   };
 
   private resolve!: any;
@@ -73,7 +77,7 @@ export default class CompteGeneralSuggestion extends Vue {
 
   private selectCompte(compte: ParametreFinancier) {
     this.resolve(compte);
-    this.dialog = false;
+    this.closeDialog();
   }
 
   private navigateToNextCell(params: any) {
@@ -89,7 +93,7 @@ export default class CompteGeneralSuggestion extends Vue {
       case KEY_DOWN:
         previousCell = params.previousCellPosition;
         // set selected cell on current cell + 1
-        this.gridOptions?.api?.forEachNode(function(node) {
+        this.gridOptions?.api?.forEachNode(function (node) {
           if (previousCell.rowIndex + 1 === node.rowIndex) {
             node.setSelected(true);
           }
@@ -101,7 +105,7 @@ export default class CompteGeneralSuggestion extends Vue {
         } else {
           previousCell = params.previousCellPosition;
           // set selected cell on current cell - 1
-          this.gridOptions?.api?.forEachNode(function(node) {
+          this.gridOptions?.api?.forEachNode(function (node) {
             if (previousCell.rowIndex - 1 === node.rowIndex) {
               node.setSelected(true);
             }
@@ -126,6 +130,11 @@ export default class CompteGeneralSuggestion extends Vue {
   private rowDoubleClick() {
     const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as ParametreFinancier;
     this.selectCompte(selectedRow);
+  }
+
+  private closeDialog() {
+    this.reject();
+    this.dialog = false;
   }
 }
 </script>
