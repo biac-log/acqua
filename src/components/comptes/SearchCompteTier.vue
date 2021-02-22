@@ -27,6 +27,14 @@
           autocomplete="off"
           outlined
         ></v-text-field>
+        <v-btn
+          color="error"
+          fab
+          small
+          class="ml-5"
+          @click="close"
+          ><v-icon>mdi-close</v-icon></v-btn
+        >
       </v-card-title>
       <AgGridVue
         style="height: 730px"
