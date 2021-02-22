@@ -290,8 +290,11 @@ export default class SocieteVue extends Vue {
     if (this.newRecord) {
       await SocieteApi.createSociete(this.societe)
         .then(() => {
-          this.societe = this.societeBase;
+          if(SocieteModule.societes.length <= 0) {
+            SocieteModule.selectSociete(this.societe);
+          }
           SocieteModule.fetchSocietes();
+          this.societe = this.societeBase;
           this.closeDialog();
         })
         .catch((err) => {
