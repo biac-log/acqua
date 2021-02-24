@@ -16,6 +16,9 @@ export class EcheancierElementDTO {
   montantBase = 0;
   codeBlocage = 0;
   libelleCodeBlocage = '';
+  caseBase1 = 0;
+  caseBase2 = 0;
+  caseBase3 = 0;
 }
 
 export class EcheancierElement extends EcheancierElementDTO {
