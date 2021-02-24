@@ -388,6 +388,8 @@ export default class VentilationVue extends Vue {
   private montantInit = 0;
 
   private caseTva: CaseTva = new CaseTva();
+  private caseBase = 0;
+  private lockCaseTva = false; 
   private numeroCaseTva = '';
   private numeroCaseTvaError = '';
   private numeroCaseTvaRules: any = [(v: string) => !v || (v.isInt() && v.toNumber() != 0) || 'Numéro invalide'];
@@ -518,14 +520,20 @@ export default class VentilationVue extends Vue {
     }
   }
   //#endregion
-  private resetCompte() {
+  private async resetCompte() {
     this.compteComponent?.resetCompte();
     if (this.typesComptesSelected.id != 'G') {
       this.caseTva.refresh();
       this.numeroCaseTva = '';
-    } /**else {
-      this.caseTva = this.getCaseTvaVentilations() ?? new CaseTva();
-    } **/
+    } else {
+      this.caseTva = await this.getCaseTvaVentilations() ?? new CaseTva();
+      if(this.caseTva.typeCase == 1) {
+        this.numeroCaseTva = this.caseTva.numeroCase.toIntString();
+        this.calculMontant();
+        this.compteComponent.focus();
+        this.lockCaseTva = true;
+      }
+    }
   }
 
   private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
@@ -546,7 +554,7 @@ export default class VentilationVue extends Vue {
       this.nomCompte = compte.nom;
       this.numeroCompte = compte.numero.toString();
       this.natureCompte = compte.nature;
-      this.setCompteGeneralCaseTvaAsync(compte);
+      if(!this.lockCaseTva) this.setCompteGeneralCaseTvaAsync(compte);
       if (
         this.typesComptesSelected?.id == 'G' &&
         (compte.nature == 'R' || compte.nature == 'C') &&
@@ -596,6 +604,7 @@ export default class VentilationVue extends Vue {
         this.numeroCaseTva = '';
       }
       this.calculMontant();
+      this.lockCaseTva = false;
     }
   }
 
@@ -705,6 +714,7 @@ export default class VentilationVue extends Vue {
     this.reference = `${element.numeroJournal}.${element.numeroPiece}`;
     this.referenceJournal = element.numeroJournal.toString();
     this.referencePiece = element.numeroPiece.toString();
+    this.caseBase = element.caseBase1 ?? element.caseBase2 ?? element.caseBase3;
     if (element.soldeDevise > 0) {
       this.typesMouvementsSelected =
         this.typesComptesSelected.id == 'F' ? this.typesMouvements[1] : this.typesMouvements[0]; // [1] == CR, [0] == DB
@@ -729,6 +739,7 @@ export default class VentilationVue extends Vue {
     ventilation.referenceJournal = element.numeroJournal;
     ventilation.referencePiece = element.numeroPiece;
     ventilation.libelle = this.reglement.libelle;
+    ventilation.caseBase = element.caseBase1 ?? element.caseBase2 ?? element.caseBase3;
     if (element.soldeDevise > 0) {
       ventilation.codeMouvement = this.typesComptesSelected.id == 'F' ? 'CR' : 'DB';
     } else {
@@ -756,10 +767,12 @@ export default class VentilationVue extends Vue {
           this.caseTva = caseTva;
           this.numeroCaseTvaError = '';
           this.calculMontant();
+          this.lockCaseTva = false;
         }
       } else {
         this.caseTva.refresh();
         this.caseTva = new CaseTva();
+        this.lockCaseTva = false;
       }
     } catch (err) {
       this.caseTva = new CaseTva();
@@ -778,6 +791,7 @@ export default class VentilationVue extends Vue {
         this.caseTva = caseTva;
         this.numeroCaseTvaError = '';
         this.calculMontant();
+        this.lockCaseTva = false;
         this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
       })
       .catch(() => {
@@ -804,6 +818,7 @@ export default class VentilationVue extends Vue {
     ventilation.dossier = this.idDossier;
     ventilation.dossierNom = this.nomDossier;
     ventilation.caseTva = new CaseTva(this.caseTva);
+    ventilation.caseBase = this.caseBase;
     return ventilation;
   }
 
@@ -860,9 +875,15 @@ export default class VentilationVue extends Vue {
     }
   }
 
-  // public getCaseTvaVentilations(): CaseTva | undefined {
-  //   return this.ventilations.find((vent) => vent.codeCaseTVA)?.caseTva;
-  // }
+  public async getCaseTvaVentilations(): Promise<CaseTva | undefined> {
+    const caseBase = this.ventilations.find((vent) => vent.caseBase)?.caseBase;
+    console.log(caseBase);
+    let caseTva = new CaseTva();
+    if(caseBase){
+      caseTva = await CaseTvaApi.getCaseTVA(caseBase, this.numeroJournal);
+    }
+    return caseTva;
+  }
 
   public selectTextMontant() {
     this.$nextTick(() => (this.$refs.montant as Vue).$el.querySelector('input')?.select());
