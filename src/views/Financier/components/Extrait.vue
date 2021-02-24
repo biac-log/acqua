@@ -458,6 +458,7 @@ export default class extends Vue {
         Math.abs(this.ventileBase) <= Math.abs(this.getTvaCalcule() - this.getTvaImpute()) // Et si le solde à ventiler est inférieur à (TVA calculée - TVA imputée)
       ) {
         ventilation.typeCompte = 'G';
+        ventilation.codeMouvement = this.getVentileDevise() < 0 ? 'DB' : 'CR'; // Code mouvement selon le reste à ventiler
 
         if (this.dernierType == 'C' || this.derniereBase == 'V') {
           const param = ApplicationModule.compteTvaClient;
@@ -479,9 +480,9 @@ export default class extends Vue {
           }
         }
       } else {
-        // Sinon on propose le mouvement et type compte de la dernière ventilation
-        ventilation.codeMouvement = lastVentilation.codeMouvement;
+        // Sinon on propose le type compte de la dernière ventilation
         ventilation.typeCompte = lastVentilation.typeCompte;
+        ventilation.codeMouvement = this.getVentileDevise() < 0 ? 'DB' : 'CR'; // Code mouvement selon le reste à ventiler
         // if (ventilation.typeCompte == 'G') ventilation.caseTva = this.getCaseTvaVentilations() ?? new CaseTva();
         if(this.ventilations.some((vent) => vent.caseTva.typeCase === 1)) { // S'il y a déjà des ventilations avec des bases taxables
           ventilation.montantDevise = this.ventileDevise - Math.abs(this.getTvaCalcule()); // On soustrait cette partie taxable du montant restant à ventiler
