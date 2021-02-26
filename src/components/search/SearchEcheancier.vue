@@ -27,6 +27,7 @@
           autocomplete="off"
           outlined
         ></v-text-field>
+        <v-btn color="error" fab small class="ml-5" @click="close"><v-icon>mdi-close</v-icon></v-btn>
       </v-card-title>
       <v-card-text>
         <v-row dense>
@@ -116,7 +117,7 @@
         <v-row>
           <v-col cols="12">
             <AgGridVue
-              style="height: 561px;"
+              style="height: 519px"
               id="dataTable"
               class="ag-theme-alpine"
               :columnDefs="headersEcheanciers"
@@ -158,7 +159,7 @@ import _ from 'lodash';
 
 @Component({
   name: 'SearchEcheancier',
-  components: { AgGridVue }
+  components: { AgGridVue },
 })
 export default class extends Vue {
   private dialog = false;
@@ -184,7 +185,7 @@ export default class extends Vue {
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: true,
-      type: 'rightAligned'
+      type: 'rightAligned',
     },
     { headerName: 'PiecePrincipale', field: 'isPiecePrincipale', filter: true, width: 150, hide: true },
     { headerName: 'Type', field: 'typePiece', filter: true, width: 150 },
@@ -194,7 +195,7 @@ export default class extends Vue {
       filter: true,
       width: 120,
       type: 'dateColumn',
-      valueFormatter: this.dateToString
+      valueFormatter: this.dateToString,
     },
     {
       headerName: 'Montant',
@@ -202,7 +203,7 @@ export default class extends Vue {
       filter: true,
       width: 140,
       type: 'numericColumn',
-      valueFormatter: this.montantDeviseToString
+      valueFormatter: this.montantDeviseToString,
     },
     {
       headerName: 'Montant',
@@ -211,7 +212,7 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
-      hide: true
+      hide: true,
     },
     { headerName: 'Libellé', field: 'libelle', filter: true, width: 150, type: 'dateColumn' },
     {
@@ -219,7 +220,7 @@ export default class extends Vue {
       field: 'dateEcheanceDate',
       filter: true,
       width: 120,
-      valueFormatter: this.dateToString
+      valueFormatter: this.dateToString,
     },
     {
       headerName: 'Solde',
@@ -227,7 +228,7 @@ export default class extends Vue {
       filter: true,
       width: 140,
       type: 'numericColumn',
-      valueFormatter: this.montantDeviseToString
+      valueFormatter: this.montantDeviseToString,
     },
     {
       headerName: 'Solde',
@@ -236,10 +237,10 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
-      hide: true
+      hide: true,
     },
     { headerName: 'Rappel', field: 'rappel', filter: true, width: 100, type: 'numericColumn' },
-    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150 }
+    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150 },
   ];
 
   private resolve!: any;
@@ -255,14 +256,14 @@ export default class extends Vue {
     navigateToNextCell: this.navigateToNextCell,
     pagination: true,
     // paginationAutoPageSize: true,
-    paginationPageSize: 15,
+    paginationPageSize: 10,
     suppressRowClickSelection: true,
     enableSorting: true,
     columnTypes: {
       dateColumn: {
         filter: 'agDateColumnFilter',
-        suppressMenu: true
-      }
+        suppressMenu: true,
+      },
     },
     getRowStyle(params: any) {
       if (params.node.data.isLastRow) return { 'border-bottom': '1px solid black' };
@@ -294,7 +295,7 @@ export default class extends Vue {
           }
         }
       }
-    }
+    },
   };
 
   public open(typeToLoad: string, numeroEcheancierToLoad: string, nomCompte: string): Promise<EcheancierElement[]> {

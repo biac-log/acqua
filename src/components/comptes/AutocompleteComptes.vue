@@ -242,6 +242,7 @@ export default class AutocompleteComptes extends Vue {
         this.errorCompte = 'Compte bloqué';
       } else {
         this.blur();
+        this.emitChange(compte);
       }
     }
   }
