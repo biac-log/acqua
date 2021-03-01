@@ -525,6 +525,7 @@ export default class VentilationVue extends Vue {
     if (this.typesComptesSelected.id != 'G') {
       this.caseTva.refresh();
       this.numeroCaseTva = '';
+      this.montant = this.montantInit.toString();
     } else {
       this.caseTva = await this.getCaseTvaVentilations() ?? new CaseTva();
       if(this.caseTva.typeCase == 1) {
@@ -566,7 +567,7 @@ export default class VentilationVue extends Vue {
         this.dossierIsDisabled = true;
         this.dossierComponent?.resetDossier();
         //this.compteComponent.blur();
-        this.$nextTick(() => this.selectTextMontant());
+        this.$nextTick(() => (this.$refs.numeroCaseTva as any).focus());
       }
     } else if (compte instanceof CompteSearch || compte instanceof CompteDeTier) {
       this.nomCompte = compte.nom;
@@ -877,7 +878,6 @@ export default class VentilationVue extends Vue {
 
   public async getCaseTvaVentilations(): Promise<CaseTva | undefined> {
     const caseBase = this.ventilations.find((vent) => vent.caseBase)?.caseBase;
-    console.log(caseBase);
     let caseTva = new CaseTva();
     if(caseBase){
       caseTva = await CaseTvaApi.getCaseTVA(caseBase, this.numeroJournal);
@@ -893,7 +893,6 @@ export default class VentilationVue extends Vue {
     if (this.caseTva.typeCase == 1)
       this.montant = (Math.abs(this.montantInit) / (1 + this.caseTva.tauxTvaCase / 100)).toString();
     this.montant = this.montant.toNumber().toComptaString();
-    this.selectTextMontant();
   }
 
   public openSuggestion() {
