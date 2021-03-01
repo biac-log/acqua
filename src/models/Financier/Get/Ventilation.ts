@@ -19,7 +19,7 @@ export class VentilationDTO {
   dossier = '';
   dossierNom = '';
   caseTva = new CaseTva();
-  caseBase = 0;
+  caseBases: number[] = [];
 }
 
 export class Ventilation extends VentilationDTO {

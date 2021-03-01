@@ -132,7 +132,7 @@
                         <span v-if="!journal.devise || journal.devise.id == 1"
                           >Montant à ventiler :
                           <b
-                            >{{ ventileDevise | numberToStringEvenZero }}
+                            >{{ getVentileDevise() | numberToStringEvenZero }}
                             {{ journal.devise ? journal.devise.libelle : 'EUR' }}</b
                           ></span
                         >
