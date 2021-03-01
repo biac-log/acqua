@@ -388,7 +388,7 @@ export default class VentilationVue extends Vue {
   private montantInit = 0;
 
   private caseTva: CaseTva = new CaseTva();
-  private caseBase = 0;
+  private caseBases: number[] = [];
   private numeroCaseTva = '';
   private numeroCaseTvaError = '';
   private numeroCaseTvaRules: any = [(v: string) => !v || (v.isInt() && v.toNumber() != 0) || 'Numéro invalide'];
@@ -590,7 +590,8 @@ export default class VentilationVue extends Vue {
     let caseTva: CaseTva | null;
     caseTva = await this.getCaseTvaVentilations(compte); // On vérifie d'abord dans les ventilations
 
-    if (!caseTva && compte.numeroCase) { // Si pas trouvé dans les ventilations, on prend le numéro défini par le compte
+    if (!caseTva && compte.numeroCase) {
+      // Si pas trouvé dans les ventilations, on prend le numéro défini par le compte
       caseTva = await CaseTvaApi.getCaseTVA(compte.numeroCase, this.numeroJournal);
     }
 
@@ -710,7 +711,7 @@ export default class VentilationVue extends Vue {
     this.reference = `${element.numeroJournal}.${element.numeroPiece}`;
     this.referenceJournal = element.numeroJournal.toString();
     this.referencePiece = element.numeroPiece.toString();
-    this.caseBase = element.caseBase1 ?? element.caseBase2 ?? element.caseBase3;
+    this.caseBases.push(element.caseBase1, element.caseBase2, element.caseBase3);
     if (element.soldeDevise > 0) {
       this.typesMouvementsSelected =
         this.typesComptesSelected.id == 'F' ? this.typesMouvements[1] : this.typesMouvements[0]; // [1] == CR, [0] == DB
@@ -735,7 +736,7 @@ export default class VentilationVue extends Vue {
     ventilation.referenceJournal = element.numeroJournal;
     ventilation.referencePiece = element.numeroPiece;
     ventilation.libelle = this.reglement.libelle;
-    ventilation.caseBase = element.caseBase1 ?? element.caseBase2 ?? element.caseBase3;
+    ventilation.caseBases.push(element.caseBase1, element.caseBase2, element.caseBase3);
     if (element.soldeDevise > 0) {
       ventilation.codeMouvement = this.typesComptesSelected.id == 'F' ? 'CR' : 'DB';
     } else {
@@ -811,7 +812,7 @@ export default class VentilationVue extends Vue {
     ventilation.dossier = this.idDossier;
     ventilation.dossierNom = this.nomDossier;
     ventilation.caseTva = new CaseTva(this.caseTva);
-    ventilation.caseBase = this.caseBase;
+    ventilation.caseBases = this.caseBases;
     return ventilation;
   }
 
@@ -871,8 +872,16 @@ export default class VentilationVue extends Vue {
   public async getCaseTvaVentilations(compte: CompteGeneralSearch): Promise<CaseTva | null> {
     let caseTva = new CaseTva();
     let caseBase = 0;
+    const caseBases: number[] = [];
     // Retrouver les cases bases dans les ventilations hors TVA
-    const caseBases = this.ventilations.filter((v) => v.caseTva.typeCase != 50).map((v) => v.caseBase);
+    this.ventilations
+      .filter((v) => v.caseTva.typeCase != 50)
+      .forEach((v) => {
+        v.caseBases.forEach((cb) => caseBases.push(cb));
+      });
+    // Filter duplicates or zeros
+    caseBases.filter((item, index) => caseBases.indexOf(item) != index || item != 0);
+
     // On cherche les cases déjà utilisées pour ce compte
     const usedCaseBases = this.ventilations
       .filter(
@@ -880,6 +889,8 @@ export default class VentilationVue extends Vue {
           v.typeCompte == 'G' && v.numeroCompte == compte.numero && v.caseTva.typeCase != 0 && v.caseTva.typeCase != 50
       )
       .map((v) => v.codeCaseTVA);
+    //Filter duplicates and zeros
+    usedCaseBases.filter((item, index) => usedCaseBases.indexOf(item) != index || item != 0);
 
     // On renvoie la première case qui n'est pas reprise dans les cases déjà utilisées
     caseBase = caseBases.find((c) => !usedCaseBases.some((uc) => c == uc)) ?? 0;
