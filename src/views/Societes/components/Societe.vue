@@ -98,6 +98,8 @@
             <span>Emplacement où les fichiers seront stockés.</span></v-tooltip
           >
           <v-text-field outlined v-model="dbName" label="Base de données" readonly />
+          <v-text-field outlined v-if="!newRecord" v-model="syncedAt" label="Dernière synchronisation" readonly />
+
         </v-form>
       </v-card-text>
       <v-card-actions v-if="!readonly">
@@ -194,6 +196,7 @@ export default class SocieteVue extends Vue {
   private pathApollo = '';
   private dbName = '';
   private apolloInstanceName = '';
+  private syncedAt = '';
 
   private rules = Societe.rules;
   private identifiantErrors: string[] = [];
@@ -246,6 +249,7 @@ export default class SocieteVue extends Vue {
     this.apolloInstanceName = societe.apolloInstanceName;
     this.pathApollo = ApplicationModule.parametre.pathApolloPlaceholder.replace('\\{path}', `\\${societe.identifiant}`);
     this.dbName = `AcQuaCoreDB-${societe.identifiant}`;
+    this.syncedAt = societe.syncedAtDate.toDateString();
   }
 
   private mapModel() {

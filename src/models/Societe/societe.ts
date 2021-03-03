@@ -1,9 +1,12 @@
+import moment from "moment";
+
 export class SocieteDTO {
     id = 0;
     name = '';
     identifiant = '';
     apolloInstanceName = '';
     hash = '';
+    syncedAt = '';
 }
 
 export class Societe extends SocieteDTO {
@@ -17,4 +20,11 @@ export class Societe extends SocieteDTO {
         'identifiant': [(v: string) => !!v || 'Identifiant requis.'],
         'instanceName': [(v: string) => !!v || 'Nom d\'instance requis.']
     }
+
+    get syncedAtDate(): Date {
+        return moment(this.syncedAt).toDate();
+      }
+      set syncedAtString(date: Date) {
+        this.syncedAt = date.toISOString();
+      }
 }
