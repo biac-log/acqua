@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="display" ref="generateSocieteDialog" max-width="30%" eager>
+  <v-dialog v-model="display" ref="generateSocieteDialog" max-width="40%" eager>
     <v-card>
       <v-toolbar color="primary" dark flat>
         <v-card-title>Générer les sociétés</v-card-title>
@@ -12,16 +12,40 @@
       <v-card-text>
         <!-- <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" /> -->
-        <v-row v-for="dossier in dossiers" :key="dossier" dense align="center">
-          <v-col
-            ><span>{{ dossier }}</span></v-col
-          >
-          <v-col>
-            <v-icon v-if="checkSocieteExiste(dossier)">mdi-check</v-icon>
+        <v-simple-table>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">
+                  Dossier
+                </th>
+                <th class="text-left">
+                  Société créée
+                </th>
+                <th class="text-left">
+                  Synchronisé le
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="societe in societesToGenerate"
+                :key="societe.identifiant"
+              >
+                <td>{{ societe.path }}</td>
+                <td><v-icon>{{ societe.created ? 'mdi-check' : 'mdi-close' }}</v-icon></td>
+                <td>
+                  <span v-if="societe.synced">{{societe.syncedAt}}</span>
+                  <v-icon v-else>mdi-close</v-icon>
+                </td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
+            <!-- <v-icon v-if="checkSocieteExiste(dossier)">mdi-check</v-icon>
             <v-progress-circular v-else-if="saveLoading" indeterminate color="primary" />
             <v-checkbox v-else @change="toggleSociete(dossier)"></v-checkbox>
-          </v-col>
-        </v-row>
+          </v-col> -->
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -71,6 +95,7 @@
 <script lang="ts">
 import SocietesApi from '@/api/SocietesApi';
 import { Societe } from '@/models/Societe/societe';
+import { GenerateSociete } from '@/models/Societe/generateSociete';
 import { SocieteModule } from '@/store/modules/companies';
 import { Component, Vue } from 'vue-property-decorator';
 @Component({
@@ -81,6 +106,7 @@ export default class GenerateSocietes extends Vue {
   private display = false;
   private isLoading = false;
   private dossiers: string[] = [];
+  private societesToGenerate: GenerateSociete[] = [];
   private selectedDossiers: string[] = [];
   private saveLoading = false;
 
@@ -92,6 +118,9 @@ export default class GenerateSocietes extends Vue {
   private async loadDossiers() {
     this.isLoading = true;
     this.dossiers = await SocietesApi.getDirectories();
+    this.dossiers.forEach((d) => {
+      this.societesToGenerate.push(new GenerateSociete(d));
+    })
     this.isLoading = false;
   }
 
@@ -131,6 +160,7 @@ export default class GenerateSocietes extends Vue {
         if(SocieteModule.societes.length <= 0) {
             SocieteModule.selectSociete(newSociete);
           }
+        await SocietesApi.syncSociete(newSociete.identifiant);
         await SocieteModule.fetchSocietes();
     }
     this.saveLoading = false;
