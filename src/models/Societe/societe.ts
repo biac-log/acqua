@@ -22,7 +22,8 @@ export class Societe extends SocieteDTO {
     }
 
     get syncedAtFormatted(): string {
-        return moment(this.syncedAt).toDate().toLocaleString('fr');
+        
+        return this.syncedAt != "0001-01-01T00:00:00" ? moment(this.syncedAt).toDate().toLocaleString('fr') : "Pas encore synchronisé";
       }
       set syncedAtString(date: Date) {
         this.syncedAt = date.toISOString();

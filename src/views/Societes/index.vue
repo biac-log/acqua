@@ -69,6 +69,7 @@ export default class Societes extends Vue {
   private headers = [
     { text: 'Nom', value: 'name' },
     { text: 'Identifiant', value: 'identifiant' },
+    { text: 'Synchronisé le', value: 'syncedAtFormatted' },
   ];
   private pathApolloPlaceholder = ApplicationModule.parametre.pathApolloPlaceholder.replace('\\{path}', '');
 
