@@ -21,8 +21,8 @@ export class Societe extends SocieteDTO {
         'instanceName': [(v: string) => !!v || 'Nom d\'instance requis.']
     }
 
-    get syncedAtDate(): Date {
-        return moment(this.syncedAt).toDate();
+    get syncedAtFormatted(): string {
+        return moment(this.syncedAt).toDate().toLocaleString('fr');
       }
       set syncedAtString(date: Date) {
         this.syncedAt = date.toISOString();

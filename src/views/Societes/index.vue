@@ -12,8 +12,8 @@
         </small>
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }"
-            ><v-btn ref="btnGenerate" color="warning" small fab class="ml-5" v-on="on" @click.stop="generateSocietes"
-              ><v-icon>mdi-playlist-plus</v-icon></v-btn
+            ><v-btn ref="btnGenerate" color="warning" class="ml-5" v-on="on" @click.stop="generateSocietes"
+              ><v-icon>mdi-playlist-plus</v-icon>Générer depuis les dossiers</v-btn
             ></template
           ><span>Générer les sociétés à partir des sous-dossiers existants</span>
           </v-tooltip

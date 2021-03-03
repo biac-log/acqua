@@ -32,4 +32,8 @@ export default abstract class SocietesApi {
 
     return response.data;
   }
+
+  static async syncSociete(identifiant: string): Promise<void> {
+    await api.AcQuaCore.get('synchronisation/synchronisationsociete', {headers: {'Company-Name': identifiant}});
+  }
 }

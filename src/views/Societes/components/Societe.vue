@@ -7,24 +7,13 @@
     @keydown.alt.enter.stop="saveModel()"
     :persistent="!readonly || saveLoading || deleteLoading"
     ref="societeDialog"
-    max-width="20%"
+    max-width="30%"
     eager
   >
     <v-card>
       <v-toolbar color="primary" dark flat>
         <v-card-title>{{ newRecord ? 'Nouvelle société' : name }}</v-card-title>
         <v-spacer></v-spacer>
-        <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
-          <template v-slot:activator="{ on }">
-            <v-btn class="mr-2" color="success" :disabled="isLoading" @click="modifierModel" v-on="on">
-              <v-icon left>mdi-pencil</v-icon>Modifier
-            </v-btn>
-          </template>
-          <span>
-            Modifier la société
-            <span class="shortcutTooltip">F2</span>
-          </span>
-        </v-tooltip>
         <!-- <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
@@ -51,7 +40,7 @@
       <v-card-text>
         <AlertMessageVue ref="alertMessage" class="alertMessage" type="warning" />
         <AlertMessageVue ref="successMessage" class="alertMessage" type="success" />
-        <v-form ref="form" v-model="isValid" lazy-validation class="pt-2">
+        <v-form ref="form" v-model="isValid" lazy-validation class="pt-4">
           <v-text-field
             outlined
             v-model="name"
@@ -99,7 +88,6 @@
           >
           <v-text-field outlined v-model="dbName" label="Base de données" readonly />
           <v-text-field outlined v-if="!newRecord" v-model="syncedAt" label="Dernière synchronisation" readonly />
-
         </v-form>
       </v-card-text>
       <v-card-actions v-if="!readonly">
@@ -140,6 +128,37 @@
           <span>
             Sauvegarder la société
             <span class="shortcutTooltip">alt + enter</span>
+          </span>
+        </v-tooltip>
+      </v-card-actions>
+      <v-card-actions v-else>
+        <v-spacer />
+        <v-tooltip top open-delay="500">
+          <template v-slot:activator="{ on }">
+            <v-btn
+              color="blue darken-1"
+              class="ma-2 mt-0 pr-4 align-self-start"
+              :disabled="saveLoading"
+              tile
+              outlined
+              @click="syncSociete()"
+              tabindex="-1"
+              v-on="on"
+            >
+              <v-icon left>mdi-sync</v-icon>Synchroniser
+            </v-btn>
+          </template>
+          <span>Synchroniser la société</span>
+        </v-tooltip>
+        <v-tooltip v-if="readonly && !newRecord" top open-delay="500">
+          <template v-slot:activator="{ on }">
+            <v-btn class="ma-2 mt-0 pr-4" color="success" :disabled="isLoading" @click="modifierModel" v-on="on">
+              <v-icon left>mdi-pencil</v-icon>Modifier
+            </v-btn>
+          </template>
+          <span>
+            Modifier la société
+            <span class="shortcutTooltip">F2</span>
           </span>
         </v-tooltip>
       </v-card-actions>
@@ -249,7 +268,7 @@ export default class SocieteVue extends Vue {
     this.apolloInstanceName = societe.apolloInstanceName;
     this.pathApollo = ApplicationModule.parametre.pathApolloPlaceholder.replace('\\{path}', `\\${societe.identifiant}`);
     this.dbName = `AcQuaCoreDB-${societe.identifiant}`;
-    this.syncedAt = societe.syncedAtDate.toDateString();
+    this.syncedAt = societe.syncedAtFormatted;
   }
 
   private mapModel() {
@@ -294,7 +313,7 @@ export default class SocieteVue extends Vue {
     if (this.newRecord) {
       await SocieteApi.createSociete(this.societe)
         .then(() => {
-          if(SocieteModule.societes.length <= 0) {
+          if (SocieteModule.societes.length <= 0) {
             SocieteModule.selectSociete(this.societe);
           }
           SocieteModule.fetchSocietes();
@@ -309,13 +328,13 @@ export default class SocieteVue extends Vue {
           this.saveLoading = false;
         });
     } else {
-        await SocieteApi.updateSociete(this.societe, this.societeBase.hash)
-          .then(() => {
-            this.readonly = true;
-            this.successMessage.show('La société a été mise à jour avec succès.', '');
-            this.resolve(true);
-          })
-          .finally(() => (this.saveLoading = false));
+      await SocieteApi.updateSociete(this.societe, this.societeBase.hash)
+        .then(() => {
+          this.readonly = true;
+          this.successMessage.show('La société a été mise à jour avec succès.', '');
+          this.resolve(true);
+        })
+        .finally(() => (this.saveLoading = false));
     }
   }
 
@@ -353,8 +372,15 @@ export default class SocieteVue extends Vue {
     }
   }
 
-  private initIdentifiant(){
-    if(this.newRecord) this.identifiant = this.name.toSlug()
+  private initIdentifiant() {
+    if (this.newRecord) this.identifiant = this.name.toSlug();
+  }
+
+  private async syncSociete() {
+    this.saveLoading = true;
+    await SocieteApi.syncSociete(this.identifiant);
+    this.saveLoading = false;
+
   }
 }
 </script>
