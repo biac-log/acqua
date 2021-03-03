@@ -16,33 +16,28 @@
           <template v-slot:default>
             <thead>
               <tr>
-                <th class="text-left">
-                  Dossier
-                </th>
-                <th class="text-left">
-                  Société créée
-                </th>
-                <th class="text-left">
-                  Synchronisé le
-                </th>
+                <th class="text-left">Dossier</th>
+                <th class="text-left">Société créée</th>
+                <th class="text-left">Synchronisé le</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="societe in societesToGenerate"
-                :key="societe.identifiant"
-              >
+              <tr v-for="societe in societesToGenerate" :key="societe.identifiant">
                 <td>{{ societe.path }}</td>
-                <td><v-icon>{{ societe.created ? 'mdi-check' : 'mdi-close' }}</v-icon></td>
                 <td>
-                  <span v-if="societe.synced">{{societe.syncedAt}}</span>
+                  <v-icon v-if="societe.created">mdi-check</v-icon>
+                  <v-checkbox v-else @change="toggleSociete(societe.path)" />
+                </td>
+                <td>
+                  <span v-if="societe.created && societe.synced">{{ societe.syncedAt }}</span>
+                  <v-btn v-else-if="societe.created" color="warning"><v-icon>mdi-sync</v-icon>Synchroniser</v-btn>
                   <v-icon v-else>mdi-close</v-icon>
                 </td>
               </tr>
             </tbody>
           </template>
         </v-simple-table>
-            <!-- <v-icon v-if="checkSocieteExiste(dossier)">mdi-check</v-icon>
+        <!-- <v-icon v-if="checkSocieteExiste(dossier)">mdi-check</v-icon>
             <v-progress-circular v-else-if="saveLoading" indeterminate color="primary" />
             <v-checkbox v-else @change="toggleSociete(dossier)"></v-checkbox>
           </v-col> -->
@@ -120,7 +115,7 @@ export default class GenerateSocietes extends Vue {
     this.dossiers = await SocietesApi.getDirectories();
     this.dossiers.forEach((d) => {
       this.societesToGenerate.push(new GenerateSociete(d));
-    })
+    });
     this.isLoading = false;
   }
 
@@ -150,18 +145,24 @@ export default class GenerateSocietes extends Vue {
 
   private async generateSocietes() {
     this.saveLoading = true;
-    let dossier;
-    for(dossier of this.selectedDossiers){
-        const newSociete = new Societe();
-        newSociete.name = this.societeIdentifiant(dossier);
-        newSociete.identifiant = this.societeIdentifiant(dossier).toSlug();
-        newSociete.apolloInstanceName = this.societeIdentifiant(dossier);
-        await SocietesApi.createSociete(newSociete);
-        if(SocieteModule.societes.length <= 0) {
-            SocieteModule.selectSociete(newSociete);
-          }
+    let dossier: string;
+    for (dossier of this.selectedDossiers) {
+      const newSociete = new Societe();
+      newSociete.name = this.societeIdentifiant(dossier);
+      newSociete.identifiant = this.societeIdentifiant(dossier).toSlug();
+      newSociete.apolloInstanceName = this.societeIdentifiant(dossier);
+      await SocietesApi.createSociete(newSociete).then(async () => {
+        const societe = this.societesToGenerate.find((s) => s.path == dossier);
+        if(societe) {
+          societe.created = true;
+        }
+        if (SocieteModule.societes.length <= 0) {
+          SocieteModule.selectSociete(newSociete);
+        }
         await SocietesApi.syncSociete(newSociete.identifiant);
-        await SocieteModule.fetchSocietes();
+      });
+
+      await SocieteModule.fetchSocietes();
     }
     this.saveLoading = false;
     this.selectedDossiers = [];
