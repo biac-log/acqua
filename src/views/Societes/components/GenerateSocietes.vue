@@ -3,6 +3,7 @@
     <v-card>
       <v-toolbar color="primary" dark flat>
         <v-card-title>Générer les sociétés</v-card-title>
+        <v-btn fab small @click="loadDossiers" color="warning"><v-icon>mdi-refresh</v-icon></v-btn>
         <v-spacer></v-spacer>
         <v-btn ref="buttonClose" class="ml-5" icon color="white" @click="closeDialog()">
           <v-icon>mdi-close</v-icon>
@@ -22,45 +23,24 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="societe in societesToGenerate" :key="societe.identifiant">
+              <tr v-for="(societe,index) in societesToGenerate" :key="societe.identifiant">
                 <td>{{ societe.path }}</td>
                 <td>
                   <v-icon v-if="societe.created">mdi-check</v-icon>
                   <v-checkbox v-else @change="toggleSociete(societe.path)" />
                 </td>
                 <td>
-                  <span v-if="societe.created && societe.synced">{{ societe.syncedAt }}</span>
-                  <v-btn v-else-if="societe.created" color="warning"><v-icon>mdi-sync</v-icon>Synchroniser</v-btn>
+                  <span v-if="societe.created && societe.synced">{{ societe.syncedAt }} <v-btn fab x-small class="ml-2" color="warning" @click="syncSociete(index)" :disabled="saveLoading"><v-icon>mdi-sync</v-icon></v-btn></span>
+                  <v-btn v-else-if="societe.created" color="warning" :disabled="saveLoading" @click="syncSociete(index)"><v-icon>mdi-sync</v-icon>Synchroniser</v-btn>
                   <v-icon v-else>mdi-close</v-icon>
                 </td>
               </tr>
             </tbody>
           </template>
         </v-simple-table>
-        <!-- <v-icon v-if="checkSocieteExiste(dossier)">mdi-check</v-icon>
-            <v-progress-circular v-else-if="saveLoading" indeterminate color="primary" />
-            <v-checkbox v-else @change="toggleSociete(dossier)"></v-checkbox>
-          </v-col> -->
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <!-- <v-tooltip top open-delay="500">
-          <template v-slot:activator="{ on }">
-            <v-btn
-              color="blue darken-1"
-              class="ma-2 mt-0 pr-4 align-self-start"
-              :disabled="saveLoading"
-              tile
-              outlined
-              @click="cancelEdit()"
-              tabindex="-1"
-              v-on="on"
-            >
-              <v-icon left>mdi-close</v-icon>Annuler
-            </v-btn>
-          </template>
-          <span>Annuler les modifications</span>
-        </v-tooltip> -->
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
             <v-btn
@@ -71,8 +51,8 @@
               color="success"
               :loading="saveLoading"
               :disabled="selectedDossiers.isEmpty()"
-              @click="generateSocietes()"
               tabindex="17"
+              @click="generateSocietes()"
             >
               <v-icon left>mdi-content-save</v-icon>Générer
             </v-btn>
@@ -111,6 +91,7 @@ export default class GenerateSocietes extends Vue {
   }
 
   private async loadDossiers() {
+    this.societesToGenerate = [];
     this.isLoading = true;
     this.dossiers = await SocietesApi.getDirectories();
     this.dossiers.forEach((d) => {
@@ -159,13 +140,21 @@ export default class GenerateSocietes extends Vue {
         if (SocieteModule.societes.length <= 0) {
           SocieteModule.selectSociete(newSociete);
         }
-        await SocietesApi.syncSociete(newSociete.identifiant);
+        const index = this.societesToGenerate.findIndex((s) => s.path == dossier);
+        await this.syncSociete(index);
       });
-
-      await SocieteModule.fetchSocietes();
     }
     this.saveLoading = false;
     this.selectedDossiers = [];
+  }
+
+  private async syncSociete(index: number) {
+    const identifiant = this.societeIdentifiant(this.societesToGenerate[index].path).toSlug();
+    this.saveLoading = true;
+    await SocietesApi.syncSociete(identifiant);
+    await SocieteModule.fetchSocietes();
+    this.societesToGenerate[index].syncedAt = SocieteModule.societes.find((s) => s.identifiant == identifiant)?.syncedAtFormatted ?? "";
+    this.saveLoading = false;
   }
 }
 </script>
