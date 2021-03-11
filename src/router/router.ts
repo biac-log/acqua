@@ -113,6 +113,28 @@ export const asyncRoutes: RouteConfig[] = [
     ]
   },
   {
+    path: '/historiquecomptable',
+    component: Layout,
+    redirect: 'historiquecomptable/index',
+    meta: {
+      roles: ['admin', 'ACQUAACHATVENTE'],
+      title: 'Historique Comptable',
+      icon: 'mdi-history'
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import(/* webpackChunkName: "historiquecomptable" */ '@/views/HistoriqueComptable/index.vue'),
+        name: 'Historique Comptable',
+        meta: {
+          title: 'Historique Comptable',
+          icon: 'mdi-history',
+          affix: true
+        }
+      }
+    ]
+  },
+  {
     path: '/maintenance',
     component: Layout,
     redirect: 'maintenance/fournisseurs',
