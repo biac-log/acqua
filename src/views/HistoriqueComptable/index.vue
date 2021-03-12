@@ -5,6 +5,7 @@
         <v-row align="start" justify="start" class="pl-5">
           <v-col cols="12" xs="12" sm="6" lg="2">
             <v-select
+              ref="typesComptes"
               autofocus
               label="Type de compte"
               outlined
@@ -26,7 +27,14 @@
               outlined
               :disabled="!typeCompteSelected.id"
               @change="compteChange"
+              :rules="numeroCompteRules"
             />
+          </v-col>
+          <v-col lg="2">
+            <date-picker outlined label="A partir de" :date.sync="fromDate" :rules="fromDateRules" />
+          </v-col>
+          <v-col lg="2">
+            <date-picker outlined label="Jusqu'à" :date.sync="toDate" :rules="toDateRules" />
           </v-col>
         </v-row>
       </v-form>
@@ -40,15 +48,18 @@ import { TypeCompte } from '@/models/Compte/TypeCompte';
 import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
 import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 import { CompteSearch } from '@/models/Compte/CompteSearch';
-import { CaseTva } from '@/models/CaseTva';
 import { CompteDeTier } from '@/models/Compte/CompteDeTier';
 import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
+import DatePicker from '@/components/DatePicker.vue';
+import { DateTime } from '@/models/DateTime';
+
 @Component({
   name: 'HistoriqueComptableIndex',
-  components: { AutocompleteComptesVue },
+  components: { AutocompleteComptesVue, DatePicker },
 })
 export default class HistoriqueComptableIndex extends Vue {
   @Ref() private compteComponent!: AutocompleteComptesVue;
+  @Ref() private form!: AutocompleteComptesVue;
 
   private isSearchValid = false;
   private typesComptes: TypeCompte[] = [];
@@ -56,6 +67,18 @@ export default class HistoriqueComptableIndex extends Vue {
   private typesComptesRules: any = [(v: string) => !!v || 'Type obligatoire'];
 
   private numeroCompte = '';
+  private numeroCompteRules: any = [(v: string) => !!v || 'Numéro obligatoire'];
+
+  private fromDate = '';
+  private fromDateRules: any = [
+    (v: string) => !!v || 'Date obligatoire',
+    (v: string) => DateTime.isValid(v) || 'Date invalide',
+  ];
+  private toDate = '';
+  private toDateRules: any = [
+    (v: string) => !!v || 'Date obligatoire',
+    (v: string) => DateTime.isValid(v) || 'Date invalide',
+  ];
 
   mounted() {
     CompteApi.getTypesComptes().then((resp) => {
@@ -90,9 +113,18 @@ export default class HistoriqueComptableIndex extends Vue {
   }
 
   private resetCompte() {
-      this.compteComponent.resetCompte();
-      this.numeroCompte = '';
+    this.compteComponent.resetCompte();
+    this.numeroCompte = '';
   }
+
+  //   @Watch('typeCompteSelected')
+  //   @Watch('numeroCompte')
+  //   @Watch('fromDate')
+  //   @Watch('toDate')
+  //   private checkIsValid() {
+  //     (this.$refs.form as any).validate();
+  // (this.$refs.form as any).resetValidation();
+  //   }
 }
 </script>
 
