@@ -19,7 +19,7 @@
               @change="resetCompte"
             />
           </v-col>
-          <v-col lg="3" class="pl-5">
+          <v-col lg="2" class="pl-5">
             <AutocompleteComptesVue
               ref="compteComponent"
               :typeCompte.sync="typeCompteSelected.id"
@@ -31,7 +31,7 @@
             />
           </v-col>
           <v-col lg="2">
-            <date-picker outlined label="A partir de" :date.sync="fromDate" :rules="fromDateRules" />
+            <date-picker outlined label="A partir de" :date.sync="fromDate" :rules="fromDateRules" ref="fromDateField" />
           </v-col>
           <v-col lg="2">
             <date-picker outlined label="Jusqu'à" :date.sync="toDate" :rules="toDateRules" />
@@ -44,6 +44,7 @@
 
 <script lang='ts'>
 import CompteApi from '@/api/CompteApi';
+import HistoriqueComptableApi from '@/api/HistoriqueComptableApi';
 import { TypeCompte } from '@/models/Compte/TypeCompte';
 import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
 import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
@@ -52,6 +53,7 @@ import { CompteDeTier } from '@/models/Compte/CompteDeTier';
 import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import DatePicker from '@/components/DatePicker.vue';
 import { DateTime } from '@/models/DateTime';
+import { HistoriqueComptable } from '@/models/HistoriqueComptable/HistoriqueComptable';
 
 @Component({
   name: 'HistoriqueComptableIndex',
@@ -60,6 +62,7 @@ import { DateTime } from '@/models/DateTime';
 export default class HistoriqueComptableIndex extends Vue {
   @Ref() private compteComponent!: AutocompleteComptesVue;
   @Ref() private form!: AutocompleteComptesVue;
+  @Ref() private fromDateField!: DatePicker;
 
   private isSearchValid = false;
   private typesComptes: TypeCompte[] = [];
@@ -79,6 +82,8 @@ export default class HistoriqueComptableIndex extends Vue {
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
   ];
+
+  private historique: HistoriqueComptable = new HistoriqueComptable();
 
   mounted() {
     CompteApi.getTypesComptes().then((resp) => {
@@ -103,28 +108,33 @@ export default class HistoriqueComptableIndex extends Vue {
       compte.length == 8
     ) {
       this.numeroCompte = compte;
+      this.loadHistorique();
     } else if (
       compte instanceof CompteGeneralSearch ||
       compte instanceof CompteSearch ||
       compte instanceof CompteDeTier
     ) {
       this.numeroCompte = compte.numero.toString();
+      this.loadHistorique();
     }
+  }
+
+  private async loadHistorique() {
+    await HistoriqueComptableApi.getHistorique(
+      this.typeCompteSelected.id,
+      +this.numeroCompte,
+      this.fromDate,
+      this.toDate,
+    ).then((historique) => {
+      this.historique = historique;
+      this.fromDateField.initFromString(historique.fromDate.toString());
+    });
   }
 
   private resetCompte() {
     this.compteComponent.resetCompte();
     this.numeroCompte = '';
   }
-
-  //   @Watch('typeCompteSelected')
-  //   @Watch('numeroCompte')
-  //   @Watch('fromDate')
-  //   @Watch('toDate')
-  //   private checkIsValid() {
-  //     (this.$refs.form as any).validate();
-  // (this.$refs.form as any).resetValidation();
-  //   }
 }
 </script>
 

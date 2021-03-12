@@ -139,5 +139,9 @@ export default class extends Vue {
       return false;
     }
   }
+
+  public initFromString(date: string) {
+    this.syncedDate = new DateTime(date);
+  }
 }
 </script>
