@@ -519,6 +519,13 @@ export default class OperationDiverseVue extends Vue {
 
   private async confirmTva(): Promise<boolean> {
     try {
+      if (!this.isEquilibree())
+      return await (this.confirmDialog as Confirm).open(
+        'Attention, pièce non équilibrée',
+        `La pièce n'est pas équilibrée, voulez-vous sauvegarder ?`,
+        'error',
+        'Sauvegarder'
+      );
       if (this.errorInTVA())
         return await (this.confirmDialog as Confirm).open(
           'Attention, contrôle de tva',
@@ -655,6 +662,10 @@ export default class OperationDiverseVue extends Vue {
 
   private errorInTVA(): boolean {
     return this.getTvaCalcule() != this.getTvaImpute();
+  }
+
+  private isEquilibree(): boolean {
+    return this.solde == 0;
   }
 }
 </script>
