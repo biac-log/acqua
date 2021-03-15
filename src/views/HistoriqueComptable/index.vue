@@ -47,6 +47,19 @@
     </v-card>
     <v-card class="mt-5">
       <v-data-table :items="historique.imputations" :headers="headers">
+        <template v-slot:[`header.creditDebit`]="">
+          <v-row dense>
+            <v-col cols="4">Crédit</v-col>
+            <v-col cols="4">Débit</v-col>            
+          </v-row>
+        </template>
+        <template v-slot:[`item.creditDebit`]="{ item }">
+          <v-row>
+            <v-col cols="4">{{item.codeMouvement == "CR" ? item.mouvementBase : ''}}</v-col>
+            <v-col cols="4">{{item.codeMouvement == "DB" ? item.mouvementBase : ''}}</v-col>            
+            <v-col cols="4" class="text-end">{{item.libelleDevise}}</v-col>
+          </v-row>
+        </template>
       </v-data-table>
     </v-card>
   </v-container>
@@ -99,7 +112,7 @@ export default class HistoriqueComptableIndex extends Vue {
     { text: 'Date', value: 'dateDisplay' },
     { text: 'Pièce', value: 'pieceDesc' },
     { text: 'Libellé', value: 'libellePiece' },
-    { text: 'Crédit / Débit', value: 'mouvementBase', align: 'end' },
+    { text: 'Crédit / Débit', value: 'creditDebit'},
     { text: 'C.A', value: 'chiffreDAffaire', align: 'end' },
     { text: 'Case / Réf', value: 'caseRef', align: 'end' },
     { text: 'Lien', value: 'lien', align: 'end' },
