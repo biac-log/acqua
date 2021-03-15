@@ -358,6 +358,7 @@
                 @keydown.tab.prevent="focusFirstElement"
                 v-on="on"
                 tabindex="16"
+                id="validateButton"
               >
                 <v-icon left>mdi-check</v-icon> Valider
               </v-btn>
@@ -536,10 +537,17 @@ export default class ImputationVue extends Vue {
     this.autocompleteCompte?.resetCompte();
     this.autocompleteDossier?.resetDossier();
 
+    this.$nextTick(() => {
     this.setImputation(new Imputation());
     this.previousLibelle = previousLibelle;
     this.libelle = previousLibelle;
-    this.$nextTick(() => this.firstElement?.focus());
+      this.$nextTick(() => {
+        const element = document.getElementById('validateButton');
+        console.log('element', element);
+        element?.scrollIntoView();
+        this.firstElement?.focus();
+      });
+    });
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
