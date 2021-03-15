@@ -156,8 +156,8 @@
                         disable-pagination
                         hide-default-footer
                         disable-sort
-                        :height="$vuetify.breakpoint.lgAndUp ? 352 : ''"
-                      >
+                        :height="$vuetify.breakpoint.lgAndUp ? 608 : ''" 
+                      ><!-- 608px -> 19*32px (element height) -->
                         <template v-slot:[`item.debit`]="{ item }">
                           <span>{{ item.debit | numberToString }}</span>
                         </template>
