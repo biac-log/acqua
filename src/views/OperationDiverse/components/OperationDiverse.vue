@@ -97,6 +97,7 @@
                       tabindex="-1"
                       outlined
                       :suffix="journal.devise.libelle"
+                      class="text-end-input"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="3">
@@ -108,6 +109,7 @@
                       tabindex="-1"
                       outlined
                       :suffix="journal.devise.libelle"
+                      class="text-end-input"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -686,5 +688,9 @@ export default class OperationDiverseVue extends Vue {
 
 #dataTable tbody tr {
   cursor: pointer;
+}
+
+.text-end-input input {
+  text-align: end !important;
 }
 </style>
