@@ -11,6 +11,12 @@ export class HistoriqueComptable extends HistoriqueComptableDTO {
   constructor(dto?: HistoriqueComptableDTO) {
     super();
     Object.assign(this, dto || new HistoriqueComptableDTO());
+    if (dto) {
+      this.imputations = [];
+      dto.imputations.forEach((element) => {
+        this.imputations.push(new Imputation(element));
+      });
+    }
   }
 
   public static rules = {

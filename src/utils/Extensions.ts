@@ -3,6 +3,7 @@ interface Number {
   toIntString(): string;
   toComptaString(nbDecimal?: number): string;
   montantNegatifString(nbDecimal?: number): string;
+  padStart(nbPad?: number) : string;
 }
 
 interface String {
@@ -55,6 +56,10 @@ Number.prototype.montantNegatifString = function(nbDecimal = 2) {
       )}`;
   }
 };
+
+Number.prototype.padStart = function(nbPad = 3) {
+    return this.toString().padStart(nbPad, '0');
+}
 
 String.prototype.isInt = function(required = false) {
   if (!this) return !required;

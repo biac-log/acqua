@@ -31,13 +31,23 @@
             />
           </v-col>
           <v-col lg="2">
-            <date-picker outlined label="A partir de" :date.sync="fromDate" :rules="fromDateRules" ref="fromDateField" />
+            <date-picker
+              outlined
+              label="A partir de"
+              :date.sync="fromDate"
+              :rules="fromDateRules"
+              ref="fromDateField"
+            />
           </v-col>
           <v-col lg="2">
             <date-picker outlined label="Jusqu'à" :date.sync="toDate" :rules="toDateRules" />
           </v-col>
         </v-row>
       </v-form>
+    </v-card>
+    <v-card class="mt-5">
+      <v-data-table :items="historique.imputations" :headers="headers">
+      </v-data-table>
     </v-card>
   </v-container>
 </template>
@@ -85,6 +95,16 @@ export default class HistoriqueComptableIndex extends Vue {
 
   private historique: HistoriqueComptable = new HistoriqueComptable();
 
+  private headers = [
+    { text: 'Date', value: 'dateDisplay' },
+    { text: 'Pièce', value: 'pieceDesc' },
+    { text: 'Libellé', value: 'libellePiece' },
+    { text: 'Crédit / Débit', value: 'mouvementBase', align: 'end' },
+    { text: 'C.A', value: 'chiffreDAffaire', align: 'end' },
+    { text: 'Case / Réf', value: 'caseRef', align: 'end' },
+    { text: 'Lien', value: 'lien', align: 'end' },
+  ];
+
   mounted() {
     CompteApi.getTypesComptes().then((resp) => {
       this.typesComptes = resp;
@@ -124,7 +144,7 @@ export default class HistoriqueComptableIndex extends Vue {
       this.typeCompteSelected.id,
       +this.numeroCompte,
       this.fromDate,
-      this.toDate,
+      this.toDate
     ).then((historique) => {
       this.historique = historique;
       this.fromDateField.initFromString(historique.fromDate.toString());
