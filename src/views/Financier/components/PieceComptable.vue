@@ -255,7 +255,7 @@ import { sum } from 'lodash';
 import { PromiseResponse } from '@/models/PromiseResponse';
 
 @Component({
-  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue }
+  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue },
 })
 export default class PieceComptableVue extends Vue {
   @Ref() refExtraitVue!: ExtraitVue;
@@ -283,7 +283,7 @@ export default class PieceComptableVue extends Vue {
   private datePieceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période',
   ];
 
   private extraits: Extrait[] = [];
@@ -294,7 +294,7 @@ export default class PieceComptableVue extends Vue {
   private numeroToForce = '';
   private numeroToForceRules: any = [
     (v: string) => !!v || 'Numéro obligatoire',
-    (v: string) => !!v.toNumber() || 'Numéro invalide'
+    (v: string) => !!v.toNumber() || 'Numéro invalide',
   ];
 
   private saveLoading = false;
@@ -619,9 +619,21 @@ export default class PieceComptableVue extends Vue {
   }
 
   private closeDialog() {
-    this.dialog = false;
-    this.reject({ newRecord: this.newRecord, numeroPiece: this.numeroPiece });
-    this.reset();
+    if (!this.readonly) {
+      this.confirmDialog
+        .open('Fermer', `Êtes-vous sûr de vouloir fermer ? Ceci annulera vos modifications.`, 'warning', 'Fermer')
+        .then((resp) => {
+          if (resp) {
+            this.dialog = false;
+            this.reject({ newRecord: this.newRecord, numeroPiece: this.numeroPiece });
+            this.reset();
+          }
+        });
+    } else {
+      this.dialog = false;
+      this.reject({ newRecord: this.newRecord, numeroPiece: this.numeroPiece });
+      this.reset();
+    }
   }
 
   private clickOutside() {

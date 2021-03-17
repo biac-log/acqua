@@ -156,8 +156,8 @@
                         disable-pagination
                         hide-default-footer
                         disable-sort
-                        :height="$vuetify.breakpoint.lgAndUp ? 608 : ''" 
-                      ><!-- 608px -> 19*32px (element height) -->
+                        :height="$vuetify.breakpoint.lgAndUp ? 608 : ''"
+                        ><!-- 608px -> 19*32px (element height) -->
                         <template v-slot:[`item.debit`]="{ item }">
                           <span>{{ item.debit | numberToString }}</span>
                         </template>
@@ -285,7 +285,7 @@ import {
   Journal,
   PieceComptable,
   Imputation,
-  OperationDiverseToSave
+  OperationDiverseToSave,
 } from '@/models/OperationDiverse';
 import { DateTime } from '@/models/DateTime';
 import AlertMessageVue from '@/components/AlertMessage.vue';
@@ -297,7 +297,7 @@ import { displayAxiosError } from '@/utils/ErrorMethods';
 import { sum } from 'lodash';
 
 @Component({
-  components: { ImputationVue, DatePicker, Confirm, AlertMessageVue }
+  components: { ImputationVue, DatePicker, Confirm, AlertMessageVue },
 })
 export default class OperationDiverseVue extends Vue {
   @Ref() refImputationVue!: ImputationVue;
@@ -324,7 +324,7 @@ export default class OperationDiverseVue extends Vue {
   private datePieceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période',
   ];
   private libellePiece = '';
 
@@ -345,14 +345,14 @@ export default class OperationDiverseVue extends Vue {
     { text: 'Crédit', value: 'credit' },
     { text: 'Devise', value: 'libelleDevise' },
     { text: 'Divers', value: 'libelleReference' },
-    { text: 'Case TVA', value: 'libelleCaseTVA', align: 'end' }
+    { text: 'Case TVA', value: 'libelleCaseTVA', align: 'end' },
   ];
 
   private forcerNumero = false;
   private numeroToForce = '';
   private numeroToForceRules: any = [
     (v: string) => !!v || 'Numéro obligatoire',
-    (v: string) => !!v.toNumber() || 'Numéro invalide'
+    (v: string) => !!v.toNumber() || 'Numéro invalide',
   ];
 
   private saveLoading = false;
@@ -522,12 +522,12 @@ export default class OperationDiverseVue extends Vue {
   private async confirmTva(): Promise<boolean> {
     try {
       if (!this.isEquilibree())
-      return await (this.confirmDialog as Confirm).open(
-        'Attention, pièce non équilibrée',
-        `La pièce n'est pas équilibrée, voulez-vous sauvegarder ?`,
-        'error',
-        'Sauvegarder'
-      );
+        return await (this.confirmDialog as Confirm).open(
+          'Attention, pièce non équilibrée',
+          `La pièce n'est pas équilibrée, voulez-vous sauvegarder ?`,
+          'error',
+          'Sauvegarder'
+        );
       if (this.errorInTVA())
         return await (this.confirmDialog as Confirm).open(
           'Attention, contrôle de tva',
@@ -621,9 +621,21 @@ export default class OperationDiverseVue extends Vue {
   }
 
   private closeDialog() {
-    this.reset();
-    this.dialog = false;
-    this.reject();
+    if (!this.readonly) {
+      this.confirmDialog
+        .open('Fermer', `Êtes-vous sûr de vouloir fermer ? Ceci annulera vos modifications.`, 'warning', 'Fermer')
+        .then((resp) => {
+          if (resp) {
+            this.reset();
+            this.dialog = false;
+            this.reject();
+          }
+        });
+    } else {
+      this.reset();
+      this.dialog = false;
+      this.reject();
+    }
   }
 
   private clickOutside() {
@@ -641,7 +653,7 @@ export default class OperationDiverseVue extends Vue {
         montantsCaseTva.push({
           case: element.caseTva.numeroCase,
           caseTaux: element.caseTva.tauxTvaCase,
-          montant: element.credit - element.debit
+          montant: element.credit - element.debit,
         });
       }
     });

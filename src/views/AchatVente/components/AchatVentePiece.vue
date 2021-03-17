@@ -65,7 +65,7 @@
             top
             color="primary accent-4"
           ></v-progress-linear>
-          <v-card-text style="height: 750px;">
+          <v-card-text style="height: 750px">
             <v-row>
               <v-col lg="5" sm="12">
                 <v-row dense>
@@ -408,7 +408,7 @@ import {
   Statut,
   Journal,
   PieceComptableContrepartieSaveDTO,
-  PieceComptableSaveDTO
+  PieceComptableSaveDTO,
 } from '@/models/AchatVente';
 import { CompteSearch } from '@/models/Compte/CompteSearch';
 import SearchCompteTier from './SearchCompteTier.vue';
@@ -427,7 +427,7 @@ import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue
 
 @Component({
   name: 'AchatVentePiece',
-  components: { SearchCompteTier, GridContreparties, Confirm, DatePicker, AutocompleteComptesVue }
+  components: { SearchCompteTier, GridContreparties, Confirm, DatePicker, AutocompleteComptesVue },
 })
 export default class extends Vue {
   @Ref() readonly autocompleteCompteTier!: AutocompleteComptesVue;
@@ -452,7 +452,7 @@ export default class extends Vue {
   private numeroCompteTier = '';
   private numeroCompteTierSelected: { numero: number | string; nom: string } = {
     numero: '',
-    nom: ''
+    nom: '',
   };
 
   private oldPiece: PieceComptable = new PieceComptable();
@@ -477,14 +477,14 @@ export default class extends Vue {
   private datePieceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période',
   ];
 
   private dateEcheance: DateTime | null = null;
   private dateEcheanceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDateEcheance(v)
+    (v: string) => this.validateDateEcheance(v),
   ];
 
   mounted() {
@@ -532,7 +532,7 @@ export default class extends Vue {
   private numeroToForce = '';
   private numeroToForceRules: any = [
     (v: string) => !!v || 'Numéro obligatoire',
-    (v: string) => !!v.toNumber() || 'Numéro invalide'
+    (v: string) => !!v.toNumber() || 'Numéro invalide',
   ];
 
   private ventilleBase = 0;
@@ -649,7 +649,7 @@ export default class extends Vue {
     if (pieceComptable) {
       const compteToSelect = {
         numero: pieceComptable.compteTiersNumero,
-        nom: pieceComptable.compteTiersNom
+        nom: pieceComptable.compteTiersNom,
       };
       this.numeroCompteTierSelected = compteToSelect;
     }
@@ -681,7 +681,7 @@ export default class extends Vue {
           new Devise({
             id: pieceComptable.codeDevise,
             libelle: pieceComptable.libelleDevise,
-            typeDevise: 'D'
+            typeDevise: 'D',
           })
         )
       : this.devises[0];
@@ -689,7 +689,7 @@ export default class extends Vue {
       ? this.getStatutToSelect(
           new Statut({
             id: pieceComptable.statut,
-            libelle: pieceComptable.statutLibelle
+            libelle: pieceComptable.statutLibelle,
           })
         )
       : this.statuts[0];
@@ -741,7 +741,7 @@ export default class extends Vue {
           new Devise({
             id: compte.codeDevise,
             libelle: compte.libelleDevise,
-            typeDevise: 'D'
+            typeDevise: 'D',
           })
         )
       : this.devises[0];
@@ -937,7 +937,7 @@ export default class extends Vue {
         this.numeroPiece = numeroPiece.toString();
         this.resolve({
           action: DialogActionResult.Create,
-          data: this.getModelForGrid()
+          data: this.getModelForGrid(),
         });
         (this.$refs.form as any).resetValidation();
         this.dialog = false;
@@ -961,7 +961,7 @@ export default class extends Vue {
       .then(() => {
         this.resolve({
           action: DialogActionResult.Update,
-          data: this.getModelForGrid()
+          data: this.getModelForGrid(),
         });
         this.dialog = false;
         this.resetForm();
@@ -996,7 +996,7 @@ export default class extends Vue {
               this.dialog = false;
               this.resolve({
                 action: DialogActionResult.Delete,
-                data: this.getModelForGrid()
+                data: this.getModelForGrid(),
               });
               this.resetForm();
             })
@@ -1097,12 +1097,27 @@ export default class extends Vue {
   }
 
   private closeDialog() {
-    this.resetForm();
-    this.autocompleteCompteTier?.blur();
-    this.$nextTick(() => {
-      this.dialog = false;
-      this.resolve({ action: DialogActionResult.None });
-    });
+    if (!this.piecereadonly) {
+      this.confirmDialog
+        .open('Fermer', `Êtes-vous sûr de vouloir fermer ? Ceci annulera vos modifications.`, 'warning', 'Fermer')
+        .then((resp) => {
+          if (resp) {
+            this.resetForm();
+            this.autocompleteCompteTier?.blur();
+            this.$nextTick(() => {
+              this.dialog = false;
+              this.resolve({ action: DialogActionResult.None });
+            });
+          }
+        });
+    } else {
+      this.resetForm();
+      this.autocompleteCompteTier?.blur();
+      this.$nextTick(() => {
+        this.dialog = false;
+        this.resolve({ action: DialogActionResult.None });
+      });
+    }
   }
 
   private clickOutside() {
