@@ -10,7 +10,7 @@ export default abstract class HistoriqueComptableApi {
     toDate: string
   ): Promise<HistoriqueComptable> {
     const response = await api.AcQuaCore.get<HistoriqueComptableDTO>(
-      `/HistoriqueComptable?typeCompte=${typeCompte}&numeroCompte=${numeroCompte}&startDate=${fromDate}&endDate=${toDate}`
+      `/HistoriqueComptable?typeCompte=${typeCompte}&numeroCompte=${numeroCompte}&startDate=${fromDate ?? ''}&endDate=${toDate ?? ''}`
     );
     return new HistoriqueComptable(response.data);
   }

@@ -107,6 +107,7 @@ export default class extends Vue {
       this.dateFormatted = '';
       this.syncedDate = null;
     }
+    this.$emit('change', val ?? '');
   }
 
   @Watch('syncedDate', { deep: true })
