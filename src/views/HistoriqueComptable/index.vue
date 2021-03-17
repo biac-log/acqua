@@ -54,14 +54,14 @@
         </template>
         <template v-slot:[`header.creditDebit`]="">
           <v-row dense>
-            <v-col cols="3" class="text-end">Crédit</v-col>
-            <v-col cols="3" class="text-end">Débit</v-col>
+            <v-col cols="4" class="text-end">Crédit</v-col>
+            <v-col cols="4" class="text-end">Débit</v-col>
           </v-row>
         </template>
         <template v-slot:[`item.creditDebit`]="{ item }">
           <v-row>
-            <v-col cols="3" class="text-end">{{ item.codeMouvement == 'CR' ? item.mouvement : '' }}</v-col>
-            <v-col cols="3" class="text-end">{{ item.codeMouvement == 'DB' ? item.mouvement : '' }}</v-col>
+            <v-col cols="4" class="text-end">{{ item.codeMouvement == 'CR' ? item.mouvement : '' }}</v-col>
+            <v-col cols="4" class="text-end">{{ item.codeMouvement == 'DB' ? item.mouvement : '' }}</v-col>
             <v-col cols="3" class="text-end">{{ item.libelleDevise }}</v-col>
           </v-row>
         </template>
