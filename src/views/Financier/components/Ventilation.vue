@@ -712,13 +712,8 @@ export default class VentilationVue extends Vue {
     this.referenceJournal = element.numeroJournal.toString();
     this.referencePiece = element.numeroPiece.toString();
     this.caseBases.push(element.caseBase1, element.caseBase2, element.caseBase3);
-    if (element.soldeDevise > 0) {
-      this.typesMouvementsSelected =
-        this.typesComptesSelected.id == 'F' ? this.typesMouvements[1] : this.typesMouvements[0]; // [1] == CR, [0] == DB
-    } else {
-      this.typesMouvementsSelected =
-        this.typesComptesSelected.id == 'F' ? this.typesMouvements[0] : this.typesMouvements[1]; // [0] == DB, [1] == CR
-    }
+    // Take the opposite codeMouvement from element
+    this.typesMouvementsSelected = element.soldeDevise > 0 ? this.typesMouvements[1] : this.typesMouvements[0]; // [0] == DB, [1] == CR
     this.montant = Math.abs(element.soldeDevise).toComptaString(2);
     // Init other ventilations if there were more than one element
     for (let index = 1; index < elements.length; index++) {
@@ -737,12 +732,7 @@ export default class VentilationVue extends Vue {
     ventilation.referencePiece = element.numeroPiece;
     ventilation.libelle = this.reglement.libelle;
     ventilation.caseBases.push(element.caseBase1, element.caseBase2, element.caseBase3);
-    if (element.soldeDevise > 0) {
-      ventilation.codeMouvement = this.typesComptesSelected.id == 'F' ? 'CR' : 'DB';
-    } else {
-      ventilation.codeMouvement = this.typesComptesSelected.id == 'F' ? 'DB' : 'CR';
-    }
-    // ventilation.codeMouvement = element.montantDevise < 0 ? 'DB' : 'CR';
+    ventilation.codeMouvement = element.montantDevise < 0 ? 'DB' : 'CR';
     ventilation.montantDevise = Math.abs(element.montantDevise);
     ventilation.montantBase = Math.abs(element.montantBase);
     ventilation.codeDevise = element.codeDevise;
