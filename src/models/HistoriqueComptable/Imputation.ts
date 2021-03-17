@@ -14,6 +14,7 @@ export class ImputationDTO {
   codeJournal = 0;
   mouvementBase = 0;
   chiffreDAffaire = 0;
+  cumulTva = 0;
   referenceJournal = 0;
   referencePiece = 0;
   codeOperation = 0;
@@ -41,5 +42,13 @@ export class Imputation extends ImputationDTO {
 
   get lien(): string {
     return `${this.codeLigneExtrait.padStart(2)}/${this.codeLigneVentilation.padStart(3)}`;
+  }
+
+  get chiffreAffaire() {
+    return this.chiffreDAffaire.toComptaString();
+  }
+
+  get mouvement() {
+    return this.mouvementBase.toComptaString();
   }
 }

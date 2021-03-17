@@ -46,19 +46,27 @@
       </v-form>
     </v-card>
     <v-card class="mt-5">
-      <v-data-table :items="historique.imputations" :headers="headers">
+      <v-data-table :items="historique.imputations" :headers="headers" disable-sort>
+        <template v-slot:[`item.pieceDesc`]="{ item }">
+          <span>{{item.pieceDesc}}</span>
+          <span class="pl-4">{{item.libellePiece}}</span>
+        </template>
         <template v-slot:[`header.creditDebit`]="">
           <v-row dense>
-            <v-col cols="4">Crédit</v-col>
-            <v-col cols="4">Débit</v-col>            
+            <v-col cols="3" class="text-end">Crédit</v-col>
+            <v-col cols="3" class="text-end">Débit</v-col>            
           </v-row>
         </template>
         <template v-slot:[`item.creditDebit`]="{ item }">
           <v-row>
-            <v-col cols="4">{{item.codeMouvement == "CR" ? item.mouvementBase : ''}}</v-col>
-            <v-col cols="4">{{item.codeMouvement == "DB" ? item.mouvementBase : ''}}</v-col>            
-            <v-col cols="4" class="text-end">{{item.libelleDevise}}</v-col>
+            <v-col cols="3" class="text-end">{{item.codeMouvement == "CR" ? item.mouvement : ''}}</v-col>
+            <v-col cols="3" class="text-end">{{item.codeMouvement == "DB" ? item.mouvement : ''}}</v-col>            
+            <v-col cols="3" class="text-end">{{item.libelleDevise}}</v-col>
           </v-row>
+        </template>
+        <template v-slot:[`item.chiffreDAffaire`]="{ item }">
+          <span>{{item.chiffreDAffaire.toComptaString()}}</span>
+          <span class="pl-6">{{item.cumulTva.toComptaString()}}</span>
         </template>
       </v-data-table>
     </v-card>
@@ -113,7 +121,7 @@ export default class HistoriqueComptableIndex extends Vue {
     { text: 'Pièce', value: 'pieceDesc' },
     { text: 'Libellé', value: 'libellePiece' },
     { text: 'Crédit / Débit', value: 'creditDebit'},
-    { text: 'C.A', value: 'chiffreDAffaire', align: 'end' },
+    { text: 'C.A & TVA/mvt devise', value: 'chiffreDAffaire', align: 'end' },
     { text: 'Case / Réf', value: 'caseRef', align: 'end' },
     { text: 'Lien', value: 'lien', align: 'end' },
   ];
@@ -141,6 +149,7 @@ export default class HistoriqueComptableIndex extends Vue {
       compte.length == 8
     ) {
       this.numeroCompte = compte;
+      this.fromDate = '';
       this.loadHistorique();
     } else if (
       compte instanceof CompteGeneralSearch ||
@@ -148,11 +157,13 @@ export default class HistoriqueComptableIndex extends Vue {
       compte instanceof CompteDeTier
     ) {
       this.numeroCompte = compte.numero.toString();
+      this.fromDate = '';
       this.loadHistorique();
     }
   }
 
   private async loadHistorique() {
+    this.historique = new HistoriqueComptable();
     await HistoriqueComptableApi.getHistorique(
       this.typeCompteSelected.id,
       +this.numeroCompte,
