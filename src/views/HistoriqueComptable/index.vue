@@ -46,7 +46,14 @@
         </v-row>
       </v-form>
     </v-card>
-    <v-card class="mt-5">
+    <v-card class="mt-5" v-if="historique.imputations.length > 0">
+      <v-toolbar color="primary" dark flat>
+        <v-row>
+          <v-col cols="3">
+            Solde : {{historique.solde}}
+          </v-col>
+        </v-row>
+      </v-toolbar>
       <v-data-table :items="historique.imputations" :headers="headers" disable-sort>
         <template v-slot:[`item.pieceDesc`]="{ item }">
           <span>{{ item.pieceDesc }}</span>
