@@ -54,21 +54,21 @@
           </v-col>
         </v-row>
       </v-toolbar>
-      <v-data-table :items="historique.imputations" :headers="headers" disable-sort>
+      <v-data-table :items="historique.imputations" :headers="headers" disable-sort @click:row="openEcriture">
         <template v-slot:[`item.pieceDesc`]="{ item }">
           <span>{{ item.pieceDesc }}</span>
           <span class="pl-4">{{ item.libellePiece }}</span>
         </template>
         <template v-slot:[`header.creditDebit`]="">
           <v-row dense>
-            <v-col cols="4" class="text-end">Crédit</v-col>
             <v-col cols="4" class="text-end">Débit</v-col>
+            <v-col cols="4" class="text-end">Crédit</v-col>
           </v-row>
         </template>
         <template v-slot:[`item.creditDebit`]="{ item }">
           <v-row>
-            <v-col cols="4" class="text-end">{{ item.codeMouvement == 'CR' ? item.mouvement : '' }}</v-col>
             <v-col cols="4" class="text-end">{{ item.codeMouvement == 'DB' ? item.mouvement : '' }}</v-col>
+            <v-col cols="4" class="text-end">{{ item.codeMouvement == 'CR' ? item.mouvement : '' }}</v-col>
             <v-col cols="3" class="text-end">{{ item.libelleDevise }}</v-col>
           </v-row>
         </template>
@@ -78,6 +78,7 @@
         </template>
       </v-data-table>
     </v-card>
+    <ecriture-vue ref="ecritureModal" />
   </v-container>
 </template>
 
@@ -93,15 +94,18 @@ import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import DatePicker from '@/components/DatePicker.vue';
 import { DateTime } from '@/models/DateTime';
 import { HistoriqueComptable } from '@/models/HistoriqueComptable/HistoriqueComptable';
+import EcritureVue from '@/views/HistoriqueComptable/components/Ecriture.vue';
+import { Imputation } from '@/models/HistoriqueComptable/Imputation';
 
 @Component({
   name: 'HistoriqueComptableIndex',
-  components: { AutocompleteComptesVue, DatePicker },
+  components: { AutocompleteComptesVue, DatePicker, EcritureVue },
 })
 export default class HistoriqueComptableIndex extends Vue {
   @Ref() private compteComponent!: AutocompleteComptesVue;
   @Ref() private form!: AutocompleteComptesVue;
   @Ref() private fromDateField!: DatePicker;
+  @Ref() private ecritureModal!: EcritureVue;
 
   private isSearchValid = false;
   private typesComptes: TypeCompte[] = [];
@@ -125,7 +129,6 @@ export default class HistoriqueComptableIndex extends Vue {
   private headers = [
     { text: 'Date', value: 'dateDisplay' },
     { text: 'Pièce', value: 'pieceDesc' },
-    { text: 'Libellé', value: 'libellePiece' },
     { text: 'Crédit / Débit', value: 'creditDebit' },
     { text: 'C.A & TVA/mvt devise', value: 'chiffreDAffaire', align: 'end' },
     { text: 'Case / Réf', value: 'caseRef', align: 'end' },
@@ -179,6 +182,10 @@ export default class HistoriqueComptableIndex extends Vue {
       this.historique = historique;
       this.fromDateField.initFromString(historique.fromDate.toString());
     });
+  }
+
+  private openEcriture(imputation: Imputation) {
+    this.ecritureModal.open(imputation.codeJournal, imputation.numeroPiece);
   }
 
   private resetCompte() {
