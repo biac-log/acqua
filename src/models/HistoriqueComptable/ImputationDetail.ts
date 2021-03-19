@@ -20,4 +20,16 @@ export class ImputationDetail extends ImputationDetailDTO {
     super();
     Object.assign(this, dto || new ImputationDetailDTO());
   }
+
+  get dateDisplay(): string {
+    return this.date.toString('DD.MM.YYYY');
+  }
+
+  get pieceDesc() {
+    return `${this.codeJournal}.${this.codePiece}/${this.codeLigneExtrait.padStart(2)} ${this.codeLigneVentilation.padStart(3)}`;
+  }
+
+  get reference() {
+    return `${this.refCodeJournal}.${this.refCodePiece}`;
+  }
 }

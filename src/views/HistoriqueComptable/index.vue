@@ -185,7 +185,7 @@ export default class HistoriqueComptableIndex extends Vue {
   }
 
   private openEcriture(imputation: Imputation) {
-    this.ecritureModal.open(imputation.codeJournal, imputation.numeroPiece);
+    this.ecritureModal.open(imputation.codeJournal, imputation.numeroPiece, imputation.codeLigneExtrait, imputation.codeLigneVentilation);
   }
 
   private resetCompte() {
