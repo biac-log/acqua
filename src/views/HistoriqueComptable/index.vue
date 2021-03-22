@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-card>
       <v-form ref="form" v-model="isSearchValid">
-        <v-row align="start" justify="start" class="pl-5">
+        <v-row align="start" justify="start" class="pl-5 pt-2 pb-2">
           <v-col cols="12" xs="12" sm="6" lg="2">
             <v-select
               ref="typesComptes"
@@ -17,6 +17,7 @@
               :rules="typesComptesRules"
               @keyup="changeType"
               @change="resetCompte"
+              hide-details
             />
           </v-col>
           <v-col lg="2" class="pl-5">
@@ -28,6 +29,7 @@
               :disabled="!typeCompteSelected.id"
               @change="compteChange"
               :rules="numeroCompteRules"
+              hide-details
             />
           </v-col>
           <v-col lg="2">
@@ -38,10 +40,18 @@
               :rules="fromDateRules"
               ref="fromDateField"
               @change="loadHistorique"
+              hide-details
             />
           </v-col>
           <v-col lg="2">
-            <date-picker outlined label="Jusqu'à" :date.sync="toDate" :rules="toDateRules" @change="loadHistorique" />
+            <date-picker
+              outlined
+              label="Jusqu'à"
+              :date.sync="toDate"
+              :rules="toDateRules"
+              @change="loadHistorique"
+              hide-details
+            />
           </v-col>
         </v-row>
       </v-form>
@@ -49,9 +59,7 @@
     <v-card class="mt-5" v-if="historique.imputations.length > 0">
       <v-toolbar color="primary" dark flat>
         <v-row>
-          <v-col cols="3">
-            Solde : {{historique.solde}}
-          </v-col>
+          <v-col cols="3"> Solde : {{ historique.solde.toComptaString() }} {{ historique.devise }} </v-col>
         </v-row>
       </v-toolbar>
       <v-data-table :items="historique.imputations" :headers="headers" disable-sort @click:row="openEcriture">
@@ -105,6 +113,7 @@ export default class HistoriqueComptableIndex extends Vue {
   @Ref() private compteComponent!: AutocompleteComptesVue;
   @Ref() private form!: AutocompleteComptesVue;
   @Ref() private fromDateField!: DatePicker;
+  @Ref() private toDateField!: DatePicker;
   @Ref() private ecritureModal!: EcritureVue;
 
   private isSearchValid = false;
@@ -116,13 +125,9 @@ export default class HistoriqueComptableIndex extends Vue {
   private numeroCompteRules: any = [(v: string) => !!v || 'Numéro obligatoire'];
 
   private fromDate = '';
-  private fromDateRules: any = [
-    (v: string) => DateTime.isValid(v) || 'Date invalide',
-  ];
+  private fromDateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
   private toDate = '';
-  private toDateRules: any = [
-    (v: string) => DateTime.isValid(v) || 'Date invalide',
-  ];
+  private toDateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
 
   private historique: HistoriqueComptable = new HistoriqueComptable();
 
@@ -185,7 +190,12 @@ export default class HistoriqueComptableIndex extends Vue {
   }
 
   private openEcriture(imputation: Imputation) {
-    this.ecritureModal.open(imputation.codeJournal, imputation.numeroPiece, imputation.codeLigneExtrait, imputation.codeLigneVentilation);
+    this.ecritureModal.open(
+      imputation.codeJournal,
+      imputation.numeroPiece,
+      imputation.codeLigneExtrait,
+      imputation.codeLigneVentilation
+    );
   }
 
   private resetCompte() {

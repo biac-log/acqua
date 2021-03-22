@@ -3,6 +3,7 @@ import { Imputation } from './Imputation';
 
 export class HistoriqueComptableDTO {
     solde = 0;
+    devise = '';
     fromDate: DateTime = new DateTime();
     imputations: Imputation[] = [];
 }
