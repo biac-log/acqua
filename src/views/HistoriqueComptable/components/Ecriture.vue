@@ -1,8 +1,9 @@
 <template>
   <v-dialog v-model="visible">
     <v-toolbar color="primary" dark flat>
-      <span>Période : (?)</span>
+      <span>Période : {{ ecriture.periode }}</span>
       <span class="pl-5">Pièce : {{ `${ecriture.codeJournal}.${ecriture.codePiece}` }}</span>
+      <span class="pl-5">{{ ecriture.periodeDesc }}</span>
       <v-spacer />
       <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
         <v-icon>mdi-close</v-icon>
@@ -10,7 +11,14 @@
     </v-toolbar>
     <v-card>
       <v-card-text>
-        <v-data-table :items="ecriture.imputations" :headers="headers" :item-class="highlightRow" disable-sort>
+        <v-data-table
+          :items="ecriture.imputations"
+          :headers="headers"
+          :item-class="highlightRow"
+          disable-sort
+          class="elevation-1"
+          dense
+        >
           <template v-slot:[`item.pieceDesc`]="{ item }">
             <span class="text-end">{{
               ecriture.imputations.indexOf(item) > 0 ? item.pieceDesc : item.pieceDescEntete
@@ -90,5 +98,8 @@ export default class Ecriture extends Vue {
 <style>
 .highlighted {
   background-color: lightgrey;
+}
+.max-height-95 {
+  max-height: 95%;
 }
 </style>

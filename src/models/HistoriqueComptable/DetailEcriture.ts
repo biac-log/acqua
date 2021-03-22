@@ -2,6 +2,7 @@ import { ImputationDetail } from "./ImputationDetail";
 
 export class DetailEcritureDTO {
     periode = '';
+    periodeDesc = '';
     codeJournal = 0;
     codePiece = 0;
     imputations: ImputationDetail[] = [];
