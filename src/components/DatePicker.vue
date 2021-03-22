@@ -25,6 +25,7 @@
         validate-on-blur
         @update:error="validateField"
         :error-messages="errorMessages"
+        @keydown.enter.prevent="blur"
       >
         <template v-slot:prepend-inner>
           <v-btn
