@@ -6,7 +6,24 @@
     </v-toolbar>
     <v-card>
       <v-card-text>
-        <v-data-table :items="ecriture.imputations" :headers="headers" :item-class="highlightRow"></v-data-table>
+        <v-data-table :items="ecriture.imputations" :headers="headers" :item-class="highlightRow" disable-sort>
+          <template v-slot:[`item.pieceDesc`]="{item}">
+            <span class="text-end">{{ecriture.imputations.indexOf(item) > 0 ? item.pieceDesc : item.pieceDescEntete }}</span>
+          </template>
+          <template v-slot:[`header.creditDebit`]="">
+          <v-row dense>
+            <v-col cols="4" class="text-end">Débit</v-col>
+            <v-col cols="4" class="text-end">Crédit</v-col>
+          </v-row>
+        </template>
+          <template v-slot:[`item.creditDebit`]="{ item }">
+          <v-row>
+            <v-col cols="4" class="text-end">{{ item.codeMouvement == 'DB' ? item.mouvement : '' }}</v-col>
+            <v-col cols="4" class="text-end">{{ item.codeMouvement == 'CR' ? item.mouvement : '' }}</v-col>
+            <v-col cols="3" class="text-end">{{ item.libelleDevise }}</v-col>
+          </v-row>
+        </template>
+        </v-data-table>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -30,13 +47,13 @@ export default class Ecriture extends Vue {
   private highlightVentilation!: number;
 
   private headers = [
-    { text: 'Date', value: 'date' },
-    { text: 'Pièce', value: 'pieceDesc' },
+    { text: 'Date', value: 'dateDisplay' },
+    { text: 'Pièce', value: 'pieceDesc', align: "end" },
     { text: 'Compte', value: 'numeroCompte' },
     { text: 'Nom', value: 'nomCompte' },
     { text: 'Libellé', value: 'libellePiece' },
-    { text: 'Débit  Crédit  Dev', value: 'mouvementBase' },
-    { text: 'TVA', value: 'caseBase' },
+    { text: 'Débit  Crédit  Dev', value: 'creditDebit' },
+    { text: 'TVA', value: 'case' },
     { text: 'Référence', value: 'reference' },
   ];
 
@@ -52,7 +69,6 @@ export default class Ecriture extends Vue {
   }
 
   private highlightRow(item: ImputationDetail) {
-    console.log(item.codeLigneExtrait == this.highlightExtrait && item.codeLigneVentilation == this.highlightVentilation);
     return item.codeLigneExtrait == this.highlightExtrait && item.codeLigneVentilation == this.highlightVentilation
       ? 'highlighted'
       : '';
