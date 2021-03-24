@@ -53,16 +53,29 @@
               hide-details
             />
           </v-col>
+          <v-spacer />
+          <v-col cols="2">
+            <v-select
+              label="Affichage"
+              class="pr-5"
+              :items="modes"
+              v-model="mode"
+              item-text="text"
+              item-value="value"
+              outlined
+              @change="changeMode"
+            />
+          </v-col>
         </v-row>
       </v-form>
     </v-card>
-    <v-card class="mt-5" v-if="historique.imputations.length > 0">
+    <v-card class="mt-5" v-if="historique.imputations.length > 0 && mode == 'historique'">
       <v-toolbar color="primary" dark flat>
         <v-row>
           <v-col cols="3"> Solde : {{ historique.solde.toComptaString() }} {{ historique.devise }} </v-col>
         </v-row>
       </v-toolbar>
-      <v-data-table :items="historique.imputations" :headers="headers" disable-sort @click:row="openEcriture">
+      <v-data-table :items="historique.imputations" :headers="headersHistorique" disable-sort @click:row="openEcriture">
         <template v-slot:[`item.pieceDesc`]="{ item }">
           <span>{{ item.pieceDesc }}</span>
           <span class="pl-4">{{ item.libellePiece }}</span>
@@ -86,6 +99,10 @@
         </template>
       </v-data-table>
     </v-card>
+    <v-card class="mt-5" v-if="mode == 'reportMensuel'">
+      <v-toolbar color="primary" dark flat> Report mensuel </v-toolbar>
+      <v-data-table :items="reportMensuel" :headers="headersReportMensuel"></v-data-table>
+    </v-card>
     <ecriture-vue ref="ecritureModal" />
   </v-container>
 </template>
@@ -104,6 +121,7 @@ import { DateTime } from '@/models/DateTime';
 import { HistoriqueComptable } from '@/models/HistoriqueComptable/HistoriqueComptable';
 import EcritureVue from '@/views/HistoriqueComptable/components/Ecriture.vue';
 import { Imputation } from '@/models/HistoriqueComptable/Imputation';
+import { LigneReport } from '@/models/HistoriqueComptable/LigneReport';
 
 @Component({
   name: 'HistoriqueComptableIndex',
@@ -130,14 +148,32 @@ export default class HistoriqueComptableIndex extends Vue {
   private toDateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
 
   private historique: HistoriqueComptable = new HistoriqueComptable();
+  private reportMensuel: LigneReport[] = [];
 
-  private headers = [
+  private mode = 'historique';
+  private modes = [
+    { text: 'Historique', value: 'historique' },
+    { text: 'Report mensuel', value: 'reportMensuel' },
+    { text: 'Report journalier', value: 'reportJournalier' },
+  ];
+
+  private headersHistorique = [
     { text: 'Date', value: 'dateDisplay' },
     { text: 'Pièce', value: 'pieceDesc' },
     { text: 'Crédit / Débit', value: 'creditDebit' },
     { text: 'C.A & TVA/mvt devise', value: 'chiffreDAffaire', align: 'end' },
     { text: 'Case / Réf', value: 'caseRef', align: 'end' },
     { text: 'Lien', value: 'lien', align: 'end' },
+  ];
+
+  private headersReportMensuel = [
+    { text: ' ', value: 'periode' },
+    { text: 'Solde', value: 'soldeCompta' },
+    { text: 'Débit', value: 'debitCompta' },
+    { text: 'Débit Cumulé', value: 'debitCumuleCompta' },
+    { text: 'Crédit', value: 'creditCompta' },
+    { text: 'Crédit Cumulé', value: 'creditCumuleCompta' },
+    { text: 'Solde Cumulé', value: 'soldeCumuleCompta' },
   ];
 
   mounted() {
@@ -196,6 +232,29 @@ export default class HistoriqueComptableIndex extends Vue {
       imputation.codeLigneExtrait,
       imputation.codeLigneVentilation
     );
+  }
+
+  private changeMode() {
+    if (this.mode == 'historique') {
+      console.log('historique');
+    } else if (this.mode == 'reportMensuel') {
+      this.loadReportMensuel();
+    } else if (this.mode == 'reportJournalier') {
+      console.log('daily');
+    } else {
+      console.log('Invalid mode');
+    }
+  }
+
+  private async loadReportMensuel() {
+    HistoriqueComptableApi.getReportMensuel(
+      this.typeCompteSelected.id,
+      +this.numeroCompte,
+      this.fromDate,
+      this.toDate
+    ).then((resp) => {
+      this.reportMensuel = resp;
+    });
   }
 
   private resetCompte() {
