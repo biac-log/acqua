@@ -39,7 +39,7 @@
               :date.sync="fromDate"
               :rules="fromDateRules"
               ref="fromDateField"
-              @change="loadHistorique"
+              @change="loadDatas"
               hide-details
             />
           </v-col>
@@ -49,7 +49,7 @@
               label="Jusqu'à"
               :date.sync="toDate"
               :rules="toDateRules"
-              @change="loadHistorique"
+              @change="loadDatas"
               hide-details
               ref="toDateField"
             />
@@ -64,7 +64,8 @@
               item-text="text"
               item-value="value"
               outlined
-              @change="changeMode"
+              @change="loadDatas"
+              hide-details
             />
           </v-col>
         </v-row>
@@ -236,9 +237,9 @@ export default class HistoriqueComptableIndex extends Vue {
     );
   }
 
-  private changeMode() {
+  private loadDatas() {
     if (this.mode == 'historique') {
-      console.log('historique');
+      this.loadHistorique();
     } else if (this.mode == 'reportMensuel') {
       this.loadReportMensuel();
     } else if (this.mode == 'reportJournalier') {
