@@ -5,6 +5,7 @@ export class HistoriqueComptableDTO {
     solde = 0;
     devise = '';
     fromDate: DateTime = new DateTime();
+    toDate: DateTime = new DateTime();
     imputations: Imputation[] = [];
 }
 

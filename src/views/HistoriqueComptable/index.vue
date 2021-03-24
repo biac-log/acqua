@@ -51,6 +51,7 @@
               :rules="toDateRules"
               @change="loadHistorique"
               hide-details
+              ref="toDateField"
             />
           </v-col>
           <v-spacer />
@@ -100,7 +101,7 @@
       </v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="mode == 'reportMensuel'">
-      <v-toolbar color="primary" dark flat> Report mensuel </v-toolbar>
+      <v-toolbar color="primary" dark flat> Report mensuel -- Depuis le {{fromDate}} jusqu'au {{toDate}}</v-toolbar>
       <v-data-table :items="reportMensuel" :headers="headersReportMensuel"></v-data-table>
     </v-card>
     <ecriture-vue ref="ecritureModal" />
@@ -168,12 +169,12 @@ export default class HistoriqueComptableIndex extends Vue {
 
   private headersReportMensuel = [
     { text: ' ', value: 'periode' },
-    { text: 'Solde', value: 'soldeCompta' },
-    { text: 'Débit', value: 'debitCompta' },
+    { text: 'Solde', value: 'soldeCompta',align: 'end' },
+    { text: 'Débit', value: 'debitCompta',align: 'end' },
     { text: 'Débit Cumulé', value: 'debitCumuleCompta' },
-    { text: 'Crédit', value: 'creditCompta' },
+    { text: 'Crédit', value: 'creditCompta',align: 'end' },
     { text: 'Crédit Cumulé', value: 'creditCumuleCompta' },
-    { text: 'Solde Cumulé', value: 'soldeCumuleCompta' },
+    { text: 'Solde Cumulé', value: 'soldeCumuleCompta',align: 'end' },
   ];
 
   mounted() {
@@ -222,6 +223,7 @@ export default class HistoriqueComptableIndex extends Vue {
     ).then((historique) => {
       this.historique = historique;
       this.fromDateField.initFromString(historique.fromDate.toString());
+      this.toDateField.initFromString(historique.toDate.toString());
     });
   }
 
