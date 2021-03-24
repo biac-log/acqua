@@ -38,4 +38,16 @@ export default abstract class HistoriqueComptableApi {
     );
     return response.data.map((l) => new LigneReport(l));
   }
+
+  static async getReportJournalier(
+    typeCompte: string,
+    numeroCompte: number,
+    fromDate: string,
+    toDate: string
+  ): Promise<LigneReport[]> {
+    const response = await api.AcQuaCore.get<LigneReportDTO[]>(
+      `/HistoriqueComptable/ReportJournalier?typeCompte=${typeCompte}&numeroCompte=${numeroCompte}&startDate=${fromDate ?? ''}&endDate=${toDate ?? ''}`
+    );
+    return response.data.map((l) => new LigneReport(l));
+  }
 }

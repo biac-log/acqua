@@ -103,7 +103,11 @@
     </v-card>
     <v-card class="mt-5" v-if="mode == 'reportMensuel'">
       <v-toolbar color="primary" dark flat> Report mensuel -- Depuis le {{fromDate}} jusqu'au {{toDate}}</v-toolbar>
-      <v-data-table :items="reportMensuel" :headers="headersReportMensuel"></v-data-table>
+      <v-data-table :items="reportMensuel" :headers="headersReport"></v-data-table>
+    </v-card>
+    <v-card class="mt-5" v-if="mode == 'reportJournalier'">
+      <v-toolbar color="primary" dark flat> Report journalier -- Depuis le {{fromDate}} jusqu'au {{toDate}}</v-toolbar>
+      <v-data-table :items="reportJournalier" :headers="headersReport"></v-data-table>
     </v-card>
     <ecriture-vue ref="ecritureModal" />
   </v-container>
@@ -151,6 +155,7 @@ export default class HistoriqueComptableIndex extends Vue {
 
   private historique: HistoriqueComptable = new HistoriqueComptable();
   private reportMensuel: LigneReport[] = [];
+  private reportJournalier: LigneReport[] = [];
 
   private mode = 'historique';
   private modes = [
@@ -168,7 +173,7 @@ export default class HistoriqueComptableIndex extends Vue {
     { text: 'Lien', value: 'lien', align: 'end' },
   ];
 
-  private headersReportMensuel = [
+  private headersReport = [
     { text: ' ', value: 'periode' },
     { text: 'Solde', value: 'soldeCompta',align: 'end' },
     { text: 'Débit', value: 'debitCompta',align: 'end' },
@@ -243,7 +248,7 @@ export default class HistoriqueComptableIndex extends Vue {
     } else if (this.mode == 'reportMensuel') {
       this.loadReportMensuel();
     } else if (this.mode == 'reportJournalier') {
-      console.log('daily');
+      this.loadReportJournalier();
     } else {
       console.log('Invalid mode');
     }
@@ -257,6 +262,17 @@ export default class HistoriqueComptableIndex extends Vue {
       this.toDate
     ).then((resp) => {
       this.reportMensuel = resp;
+    });
+  }
+
+  private async loadReportJournalier() {
+    HistoriqueComptableApi.getReportJournalier(
+      this.typeCompteSelected.id,
+      +this.numeroCompte,
+      this.fromDate,
+      this.toDate
+    ).then((resp) => {
+      this.reportJournalier = resp;
     });
   }
 
