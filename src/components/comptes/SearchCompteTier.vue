@@ -75,6 +75,7 @@ export default class extends Vue {
     { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
     { headerName: 'Raison sociale', field: 'raisonSocial', filter: true, width: 140 },
     { headerName: 'Adresse', field: 'adresse', filter: true, flex: 1 },
+    { headerName: 'Solde', field: 'soldeCompta', filter: true, flex: 1 },
     { headerName: 'Bloqué', field: 'compteBloqueDisplay', filter: true, width: 100 }
   ];
 

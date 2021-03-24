@@ -1,7 +1,7 @@
 interface Number {
   toDecimalString(nbDecimal?: number): string;
   toIntString(): string;
-  toComptaString(nbDecimal?: number): string;
+  toComptaString(nbDecimal?: number, showZero?: boolean): string;
   montantNegatifString(nbDecimal?: number): string;
 }
 
@@ -27,9 +27,9 @@ Number.prototype.toIntString = function() {
   else return Intl.NumberFormat('fr-FR').format(this as number);
 };
 
-Number.prototype.toComptaString = function(nbDecimal = 2) {
+Number.prototype.toComptaString = function(nbDecimal = 2, showZero = false) {
   if (!nbDecimal) nbDecimal = 2;
-  if (!this) return '';
+  if (!this && !showZero) return '';
   else {
     if (+this >= 0)
       return Intl.NumberFormat('fr-FR', { minimumFractionDigits: nbDecimal, maximumFractionDigits: nbDecimal }).format(
