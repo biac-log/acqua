@@ -27,21 +27,36 @@
           autocomplete="off"
           outlined
         ></v-text-field>
-        <v-btn
-          color="error"
-          fab
-          small
-          class="ml-5"
-          @click="close"
-          ><v-icon>mdi-close</v-icon></v-btn
-        >
+        <v-btn color="error" fab small class="ml-5" @click="close"><v-icon>mdi-close</v-icon></v-btn>
       </v-card-title>
+      <v-card-text>
+        <v-row dense>
+          <v-col cols="4">
+            <v-checkbox
+              label="Afficher les comptes bloqués"
+              class="pa-0 ma-0 ml-5 mt-1"
+              v-model="displayBlocked"
+              hide-details
+              @change="filter"
+            ></v-checkbox>
+          </v-col>
+          <v-col cols="4">
+            <v-checkbox
+              label="Afficher les comptes dont le solde != 0"
+              class="pa-0 ma-0 ml-5 mt-1"
+              v-model="displaySolde"
+              hide-details
+              @change="filter"
+            ></v-checkbox>
+          </v-col>
+        </v-row>
+      </v-card-text>
       <AgGridVue
         style="height: 730px"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersComptes"
-        :rowData="comptes"
+        :rowData="filteredComptes"
         rowSelection="single"
         :gridOptions="gridOptions"
       >
@@ -61,7 +76,7 @@ import Confirm from '@/components/Confirm.vue';
 
 @Component({
   name: 'SearchCompteTier',
-  components: { AgGridVue, Confirm }
+  components: { AgGridVue, Confirm },
 })
 export default class extends Vue {
   private dialog = false;
@@ -70,13 +85,14 @@ export default class extends Vue {
   private filtreCompte = '';
   private isLoading = false;
   private comptes: CompteSearch[] = [];
+  private filteredComptes: CompteSearch[] = [];
   private headersComptes = [
     { headerName: 'Numéro', field: 'numero', filter: true, width: 120 },
     { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
     { headerName: 'Raison sociale', field: 'raisonSocial', filter: true, width: 140 },
     { headerName: 'Adresse', field: 'adresse', filter: true, flex: 1 },
     { headerName: 'Solde', field: 'soldeCompta', filter: true, flex: 1 },
-    { headerName: 'Bloqué', field: 'compteBloqueDisplay', filter: true, width: 100 }
+    { headerName: 'Bloqué', field: 'compteBloqueDisplay', filter: true, width: 100 },
   ];
 
   private resolve!: any;
@@ -96,8 +112,11 @@ export default class extends Vue {
     onRowDoubleClicked: this.rowDoubleClick,
     getRowStyle(params: any) {
       if (params.node.data.compteBloque) return { 'background-color': '#ffd6cc' };
-    }
+    },
   };
+
+  private displayBlocked = false;
+  private displaySolde = false;
 
   public open(typeToLoad: string, filter: string): Promise<CompteSearch> {
     this.dialog = true;
@@ -123,6 +142,7 @@ export default class extends Vue {
       CompteApi.getComptesTiers(this.typeLoad)
         .then((resp) => {
           this.comptes = resp;
+          this.filter();
           this.$nextTick(() => {
             this.filterGrid(this.filtreCompte);
           });
@@ -157,7 +177,7 @@ export default class extends Vue {
       case KEY_DOWN:
         previousCell = params.previousCellPosition;
         // set selected cell on current cell + 1
-        this.gridOptions?.api?.forEachNode(function(node) {
+        this.gridOptions?.api?.forEachNode(function (node) {
           if (previousCell.rowIndex + 1 === node.rowIndex) {
             node.setSelected(true);
           }
@@ -170,7 +190,7 @@ export default class extends Vue {
         } else {
           previousCell = params.previousCellPosition;
           // set selected cell on current cell - 1
-          this.gridOptions?.api?.forEachNode(function(node) {
+          this.gridOptions?.api?.forEachNode(function (node) {
             if (previousCell.rowIndex - 1 === node.rowIndex) {
               node.setSelected(true);
             }
@@ -213,7 +233,7 @@ export default class extends Vue {
       id = this?.gridOptions?.api?.getLastDisplayedRow() || 0;
 
     let ds = 0;
-    this.gridOptions?.api?.forEachNode(function(node) {
+    this.gridOptions?.api?.forEachNode(function (node) {
       if (node.rowIndex === id) {
         node.setSelected(true);
         ds = node.rowIndex;
@@ -275,6 +295,17 @@ export default class extends Vue {
       'error',
       'Sélectionner'
     );
+  }
+
+  private filter() {
+    this.filteredComptes = this.comptes;
+    
+    if (!this.displayBlocked) {
+      this.filteredComptes = this.comptes.filter((c) => !c.compteBloque);
+    }
+    if(!this.displaySolde){
+      this.filteredComptes = this.filteredComptes.filter((c) => c.solde == 0);
+    }
   }
 }
 </script>
