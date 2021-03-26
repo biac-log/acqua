@@ -1,5 +1,10 @@
 <template>
-  <v-container fluid>
+  <v-container
+    fluid
+    @keydown.f2.prevent="switchMode('historique')"
+    @keydown.f3.prevent="switchMode('reportMensuel')"
+    @keydown.f5.prevent="switchMode('reportJournalier')"
+  >
     <v-card>
       <v-form ref="form" v-model="isSearchValid">
         <v-row align="start" justify="start" class="pl-5 pt-2 pb-2">
@@ -66,7 +71,12 @@
               outlined
               @change="loadDatas"
               hide-details
-            />
+            >
+              <template v-slot:item="{ item }">
+                <span>{{ item.text }}</span>
+                <span class="shortcutTooltip">{{ item.shortcut }}</span>
+              </template>
+            </v-select>
           </v-col>
         </v-row>
       </v-form>
@@ -102,11 +112,13 @@
       </v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="mode == 'reportMensuel'">
-      <v-toolbar color="primary" dark flat> Report mensuel -- Depuis le {{fromDate}} jusqu'au {{toDate}}</v-toolbar>
+      <v-toolbar color="primary" dark flat> Report mensuel -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar>
       <v-data-table :items="reportMensuel" :headers="headersReport"></v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="mode == 'reportJournalier'">
-      <v-toolbar color="primary" dark flat> Report journalier -- Depuis le {{fromDate}} jusqu'au {{toDate}}</v-toolbar>
+      <v-toolbar color="primary" dark flat>
+        Report journalier -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar
+      >
       <v-data-table :items="reportJournalier" :headers="headersReport"></v-data-table>
     </v-card>
     <ecriture-vue ref="ecritureModal" />
@@ -159,9 +171,9 @@ export default class HistoriqueComptableIndex extends Vue {
 
   private mode = 'historique';
   private modes = [
-    { text: 'Historique', value: 'historique' },
-    { text: 'Report mensuel', value: 'reportMensuel' },
-    { text: 'Report journalier', value: 'reportJournalier' },
+    { text: 'Historique', value: 'historique', shortcut: 'F2' },
+    { text: 'Report mensuel', value: 'reportMensuel', shortcut: 'F3' },
+    { text: 'Report journalier', value: 'reportJournalier', shortcut: 'F5' },
   ];
 
   private headersHistorique = [
@@ -175,12 +187,12 @@ export default class HistoriqueComptableIndex extends Vue {
 
   private headersReport = [
     { text: ' ', value: 'periode' },
-    { text: 'Solde', value: 'soldeCompta',align: 'end' },
-    { text: 'Débit', value: 'debitCompta',align: 'end' },
+    { text: 'Solde', value: 'soldeCompta', align: 'end' },
+    { text: 'Débit', value: 'debitCompta', align: 'end' },
     { text: 'Débit Cumulé', value: 'debitCumuleCompta' },
-    { text: 'Crédit', value: 'creditCompta',align: 'end' },
+    { text: 'Crédit', value: 'creditCompta', align: 'end' },
     { text: 'Crédit Cumulé', value: 'creditCumuleCompta' },
-    { text: 'Solde Cumulé', value: 'soldeCumuleCompta',align: 'end' },
+    { text: 'Solde Cumulé', value: 'soldeCumuleCompta', align: 'end' },
   ];
 
   mounted() {
@@ -276,6 +288,11 @@ export default class HistoriqueComptableIndex extends Vue {
     });
   }
 
+  private switchMode(mode: string) {
+    this.mode = mode;
+    this.loadDatas();
+  }
+
   private resetCompte() {
     this.compteComponent.resetCompte();
     this.numeroCompte = '';
@@ -284,4 +301,7 @@ export default class HistoriqueComptableIndex extends Vue {
 </script>
 
 <style>
+.shortcutTooltip {
+  color: white !important;
+}
 </style>

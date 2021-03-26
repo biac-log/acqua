@@ -14,6 +14,8 @@ moment.locale('fr');
 //Vue.prototype.$lodash = lodash;
 Vue.config.productionTip = false;
 Vue.config.keyCodes.f2 = 113;
+Vue.config.keyCodes.f3 = 114;
+Vue.config.keyCodes.f5 = 116;
 Vue.config.keyCodes.del = 46;
 Vue.config.keyCodes.plus = 107;
 
