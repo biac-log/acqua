@@ -15,21 +15,21 @@ export class LigneReport extends LigneReportDTO {
   }
 
   get soldeCompta() {
-      return this.solde.toComptaString();
+      return this.solde.toComptaString(2, true);
   }
   get soldeCumuleCompta() {
-      return this.soldeCumule.toComptaString();
+      return this.soldeCumule.toComptaString(2, true);
   }
   get debitCompta() {
-      return this.debit.toComptaString();
+      return this.debit.toComptaString(2, true);
   }
   get debitCumuleCompta() {
-      return this.debitCumule.toComptaString();
+      return this.debitCumule.toComptaString(2, true);
   }
   get creditCompta() {
-      return this.credit.toComptaString();
+      return this.credit.toComptaString(2, true);
   }
   get creditCumuleCompta() {
-      return this.creditCumule.toComptaString();
+      return this.creditCumule.toComptaString(2, true);
   }
 }
