@@ -10,6 +10,7 @@
         <v-row align="start" justify="start" class="pl-5 pt-2 pb-2">
           <v-col cols="12" xs="12" sm="6" lg="2">
             <v-select
+              id="indexSearch"
               ref="typesComptes"
               autofocus
               label="Type de compte"
