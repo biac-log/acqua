@@ -45,7 +45,8 @@ export class Imputation extends ImputationDTO {
   }
 
   get chiffreAffaire() {
-    return this.chiffreDAffaire.toComptaString();
+    if(this.chiffreDAffaire) return `${this.chiffreDAffaire.toComptaString()}   ${this.cumulTva.toComptaString(2, true)}`
+    else return '';
   }
 
   get mouvement() {

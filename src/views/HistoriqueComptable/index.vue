@@ -106,10 +106,10 @@
             <v-col cols="3" class="text-end">{{ item.libelleDevise }}</v-col>
           </v-row>
         </template>
-        <template v-slot:[`item.chiffreDAffaire`]="{ item }">
+        <!-- <template v-slot:[`item.chiffreDAffaire`]="{ item }">
           <span>{{ item.chiffreDAffaire.toComptaString() }}</span>
           <span class="pl-6">{{ item.cumulTva.toComptaString() }}</span>
-        </template>
+        </template> -->
       </v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="!reportMensuel.isEmpty() && mode == 'reportMensuel'">
@@ -181,7 +181,7 @@ export default class HistoriqueComptableIndex extends Vue {
     { text: 'Date', value: 'dateDisplay' },
     { text: 'Pièce', value: 'pieceDesc' },
     { text: 'Crédit / Débit', value: 'creditDebit' },
-    { text: 'C.A & TVA/mvt devise', value: 'chiffreDAffaire', align: 'end' },
+    { text: 'C.A & TVA/mvt devise', value: 'chiffreAffaire', align: 'end' },
     { text: 'Case / Réf', value: 'caseRef', align: 'end' },
     { text: 'Lien', value: 'lien', align: 'end' },
   ];
