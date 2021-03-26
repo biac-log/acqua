@@ -112,11 +112,11 @@
         </template>
       </v-data-table>
     </v-card>
-    <v-card class="mt-5" v-if="mode == 'reportMensuel'">
+    <v-card class="mt-5" v-if="!reportMensuel.isEmpty() && mode == 'reportMensuel'">
       <v-toolbar color="primary" dark flat> Report mensuel -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar>
       <v-data-table :items="reportMensuel" :headers="headersReport"></v-data-table>
     </v-card>
-    <v-card class="mt-5" v-if="mode == 'reportJournalier'">
+    <v-card class="mt-5" v-if="!reportJournalier.isEmpty() && mode == 'reportJournalier'">
       <v-toolbar color="primary" dark flat>
         Report journalier -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar
       >
@@ -255,15 +255,20 @@ export default class HistoriqueComptableIndex extends Vue {
     );
   }
 
+  get canLoadDatas() {
+    return this.typeCompteSelected.id != '' && this.numeroCompte;
+  }
   private loadDatas() {
-    if (this.mode == 'historique') {
-      this.loadHistorique();
-    } else if (this.mode == 'reportMensuel') {
-      this.loadReportMensuel();
-    } else if (this.mode == 'reportJournalier') {
-      this.loadReportJournalier();
-    } else {
-      console.log('Invalid mode');
+    if (this.canLoadDatas) {
+      if (this.mode == 'historique') {
+        this.loadHistorique();
+      } else if (this.mode == 'reportMensuel') {
+        this.loadReportMensuel();
+      } else if (this.mode == 'reportJournalier') {
+        this.loadReportJournalier();
+      } else {
+        console.log('Invalid mode');
+      }
     }
   }
 
