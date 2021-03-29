@@ -10,6 +10,7 @@
       </v-btn>
     </v-toolbar>
     <v-card>
+      <v-progress-linear :active="isLoading" indeterminate top color="primary accent-4" />
       <v-card-text>
         <v-data-table
           :items="ecriture.imputations"
@@ -63,6 +64,7 @@ export default class Ecriture extends Vue {
   private highlightVentilation!: number;
 
   private page = 1;
+  private isLoading = false;
 
   private headers = [
     { text: 'Date', value: 'dateDisplay' },
@@ -83,7 +85,10 @@ export default class Ecriture extends Vue {
   }
 
   private loadEcriture(journal: number, piece: number) {
-    HistoriqueComptableApi.getDetailEcriture(journal, piece).then((resp) => (this.ecriture = resp));
+    this.isLoading = true;
+    HistoriqueComptableApi.getDetailEcriture(journal, piece)
+      .then((resp) => (this.ecriture = resp))
+      .finally(() => (this.isLoading = false));
   }
 
   private highlightRow(item: ImputationDetail) {
