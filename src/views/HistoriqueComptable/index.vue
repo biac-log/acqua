@@ -194,7 +194,7 @@ export default class HistoriqueComptableIndex extends Vue {
   ];
 
   private headersReport = [
-    { text: ' ', value: 'periode' },
+    { text: ' ', value: 'periodePad' },
     { text: 'Solde', value: 'soldeCompta', align: 'end' },
     { text: 'Débit', value: 'debitCompta', align: 'end' },
     { text: 'Débit Cumulé', value: 'debitCumuleCompta' },
