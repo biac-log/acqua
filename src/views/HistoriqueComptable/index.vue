@@ -4,6 +4,8 @@
     @keydown.f2.prevent="switchMode('historique')"
     @keydown.f3.prevent="switchMode('reportMensuel')"
     @keydown.f5.prevent="switchMode('reportJournalier')"
+    @keydown.34.prevent="pgDown"
+    @keydown.33.prevent="pgUp"
   >
     <v-card>
       <v-form ref="form" v-model="isSearchValid">
@@ -88,7 +90,16 @@
           <v-col cols="3"> Solde : {{ historique.solde.toComptaString() }} {{ historique.devise }} </v-col>
         </v-row>
       </v-toolbar>
-      <v-data-table :items="historique.imputations" :headers="headersHistorique" disable-sort @click:row="openEcriture">
+      <v-data-table
+        :items="historique.imputations"
+        :headers="headersHistorique"
+        disable-sort
+        @click:row="openEcriture"
+        dense
+        class="elevation-1"
+        :items-per-page="15"
+        :page="page"
+      >
         <template v-slot:[`item.pieceDesc`]="{ item }">
           <span>{{ item.pieceDesc }}</span>
           <span class="pl-4">{{ item.libellePiece }}</span>
@@ -100,27 +111,23 @@
           </v-row>
         </template>
         <template v-slot:[`item.creditDebit`]="{ item }">
-          <v-row>
+          <v-row dense>
             <v-col cols="4" class="text-end">{{ item.codeMouvement == 'DB' ? item.mouvement : '' }}</v-col>
             <v-col cols="4" class="text-end">{{ item.codeMouvement == 'CR' ? item.mouvement : '' }}</v-col>
             <v-col cols="3" class="text-end">{{ item.libelleDevise }}</v-col>
           </v-row>
         </template>
-        <!-- <template v-slot:[`item.chiffreDAffaire`]="{ item }">
-          <span>{{ item.chiffreDAffaire.toComptaString() }}</span>
-          <span class="pl-6">{{ item.cumulTva.toComptaString() }}</span>
-        </template> -->
       </v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="!reportMensuel.isEmpty() && mode == 'reportMensuel'">
       <v-toolbar color="primary" dark flat> Report mensuel -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar>
-      <v-data-table :items="reportMensuel" :headers="headersReport"></v-data-table>
+      <v-data-table :items="reportMensuel" :headers="headersReport" :items-per-page="15" :page="page"></v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="!reportJournalier.isEmpty() && mode == 'reportJournalier'">
       <v-toolbar color="primary" dark flat>
         Report journalier -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar
       >
-      <v-data-table :items="reportJournalier" :headers="headersReport"></v-data-table>
+      <v-data-table :items="reportJournalier" :headers="headersReport" :items-per-page="15" :page="page"></v-data-table>
     </v-card>
     <ecriture-vue ref="ecritureModal" />
   </v-container>
@@ -196,6 +203,8 @@ export default class HistoriqueComptableIndex extends Vue {
     { text: 'Solde Cumulé', value: 'soldeCumuleCompta', align: 'end' },
   ];
 
+  private page = 1;
+
   mounted() {
     CompteApi.getTypesComptes().then((resp) => {
       this.typesComptes = resp;
@@ -269,6 +278,7 @@ export default class HistoriqueComptableIndex extends Vue {
       } else {
         console.log('Invalid mode');
       }
+      this.page = 1;
     }
   }
 
@@ -303,11 +313,23 @@ export default class HistoriqueComptableIndex extends Vue {
     this.compteComponent.resetCompte();
     this.numeroCompte = '';
   }
+
+  private pgDown() {
+    this.page++;
+  }
+
+  private pgUp() {
+    this.page--;
+  }
 }
 </script>
 
 <style>
 .shortcutTooltip {
   color: white !important;
+}
+
+.table.cell-height {
+  max-height: 20px;
 }
 </style>

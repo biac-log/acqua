@@ -18,6 +18,8 @@ Vue.config.keyCodes.f3 = 114;
 Vue.config.keyCodes.f5 = 116;
 Vue.config.keyCodes.del = 46;
 Vue.config.keyCodes.plus = 107;
+Vue.config.keyCodes.pageUp = 33;
+Vue.config.keyCodes.pageDown = 34;
 
 // Register global filter functions
 Object.keys(filters).forEach((key) => {

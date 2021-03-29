@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="visible">
+  <v-dialog v-model="visible" @keydown.34.prevent="pgDown" @keydown.33.prevent="pgUp">
     <v-toolbar color="primary" dark flat>
       <span>Période : {{ ecriture.periode }}</span>
       <span class="pl-5">Pièce : {{ `${ecriture.codeJournal}.${ecriture.codePiece}` }}</span>
@@ -18,6 +18,8 @@
           disable-sort
           class="elevation-1"
           dense
+          :items-per-page="20"
+          :page="page"
         >
           <template v-slot:[`item.pieceDesc`]="{ item }">
             <span class="text-end">{{
@@ -31,7 +33,7 @@
             </v-row>
           </template>
           <template v-slot:[`item.creditDebit`]="{ item }">
-            <v-row>
+            <v-row dense>
               <v-col cols="4" class="text-end">{{ item.codeMouvement == 'DB' ? item.mouvement : '' }}</v-col>
               <v-col cols="4" class="text-end">{{ item.codeMouvement == 'CR' ? item.mouvement : '' }}</v-col>
               <v-col cols="3" class="text-end">{{ item.libelleDevise }}</v-col>
@@ -59,6 +61,8 @@ export default class Ecriture extends Vue {
 
   private highlightExtrait!: number;
   private highlightVentilation!: number;
+
+  private page = 1;
 
   private headers = [
     { text: 'Date', value: 'dateDisplay' },
@@ -88,8 +92,17 @@ export default class Ecriture extends Vue {
       : '';
   }
 
+  private pgDown() {
+    this.page++;
+  }
+
+  private pgUp() {
+    this.page--;
+  }
+
   private closeDialog() {
     this.ecriture = new DetailEcriture();
+    this.page = 1;
     this.visible = false;
   }
 }
