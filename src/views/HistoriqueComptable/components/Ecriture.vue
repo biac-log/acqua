@@ -91,6 +91,7 @@ export default class Ecriture extends Vue {
       .finally(() => (this.isLoading = false));
   }
 
+  // Ajout d'une surbrillance pour mettre en avant l'imputation sélectionnée à l'écran précédent
   private highlightRow(item: ImputationDetail) {
     return item.codeLigneExtrait == this.highlightExtrait && item.codeLigneVentilation == this.highlightVentilation
       ? 'highlighted'

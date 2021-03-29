@@ -85,7 +85,7 @@
       </v-form>
     </v-card>
     <v-card class="mt-5" v-if="historique.imputations.length > 0 && mode == 'historique'">
-      <v-toolbar color="primary" dark flat>
+      <v-toolbar color="primary" dark flat dense>
         <v-row>
           <v-col cols="3"> Solde : {{ historique.solde.toComptaString() }} {{ historique.devise }} </v-col>
         </v-row>
@@ -211,6 +211,7 @@ export default class HistoriqueComptableIndex extends Vue {
     });
   }
 
+  // Changer le type de compte avec les touches correspondantes
   private changeType(event: KeyboardEvent) {
     if (['c', 'f', 'g', 'z'].includes(event.key)) {
       if ('z' == event.key) this.typeCompteSelected = new TypeCompte({ id: 'Z', libelle: 'Extra-comptable' });
@@ -219,6 +220,7 @@ export default class HistoriqueComptableIndex extends Vue {
     }
   }
 
+  // Définir le compte selon la méthode utilisée avec l'AutocompleteComptes
   private async compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
     if (!compte) {
       this.numeroCompte = '';
@@ -229,7 +231,7 @@ export default class HistoriqueComptableIndex extends Vue {
     ) {
       this.numeroCompte = compte;
       this.fromDate = '';
-      this.loadHistorique();
+      this.loadDatas();
     } else if (
       compte instanceof CompteGeneralSearch ||
       compte instanceof CompteSearch ||
@@ -237,7 +239,7 @@ export default class HistoriqueComptableIndex extends Vue {
     ) {
       this.numeroCompte = compte.numero.toString();
       this.fromDate = '';
-      this.loadHistorique();
+      this.loadDatas();
     }
   }
 
@@ -255,6 +257,7 @@ export default class HistoriqueComptableIndex extends Vue {
     });
   }
 
+  // Ouvre la modal pour afficher les détails de l'écriture
   private openEcriture(imputation: Imputation) {
     this.ecritureModal.open(
       imputation.codeJournal,
@@ -264,9 +267,12 @@ export default class HistoriqueComptableIndex extends Vue {
     );
   }
 
+  // Permette de charger les données seulement si le compte est bien défini
   get canLoadDatas() {
     return this.typeCompteSelected.id != '' && this.numeroCompte;
   }
+
+  // Charger les données en fonction du mode
   private loadDatas() {
     if (this.canLoadDatas) {
       if (this.mode == 'historique') {
@@ -304,6 +310,7 @@ export default class HistoriqueComptableIndex extends Vue {
     });
   }
 
+  // Changer le mode d'affichage
   private switchMode(mode: string) {
     this.mode = mode;
     this.loadDatas();
