@@ -20,10 +20,10 @@ export class LigneReport extends LigneReportDTO {
   }
 
   get soldeCompta() {
-    return this.solde.toComptaString(2, true);
+    return this.solde.montantNegatifString(2, true);
   }
   get soldeCumuleCompta() {
-    return this.soldeCumule.toComptaString(2, true);
+    return this.soldeCumule.montantNegatifString(2, true);
   }
   get debitCompta() {
     return this.debit.toComptaString(2, true);

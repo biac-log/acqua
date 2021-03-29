@@ -2,7 +2,7 @@ interface Number {
   toDecimalString(nbDecimal?: number): string;
   toIntString(): string;
   toComptaString(nbDecimal?: number, showZero?: boolean): string;
-  montantNegatifString(nbDecimal?: number): string;
+  montantNegatifString(nbDecimal?: number, showZero?: boolean): string;
   padStart(nbPad?: number): string;
 }
 
@@ -33,9 +33,10 @@ Number.prototype.toComptaString = function(nbDecimal = 2, showZero = false) {
   if (!this && !showZero) return '';
   else {
     if (+this >= 0)
-      return Intl.NumberFormat('fr-FR', { minimumFractionDigits: nbDecimal, maximumFractionDigits: nbDecimal }).format(
-        Math.abs(+this)
-      );
+      return Intl.NumberFormat('fr-FR', {
+        minimumFractionDigits: nbDecimal,
+        maximumFractionDigits: nbDecimal
+      }).format(Math.abs(+this)) + " ";
     else
       return `${Intl.NumberFormat('fr-FR', {
         minimumFractionDigits: nbDecimal,
@@ -44,9 +45,9 @@ Number.prototype.toComptaString = function(nbDecimal = 2, showZero = false) {
   }
 };
 
-Number.prototype.montantNegatifString = function(nbDecimal = 2) {
+Number.prototype.montantNegatifString = function(nbDecimal = 2, showZero = false) {
   if (!nbDecimal) nbDecimal = 2;
-  if (!this) return '';
+  if (!this && !showZero) return '';
   else {
     if (+this >= 0)
       return Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(+this));

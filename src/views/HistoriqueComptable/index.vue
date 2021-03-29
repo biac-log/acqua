@@ -197,9 +197,9 @@ export default class HistoriqueComptableIndex extends Vue {
     { text: ' ', value: 'periodePad' },
     { text: 'Solde', value: 'soldeCompta', align: 'end' },
     { text: 'Débit', value: 'debitCompta', align: 'end' },
-    { text: 'Débit Cumulé', value: 'debitCumuleCompta' },
+    { text: 'Débit Cumulé', value: 'debitCumuleCompta', align: 'end' },
     { text: 'Crédit', value: 'creditCompta', align: 'end' },
-    { text: 'Crédit Cumulé', value: 'creditCumuleCompta' },
+    { text: 'Crédit Cumulé', value: 'creditCumuleCompta', align: 'end' },
     { text: 'Solde Cumulé', value: 'soldeCumuleCompta', align: 'end' },
   ];
 
