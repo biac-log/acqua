@@ -36,8 +36,7 @@ export class ImputationDetail extends ImputationDetailDTO {
   }
 
   get reference() {
-    if (!this.refCodeJournal && !this.refCodePiece && !this.libelleCase) return '';
-    else if(this.libelleCase) return this.libelleCase;
+    if (!this.refCodeJournal && !this.refCodePiece) return '';
     else return `${this.refCodeJournal}.${this.refCodePiece}`;
   }
 
@@ -47,6 +46,6 @@ export class ImputationDetail extends ImputationDetailDTO {
 
   get case() {
     if(!this.numeroCase) return '';
-    else return this.numeroCase.padStart(3);
+    else return `${this.numeroCase.padStart(3)} - ${this.libelleCase}`;
   }
 }
