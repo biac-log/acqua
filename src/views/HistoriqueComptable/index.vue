@@ -10,25 +10,25 @@
     <v-card>
       <v-form ref="form" v-model="isSearchValid">
         <v-row align="start" justify="start" class="pl-5 pt-2 pb-2">
-          <v-col cols="12" xs="12" sm="6" lg="2">
-            <v-select
-              id="indexSearch"
-              ref="typesComptes"
-              autofocus
-              label="Type de compte"
-              outlined
-              required
-              :items="typesComptes"
-              v-model="typeCompteSelected"
-              return-object
-              item-text="libelle"
-              :rules="typesComptesRules"
-              @keyup="changeType"
-              @change="resetCompte"
-              hide-details
-            />
-          </v-col>
-          <v-col lg="2" class="pl-5">
+          <v-select
+            class="mt-3 ml-2"
+            style="max-width: 182px"
+            id="indexSearch"
+            ref="typesComptes"
+            autofocus
+            label="Type de compte"
+            outlined
+            required
+            :items="typesComptes"
+            v-model="typeCompteSelected"
+            return-object
+            item-text="libelle"
+            :rules="typesComptesRules"
+            @keyup="changeType"
+            @change="resetCompte"
+            hide-details
+          />
+          <div class="ml-5 mt-3" style="max-width: 345px">
             <AutocompleteComptesVue
               ref="compteComponent"
               :typeCompte.sync="typeCompteSelected.id"
@@ -39,8 +39,8 @@
               :rules="numeroCompteRules"
               hide-details
             />
-          </v-col>
-          <v-col lg="2">
+          </div>
+          <div style="max-width: 150px" class="mt-3 ml-5">
             <date-picker
               outlined
               label="A partir de"
@@ -50,9 +50,11 @@
               @change="loadDatas"
               hide-details
             />
-          </v-col>
-          <v-col lg="2">
+          </div>
+          <div class="mt-3 ml-2" style="max-width: 150px">
             <date-picker
+              style="max-width: 150px"
+              class="pt-3"
               outlined
               label="Jusqu'à"
               :date.sync="toDate"
@@ -61,7 +63,7 @@
               hide-details
               ref="toDateField"
             />
-          </v-col>
+          </div>
           <v-spacer />
           <v-col cols="2">
             <v-select
@@ -120,14 +122,28 @@
       </v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="!reportMensuel.isEmpty() && mode == 'reportMensuel'">
-      <v-toolbar color="primary" dark flat dense> Total mensuel -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar>
-      <v-data-table :items="reportMensuel" :headers="headersReport" :items-per-page="15" :page="page" dense></v-data-table>
+      <v-toolbar color="primary" dark flat dense>
+        Total mensuel -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar
+      >
+      <v-data-table
+        :items="reportMensuel"
+        :headers="headersReport"
+        :items-per-page="15"
+        :page="page"
+        dense
+      ></v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="!reportJournalier.isEmpty() && mode == 'reportJournalier'">
       <v-toolbar color="primary" dark flat dense>
         Total journalier -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar
       >
-      <v-data-table :items="reportJournalier" :headers="headersReport" :items-per-page="15" :page="page" dense></v-data-table>
+      <v-data-table
+        :items="reportJournalier"
+        :headers="headersReport"
+        :items-per-page="15"
+        :page="page"
+        dense
+      ></v-data-table>
     </v-card>
     <ecriture-vue ref="ecritureModal" />
   </v-container>
