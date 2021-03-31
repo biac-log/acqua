@@ -120,12 +120,12 @@
       </v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="!reportMensuel.isEmpty() && mode == 'reportMensuel'">
-      <v-toolbar color="primary" dark flat dense> Report mensuel -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar>
+      <v-toolbar color="primary" dark flat dense> Total mensuel -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar>
       <v-data-table :items="reportMensuel" :headers="headersReport" :items-per-page="15" :page="page" dense></v-data-table>
     </v-card>
     <v-card class="mt-5" v-if="!reportJournalier.isEmpty() && mode == 'reportJournalier'">
       <v-toolbar color="primary" dark flat dense>
-        Report journalier -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar
+        Total journalier -- Depuis le {{ fromDate }} jusqu'au {{ toDate }}</v-toolbar
       >
       <v-data-table :items="reportJournalier" :headers="headersReport" :items-per-page="15" :page="page" dense></v-data-table>
     </v-card>
