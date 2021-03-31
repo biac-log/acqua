@@ -1,10 +1,11 @@
 <template>
-  <v-dialog v-model="visible" @keydown.34.prevent="pgDown" @keydown.33.prevent="pgUp">
+  <v-dialog v-model="visible" @keydown.34.prevent="pgDown" @keydown.33.prevent="pgUp" @click:outside="closeDialog">
     <v-toolbar color="primary" dark flat>
       <span>Période : {{ ecriture.periode }}</span>
       <span class="pl-5">Pièce : {{ `${ecriture.codeJournal}.${ecriture.codePiece}` }}</span>
       <span class="pl-5">{{ ecriture.periodeDesc }}</span>
       <v-spacer />
+      <v-btn @click="jumpToHighlight" color="warning"> Afficher l'imputation </v-btn>
       <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
         <v-icon>mdi-close</v-icon>
       </v-btn>
@@ -19,8 +20,8 @@
           disable-sort
           class="elevation-1"
           dense
-          :items-per-page="20"
-          :page="page"
+          :items-per-page.sync="itemsPerPage"
+          :page.sync="page"
         >
           <template v-slot:[`item.pieceDesc`]="{ item }">
             <span class="text-end">{{
@@ -64,6 +65,7 @@ export default class Ecriture extends Vue {
   private highlightVentilation!: number;
 
   private page = 1;
+  private itemsPerPage = 20;
   private isLoading = false;
 
   private headers = [
@@ -77,16 +79,16 @@ export default class Ecriture extends Vue {
     { text: 'Référence', value: 'reference' },
   ];
 
-  public open(journal: number, piece: number, codeExtrait: number, codeVentilation: number) {
+  public async open(journal: number, piece: number, codeExtrait: number, codeVentilation: number) {
     this.visible = true;
     this.highlightExtrait = codeExtrait;
     this.highlightVentilation = codeVentilation;
-    this.loadEcriture(journal, piece);
+    await this.loadEcriture(journal, piece);
   }
 
-  private loadEcriture(journal: number, piece: number) {
+  private async loadEcriture(journal: number, piece: number) {
     this.isLoading = true;
-    HistoriqueComptableApi.getDetailEcriture(journal, piece)
+    await HistoriqueComptableApi.getDetailEcriture(journal, piece)
       .then((resp) => (this.ecriture = resp))
       .finally(() => (this.isLoading = false));
   }
@@ -106,9 +108,19 @@ export default class Ecriture extends Vue {
     this.page--;
   }
 
+  private jumpToHighlight() {
+    const highlight =
+      this.ecriture.imputations.find(
+        (i) => i.codeLigneExtrait == this.highlightExtrait && i.codeLigneVentilation == this.highlightVentilation
+      ) ?? new ImputationDetail();
+    const highlightIndex = this.ecriture.imputations.indexOf(highlight);
+    const pageToJump = highlightIndex / this.itemsPerPage + 1;
+    this.page = pageToJump;
+  }
+
   private closeDialog() {
     this.ecriture = new DetailEcriture();
-    this.page = 1;
+    this.page = 0;
     this.visible = false;
   }
 }
