@@ -45,11 +45,37 @@ export class Imputation extends ImputationDTO {
   }
 
   get chiffreAffaire() {
-    if(this.chiffreDAffaire) return `${this.chiffreDAffaire.toComptaString()}   ${this.cumulTva.toComptaString(2, true)}`
+    if (this.chiffreDAffaire)
+      return `${this.chiffreDAffaire.toComptaString()}   ${this.cumulTva.toComptaString(2, true)}`;
     else return '';
   }
 
   get mouvement() {
     return this.mouvementBase.toComptaString();
+  }
+
+  get operation() {
+    let abbr = '';
+    switch (this.codeOperation) {
+      case 3:
+        abbr = 'Facture';
+        break;
+      case 5:
+        abbr = 'Paiement';
+        break;
+      case 6:
+        abbr = 'Acompte';
+        break;
+      case 7:
+        abbr = 'Note de crédit';
+        break;
+      case 8:
+        abbr = 'Note de crédit';
+        break;
+      default:
+        console.log('invalid code');
+        break;
+    }
+    return abbr;
   }
 }

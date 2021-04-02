@@ -279,7 +279,8 @@ export default class HistoriqueComptableIndex extends Vue {
       imputation.codeJournal,
       imputation.numeroPiece,
       imputation.codeLigneExtrait,
-      imputation.codeLigneVentilation
+      imputation.codeLigneVentilation,
+      imputation.operation,
     );
   }
 

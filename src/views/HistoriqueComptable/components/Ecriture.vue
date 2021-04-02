@@ -1,8 +1,7 @@
 <template>
   <v-dialog v-model="visible" @keydown.34.prevent="pgDown" @keydown.33.prevent="pgUp" @click:outside="closeDialog">
     <v-toolbar color="primary" dark flat>
-      <span>Période : {{ ecriture.periode }}</span>
-      <span class="pl-5">Pièce : {{ `${ecriture.codeJournal}.${ecriture.codePiece}` }}</span>
+      <span class="pl-5">{{ operation }} {{ `${ecriture.codeJournal}.${ecriture.codePiece}` }}</span>
       <span class="pl-5">{{ ecriture.periodeDesc }}</span>
       <v-spacer />
       <v-btn @click="jumpToHighlight" color="warning"> Afficher l'imputation </v-btn>
@@ -64,6 +63,8 @@ export default class Ecriture extends Vue {
   private highlightExtrait!: number;
   private highlightVentilation!: number;
 
+  private operation = '';
+
   private page = 1;
   private itemsPerPage = 20;
   private isLoading = false;
@@ -79,10 +80,11 @@ export default class Ecriture extends Vue {
     { text: 'Référence', value: 'reference' },
   ];
 
-  public async open(journal: number, piece: number, codeExtrait: number, codeVentilation: number) {
+  public async open(journal: number, piece: number, codeExtrait: number, codeVentilation: number, operation: string) {
     this.visible = true;
     this.highlightExtrait = codeExtrait;
     this.highlightVentilation = codeVentilation;
+    this.operation = operation;
     await this.loadEcriture(journal, piece);
   }
 
@@ -121,6 +123,7 @@ export default class Ecriture extends Vue {
   private closeDialog() {
     this.ecriture = new DetailEcriture();
     this.page = 0;
+    this.operation = '';
     this.visible = false;
   }
 }
