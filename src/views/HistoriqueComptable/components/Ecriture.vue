@@ -2,12 +2,12 @@
   <v-dialog v-model="visible" @keydown.34.prevent="pgDown" @keydown.33.prevent="pgUp" @click:outside="closeDialog">
     <v-toolbar color="primary" dark flat>
       <span class="pl-5">{{ operation }} {{ `${ecriture.codeJournal}.${ecriture.codePiece}` }}</span>
-      <span class="pl-5">{{ ecriture.periodeDesc }}</span>
+      <span class="pl-5">{{ ecriture.periodeDesc }} -- {{ datePiece }}</span>
       <v-spacer />
-      <v-btn v-if="operation == 'Paiement'" @click="toggleVentilation">{{
+      <v-btn v-if="operation == 'Paiement'" @click="toggleVentilation" class="mr-2" color="success">{{
         displayVentilation ? 'Cacher la ventilation' : 'Afficher la ventilation'
       }}</v-btn>
-      <v-btn @click="jumpToHighlight" color="warning"> Afficher l'imputation </v-btn>
+      <v-btn @click="jumpToHighlight" color="warning"> Aller à l'imputation </v-btn>
       <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
         <v-icon>mdi-close</v-icon>
       </v-btn>
@@ -28,11 +28,10 @@
           dense
           :items-per-page.sync="itemsPerPage"
           :page.sync="page"
+          height="672px"
         >
-          <template v-slot:[`item.pieceDesc`]="{ item }">
-            <span class="text-end">{{
-              ecriture.imputations.indexOf(item) > 0 ? item.pieceDesc : item.pieceDescEntete
-            }}</span>
+          <template v-slot:[`item.extrait`]="{ item }">
+            <span class="text-end">{{ displayVentilation ? item.extraitVentilationPadded : item.extraitPadded }}</span>
           </template>
           <template v-slot:[`header.creditDebit`]="">
             <v-row dense>
@@ -79,8 +78,7 @@ export default class Ecriture extends Vue {
   private displayVentilation = false;
 
   private headers = [
-    { text: 'Date', value: 'dateDisplay' },
-    { text: 'Pièce', value: 'pieceDesc', align: 'end' },
+    { text: 'Extrait', value: 'extrait' },
     { text: 'Compte', value: 'numeroCompte' },
     { text: 'Nom', value: 'nomCompte' },
     { text: 'Libellé', value: 'libellePiece' },
@@ -88,6 +86,10 @@ export default class Ecriture extends Vue {
     { text: 'TVA', value: 'case' },
     { text: 'Référence', value: 'reference' },
   ];
+
+  get datePiece() {
+    return this.ecriture.imputations[0]?.dateDisplay ?? "";
+  }
 
   public async open(journal: number, piece: number, codeExtrait: number, codeVentilation: number, operation: string) {
     this.visible = true;
@@ -148,7 +150,7 @@ export default class Ecriture extends Vue {
 .highlighted {
   background-color: lightgrey;
 }
-.max-height-95 {
-  max-height: 95%;
+.height-90 {
+  height: 90%;
 }
 </style>

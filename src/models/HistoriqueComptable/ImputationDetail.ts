@@ -30,6 +30,14 @@ export class ImputationDetail extends ImputationDetailDTO {
   get pieceDescEntete() {
     return `${this.codeJournal}.${this.codePiece}/${this.codeLigneExtrait.padStart(2)} ${this.codeLigneVentilation.padStart(3)}`;
   }
+
+  get extraitPadded() {
+    return this.codeLigneExtrait.padStart(2);
+  }
+
+  get extraitVentilationPadded() {
+    return `${this.codeLigneExtrait.padStart(2)}.${this.codeLigneVentilation.padStart(3)}`;
+  }
   
   get pieceDesc() {
     return `${this.codeLigneExtrait.padStart(2)}.${this.codeLigneVentilation.padStart(3)}`;
