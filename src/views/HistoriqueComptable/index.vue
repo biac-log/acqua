@@ -47,7 +47,6 @@
               :date.sync="fromDate"
               :rules="fromDateRules"
               ref="fromDateField"
-              @change="loadDatas"
               hide-details
             />
           </div>
@@ -59,7 +58,6 @@
               label="Jusqu'à"
               :date.sync="toDate"
               :rules="toDateRules"
-              @change="loadDatas"
               hide-details
               ref="toDateField"
             />
@@ -74,7 +72,6 @@
               item-text="text"
               item-value="value"
               outlined
-              @change="loadDatas"
               hide-details
             >
               <template v-slot:item="{ item }">
@@ -180,15 +177,35 @@ export default class HistoriqueComptableIndex extends Vue {
 
   private isSearchValid = false;
   private typesComptes: TypeCompte[] = [];
-  private typeCompteSelected: TypeCompte = new TypeCompte();
+  private get typeCompteSelected(): TypeCompte {
+    return HistoriqueModule.typeCompteSelected;
+  }
+  private set typeCompteSelected(typeCompte: TypeCompte) {
+    HistoriqueModule.setTypeCompte(typeCompte);
+  }
   private typesComptesRules: any = [(v: string) => !!v || 'Type obligatoire'];
 
-  private numeroCompte = '';
+  private get numeroCompte() {
+    return HistoriqueModule.numeroCompte;
+  }
+  private set numeroCompte(numero: string) {
+    HistoriqueModule.setNumeroCompte(numero);
+  }
   private numeroCompteRules: any = [(v: string) => !!v || 'Numéro obligatoire'];
 
-  private fromDate = '';
+  private get fromDate() {
+    return HistoriqueModule.fromDate;
+  }
+  private set fromDate(date: string) {
+    HistoriqueModule.setFromDate(date);
+  }
   private fromDateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
-  private toDate = '';
+  private get toDate() {
+    return HistoriqueModule.toDate;
+  }
+  private set toDate(date: string) {
+    HistoriqueModule.setToDate(date);
+  }
   private toDateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
 
   private get historique() {
@@ -197,7 +214,12 @@ export default class HistoriqueComptableIndex extends Vue {
   private reportMensuel: LigneReport[] = [];
   private reportJournalier: LigneReport[] = [];
 
-  private mode = 'historique';
+  private get mode() {
+    return HistoriqueModule.mode;
+  }
+  private set mode(mode: string) {
+    HistoriqueModule.setMode(mode);
+  }
   private modes = [
     { text: 'Historique', value: 'historique', shortcut: 'F2' },
     { text: 'Report mensuel', value: 'reportMensuel', shortcut: 'F3' },
@@ -250,29 +272,21 @@ export default class HistoriqueComptableIndex extends Vue {
       compte.length == 8
     ) {
       this.numeroCompte = compte;
-      this.fromDate = '';
-      this.loadDatas();
+      HistoriqueModule.setFromDate('');
     } else if (
       compte instanceof CompteGeneralSearch ||
       compte instanceof CompteSearch ||
       compte instanceof CompteDeTier
     ) {
       this.numeroCompte = compte.numero.toString();
-      this.fromDate = '';
-      this.loadDatas();
+      HistoriqueModule.setFromDate('');
     }
   }
 
   private async loadHistorique() {
-    
-    const input: HistoriqueInput = {
-      typeCompte: this.typeCompteSelected.id,
-      numeroCompte: +this.numeroCompte,
-      startDate: this.fromDate,
-      endDate: this.toDate,
-    };
-
-    await HistoriqueModule.fetchHistorique(input);
+    await HistoriqueModule.fetchHistorique();
+    this.fromDateField.initFromString(this.fromDate);
+    this.toDateField.initFromString(this.toDate);
   }
 
   // Ouvre la modal pour afficher les détails de l'écriture
@@ -291,49 +305,27 @@ export default class HistoriqueComptableIndex extends Vue {
     return this.typeCompteSelected.id != '' && this.numeroCompte;
   }
 
-  // Charger les données en fonction du mode
-  private loadDatas() {
-    if (this.canLoadDatas) {
-      if (this.mode == 'historique') {
-        this.loadHistorique();
-      } else if (this.mode == 'reportMensuel') {
-        this.loadReportMensuel();
-      } else if (this.mode == 'reportJournalier') {
-        this.loadReportJournalier();
-      } else {
-        console.log('Invalid mode');
-      }
-      this.page = 1;
-    }
-  }
+  // // Charger les données en fonction du mode
+  // private loadDatas() {
+  //   if (this.canLoadDatas) {
+  //     if (this.mode == 'historique') {
+  //       this.loadHistorique();
+  //     } else if (this.mode == 'reportMensuel') {
+  //       this.loadReportMensuel();
+  //     } else if (this.mode == 'reportJournalier') {
+  //       this.loadReportJournalier();
+  //     } else {
+  //       console.log('Invalid mode');
+  //     }
+  //     this.page = 1;
+  //   }
+  // }
 
-  private async loadReportMensuel() {
-    HistoriqueComptableApi.getReportMensuel(
-      this.typeCompteSelected.id,
-      +this.numeroCompte,
-      this.fromDate,
-      this.toDate
-    ).then((resp) => {
-      this.reportMensuel = resp;
-    });
-  }
-
-  private async loadReportJournalier() {
-    HistoriqueComptableApi.getReportJournalier(
-      this.typeCompteSelected.id,
-      +this.numeroCompte,
-      this.fromDate,
-      this.toDate
-    ).then((resp) => {
-      this.reportJournalier = resp;
-    });
-  }
-
-  // Changer le mode d'affichage
-  private switchMode(mode: string) {
-    this.mode = mode;
-    this.loadDatas();
-  }
+  // // Changer le mode d'affichage
+  // private switchMode(mode: string) {
+  //   this.mode = mode;
+  //   this.loadDatas();
+  // }
 
   private resetCompte() {
     this.compteComponent.resetCompte();
