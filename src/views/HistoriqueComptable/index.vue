@@ -164,6 +164,8 @@ import { HistoriqueComptable } from '@/models/HistoriqueComptable/HistoriqueComp
 import EcritureVue from '@/views/HistoriqueComptable/components/Ecriture.vue';
 import { Imputation } from '@/models/HistoriqueComptable/Imputation';
 import { LigneReport } from '@/models/HistoriqueComptable/LigneReport';
+import { HistoriqueInput } from '@/models/HistoriqueComptable/HistoriqueInput';
+import { HistoriqueModule } from '@/store/modules/historiqueComptable';
 
 @Component({
   name: 'HistoriqueComptableIndex',
@@ -189,7 +191,9 @@ export default class HistoriqueComptableIndex extends Vue {
   private toDate = '';
   private toDateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
 
-  private historique: HistoriqueComptable = new HistoriqueComptable();
+  private get historique() {
+    return HistoriqueModule.historique;
+  }
   private reportMensuel: LigneReport[] = [];
   private reportJournalier: LigneReport[] = [];
 
@@ -260,17 +264,15 @@ export default class HistoriqueComptableIndex extends Vue {
   }
 
   private async loadHistorique() {
-    this.historique = new HistoriqueComptable();
-    await HistoriqueComptableApi.getHistorique(
-      this.typeCompteSelected.id,
-      +this.numeroCompte,
-      this.fromDate,
-      this.toDate
-    ).then((historique) => {
-      this.historique = historique;
-      this.fromDateField.initFromString(historique.fromDate.toString());
-      this.toDateField.initFromString(historique.toDate.toString());
-    });
+    
+    const input: HistoriqueInput = {
+      typeCompte: this.typeCompteSelected.id,
+      numeroCompte: +this.numeroCompte,
+      startDate: this.fromDate,
+      endDate: this.toDate,
+    };
+
+    await HistoriqueModule.fetchHistorique(input);
   }
 
   // Ouvre la modal pour afficher les détails de l'écriture
@@ -280,7 +282,7 @@ export default class HistoriqueComptableIndex extends Vue {
       imputation.numeroPiece,
       imputation.codeLigneExtrait,
       imputation.codeLigneVentilation,
-      imputation.operation,
+      imputation.operation
     );
   }
 
