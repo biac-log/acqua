@@ -28,7 +28,7 @@
             @change="resetCompte"
             hide-details
           />
-          <div class="ml-5 mt-3" style="max-width: 345px">
+          <div class="ml-5 mt-3" style="width: 345px">
             <AutocompleteComptesVue
               ref="compteComponent"
               :typeCompte.sync="typeCompteSelected.id"
