@@ -126,6 +126,7 @@ export default class Ecriture extends Vue {
       ) ?? new ImputationDetail();
     const highlightIndex = this.ecriture.imputations.indexOf(highlight);
     const pageToJump = highlightIndex / this.itemsPerPage + 1;
+    this.displayVentilation = true;
     this.page = pageToJump;
   }
 
@@ -138,6 +139,7 @@ export default class Ecriture extends Vue {
     this.page = 0;
     this.operation = '';
     this.visible = false;
+    this.displayVentilation = false;
   }
 }
 </script>
