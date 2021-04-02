@@ -32,7 +32,7 @@ export class ImputationDetail extends ImputationDetailDTO {
   }
   
   get pieceDesc() {
-    return `${this.codeLigneExtrait.padStart(2)} ${this.codeLigneVentilation.padStart(3)}`;
+    return `${this.codeLigneExtrait.padStart(2)}.${this.codeLigneVentilation.padStart(3)}`;
   }
 
   get reference() {

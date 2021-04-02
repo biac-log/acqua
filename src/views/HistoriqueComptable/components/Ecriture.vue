@@ -4,6 +4,9 @@
       <span class="pl-5">{{ operation }} {{ `${ecriture.codeJournal}.${ecriture.codePiece}` }}</span>
       <span class="pl-5">{{ ecriture.periodeDesc }}</span>
       <v-spacer />
+      <v-btn v-if="operation == 'Paiement'" @click="toggleVentilation">{{
+        displayVentilation ? 'Cacher la ventilation' : 'Afficher la ventilation'
+      }}</v-btn>
       <v-btn @click="jumpToHighlight" color="warning"> Afficher l'imputation </v-btn>
       <v-btn ref="buttonClose" class="ml-10" icon color="white" @click="closeDialog()">
         <v-icon>mdi-close</v-icon>
@@ -13,7 +16,11 @@
       <v-progress-linear :active="isLoading" indeterminate top color="primary accent-4" />
       <v-card-text>
         <v-data-table
-          :items="ecriture.imputations"
+          :items="
+            operation == 'Paiement' && !displayVentilation
+              ? ecriture.imputations.filter((i) => i.codeLigneVentilation == 0)
+              : ecriture.imputations
+          "
           :headers="headers"
           :item-class="highlightRow"
           disable-sort
@@ -69,6 +76,8 @@ export default class Ecriture extends Vue {
   private itemsPerPage = 20;
   private isLoading = false;
 
+  private displayVentilation = false;
+
   private headers = [
     { text: 'Date', value: 'dateDisplay' },
     { text: 'Pièce', value: 'pieceDesc', align: 'end' },
@@ -118,6 +127,10 @@ export default class Ecriture extends Vue {
     const highlightIndex = this.ecriture.imputations.indexOf(highlight);
     const pageToJump = highlightIndex / this.itemsPerPage + 1;
     this.page = pageToJump;
+  }
+
+  private toggleVentilation() {
+    this.displayVentilation = !this.displayVentilation;
   }
 
   private closeDialog() {
