@@ -31,7 +31,7 @@
           height="672px"
         >
           <template v-slot:[`item.extrait`]="{ item }">
-            <span class="text-end">{{ displayVentilation ? item.extraitVentilationPadded : item.extraitPadded }}</span>
+            <span class="text-end">{{ operation == 'Paiement' && !displayVentilation ? item.extraitPadded : item.extraitVentilationPadded }}</span>
           </template>
           <template v-slot:[`header.creditDebit`]="">
             <v-row dense>
