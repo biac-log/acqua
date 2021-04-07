@@ -25,6 +25,7 @@
         validate-on-blur
         @update:error="validateField"
         :error-messages="errorMessages"
+        @keydown.enter.prevent="blur"
       >
         <template v-slot:prepend-inner>
           <v-btn
@@ -107,6 +108,7 @@ export default class extends Vue {
       this.dateFormatted = '';
       this.syncedDate = null;
     }
+    this.$emit('change', val ?? '');
   }
 
   @Watch('syncedDate', { deep: true })
@@ -138,6 +140,10 @@ export default class extends Vue {
       this.focus();
       return false;
     }
+  }
+
+  public initFromString(date: string) {
+    this.syncedDate = new DateTime(date);
   }
 }
 </script>

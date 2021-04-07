@@ -2,6 +2,7 @@ import { CompteSearchDTO, CompteSearch } from '@/models/Compte/CompteSearch';
 import { CompteGeneralSearchDTO, CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import { CompteDeTierDTO, CompteDeTier } from '@/models/Compte/CompteDeTier';
 import api from '@/api/AxiosApi';
+import { TypeCompte, TypeCompteDTO } from '@/models/Compte/TypeCompte';
 
 export default abstract class CompteApi {
   static async getComptesTiers(type: string): Promise<CompteSearch[]> {
@@ -62,5 +63,10 @@ export default abstract class CompteApi {
       `Compte/GetComptesByNumero?typeCompte=${type}&startNumero=${numero}&nbrElement=${nbrElement}`
     );
     return response.data.map((CompteSearchDTO) => new CompteGeneralSearch(CompteSearchDTO));
+  }
+
+  static async getTypesComptes(): Promise<TypeCompte[]> {
+    const response = await api.AcQuaCore.get<TypeCompteDTO[]>(`/Compte/GetTypesComptes`);
+    return response.data.map((TypeCompteDTO) => new TypeCompte(TypeCompteDTO));
   }
 }
