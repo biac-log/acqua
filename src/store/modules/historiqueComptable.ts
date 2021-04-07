@@ -30,6 +30,11 @@ class HistoriqueMod extends VuexModule implements IHistoriqueState {
   /** Mutations  **/
 
   @Mutation
+  private setNumeroCompte(numero: string) {
+    this.numeroCompte = numero;
+  }
+
+  @Mutation
   private setHistorique(historique: HistoriqueComptable) {
     this.historique = historique;
   }
@@ -40,21 +45,23 @@ class HistoriqueMod extends VuexModule implements IHistoriqueState {
   }
 
   @Mutation
-  public setFromDate(date: string) {
+  public setReportMensuel(report: LigneReport[]) {
+    this.reportMensuel = report;
+  }
+
+  @Mutation
+  public setReportJournalier(report: LigneReport[]) {
+    this.reportJournalier = report;
+  }
+
+  @Mutation
+  private setFromDate(date: string) {
     this.fromDate = date;
-    this.loadDatas();
   }
 
   @Mutation
-  public setToDate(date: string) {
+  private setToDate(date: string) {
     this.toDate = date;
-    this.loadDatas();
-  }
-
-  @Mutation
-  public setNumeroCompte(numero: string) {
-    this.numeroCompte = numero;
-    if (numero) this.loadDatas();
   }
 
   @Mutation
@@ -65,17 +72,6 @@ class HistoriqueMod extends VuexModule implements IHistoriqueState {
   @Mutation
   public setMode(mode: string) {
     this.mode = mode;
-    this.loadDatas();
-  }
-
-  @Mutation
-  public setReportMensuel(report: LigneReport[]) {
-    this.reportMensuel = report;
-  }
-
-  @Mutation
-  public setReportJournalier(report: LigneReport[]) {
-    this.reportJournalier = report;
   }
 
   /** Actions */
@@ -89,7 +85,7 @@ class HistoriqueMod extends VuexModule implements IHistoriqueState {
     };
     this.resetHistorique();
     const historique = await HistoriqueComptableApi.getHistorique(input);
-
+    console.log(historique.fromDate.toString());
     this.setFromDate(historique.fromDate.toString());
     this.setToDate(historique.toDate.toString());
     this.setHistorique(historique);
@@ -119,13 +115,37 @@ class HistoriqueMod extends VuexModule implements IHistoriqueState {
     this.setReportJournalier(reportJournalier);
   }
 
+  @Action({ rawError: true })
+  public changeFromDate(date: string) {
+    this.changeFromDate(date);
+    // this.loadDatas();
+  }
+
+  @Action({ rawError: true })
+  public changeToDate(date: string) {
+    this.changeToDate(date);
+    // this.loadDatas();
+  }
+
+  @Action({ rawError: true })
+  public changeNumeroCompte(numero: string) {
+    this.setNumeroCompte(numero);
+    if (numero) this.loadDatas();
+  }
+
+  @Action({ rawError: true })
+  public changeMode(mode: string) {
+    this.setMode(mode);
+    this.loadDatas();
+  }
+
   // /** Getters */
 
   private get canLoadDatas() {
     return this.typeCompteSelected.id != '' && this.numeroCompte;
   }
 
-	@Action
+  @Action
   async loadDatas() {
     if (this.canLoadDatas) {
       if (this.mode == 'historique') {

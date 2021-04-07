@@ -163,6 +163,7 @@ import { Imputation } from '@/models/HistoriqueComptable/Imputation';
 import { LigneReport } from '@/models/HistoriqueComptable/LigneReport';
 import { HistoriqueInput } from '@/models/HistoriqueComptable/HistoriqueInput';
 import { HistoriqueModule } from '@/store/modules/historiqueComptable';
+import { mapActions, mapGetters } from 'vuex';
 
 @Component({
   name: 'HistoriqueComptableIndex',
@@ -189,7 +190,7 @@ export default class HistoriqueComptableIndex extends Vue {
     return HistoriqueModule.numeroCompte;
   }
   private set numeroCompte(numero: string) {
-    HistoriqueModule.setNumeroCompte(numero);
+    HistoriqueModule.changeNumeroCompte(numero);
   }
   private numeroCompteRules: any = [(v: string) => !!v || 'Numéro obligatoire'];
 
@@ -197,14 +198,14 @@ export default class HistoriqueComptableIndex extends Vue {
     return HistoriqueModule.fromDate;
   }
   private set fromDate(date: string) {
-    HistoriqueModule.setFromDate(date);
+    HistoriqueModule.changeFromDate(date);
   }
   private fromDateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
   private get toDate() {
     return HistoriqueModule.toDate;
   }
   private set toDate(date: string) {
-    HistoriqueModule.setToDate(date);
+    HistoriqueModule.changeToDate(date);
   }
   private toDateRules: any = [(v: string) => DateTime.isValid(v) || 'Date invalide'];
 
@@ -272,19 +273,20 @@ export default class HistoriqueComptableIndex extends Vue {
       compte.length == 8
     ) {
       this.numeroCompte = compte;
-      HistoriqueModule.setFromDate('');
+      HistoriqueModule.changeFromDate('');
     } else if (
       compte instanceof CompteGeneralSearch ||
       compte instanceof CompteSearch ||
       compte instanceof CompteDeTier
     ) {
       this.numeroCompte = compte.numero.toString();
-      HistoriqueModule.setFromDate('');
+      HistoriqueModule.changeFromDate('');
     }
   }
 
   private async loadHistorique() {
     await HistoriqueModule.fetchHistorique();
+    console.log(this.fromDate);
     this.fromDateField.initFromString(this.fromDate);
     this.toDateField.initFromString(this.toDate);
   }
@@ -299,33 +301,6 @@ export default class HistoriqueComptableIndex extends Vue {
       imputation.operation
     );
   }
-
-  // Permette de charger les données seulement si le compte est bien défini
-  get canLoadDatas() {
-    return this.typeCompteSelected.id != '' && this.numeroCompte;
-  }
-
-  // // Charger les données en fonction du mode
-  // private loadDatas() {
-  //   if (this.canLoadDatas) {
-  //     if (this.mode == 'historique') {
-  //       this.loadHistorique();
-  //     } else if (this.mode == 'reportMensuel') {
-  //       this.loadReportMensuel();
-  //     } else if (this.mode == 'reportJournalier') {
-  //       this.loadReportJournalier();
-  //     } else {
-  //       console.log('Invalid mode');
-  //     }
-  //     this.page = 1;
-  //   }
-  // }
-
-  // // Changer le mode d'affichage
-  // private switchMode(mode: string) {
-  //   this.mode = mode;
-  //   this.loadDatas();
-  // }
 
   private resetCompte() {
     this.compteComponent.resetCompte();
