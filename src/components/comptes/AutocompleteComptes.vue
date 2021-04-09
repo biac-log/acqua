@@ -174,7 +174,7 @@ export default class AutocompleteComptes extends Vue {
     try {
       this.autocompleteLoading = true;
       if (matchCode && matchCode.isInt() && this._typeCompte == 'G') {
-        this.comptesSearch = await CompteApi.autocompleteCompteByNumero(this._typeCompte, matchCode, 5);
+        this.comptesSearch = await CompteApi.autocompleteCompteByNumero(this._typeCompte, matchCode, 10);
       } else if (matchCode) {
         if (this._typeCompte == 'F' || this._typeCompte == 'C') {
           this.comptesSearch = await CompteApi.searchCompteDeTier(this._typeCompte, matchCode.toUpperCase(), 5);
