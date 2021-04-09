@@ -543,7 +543,6 @@ export default class ImputationVue extends Vue {
     this.libelle = previousLibelle;
       this.$nextTick(() => {
         const element = document.getElementById('validateButton');
-        console.log('element', element);
         element?.scrollIntoView();
         this.firstElement?.focus();
       });
@@ -578,7 +577,7 @@ export default class ImputationVue extends Vue {
     this.reference = imputation.libelleReference;
     this.referenceJournal = imputation.referenceJournal;
     this.referencePiece = imputation.referencePiece;
-    this.dateEcheance = imputation.dateEcheanceDate;
+    this.dateEcheance = this.isAdd ? null : imputation.dateEcheanceDate;
     this.chida = imputation.chida.toDecimalString();
     this.escompte = imputation.escompte.toDecimalString();
     this.montantTVA = imputation.montantTVA.toDecimalString();
@@ -752,9 +751,15 @@ export default class ImputationVue extends Vue {
     this.referencePiece = element.numeroPiece;
   }
 
+  private get dateEcheanceIsNeeded(){
+    if(!['C','F'].includes(this.typesComptesSelected.id)) return false
+    else return false;
+  }
+
   private validateDateEcheance(date: string): boolean {
     const dateTime = new DateTime(date);
-    return dateTime.isBetween(this.periodeComptable.dateDebut, this.periodeComptable.dateFin);
+    if(this.dateEcheanceIsNeeded) return dateTime.isSameOrAfter(this.datePiece);
+    else return true;
   }
 
   private async loadCaseTvaAsync() {
