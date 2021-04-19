@@ -2,13 +2,13 @@
   <v-container
     fluid
     @keydown.107.prevent="openPieceComptable()"
-    @keydown.page-up="nextPage()"
-    @keydown.page-down="previousPage()"
+    @keydown.page-down="nextPage()"
+    @keydown.page-up="previousPage()"
   >
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
-          <v-col cols="12" xs="12" md="4" lg="2">
+          <v-col cols="12" xs="12" sm="6" md="6" lg="2">
             <v-select
               autofocus
               label="Sélection de la période"
@@ -25,7 +25,7 @@
               @change="loadPiecesComptables"
             ></v-select>
           </v-col>
-          <v-col cols="12" xs="12" md="6" lg="3">
+          <v-col cols="12" xs="12" sm="6" md="6" lg="3">
             <v-select
               v-model="journalSelected"
               :items="journaux"
@@ -34,7 +34,7 @@
               :loading="journauxIsLoading"
               item-text="fullLibelle"
               item-value="numero"
-              :hint="`Devise ${journalSelected.devise} - Dernière pièce ${journalSelected.numeroDernierePiece}`"
+              :hint="journalSelected.description"
               return-object
               persistent-hint
               @change="loadPiecesComptables"
@@ -48,33 +48,38 @@
     </v-card>
     <v-card class="mt-5">
       <v-card-title>
-        Pièces comptables
-        <v-tooltip top open-delay="500">
-          <template v-slot:activator="{ on }">
-            <v-btn
-              ref="btnAdd"
-              color="warning"
-              small
-              fab
-              class="ml-5"
-              :disabled="!searchIsValid"
-              @click="openPieceComptable()"
-              v-on="on"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </template>
-          <span>Créer une nouvelle pièce <span class="shortcutTooltip">+</span></span>
-        </v-tooltip>
-        <v-spacer></v-spacer>
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Rechercher"
-          single-line
-          hide-details
-          @keydown.enter="loadPiecesComptables()"
-        ></v-text-field>
+        <v-col cols="8">
+          Pièces comptables
+          <v-tooltip top open-delay="500">
+            <template v-slot:activator="{ on }">
+              <v-btn
+                ref="btnAdd"
+                color="warning"
+                small
+                fab
+                class="ml-5"
+                :disabled="!searchIsValid"
+                @click="openPieceComptable()"
+                v-on="on"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </template>
+            <span>Créer une nouvelle pièce <span class="shortcutTooltip">+</span></span>
+          </v-tooltip>
+        </v-col>
+        <v-col cols="4">
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Rechercher"
+            single-line
+            hide-details
+            @keydown.enter="loadPiecesComptables()"
+            id="indexSearch"
+            outlined
+          ></v-text-field>
+        </v-col>
       </v-card-title>
       <v-data-table
         id="dataTable"
@@ -112,7 +117,9 @@
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
-      <v-btn icon dark @click="snackbar = false"><v-icon>mdi-close</v-icon></v-btn>
+      <template v-slot:action="{ attrs }">
+        <v-btn icon dark @click="snackbar = false" v-bind="attrs"><v-icon>mdi-close</v-icon></v-btn>
+      </template>
     </v-snackbar>
   </v-container>
 </template>
@@ -165,7 +172,7 @@ export default class extends Vue {
     { text: 'Numéro compte', value: 'numeroCompte' },
     { text: 'Nom compte', value: 'nomCompte' },
     { text: 'Date pièce', value: 'datePieceDate' },
-    { text: 'Libelle', value: 'libelle' },
+    { text: 'Libellé', value: 'libelle' },
     { text: 'Date échéance', value: 'dateEcheanceDate' },
     { text: 'Montant', value: 'montant', align: 'end' },
     { text: 'Escompte', value: 'escompteDisplay', align: 'end' },
@@ -180,7 +187,26 @@ export default class extends Vue {
   private currentPage = 1;
   private pageCount = 0;
 
+  private unsubscribe!: Function;
+
   mounted() {
+    this.loadPeriodes();
+    this.loadJournaux();
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'selectSociete') {
+        this.reset();
+      }
+    });
+  }
+
+  beforeDestroy() {
+    this.unsubscribe();
+  }
+
+  private reset() {
+    this.piecesComptables = [];
+    this.journalSelected = new Journal();
+    this.periodeSelected = new PeriodeComptable();
     this.loadPeriodes();
     this.loadJournaux();
   }
@@ -265,12 +291,14 @@ export default class extends Vue {
   }
 
   private openPieceComptable(entete?: EntetePieceComptable) {
+    if (!entete && !this.searchIsValid) return false;
     this.refDialogPiece
       .open(this.periodeSelected, this.journalSelected, entete)
       .then((resp) => {
         if (resp.action == DialogActionResult.Create) {
           if (!this.skipAddResult) this.displayAddResult(resp.data);
           this.piecesComptables.unshift(resp.data);
+          this.journalSelected.numeroDernierePiece = resp.data.codePiece;
         } else if (resp.action == DialogActionResult.Update && entete) {
           Vue.set(
             this.piecesComptables,
@@ -280,7 +308,7 @@ export default class extends Vue {
           this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> mise à jour.`, 'success');
         } else if (resp.action == DialogActionResult.Delete && entete) {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
-          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b> supprimer.`, 'error');
+          this.notifier(`Pièce numéro <b>${resp.data.codePieceDisplay}</b>supprimée.`, 'error');
         }
       })
       .finally(() => {
@@ -299,6 +327,7 @@ export default class extends Vue {
             this.piecesComptables.findIndex((e) => e == piece),
             piece
           );
+          this.journalSelected.numeroDernierePiece = numero;
         }
       })
       .finally(() => {
@@ -319,7 +348,7 @@ export default class extends Vue {
 }
 </script>
 
-<style scopped>
+<style scopped type="scss">
 #btn-acqua {
   height: 56px;
 }

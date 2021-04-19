@@ -4,8 +4,8 @@
     v-model="dialog"
     @click:outside="close"
     @keydown.esc="close()"
-    @keydown.page-up="nextPage()"
-    @keydown.page-down="previousPage()"
+    @keydown.page-down="nextPage()"
+    @keydown.page-up="previousPage()"
     @keydown.ctrl.f.prevent="focusSearch()"
   >
     <v-card :loading="isLoading">
@@ -25,10 +25,11 @@
           autofocus
           @keydown.down.prevent="giveFocusToFirstDisplayRow()"
           autocomplete="off"
+          outlined
         ></v-text-field>
       </v-card-title>
       <AgGridVue
-        style="height: 561px;"
+        style="height: 730px;"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersDossier"
@@ -76,7 +77,8 @@ export default class extends Vue {
     onCellKeyDown: this.keypress,
     onRowDoubleClicked: this.rowDoubleClick,
     pagination: true,
-    paginationAutoPageSize: true,
+    // paginationAutoPageSize: true,
+    paginationPageSize: 15,
     defaultColDef: {
       sortable: true
     },

@@ -42,24 +42,24 @@ export class EntetePieceComptable extends EntetePieceComptableDTO {
     return `${this.codeJournal}.${this.codePiece}`;
   }
 
-  private _datePieceDate?: DateTime;
-  get datePieceDate(): DateTime {
+  private _datePieceDate?: DateTime | null;
+  get datePieceDate(): DateTime | null {
     if (!this._datePieceDate) this._datePieceDate = new DateTime(this.datePiece);
     return this._datePieceDate;
   }
-  set datePieceDate(date: DateTime) {
-    this._datePieceDate = date;
-    this.datePiece = date.toUtc();
+  set datePieceDate(date: DateTime | null) {
+    this._datePieceDate = date || null;
+    this.datePiece = date ? date.toUtc() : '';
   }
 
-  private _dateEcheanceDate?: DateTime;
-  get dateEcheanceDate(): DateTime {
+  private _dateEcheanceDate?: DateTime | null;
+  get dateEcheanceDate(): DateTime | null {
     if (!this._dateEcheanceDate) this._dateEcheanceDate = new DateTime(this.dateEcheance);
     return this._dateEcheanceDate;
   }
-  set dateEcheanceDate(date: DateTime) {
+  set dateEcheanceDate(date: DateTime | null) {
     this._dateEcheanceDate = date;
-    this.dateEcheance = date.toUtc();
+    this.dateEcheance = date ? date.toUtc() : '';
   }
 
   get escompteDisplay() {

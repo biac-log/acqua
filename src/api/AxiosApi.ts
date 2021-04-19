@@ -1,22 +1,30 @@
 import axios, { AxiosInstance } from 'axios';
 import { UserModule } from '@/store/modules/user';
+import { SocieteModule } from '@/store/modules/companies';
 
 export default class AxiosApi {
   static get axiosBase() {
     return axios.create({
-      headers: { Authorization: `Bearer ${UserModule.token}` }
+      headers: { Authorization: `Bearer ${UserModule.token}`, }
     });
   }
 
   private static _acQuaCore: AxiosInstance | null;
   static get AcQuaCore() {
-    if (!this._acQuaCore) {
+    if (!this._acQuaCore ) {
       this._acQuaCore = axios.create({
         baseURL: process.env.VUE_APP_ApiAcQuaCore,
-        headers: { Authorization: `Bearer ${UserModule.token}` }
+        headers: { Authorization: `Bearer ${UserModule.token}`, 'Company-Name': SocieteModule.companyIdentifiant }
       });
     }
     return this._acQuaCore;
+  }
+
+  public static refreshAcQuaCore() {
+    this._acQuaCore = axios.create({
+      baseURL: process.env.VUE_APP_ApiAcQuaCore,
+      headers: { Authorization: `Bearer ${UserModule.token}`, 'Company-Name': SocieteModule.companyIdentifiant }
+    });
   }
 
   private static _gestionUser: AxiosInstance | null;

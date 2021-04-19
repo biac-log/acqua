@@ -5,9 +5,8 @@
     eager
     width="80%"
     :persistent="!readonly || saveLoading || deleteLoading"
-    @click:outside="closeDialog"
+    @click:outside.stop="clickOutside"
     @keydown.f2.stop="modifierPiece()"
-    @keydown.46.prevent.stop="deletePiece"
     @keydown.107.prevent.stop="createExtrait"
     @keydown.esc.prevent="cancelEdit()"
     @keydown.alt.enter.stop="savePiece()"
@@ -16,21 +15,15 @@
       <v-card>
         <v-toolbar color="primary" dark flat>
           <v-card-title class="d-flex justify-start">
-            <p class="mb-0" v-if="numeroPiece">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
-            <p class="mb-0" v-else>Nouvelle pièce</p>
-            <p class="ml-10 mb-0 textMini">{{ periode.libellePeriodeFull }}</p>
+            <p class="mb-0" v-if="!newRecord">Pièce {{ journal.numero }}.{{ numeroPiece }}</p>
+            <p class="mb-0" v-else>Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}</p>
+            <p class="ml-10 mb-0 textMini">Période {{ periode.libellePeriodeFull.toLowerCase() }}</p>
             <p class="ml-5 mb-0 textMini">Journal {{ journal.fullLibelle }}</p>
           </v-card-title>
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay="500">
             <template v-slot:activator="{ on }">
-              <v-btn
-                class="mr-5"
-                color="success"
-                :disabled="isLoading"
-                @click="modifierPiece"
-                v-on="on"
-              >
+              <v-btn class="mr-5" color="success" :disabled="isLoading" @click="modifierPiece" v-on="on">
                 <v-icon left>mdi-pencil</v-icon>Modifier
               </v-btn>
             </template>
@@ -61,6 +54,12 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
+        <v-progress-linear
+          :active="pieceIsLoading"
+          :indeterminate="pieceIsLoading"
+          top
+          color="primary accent-4"
+        ></v-progress-linear>
         <v-card-text class="pb-0 pt-0">
           <v-col cols="12" class="pr-5">
             <v-row fill-height no-gutters>
@@ -68,38 +67,33 @@
               <v-col cols="12" x-lg="5" lg="12">
                 <v-row dense>
                   <v-col cols="4">
-                    <v-text-field
-                      v-model="libelleCompte"
-                      label="Compte"
-                      :filled="readonly"
-                      readonly
-                      tabindex="-1"
-                    ></v-text-field>
+                    <v-text-field v-model="libelleCompte" label="Compte" outlined readonly tabindex="-1"></v-text-field>
                   </v-col>
-                  <v-col cols="3">
-                    <v-text-field
-                      label="Solde initial"
-                      v-model="soldeInitial"
-                      :filled="readonly"
-                      readonly
-                    ></v-text-field>
+                  <v-col lg="3" sm="2">
+                    <v-text-field label="Solde initial" v-model="soldeInitial" outlined :readonly="soldeReadonly">
+                      <template v-slot:append>
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-btn icon small @click="toggleSoldeReadonly" v-if="!readonly" v-on="on"
+                              ><v-icon>mdi-pencil</v-icon></v-btn
+                            >
+                          </template>
+                          <span> Permettre l'édition du solde initial </span>
+                        </v-tooltip>
+                      </template>
+                    </v-text-field>
                   </v-col>
-                  <v-col cols="3">
-                    <v-text-field
-                      label="Solde actuel"
-                      v-model="soldeActuel"
-                      :filled="readonly"
-                      readonly
-                    ></v-text-field>
+                  <v-col lg="3" sm="3">
+                    <v-text-field label="Solde actuel" v-model="soldeActuel" outlined readonly></v-text-field>
                   </v-col>
-                  <v-col cols="2">
+                  <v-col lg="2" sm="3">
                     <DatePicker
                       ref="refDatePiece"
                       name="datePiece"
                       label="Date pièce"
                       :date.sync="datePiece"
                       :readonly.sync="readonly"
-                      :filled="readonly"
+                      outlined
                       :rules.sync="datePieceRules"
                     ></DatePicker>
                   </v-col>
@@ -125,7 +119,7 @@
         </v-card-text>
         <v-divider v-if="saveLoading || deleteLoading || !readonly"></v-divider>
         <v-card-actions v-if="saveLoading || deleteLoading || !readonly" class="d-flex">
-          <v-tooltip v-if="numeroPiece" top open-delay="500">
+          <v-tooltip v-if="!newRecord" top open-delay="500">
             <template v-slot:activator="{ on }">
               <v-btn
                 color="error"
@@ -136,7 +130,8 @@
                 @click="deletePiece()"
                 :disabled="saveLoading"
                 :loading="deleteLoading"
-              >Supprimer</v-btn>
+                >Supprimer</v-btn
+              >
             </template>
             <span>
               Supprimer la pièce
@@ -151,7 +146,8 @@
             tabindex="-1"
             v-if="!numeroPiece && !forcerNumero"
             @click="forcerNumero = true"
-          >Forcer le numéro de pièce</v-btn>
+            >Forcer le numéro de pièce</v-btn
+          >
           <v-text-field
             label="Numéro pièce"
             v-model="numeroToForce"
@@ -196,9 +192,9 @@
                 color="success"
                 :loading="saveLoading"
                 :disabled="!isValid || deleteLoading"
-                @click="savePiece()"
+                @click="validateDialog"
               >
-                <v-icon left>mdi-content-save</v-icon>Sauvegarder
+                <v-icon left>mdi-content-save</v-icon>Valider
               </v-btn>
             </template>
             <span>
@@ -210,24 +206,33 @@
         <Confirm ref="confirmDialog"></Confirm>
       </v-card>
     </v-form>
-    <v-dialog v-model="datePieceDialog" width="300" eager style="z-index: 999999999999999999">
+    <v-dialog
+      v-model="datePieceDialog"
+      width="350"
+      eager
+      style="z-index: 999999999999999999"
+      @keydown.enter.stop="closeDatePieceDialog"
+    >
       <v-card>
-        <v-card-title primary-title>Nouvelle pièce</v-card-title>
-        <v-card-text>
+        <v-toolbar color="primary" dark flat>
+          Nouvelle pièce - {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}
+        </v-toolbar>
+        <v-card-text class="pa-5 pb-0">
+          <v-text-field label="Solde initial" v-model="soldeInitial" outlined readonly></v-text-field>
           <DatePicker
             ref="refDatePieceDialog"
             name="datePiece"
             label="Date pièce"
             :date.sync="datePiece"
             :readonly.sync="readonly"
-            :filled="readonly"
+            outlined
             :rules.sync="datePieceRules"
             autofocus
           ></DatePicker>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="success" @click="datePieceDialog = false">Valider</v-btn>
+          <v-btn color="success" @click="closeDatePieceDialog">Valider</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -236,20 +241,21 @@
 
 <script lang="ts">
 import { Component, Vue, Watch, Ref } from 'vue-property-decorator';
-import { PeriodeComptable, EntetePieceComptable, Journal, Piece, Extrait } from '@/models/Financier';
+import { PeriodeComptable, Journal, Piece, Extrait } from '@/models/Financier';
 import { DateTime } from '@/models/DateTime';
 import AlertMessageVue from '@/components/AlertMessage.vue';
 import DatePicker from '@/components/DatePicker.vue';
 import ExtraitsVue from './Extraits.vue';
 import { FinancierApi } from '../../../api/FinancierApi';
 import ExtraitVue from './Extrait.vue';
-import _ from 'lodash';
 import Confirm from '@/components/Confirm.vue';
 import { displayAxiosError } from '@/utils/ErrorMethods';
 import { PieceSaveDTO, ExtraitSaveDTO, VentilationSaveDTO } from '../../../models/Financier/Save/PieceSave';
+import { sum } from 'lodash';
+import { PromiseResponse } from '@/models/PromiseResponse';
 
 @Component({
-  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue }
+  components: { ExtraitsVue, DatePicker, ExtraitVue, Confirm, AlertMessageVue },
 })
 export default class PieceComptableVue extends Vue {
   @Ref() refExtraitVue!: ExtraitVue;
@@ -262,6 +268,7 @@ export default class PieceComptableVue extends Vue {
   private dialog = false;
   private oldPiece!: Piece | null;
   private readonly = false;
+  private soldeReadonly = true;
   private resolve: any;
   private reject: any;
   private isValid = true;
@@ -276,7 +283,7 @@ export default class PieceComptableVue extends Vue {
   private datePieceRules: any = [
     (v: string) => !!v || 'Date obligatoire',
     (v: string) => DateTime.isValid(v) || 'Date invalide',
-    (v: string) => this.validateDatePiece(v) || 'La date est hors période'
+    (v: string) => this.validateDatePiece(v) || 'La date est hors période',
   ];
 
   private extraits: Extrait[] = [];
@@ -287,7 +294,7 @@ export default class PieceComptableVue extends Vue {
   private numeroToForce = '';
   private numeroToForceRules: any = [
     (v: string) => !!v || 'Numéro obligatoire',
-    (v: string) => !!v.toNumber() || 'Numéro invalide'
+    (v: string) => !!v.toNumber() || 'Numéro invalide',
   ];
 
   private saveLoading = false;
@@ -296,6 +303,7 @@ export default class PieceComptableVue extends Vue {
   get isLoading() {
     return this.saveLoading || this.deleteLoading || this.pieceIsLoading;
   }
+  private newRecord = false;
 
   private validateDatePiece(date: string): boolean {
     const dateTime = new DateTime(date);
@@ -303,9 +311,15 @@ export default class PieceComptableVue extends Vue {
   }
 
   private hash = '';
-  public async openNew(periode: PeriodeComptable, journal: Journal): Promise<string> {
+  public async openNew(
+    periode: PeriodeComptable,
+    journal: Journal
+  ): Promise<{ numeroDernierePiece: number; delete: boolean }> {
     this.dialog = true;
-    this.$nextTick(() => (this.datePieceDialog = true));
+    this.$nextTick(() => {
+      this.newRecord = true;
+      this.datePieceDialog = true;
+    });
     this.reset();
     this.periode = periode;
     this.journal = journal;
@@ -326,7 +340,12 @@ export default class PieceComptableVue extends Vue {
     });
   }
 
-  public open(periode: PeriodeComptable, journal: Journal, numeroPieteToLoad: number): Promise<EntetePieceComptable> {
+  public open(
+    periode: PeriodeComptable,
+    journal: Journal,
+    numeroPieteToLoad: number
+  ): Promise<{ numeroDernierePiece: number; delete: boolean }> {
+    this.newRecord = false;
     this.dialog = true;
     this.readonly = true;
     this.periode = periode;
@@ -353,30 +372,35 @@ export default class PieceComptableVue extends Vue {
   private createExtrait() {
     if (!this.readonly) {
       this.refExtraitVue
-        .openNew(this.journal)
-        .then((resp: Extrait) => {
+        .openNew(this.journal, this.soldeInitial, this.soldeActuel)
+        .then((resp: PromiseResponse<Extrait>) => {
           const maxLigne = this.extraits?.length ? Math.max(...this.extraits.map((i) => i.numeroExtrait)) : 0;
-          resp.numeroExtrait = maxLigne + 1;
-          this.extraits.push(resp);
+          resp.data.numeroExtrait = maxLigne + 1;
+          this.extraits.push(resp.data);
+          this.$nextTick(() => {
+            if (resp.triggerEvent) this.createExtrait();
+            else this.savePiece();
+          });
         })
         .catch()
         .finally(() => {
-          this.gridExtraits?.focus();
+          if (!this.refExtraitVue.isOpened) this.gridExtraits?.focus();
         });
     }
   }
 
   private editExtrait(extrait: Extrait) {
     this.refExtraitVue
-      .open(this.journal, this.numeroPiece, extrait)
-      .then((resp: Extrait) => {
-        if (resp)
+      .open(this.journal, this.numeroPiece, extrait, this.soldeInitial, this.soldeActuel)
+      .then((resp: PromiseResponse<Extrait>) => {
+        if (resp.data) {
           Vue.set(
             this.extraits,
             this.extraits.findIndex((d) => d == extrait),
-            resp
+            resp.data
           );
-        else this.extraits.splice(this.extraits.indexOf(extrait), 1);
+        } else this.extraits.splice(this.extraits.indexOf(extrait), 1);
+        this.savePiece();
       })
       .catch()
       .finally(() => {
@@ -386,7 +410,7 @@ export default class PieceComptableVue extends Vue {
   }
 
   private init(piece: Piece) {
-    this.oldPiece = piece;
+    this.oldPiece = new Piece(piece); // Set it to a new Piece so the inner arrays aren't linked
     this.numeroPiece = piece.numeroPiece.toString();
     this.libelleCompte = `${piece.numeroCompteFinancier.toString()} ${piece.nomCompteFinancier}`;
     this.datePiece = new DateTime(piece.datePiece);
@@ -405,17 +429,19 @@ export default class PieceComptableVue extends Vue {
     this.extraits = [];
     this.oldPiece = null;
     this.readonly = false;
+    this.soldeReadonly = true;
     this.numeroPiece = '0';
     this.hash = '';
     this.soldeInitial = '';
     this.soldeActuel = '';
+    this.newRecord = false;
     (this.$refs.extraits as any)?.reset();
   }
 
   @Watch('extraits')
   private calculSolde() {
-    const sumCredit = _.sum(this.extraits.map((m) => m.montantCredit.toNumber()));
-    const sumDebit = _.sum(this.extraits.map((m) => m.montantDebit.toNumber()));
+    const sumCredit = sum(this.extraits.map((m) => m.montantCredit.toNumber()));
+    const sumDebit = sum(this.extraits.map((m) => m.montantDebit.toNumber()));
     this.soldeActuel = (this.soldeInitial.toNumber() + sumDebit - sumCredit).toComptaString();
   }
 
@@ -423,7 +449,7 @@ export default class PieceComptableVue extends Vue {
     this.confirmDialog
       .open(
         'Suppression',
-        `Êtes-vous sur de vouloir supprimer la piece ${this.journal.numero}.${this.numeroPiece} ?`,
+        `Êtes-vous sur de vouloir supprimer la pièce ${this.journal.numero}.${this.numeroPiece} ?`,
         'error',
         'Supprimer'
       )
@@ -436,9 +462,9 @@ export default class PieceComptableVue extends Vue {
             this.journal.numero,
             this.numeroPiece.toNumber()
           )
-            .then(() => {
+            .then((numeroDernierePiece) => {
               this.dialog = false;
-              this.resolve();
+              this.resolve({ numeroDernierePiece, delete: true });
             })
             .catch((err) => {
               this.readonly = false;
@@ -464,18 +490,17 @@ export default class PieceComptableVue extends Vue {
 
   private addPiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
-    this.readonly = true;
     FinancierApi.addPieceComptable(piece)
-      .then((numeroPiece) => {
-        this.numeroPiece = numeroPiece.toString();
-        this.resolve(numeroPiece);
-        (this.$refs.form as any).resetValidation();
-        this.dialog = false;
-        this.reset();
+      .then((createdPiece) => {
+        this.numeroPiece = createdPiece.numeroPiece.toString();
+        this.hash = createdPiece.hash;
+        (this.$parent as any).notifier('Ligne sauvegardée avec succès', 'success');
+        this.oldPiece = new Piece(createdPiece);
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la sauvegarde de la pièce', displayAxiosError(err));
         this.readonly = false;
+        (this.$parent as any).notifier("Erreur lors de l'ajout de la ligne", 'error');
       })
       .finally(() => {
         this.saveLoading = false;
@@ -484,16 +509,23 @@ export default class PieceComptableVue extends Vue {
 
   private updatePiece(piece: PieceSaveDTO) {
     this.saveLoading = true;
-    this.readonly = true;
     FinancierApi.updatePieceComptable(piece)
-      .then(() => {
-        this.resolve(piece.numeroPiece);
-        this.dialog = false;
-        this.reset();
+      .then((updatedPiece) => {
+        this.hash = updatedPiece.hash;
+        let message = '';
+        if (this.oldPiece) {
+          if (this.oldPiece?.extraits.length < updatedPiece.extraits.length) message = 'Ligne ajoutée avec succès';
+          else if (this.oldPiece.extraits.length > updatedPiece.extraits.length)
+            message = 'Ligne supprimée avec succès';
+          else message = 'Pièce mise à jour avec succès';
+        }
+        (this.$parent as any).notifier(message, 'success');
+        this.oldPiece = new Piece(updatedPiece);
       })
       .catch((err) => {
         this.warningMessage.show('Une erreur est survenue lors de la mise à jour de la pièce', displayAxiosError(err));
         this.readonly = false;
+        (this.$parent as any).notifier('Erreur lors de la mise à jour de la pièce', 'error');
       })
       .finally(() => {
         this.saveLoading = false;
@@ -560,8 +592,7 @@ export default class PieceComptableVue extends Vue {
   private modifierPiece() {
     if (!this.pieceIsLoading) {
       this.readonly = false;
-      if (this.datePieceDialog) this.refDatePieceDialog.focus();
-      else this.refDatePiece.focus();
+      this.focusDatePiece();
     }
   }
 
@@ -580,10 +611,44 @@ export default class PieceComptableVue extends Vue {
     }
   }
 
-  private closeDialog() {
-    this.reset();
+  private validateDialog() {
+    this.resolve({ numeroDernierePiece: this.numeroPiece.toNumber(), delete: false });
+    (this.$refs.form as any).resetValidation();
     this.dialog = false;
-    this.reject();
+    this.reset();
+  }
+
+  private closeDialog() {
+    if (!this.readonly) {
+      this.confirmDialog
+        .open('Fermer', `Êtes-vous sûr de vouloir fermer ? Ceci annulera vos modifications.`, 'warning', 'Fermer')
+        .then((resp) => {
+          if (resp) {
+            this.dialog = false;
+            this.reject({ newRecord: this.newRecord, numeroPiece: this.numeroPiece });
+            this.reset();
+          }
+        });
+    } else {
+      this.dialog = false;
+      this.reject({ newRecord: this.newRecord, numeroPiece: this.numeroPiece });
+      this.reset();
+    }
+  }
+
+  private clickOutside() {
+    if (this.readonly) this.closeDialog();
+  }
+
+  private closeDatePieceDialog() {
+    if (this.refDatePieceDialog.isDateValid()) {
+      this.datePieceDialog = false;
+      this.createExtrait();
+    }
+  }
+
+  private toggleSoldeReadonly() {
+    this.soldeReadonly = !this.soldeReadonly;
   }
 }
 </script>

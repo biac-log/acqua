@@ -1,23 +1,23 @@
 <template>
   <v-dialog
-    width="800"
+    width="1100"
     v-model="dialog"
     @click:outside="close()"
     @keydown.esc="close()"
-    @keydown.page-up="nextPage()"
-    @keydown.page-down="previousPage()"
+    @keydown.page-down="nextPage()"
+    @keydown.page-up="previousPage()"
     @keydown.ctrl.f.prevent="focusSearch()"
-    >>
+  >
     <v-card :loading="isLoading">
       <v-card-title>
-        Comptes {{ typeLoad ? typeLoad.libelle : '' }}
-        <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">
+        {{ title }}
+        <v-btn color="primary" fab small class="ml-5" @click="refreshItems">
           <v-icon>mdi-refresh</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
         <v-text-field
           ref="filterField"
-          v-model="filtreCompte"
+          v-model="filtreItems"
           append-icon="mdi-magnify"
           label="Filtrer"
           single-line
@@ -31,8 +31,8 @@
         style="height: 561px;"
         id="dataTable"
         class="ag-theme-alpine"
-        :columnDefs="headersComptes"
-        :rowData="comptes"
+        :columnDefs="headersItems"
+        :rowData="items"
         rowSelection="single"
         :gridOptions="gridOptions"
       >
@@ -42,96 +42,149 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
-import CompteApi from '@/api/CompteApi';
-import { GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
 import { AgGridVue } from 'ag-grid-vue';
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { GridOptions, GridApi } from 'ag-grid-community';
+import RepresentantApi from '@/api/RepresentantApi';
+import FamilleApi from '@/api/FamilleApi';
+import SecteurApi from '@/api/SecteurApi';
+import { Representant } from '@/models/Representant/Representant';
+import { CodeItem } from '@/models/CodeItem';
+import { Famille } from '@/models/Famille/Famille';
+import { Secteur } from '@/models/Secteur/Secteur';
 
 @Component({
-  name: 'SearchCompteGeneral',
+  name: 'SearchCompteTier',
   components: { AgGridVue }
 })
 export default class extends Vue {
   private dialog = false;
-  private typeLoad = '';
-  private filtreCompte = '';
+
+  private typeLoad!: string;
+  private filtreItems = '';
   private isLoading = false;
-  private comptes: CompteGeneralSearch[] = [];
-  private displayComptes: CompteGeneralSearch[] = [];
-  private headersComptes = [
-    { headerName: 'Numéro', field: 'numero', filter: true, width: 120 },
-    { headerName: 'Nom', field: 'nom', filter: true, flex: 1 },
-    {
-      headerName: 'Solde',
-      field: 'solde',
-      filter: true,
-      cellStyle: { textAlign: 'right' },
-      width: 100,
-      valueFormatter: this.numberToString
-    },
-    { headerName: 'Nature', field: 'libelleNature', filter: true, width: 120 },
-    { headerName: 'Case TVA', field: 'caseTvaDisplay', filter: true, width: 120 }
+  private title = '';
+  private itemsName = '';
+  private items: Representant[] | Famille[] | Secteur[] = [];
+  private headersItems = [
+    { headerName: '', field: '', filter: true, width: 120 },
+    { headerName: '', field: '', filter: true, width: 300 },
+    { headerName: '', field: '', filter: true, width: 140 },
+    { headerName: '', field: '', filter: true, flex: 1 }
+  ];
+  private headersRepresentants = [
+    { headerName: 'Code', field: 'code', filter: true, width: 120 },
+    { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
+    { headerName: 'Raison sociale', field: 'raisonSocial', filter: true, width: 140 },
+    { headerName: 'Adresse', field: 'adresse', filter: true, flex: 1 }
+  ];
+  private headersFamilles = [
+    { headerName: 'Famille', field: 'code', filter: true, width: 120 },
+    { headerName: 'Nom', field: 'libelleF', filter: true, width: 300 }
+  ];
+  private headersSecteurs = [
+    { headerName: 'Code', field: 'codeSecteur', filter: true, width: 120 },
+    { headerName: 'Nom', field: 'nom', filter: true, width: 300 }
   ];
 
   private resolve!: any;
   private reject!: any;
 
   private gridOptions: GridOptions = {
-    columnDefs: this.headersComptes,
+    columnDefs: this.headersItems,
     rowSelection: 'single',
-    rowData: this.comptes,
+    rowData: this.items,
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
+    overlayLoadingTemplate: `<span class="ag-overlay-loading-center">Chargement des ${this.itemsName}</span>`,
     pagination: true,
-    paginationAutoPageSize: true,
-    onRowDoubleClicked: this.rowDoubleClick
+    // paginationAutoPageSize: true,
+    paginationPageSize: 15,
+    onRowDoubleClicked: this.rowDoubleClick,
+    getRowStyle(params: any) {
+      if (params.node.data.compteBloque) return { 'background-color': '#ffd6cc' };
+    }
   };
 
-  public open(typeToLoad: string): Promise<CompteGeneralSearch> {
-    this.dialog = true;
-    this.loadComptes(typeToLoad);
+  public open(typeToLoad: string): Promise<CodeItem> {
+    this.loadItems(typeToLoad);
+    switch (typeToLoad) {
+      case 'codeRepresentant':
+        this.title = 'Représentants';
+        this.itemsName = 'représentants';
+        this.headersItems = this.headersRepresentants;
+        break;
+      case 'codeFamille':
+        this.title = 'Familles';
+        this.itemsName = 'familles';
+        this.headersItems = this.headersFamilles;
+        break;
+      case 'codeSecteur':
+        this.title = 'Secteurs';
+        this.itemsName = 'secteurs';
+        this.headersItems = this.headersSecteurs;
+        break;
 
+      default:
+        break;
+    }
+
+    this.dialog = true;
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
     });
   }
 
-  private setFilteredItems(e: CompteGeneralSearch[]) {
-    this.displayComptes = e;
-  }
-
-  private loadComptes(typeToLoad: string) {
+  private loadItems(typeToLoad: string) {
     if (this.typeLoad != typeToLoad) {
       this.typeLoad = typeToLoad;
-      this.refreshComptes();
+      this.refreshItems();
     }
   }
 
-  private refreshComptes() {
+  private refreshItems() {
     if (this.typeLoad) {
       this.isLoading = true;
-      CompteApi.getComptesGeneraux(this.typeLoad)
-        .then((resp) => {
-          this.comptes = resp;
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      switch (this.typeLoad) {
+        case 'codeRepresentant':
+          RepresentantApi.getAllRepresentants()
+            .then((resp) => {
+              this.items = resp;
+            })
+            .finally(() => {
+              this.isLoading = false;
+            });
+          break;
+        case 'codeFamille':
+          FamilleApi.getAllFamilles('F')
+            .then((resp) => {
+              this.items = resp;
+            })
+            .finally(() => {
+              this.isLoading = false;
+            });
+          break;
+        case 'codeSecteur':
+          SecteurApi.getAllSecteurs()
+            .then((resp) => {
+              this.items = resp;
+            })
+            .finally(() => {
+              this.isLoading = false;
+            });
+          break;
+
+        default:
+          break;
+      }
     }
   }
 
-  @Watch('filtreCompte')
-  private filterGrid(newValue: string) {
-    const numeroFilterComponent = this.gridOptions?.api?.getFilterInstance('numero');
-    if (newValue && newValue.isInt()) {
-      numeroFilterComponent?.setModel({ type: 'startsWith', filter: newValue });
-    } else {
-      numeroFilterComponent?.setModel({ type: 'startsWith', filter: '' });
-    }
-    this.gridOptions?.api?.setQuickFilter(this.filtreCompte);
+  @Watch('filtreItems')
+  private filterGrid() {
+    this.gridOptions?.api?.setQuickFilter(this.filtreItems);
   }
 
   private navigateToNextCell(params: any) {
@@ -177,19 +230,14 @@ export default class extends Vue {
 
   private keypress(event: any) {
     if (event?.event.key === 'Enter') {
-      const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
-      this.sendCompte(selectedRow);
+      const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0];
+      this.sendItem(selectedRow);
     }
   }
 
-  private numberToString(params: ValueFormatterParams): string {
-    return (params.value as number).toDecimalString(2);
-  }
-
   private rowDoubleClick() {
-    const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0] as CompteGeneralSearch;
-    this.reinitGrid();
-    this.sendCompte(selectedRow);
+    const selectedRow = this?.gridOptions?.api?.getSelectedRows()[0];
+    this.sendItem(selectedRow);
   }
 
   private focusSearch() {
@@ -240,15 +288,21 @@ export default class extends Vue {
     (this.gridOptions.api as GridApi).paginationGoToPage(0);
   }
 
-  private sendCompte(compte: CompteGeneralSearch) {
-    this.filtreCompte = '';
+  private sendItem(item: Representant | Famille | Secteur) {
+    this.filtreItems = '';
     this.dialog = false;
     this.reinitGrid();
-    this.resolve(compte);
+    if (item instanceof Representant) {
+      this.resolve(new CodeItem(item.code, item.nom));
+    } else if (item instanceof Famille) {
+      this.resolve(new CodeItem(item.famille, item.libelleF));
+    } else if (item instanceof Secteur) {
+      this.resolve(new CodeItem(item.codeSecteur, item.nom));
+    }
   }
 
   private close() {
-    this.filtreCompte = '';
+    this.filtreItems = '';
     this.dialog = false;
     this.reinitGrid();
     this.reject();
@@ -256,12 +310,4 @@ export default class extends Vue {
 }
 </script>
 
-<style>
-#btn-acqua {
-  height: 56px;
-}
-
-#dataTable tbody tr {
-  cursor: pointer;
-}
-</style>
+<style></style>

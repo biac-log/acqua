@@ -2,6 +2,7 @@ import { CompteSearchDTO, CompteSearch } from '@/models/Compte/CompteSearch';
 import { CompteGeneralSearchDTO, CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 import { CompteDeTierDTO, CompteDeTier } from '@/models/Compte/CompteDeTier';
 import api from '@/api/AxiosApi';
+import { TypeCompte, TypeCompteDTO } from '@/models/Compte/TypeCompte';
 
 export default abstract class CompteApi {
   static async getComptesTiers(type: string): Promise<CompteSearch[]> {
@@ -30,7 +31,12 @@ export default abstract class CompteApi {
     return response.data.map((CompteSearchDTO) => new CompteGeneralSearch(CompteSearchDTO));
   }
 
-  static async getCompteGeneral(type: string, numero: string): Promise<CompteGeneralSearch> {
+  static async searchComptesGeneraux(type: string): Promise<CompteSearch[]> {
+    const response = await api.AcQuaCore.get<CompteSearchDTO[]>(`Compte/GetAllComptesGeneraux?typeCompte=${type}`);
+    return response.data.map((CompteSearchDTO) => new CompteSearch(CompteSearchDTO));
+  }
+
+  static async getCompteGeneral(type: string, numero: string | number): Promise<CompteGeneralSearch> {
     const response = await api.AcQuaCore.get<CompteGeneralSearchDTO>(
       `Compte/GetCompteGeneralById?typeCompte=${type}&numeroCompte=${numero}`
     );
@@ -57,5 +63,10 @@ export default abstract class CompteApi {
       `Compte/GetComptesByNumero?typeCompte=${type}&startNumero=${numero}&nbrElement=${nbrElement}`
     );
     return response.data.map((CompteSearchDTO) => new CompteGeneralSearch(CompteSearchDTO));
+  }
+
+  static async getTypesComptes(): Promise<TypeCompte[]> {
+    const response = await api.AcQuaCore.get<TypeCompteDTO[]>(`/Compte/GetTypesComptes`);
+    return response.data.map((TypeCompteDTO) => new TypeCompte(TypeCompteDTO));
   }
 }

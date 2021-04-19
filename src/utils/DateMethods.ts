@@ -1,4 +1,4 @@
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 
 export const isBetween = (date: string, dateMin: string, dateMax: string): boolean => {
   const momentDate = moment(date, 'DD/MM/YYYY');

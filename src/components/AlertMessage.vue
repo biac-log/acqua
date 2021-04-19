@@ -35,6 +35,7 @@ export default class AlertMessage extends Vue {
   @Prop() readonly type!: string;
   private message = '';
   private messageDetails = '';
+  private style = '';
   private dialog = false;
 
   public show(message: string, messageDetails = '') {

@@ -2,9 +2,9 @@
   <!-- <v-dialog v-model="dialog" width="800" @click:outside="close()" @keydown.esc="close()" @keydown.alt.enter="sendContrepartie()"> -->
   <div
     class="ma-0 pa-0 editContainer"
+    @keydown.f2.stop="generateTVA"
     @keydown.esc.stop="close()"
     @keydown.alt.enter.stop="sendContrepartie()"
-    @keydown.46.prevent.stop="deleteContrepartie"
   >
     <div :class="dialog ? 'overlay' : ''" @click="close()" />
     <!-- <transition name="fade" leave-absolute> -->
@@ -15,87 +15,44 @@
           <v-row dense>
             <v-col cols="2">
               <v-select
+                ref="typesComptes"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
+                soldeToTva
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
+                @change="resetCompte"
                 tabindex="2"
+                @keyup="changeType"
               ></v-select>
             </v-col>
-            <v-col cols="3">
-              <v-combobox
-                ref="numeroCompte"
+            <v-col cols="5">
+              <autocomplete-comptes-vue
+                ref="refNumeroCompte"
                 label="N° compte"
-                v-model="numeroCompteSelected"
-                :items="comptesSearch"
-                :search-input.sync="searchCompte"
-                :rules="numeroCompteRules"
-                @keyup.enter="$event.target.select()"
-                @focus="$event.target.select()"
                 @change="numeroCompteChange"
-                @keydown.ctrl.f.prevent="openSearchCompte()"
                 :hide-details="readonly"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
-                hide-selected
-                item-text="numeroNom"
-                item-value="numero"
-                hide-no-data
-                autofocus
-                tabindex="3"
-              >
-                <template v-slot:append>
-                  <v-tooltip top open-delay="500" open-on-hover>
-                    <template v-slot:activator="{ on }">
-                      <v-btn
-                        icon
-                        small
-                        v-show="!readonly"
-                        :disabled="readonly"
-                        @click="openSearchCompte()"
-                        @keydown.enter.prevent.stop="openSearchCompte()"
-                        v-on="on"
-                        tabindex="-1"
-                      >
-                        <v-icon>mdi-magnify</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Rechercher un compte <span class="shortcutTooltip">CTRL+F</span></span>
-                  </v-tooltip>
-                </template>
-                <template v-slot:selection="{ item }">
-                  {{ item.numero }}
-                </template>
-                <template v-slot:item="{ item }">
-                  {{ item.numeroNom }}
-                </template>
-              </v-combobox>
+                :rules="numeroCompteRules"
+                :tabindex="3"
+                :typeCompte="typesComptesSelected.id"
+              />
             </v-col>
             <SearchCompteContrepartieVue ref="compteDialog"></SearchCompteContrepartieVue>
-            <v-col cols="3">
-              <v-text-field
-                label="Nom compte"
-                v-model="nomCompte"
-                :filled="readonly"
-                :hide-details="readonly"
-                :rules="nomCompteRules"
-                tabindex="-1"
-                readonly
-              ></v-text-field>
-            </v-col>
             <v-col>
               <v-text-field
                 ref="libelle"
-                label="Libelle"
+                label="Libellé"
                 v-model="libelle"
                 counter
                 maxlength="23"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="libelleRules"
                 :hide-details="readonly"
@@ -112,27 +69,31 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
                 tabindex="-1"
               ></v-select>
             </v-col>
-            <v-col cols="2">
+            <v-col cols="3">
               <v-text-field
                 label="Numéro case TVA"
                 ref="numeroCaseTva"
                 v-model="numeroCaseTva"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
-                :hide-details="readonly"
+                hide-details="auto"
                 :loading="tvaLoading"
                 @keypress.enter="loadCaseTva"
                 @change="loadCaseTva"
                 @keydown.ctrl.f.prevent="OpenSearchCaseTva()"
+                @keydown.f5.prevent="OpenSearchCaseTva()"
                 tabindex="6"
+                :suffix="caseTva.libelleCase"
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500" open-on-hover>
@@ -154,17 +115,8 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="2">
-              <v-text-field
-                label="Libellé case TVA"
-                v-model="caseTva.libelleCase"
-                :filled="readonly"
-                :hide-details="readonly"
-                tabindex="-1"
-                readonly
-              ></v-text-field>
-              <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
-            </v-col>
+            <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
+            <v-spacer></v-spacer>
             <v-col cols="3">
               <v-select
                 class="ml-10"
@@ -174,7 +126,7 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
@@ -186,7 +138,7 @@
                 ref="montantComponent"
                 v-model="montant"
                 label="Montant"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="montantRules"
                 :hide-details="readonly"
@@ -222,7 +174,7 @@
               <v-text-field
                 label="Nom Dossier"
                 v-model="nomDossier"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 tabindex="-1"
                 readonly
@@ -255,19 +207,14 @@
             Supprimer</v-btn
           >
           <v-spacer></v-spacer>
-          <v-menu bottom left v-if="!readonly">
+          <v-tooltip top open-delay="500" open-on-hover>
             <template v-slot:activator="{ on }">
-              <v-btn icon v-on="on">
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
+              <v-btn v-if="!readonly" @click="generateTVA" class="ma-2 pr-4" tile outlined v-on="on" color="warning"
+                >Solde = TVA</v-btn
+              >
             </template>
-
-            <v-list>
-              <v-list-item @click="generateTVA">
-                <v-list-item-title>Calculer la TVA</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+            <span>Attribue le reste à ventiler au montant<span class="shortcutTooltip">F2</span></span>
+          </v-tooltip>
           <v-btn color="blue darken-1" class="ma-2 pr-4" tile outlined @click="close()" tabindex="-1">
             <v-icon left>mdi-close</v-icon> Fermer</v-btn
           >
@@ -283,6 +230,8 @@
                 @click="sendContrepartie"
                 v-on="on"
                 tabindex="9"
+                id="validateContrepartie"
+                @keydown.tab.prevent="focusFirstElement"
               >
                 <v-icon left>mdi-check</v-icon> Valider
               </v-btn>
@@ -315,17 +264,20 @@ import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossie
 import { DateTime } from '@/models/DateTime';
 import { AxiosError } from 'axios';
 import { ApplicationModule } from '@/store/modules/application';
+import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 
 @Component({
   name: 'EditContrepartie',
   components: {
     SearchCompteContrepartieVue,
     SearchCaseTvaVue,
-    AutoCompleteDossierVue
+    AutoCompleteDossierVue,
+    AutocompleteComptesVue
   }
 })
 export default class extends Vue {
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
+  @Ref() readonly refNumeroCompte!: AutocompleteComptesVue;
   @Ref() readonly montantComponent!: HTMLInputElement;
 
   @PropSync('isReadOnly') public readonly!: boolean;
@@ -350,8 +302,6 @@ export default class extends Vue {
   private compteLoading = false;
   private numeroCompte = '';
   private numeroCompteRules: any = [(v: string) => !!v || 'Numéro obligatoire'];
-  private comptesSearch: { numero: string | number; numeroNom: string }[] = [];
-  private searchCompte = '';
   private numeroCompteSelected: {
     numero: string | number;
     numeroNom: string;
@@ -362,7 +312,7 @@ export default class extends Vue {
   private devisesSelected: Devise = new Devise();
   private devisesRules: any = [(v: string) => !!v || 'Devise obligatoire'];
   private libelle = '';
-  private libelleRules: any = [(v: string) => !!v || 'Libelle obligatoire'];
+  private libelleRules: any = [(v: string) => !!v || 'Libellé obligatoire'];
   private typesMouvements: TypeMouvement[] = getTypesMouvements();
   private typesMouvementsSelected: TypeMouvement = new TypeMouvement();
   private typesMouvementsRules: any = [(v: string) => !!v || 'Type obligatoire'];
@@ -434,6 +384,13 @@ export default class extends Vue {
         tvaImpute,
         propositionLibelle
       );
+      this.$nextTick(() => {
+        const element = document.getElementById('validateContrepartie');
+        if (element != null) {
+          element.scrollIntoView();
+        }
+        (this.$refs.typesComptes as any).focus();
+      });
     });
 
     return new Promise((resolve, reject) => {
@@ -458,14 +415,11 @@ export default class extends Vue {
       this.typesComptes.find((tc) => tc.id == contrepartie.typeCompte) || this.typesComptes[0];
     this.devisesSelected = this.devises.find((d) => d.id == contrepartie.codeDevise) || deviseEntete;
 
+    this.numeroCompte = contrepartie.numeroCompte != 0 ? contrepartie.numeroCompte.toString() : '';
+    this.nomCompte = contrepartie.compteLibelle;
+
     if (contrepartie) {
-      const compteToSelect = {
-        numero: contrepartie.numeroCompte ? contrepartie.numeroCompte : '',
-        numeroNom: contrepartie.compteLibelle
-      };
-      this.comptesSearch = [];
-      this.comptesSearch.push(compteToSelect);
-      this.numeroCompteSelected = compteToSelect;
+      this.refNumeroCompte.init(this.numeroCompte, contrepartie.compteLibelle);
 
       if (contrepartie.dossier) {
         this.dossierComponent.setDossier(
@@ -479,9 +433,6 @@ export default class extends Vue {
         this.idDossier = contrepartie.dossier;
       }
     }
-
-    this.numeroCompte = contrepartie.numeroCompte ? contrepartie.numeroCompte.toString() : '';
-    this.nomCompte = contrepartie.compteLibelle;
     this.libelle = contrepartie.libelle ? contrepartie.libelle : propositionLibelle;
     this.typesMouvementsSelected =
       this.typesMouvements.find((d) => d.id == contrepartie.codeMouvement) || this.typesMouvements[0];
@@ -521,9 +472,36 @@ export default class extends Vue {
     }
   }
 
+  private resetCompte() {
+    this.refNumeroCompte?.resetCompte();
+    if (this.typesComptesSelected.id != 'g') {
+      this.caseTva.refresh();
+      this.numeroCaseTva = '';
+    }
+  }
+
+  private numeroCompteChange(value: string | CompteGeneralSearch) {
+    if (!value) {
+      this.numeroCompte = '';
+      this.nomCompte = '';
+    }
+    if (typeof value === 'string') {
+      this.numeroCompte = value;
+      this.loadCompte();
+    } else if (value instanceof CompteGeneralSearch) {
+      this.numeroCompte = value.numero.toString();
+      this.$nextTick(() => (this.$refs.numeroCompte as any)?.blur());
+      this.$nextTick(() => (this.$refs.libelle as any)?.focus());
+      this.loadCompte();
+    } else {
+      this.numeroCompte = '';
+      this.nomCompte = '';
+    }
+  }
+
   private loadCompte() {
-    this.compteLoading = true;
     if (this.typesComptesSelected && this.numeroCompte) {
+      this.compteLoading = true;
       CompteApi.getCompteGeneral(this.typesComptesSelected.id, this.numeroCompte.toString())
         .then((compte) => {
           this.setCompte(compte);
@@ -533,54 +511,8 @@ export default class extends Vue {
         });
     }
   }
-  private openSearchCompte(): void {
-    if (this.typesComptesSelected) {
-      (this.$refs.numeroCompte as any).blur();
-      (this.$refs.compteDialog as SearchCompteContrepartieVue)
-        .open(this.typesComptesSelected, this.searchCompte)
-        .then((compte) => {
-          this.setCompte(compte);
-          this.$nextTick(() => (this.$refs.libelle as any)?.focus());
-        })
-        .catch(() => {
-          this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
-        });
-    }
-  }
-  @Watch('searchCompte')
-  private async searchCompteChanged(matchCode: string) {
-    try {
-      this.compteLoading = true;
-      if (matchCode && matchCode.isInt()) {
-        this.comptesSearch = await CompteApi.autocompleteCompteByNumero(this.typesComptesSelected.id, matchCode, 5);
-      } else if (matchCode) {
-        this.comptesSearch = await CompteApi.autocompleteCompteByMatchCode(
-          this.typesComptesSelected.id,
-          matchCode.toUpperCase(),
-          5
-        );
-      } else this.comptesSearch = [];
-    } finally {
-      this.compteLoading = false;
-    }
-  }
-  private numeroCompteChange(value: string | CompteGeneralSearch) {
-    if (typeof value === 'string') this.numeroCompte = value;
-    else if (value instanceof CompteGeneralSearch) {
-      this.numeroCompte = value.numero.toString();
-      this.$nextTick(() => (this.$refs.numeroCompte as any)?.blur());
-      this.$nextTick(() => (this.$refs.libelle as any)?.focus());
-    } else this.numeroCompte = '';
-    this.loadCompte();
-  }
-  private setCompte(compte: CompteGeneralSearch) {
-    if (compte) {
-      const compteToSelect = { numero: compte.numero, numeroNom: compte.nom };
-      this.comptesSearch = [];
-      this.comptesSearch.push(compteToSelect);
-      this.numeroCompteSelected = compteToSelect;
-    }
 
+  private setCompte(compte: CompteGeneralSearch) {
     this.numeroCompte = compte.numero.toString();
     this.nomCompte = compte.nom;
     if (compte.numeroCase) {
@@ -731,7 +663,7 @@ export default class extends Vue {
   }
 
   private focusFirstElement() {
-    this.$nextTick(() => (this.$refs.numeroCompte as any)?.focus());
+    this.$nextTick(() => (this.$refs.typesComptes as any)?.focus());
   }
 
   private focusLastElement() {
@@ -741,6 +673,14 @@ export default class extends Vue {
   private close() {
     this.dialog = false;
     this.reject();
+  }
+
+  private changeType(event: KeyboardEvent) {
+    if (['c', 'f', 'g', 'z'].includes(event.key)) {
+      if ('z' == event.key) this.typesComptesSelected = new TypeCompte({ id: 'Z', libelle: 'Extra-comptable' });
+      this.$nextTick(() => (this.$refs.typesComptes as any).blur());
+      this.$nextTick(() => this.refNumeroCompte.focus());
+    }
   }
 }
 </script>

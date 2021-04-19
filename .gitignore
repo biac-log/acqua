@@ -19,3 +19,8 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+src/debug.log
+*.log
+
+# Ignore les fichiers générés par visual studio
+.vs/

@@ -5,6 +5,7 @@ export class CompteSearchDTO {
   adresse = '';
   codeTVAIntracommunautaire = '';
   compteBloque = false;
+  solde = 0;
 }
 
 export class CompteSearch extends CompteSearchDTO {
@@ -23,5 +24,14 @@ export class CompteSearch extends CompteSearchDTO {
 
   get compteBloqueDisplay() {
     return this.compteBloque ? 'Bloqué' : '';
+  }
+
+  // Alias
+  get bloque(): boolean {
+    return this.compteBloque;
+  }
+
+  get soldeCompta() {
+    return this.solde.toComptaString(2, true);
   }
 }

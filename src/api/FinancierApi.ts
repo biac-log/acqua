@@ -71,20 +71,20 @@ export abstract class FinancierApi {
     return response.data;
   }
 
-  static async deletePieceComptable(periode: string, numeroJournal: number, numeroPiece: number): Promise<boolean> {
-    await api.AcQuaCore.delete<any>(
+  static async deletePieceComptable(periode: string, numeroJournal: number, numeroPiece: number): Promise<number> {
+    const resp = await api.AcQuaCore.delete<number>(
       `Financier/DeletePieceComptable?periode=${periode}&journal=${numeroJournal}&piece=${numeroPiece}`
     );
-    return true;
+    return resp.data;
   }
 
-  static async addPieceComptable(piece: PieceSaveDTO): Promise<number> {
-    const response = await api.AcQuaCore.post<number>(`/Financier/AddPieceComptable`, piece);
+  static async addPieceComptable(piece: PieceSaveDTO): Promise<PieceDTO> {
+    const response = await api.AcQuaCore.post<PieceDTO>(`/Financier/AddPieceComptable`, piece);
     return response.data;
   }
 
-  static async updatePieceComptable(piece: PieceSaveDTO): Promise<number> {
-    const response = await api.AcQuaCore.put<number>(`/Financier/UpdatePieceComptable`, piece);
+  static async updatePieceComptable(piece: PieceSaveDTO): Promise<PieceDTO> {
+    const response = await api.AcQuaCore.put<PieceDTO>(`/Financier/UpdatePieceComptable`, piece);
     return response.data;
   }
 

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="600" v-model="dialog" @click:outside="close" @keydown.esc="close()">
+  <v-dialog width="700" v-model="dialog" @click:outside="close" @keydown.esc="close()">
     <v-card :loading="isLoading">
       <v-card-title>
         Case Tva
@@ -16,10 +16,19 @@
           autofocus
           @keydown.down.prevent="giveFocusToRow(0)"
           autocomplete="off"
+          outlined
         ></v-text-field>
+        <v-btn
+          color="error"
+          fab
+          small
+          class="ml-5"
+          @click="close"
+          ><v-icon>mdi-close</v-icon></v-btn
+        >
       </v-card-title>
       <AgGridVue
-        style="height: 561px;"
+        style="height: 730px;"
         id="dataTable"
         class="ag-theme-alpine"
         :columnDefs="headersCasesTva"
@@ -38,6 +47,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { CaseTva } from '@/models/CaseTva';
 import { GridOptions, ICellRenderer, GridApi } from 'ag-grid-community';
 import CaseTvaApi from '@/api/CaseTvaApi';
+import { CaseTvaNature } from '@/models/CaseTva/CaseTvaNature';
 
 @Component({
   name: 'SearchCaseTva',
@@ -54,9 +64,10 @@ export default class extends Vue {
     { headerName: 'Numéro case', field: 'numeroCase', cellStyle: { textAlign: 'right' }, width: 120 },
     { headerName: 'Libellé', field: 'libelleCase', flex: 1 },
     { headerName: 'Type', field: 'libelleTypeCase', width: 120 },
-    { headerName: 'Nature', field: 'natureCase', width: 120 },
+    { headerName: 'Nature', field: 'libelleNatureCase', width: 180 },
     { headerName: 'Taux', field: 'tauxTvaCase', cellStyle: { textAlign: 'right' }, width: 120 }
   ];
+  private casesTvaNatures: CaseTvaNature[] = [];
 
   private resolve!: any;
   private reject!: any;
@@ -70,12 +81,14 @@ export default class extends Vue {
     navigateToNextCell: this.navigateToNextCell,
     suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
-    onRowDoubleClicked: this.rowDoubleClick
+    onRowDoubleClicked: this.rowDoubleClick,
+    paginationPageSize: 15
   };
 
   public open(numeroJournal: number): Promise<CaseTva> {
     this.dialog = true;
     this.loadcasesTva(numeroJournal);
+    this.loadCaseTvaNatures();
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -90,8 +103,13 @@ export default class extends Vue {
     }
   }
 
+  private async loadCaseTvaNatures() {
+    if (this.casesTvaNatures.isEmpty()) this.casesTvaNatures = await CaseTvaApi.getNatures();
+  }
+
   private refreshcasesTva() {
     if (this.numeroJournalLoad) {
+      this.isLoading = true;
       (this.gridOptions.api as GridApi)?.showLoadingOverlay();
       CaseTvaApi.getCasesTVADisponibles(this.numeroJournalLoad)
         .then((resp) => {
@@ -99,6 +117,7 @@ export default class extends Vue {
         })
         .finally(() => {
           (this.gridOptions.api as GridApi)?.hideOverlay();
+          this.isLoading = false;
         });
     }
   }

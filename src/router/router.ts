@@ -5,6 +5,9 @@ import { PermissionModule } from '@/store/modules/permissions';
 import Layout from '@/layout/index.vue';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import { SocieteModule } from '@/store/modules/companies';
+import { ApplicationModule } from '@/store/modules/application';
+import AxiosApi from '@/api/AxiosApi';
 
 NProgress.configure({ showSpinner: false });
 
@@ -16,6 +19,11 @@ export const constantRoutes: RouteConfig[] = [
     path: '/',
     component: Layout,
     redirect: '/home',
+    meta: {
+      title: 'Home',
+      icon: 'mdi-home',
+      affix: true
+    },
     children: [
       {
         path: 'home',
@@ -42,7 +50,11 @@ export const asyncRoutes: RouteConfig[] = [
     path: '/achatvente',
     component: Layout,
     redirect: 'achatvente/index',
-    meta: { roles: ['admin', 'ACQUAACHATVENTE'] },
+    meta: {
+      roles: ['admin', 'ACQUAACHATVENTE'],
+      title: 'Achat Vente',
+      icon: 'mdi-currency-eur'
+    },
     children: [
       {
         path: 'index',
@@ -60,15 +72,63 @@ export const asyncRoutes: RouteConfig[] = [
     path: '/financier',
     component: Layout,
     redirect: 'financier/index',
-    meta: { roles: ['admin', 'ACQUAACHATVENTE'] },
+    meta: {
+      roles: ['admin', 'ACQUAACHATVENTE'],
+      title: 'Financier',
+      icon: 'mdi-cash'
+    },
     children: [
       {
         path: 'index',
-        component: () => import(/* webpackChunkName: "achatvente" */ '@/views/Financier/index.vue'),
+        component: () => import(/* webpackChunkName: "financier" */ '@/views/Financier/index.vue'),
         name: 'Financier',
         meta: {
           title: 'Financier',
-          icon: 'mdi-bank-transfer',
+          icon: 'mdi-cash',
+          affix: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/operationsdiverses',
+    component: Layout,
+    redirect: 'operationsdiverses/index',
+    meta: {
+      roles: ['admin', 'ACQUAACHATVENTE'],
+      title: 'Opérations diverses',
+      icon: 'mdi-swap-horizontal-bold'
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import(/* webpackChunkName: "operationdiverse" */ '@/views/OperationDiverse/index.vue'),
+        name: 'Opérations diverses',
+        meta: {
+          title: 'Opérations diverses',
+          icon: 'mdi-cake',
+          affix: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/historiquecomptable',
+    component: Layout,
+    redirect: 'historiquecomptable/index',
+    meta: {
+      roles: ['admin', 'ACQUAACHATVENTE'],
+      title: 'Historique Comptable',
+      icon: 'mdi-history'
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import(/* webpackChunkName: "historiquecomptable" */ '@/views/HistoriqueComptable/index.vue'),
+        name: 'Historique Comptable',
+        meta: {
+          title: 'Historique Comptable',
+          icon: 'mdi-history',
           affix: true
         }
       }
@@ -87,7 +147,7 @@ export const asyncRoutes: RouteConfig[] = [
       {
         path: 'fournisseurs',
         component: () =>
-          import(/* webpackChunkName: "achatvente" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
+          import(/* webpackChunkName: "fournisseurs" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
         name: 'Fournisseurs',
         meta: {
           title: 'Fournisseurs',
@@ -95,14 +155,54 @@ export const asyncRoutes: RouteConfig[] = [
           affix: true
         }
       },
+      // {
+      //   path: 'clients',
+      //   component: () => import(/* webpackChunkName: "clients" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
+      //   name: 'Clients',
+      //   meta: {
+      //     title: 'Clients',
+      //     icon: 'mdi-account-supervisor-circle',
+      //     affix: true
+      //   }
+      // },
       {
-        path: 'clients',
-        component: () =>
-          import(/* webpackChunkName: "achatvente" */ '@/views/Maintenance/Fournisseurs/Fournisseurs.vue'),
-        name: 'Clients',
+        path: 'devises',
+        component: () => import(/* webpackChunkName: "devises" */ '@/views/Maintenance/Devises/index.vue'),
+        name: 'Devises',
         meta: {
-          title: 'Clients',
-          icon: 'mdi-account-supervisor-circle',
+          title: 'Devises',
+          icon: 'mdi-currency-eur',
+          affix: true
+        }
+      },
+      {
+        path: 'taux',
+        component: () => import(/* webpackChunkName: "taux" */ '@/views/Maintenance/Taux/index.vue'),
+        name: 'Taux',
+        meta: {
+          title: 'Taux',
+          icon: 'mdi-sack-percent',
+          affix: true
+        }
+      },
+      {
+        path: 'libellesreglement',
+        component: () =>
+          import(/* webpackChunkName: "libellesreglement" */ '@/views/Maintenance/LibellesReglement/index.vue'),
+        name: 'Libellés règlement',
+        meta: {
+          title: 'Libellés règlement',
+          icon: 'mdi-format-title',
+          affix: true
+        }
+      },
+      {
+        path: 'casestva',
+        component: () => import(/* webpackChunkName: "casestva" */ '@/views/Maintenance/CasesTVA/index.vue'),
+        name: 'Cases TVA',
+        meta: {
+          title: 'Cases TVA',
+          icon: 'mdi-checkbox-blank-outline',
           affix: true
         }
       }
@@ -112,7 +212,7 @@ export const asyncRoutes: RouteConfig[] = [
     path: '/utilisateurs',
     component: Layout,
     redirect: 'utilisateurs/index',
-    meta: { roles: ['ACQUAGESTIONUTILISATEUR'] },
+    meta: { roles: ['ACQUAGESTIONUTILISATEUR'], title: 'Utilisateurs', icon: 'mdi-account-multiple' },
     children: [
       {
         path: 'index',
@@ -121,6 +221,24 @@ export const asyncRoutes: RouteConfig[] = [
         meta: {
           title: 'Utilisateurs',
           icon: 'mdi-account-multiple',
+          affix: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/societes',
+    component: Layout,
+    redirect: 'societes/index',
+    meta: { roles: ['ACQUAGESTIONUTILISATEUR'], title: 'Sociétés', icon: 'mdi-domain' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/Societes/index.vue'),
+        name: 'Sociétés',
+        meta: {
+          title: 'Sociétés',
+          icon: 'mdi-domain',
           affix: true
         }
       }
@@ -155,6 +273,17 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
         router.addRoutes(PermissionModule.dynamicRoutes);
         if (to.path.toUpperCase() == '/LOGIN') {
           next({ path: '/' });
+        }
+        if (SocieteModule.societes.isEmpty()) {
+          // Init societes
+          await SocieteModule.fetchSocietes()
+            .then(() => {
+              ApplicationModule.initParametre(); // init after headers are added
+              next({ ...to, replace: true });
+            })
+            .catch(() => {
+              next('/societes/index')
+            });
         } else {
           next({ ...to, replace: true });
         }
@@ -162,10 +291,37 @@ router.beforeEach(async (to: Route, from: Route, next: any) => {
         next(`/login`);
       }
     } else {
-      next();
+      if (SocieteModule.societes.isEmpty()) {
+        // Init societes
+        await SocieteModule.fetchSocietes()
+          .then(() => {
+            ApplicationModule.initParametre(); // init after headers are added
+            next();
+          })
+          .catch(() => {
+            if (from.path.toUpperCase().includes('/SOCIETES')) {
+              next(false);
+            }
+            else 
+            if (!to.path.toUpperCase().includes('/SOCIETES')) {
+              next('/societes/index');
+            }
+            else {
+              next();
+            }
+          });
+      }else{
+        next();
+      }
     }
   } else {
     // Has no token
+    if (process.env.VUE_APP_SINGLE_USER_MODE) {
+      await UserModule.loginSingleUser().then(() => {
+        AxiosApi.refreshAcQuaCore();
+        next('/');
+      });
+    }
     if (whiteList.indexOf(to.path) !== -1) {
       // In the free login whitelist, go directly
       next();

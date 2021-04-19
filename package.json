@@ -31,8 +31,9 @@
     "vuex-module-decorators": "^0.16.1"
   },
   "devDependencies": {
+    "@mdi/font": "^5.8.55",
     "@types/jwt-decode": "^2.2.1",
-    "@types/lodash": "^4.14.157",
+    "@types/lodash": "^4.14.162",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "^4.4.4",

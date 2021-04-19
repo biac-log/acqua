@@ -33,7 +33,7 @@
                     ref="code"
                     v-model="code"
                     :value="code"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     :rules="codeRules"
                     :error-messages="codeErrorMessage"
@@ -44,7 +44,7 @@
                     label="Nom prénom"
                     ref="nomPrenom"
                     v-model="nomPrenom"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     :rules="nomRules"
                     validate-on-blur
@@ -79,7 +79,7 @@
                     type="password"
                     :value="motDePasse"
                     :readonly="utilisateurReadonly"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :rules="nomRules"
                     validate-on-blur
                     prepend-inner-icon="mdi-lock"
@@ -102,7 +102,7 @@
                     ref="idActiveDirectory"
                     v-model="idActiveDirectory"
                     :value="idActiveDirectory"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     validate-on-blur
                   ></v-text-field>
@@ -111,7 +111,7 @@
                     ref="fonction"
                     v-model="fonction"
                     :value="fonction"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     validate-on-blur
                     prepend-inner-icon="mdi-briefcase"
@@ -120,7 +120,7 @@
                     label="Département"
                     persistent-hint
                     v-model="departement"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :items="departements"
                     :readonly="utilisateurReadonly"
                     prepend-inner-icon="mdi-sitemap"
@@ -131,7 +131,7 @@
                     :items="langues"
                     v-model="langue"
                     :readonly="utilisateurReadonly"
-                    :filled="utilisateurReadonly"
+                    outlined
                     prepend-inner-icon="mdi-translate"
                   ></v-select>
                 </v-col>
@@ -141,7 +141,7 @@
                     ref="adresseLigne1"
                     v-model="adresseLigne1"
                     :value="adresseLigne1"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     prepend-inner-icon="mdi-map-marker"
                     validate-on-blur
@@ -151,7 +151,7 @@
                     ref="adresseLigne2"
                     v-model="adresseLigne2"
                     :value="adresseLigne2"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     prepend-inner-icon="mdi-map-marker"
                     validate-on-blur
@@ -161,7 +161,7 @@
                     ref="adresseLigne3"
                     v-model="adresseLigne3"
                     :value="adresseLigne3"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     prepend-inner-icon="mdi-map-marker"
                     validate-on-blur
@@ -171,7 +171,7 @@
                     ref="telephone"
                     v-model="telephone"
                     :value="telephone"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     prepend-inner-icon="mdi-phone"
                     validate-on-blur
@@ -181,7 +181,7 @@
                     ref="numeroInterne"
                     v-model="numeroInterne"
                     :value="numeroInterne"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     prepend-inner-icon="mdi-phone"
                     validate-on-blur
@@ -191,7 +191,7 @@
                     ref="fax"
                     v-model="fax"
                     :value="fax"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     prepend-inner-icon="mdi-fax"
                     validate-on-blur
@@ -201,7 +201,7 @@
                     ref="email"
                     v-model="email"
                     :value="email"
-                    :filled="utilisateurReadonly"
+                    outlined
                     :readonly="utilisateurReadonly"
                     prepend-inner-icon="mdi-email"
                     validate-on-blur

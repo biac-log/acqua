@@ -1,71 +1,69 @@
 <template>
   <div
-    @keydown.alt.enter.stop="sendVentilation()"
+    @keydown.alt.enter.prevent.stop="sendVentilation()"
     @click:outside="close()"
     @keydown.esc.stop="close()"
-    @keydown.46.prevent.stop="deleteVentilation"
+    @keydown.107.prevent.stop=""
     class="ma-0 pa-0"
   >
     <div :class="ventilationIsSelected ? 'overlay' : ''" @click="close()" />
     <v-form ref="form" v-model="isValid" lazy-validation autocomplete="off">
       <v-card outlined id="editVentilation">
         <v-toolbar color="primary" dark flat dense>
-          <v-card-title class="pa-2">
-            Ventilation
-          </v-card-title>
+          <v-card-title class="pa-2"> Ventilation </v-card-title>
+          <v-spacer />
+          <v-btn
+            v-if="ventilationIsSelected && typesComptesSelected == typesComptes[2]"
+            color="success"
+            @click="openSuggestion"
+            >Comptes prédéfinis</v-btn
+          >
         </v-toolbar>
         <v-card-text v-if="!ventilationIsSelected">
           <v-card>
-            <v-card-text>
-              Veuillez ajouter ou sélectionner une ventilation.
-            </v-card-text>
+            <v-card-text> Veuillez ajouter ou sélectionner une ventilation. </v-card-text>
           </v-card>
         </v-card-text>
         <v-card-text v-else class="pb-0">
-          <v-row>
-            <v-col cols="3">
+          <v-row dense>
+            <v-col cols="4">
               <v-select
+                ref="refTypesComptes"
                 :items="typesComptes"
                 v-model="typesComptesSelected"
                 label="Type compte"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :hide-details="readonly"
                 :rules="typesComptesRules"
-                dense
+                @change="resetCompte"
+                autofocus
+                @keyup="changeType"
               ></v-select>
             </v-col>
-            <v-col cols="4">
+            <v-col cols="8">
               <AutocompleteComptesVue
                 ref="compteComponent"
-                :Readonly.sync="readonly"
-                :TypeCompte.sync="typesComptesSelected.id"
-                @Change="compteChange"
+                :readonly.sync="readonly"
+                :typeCompte.sync="typesComptesSelected.id"
+                :rules.sync="numeroCompteRules"
+                label="Compte"
+                outlined
+                @change="compteChange"
               >
               </AutocompleteComptesVue>
             </v-col>
-            <v-col cols="5">
-              <v-text-field
-                label="Nom compte"
-                v-model="nomCompte"
-                :filled="readonly"
-                :hide-details="readonly"
-                :rules="nomCompteRules"
-                tabindex="-1"
-                readonly
-                dense
-              ></v-text-field>
-            </v-col>
+            <compte-general-suggestion ref="compteGeneralSuggestion" />
           </v-row>
-          <v-row>
-            <v-col cols="7" v-if="typesComptesSelected.id != 'G'">
+          <v-row dense>
+            <v-col cols="7" v-if="['F', 'C'].some((type) => type == typesComptesSelected.id)">
               <v-text-field
                 ref="reference"
                 label="Référence"
                 v-model="reference"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :disabled="typesComptesSelected.id == 'G'"
                 :hide-details="readonly"
@@ -73,7 +71,6 @@
                 @change="loadPieceComptable(reference)"
                 @keydown.ctrl.f.prevent="openSearchEcheancier()"
                 validate-on-blur
-                dense
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -114,12 +111,11 @@
               <v-text-field
                 label="Nom Dossier"
                 v-model="nomDossier"
-                :filled="readonly"
+                outlined
                 :hide-details="readonly"
                 :disabled="dossierIsDisabled"
                 tabindex="-1"
                 readonly
-                dense
               ></v-text-field>
             </v-col>
             <v-col :cols="this.typesComptesSelected.id != 'G' || this.dossierIsEnabled ? 5 : 12">
@@ -129,15 +125,14 @@
                 v-model="libelle"
                 counter
                 maxlength="23"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="libelleRules"
                 :hide-details="readonly"
-                dense
               ></v-text-field>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row dense>
             <v-col cols="3">
               <v-select
                 :items="devises"
@@ -146,42 +141,33 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="devisesRules"
                 :hide-details="readonly"
-                dense
+                :suffix="devisesSelected.libelle ? taux : ''"
               ></v-select>
-            </v-col>
-            <v-col cols="2">
-              <v-text-field
-                label="Taux devise"
-                readonly
-                v-model="taux"
-                :filled="readonly"
-                :hide-details="readonly"
-                tabindex="-1"
-                dense
-              ></v-text-field>
             </v-col>
             <v-col cols="3">
               <v-text-field
                 label="Numéro case TVA"
                 ref="numeroCaseTva"
                 v-model="numeroCaseTva"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="numeroCaseTvaRules"
-                :hide-details="readonly"
+                hide-details="auto"
                 :loading="tvaLoading"
                 :disabled="typesComptesSelected.id != 'G'"
                 validate-on-blur
                 @keypress.enter="loadCaseTvaAsync"
                 @change="loadCaseTvaAsync"
                 @keydown.ctrl.f.prevent="openSearchCaseTva()"
-                dense
                 :error="numeroCaseTvaError != ''"
                 :error-messages="numeroCaseTvaError"
+                :suffix="caseTva.libelleCase"
+                :hint="caseTva.libelleNatureCase"
+                persistent-hint
               >
                 <template v-slot:append>
                   <v-tooltip top open-delay="500">
@@ -203,21 +189,6 @@
                 </template>
               </v-text-field>
             </v-col>
-            <v-col cols="4">
-              <v-text-field
-                label="Libellé case TVA"
-                v-model="caseTva.libelleCase"
-                :filled="readonly"
-                :hide-details="readonly"
-                :disabled="typesComptesSelected.id != 'G'"
-                tabindex="-1"
-                readonly
-                dense
-              ></v-text-field>
-              <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
-            </v-col>
-          </v-row>
-          <v-row>
             <v-col cols="3">
               <v-select
                 :items="typesMouvements"
@@ -226,11 +197,10 @@
                 item-value="id"
                 item-text="libelle"
                 return-object
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="typesMouvementsRules"
                 :hide-details="readonly"
-                dense
               ></v-select>
             </v-col>
             <v-col cols="3">
@@ -238,12 +208,12 @@
                 ref="montant"
                 v-model="montant"
                 label="Montant"
-                :filled="readonly"
+                outlined
                 :readonly="readonly"
                 :rules="montantRules"
                 :hide-details="readonly"
                 @blur="montant = montant.toNumber().toComptaString()"
-                dense
+                @keydown.tab.prevent="cycleFocus"
               >
                 <!-- <template v-slot:append>
                   <v-btn icon small :disabled="readonly" @click="calculMontant()" @keydown.enter.prevent.stop="calculMontant()">
@@ -252,6 +222,7 @@
                 </template> -->
               </v-text-field>
             </v-col>
+            <SearchCaseTvaVue ref="caseTvaDialog"></SearchCaseTvaVue>
           </v-row>
           <v-row dense>
             <v-col cols="12">
@@ -278,7 +249,6 @@
                 tabindex="-1"
                 v-if="!isNew && !readonly"
                 @click="deleteVentilation()"
-                dense
                 v-on="on"
               >
                 Supprimer
@@ -307,6 +277,7 @@
                 @click="sendVentilation"
                 @keydown.tab.prevent="focusFirstElement"
                 v-on="on"
+                id="validateVentilation"
               >
                 <v-icon left>mdi-check</v-icon> Valider
               </v-btn>
@@ -323,9 +294,9 @@
 import { Component, Vue, PropSync, Watch, Ref } from 'vue-property-decorator';
 import { TypeCompte, Devise, TypeMouvement, getTypesMouvements } from '@/models/AchatVente';
 import SearchCaseTvaVue from '@/components/search/SearchCaseTva.vue';
-import SearchEcheancierVue from './SearchEcheancier.vue';
+import SearchEcheancierVue from '@/components/search/SearchEcheancier.vue';
 import SearchDossierVue from '@/components/search/SearchDossier.vue';
-import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
+import { CompteGeneralSearch, CompteGeneralSearchDTO } from '@/models/Compte/CompteGeneralSearch';
 import { Ventilation, Journal, PieceAchatVente } from '@/models/Financier';
 import { FinancierApi } from '@/api/FinancierApi';
 import CaseTvaApi from '@/api/CaseTvaApi';
@@ -337,9 +308,14 @@ import { Reglement } from '@/models/Financier/Get/Reglement';
 import DeviseApi from '@/api/DeviseApi';
 import { DateTime } from '@/models/DateTime';
 import { DossierSearch } from '@/models/Dossier/DossierSearch';
-import AutocompleteComptesVue from './comptes/AutocompleteComptes.vue';
+import AutocompleteComptesVue from '@/components/comptes/AutocompleteComptes.vue';
 import AutoCompleteDossierVue from '@/components/autocomplete/AutocompleteDossier.vue';
 import { ApplicationModule } from '@/store/modules/application';
+import ParametreApi from '@/api/ParametresApi';
+import { ParametreFinancier } from '@/models/ParametreFinancier';
+import ExtraitVue from './Extrait.vue';
+import CompteApi from '@/api/CompteApi';
+import CompteGeneralSuggestion from './CompteGeneralSuggestion.vue';
 
 @Component({
   components: {
@@ -347,14 +323,18 @@ import { ApplicationModule } from '@/store/modules/application';
     SearchEcheancierVue,
     SearchDossierVue,
     AutocompleteComptesVue,
-    AutoCompleteDossierVue
-  }
+    AutoCompleteDossierVue,
+    CompteGeneralSuggestion,
+  },
 })
 export default class VentilationVue extends Vue {
   @Ref() readonly compteComponent!: AutocompleteComptesVue;
-  @Ref() readonly searchEcheancierDialog!: AutocompleteComptesVue;
-  @Ref() readonly caseTvaDialog!: AutocompleteComptesVue;
+  @Ref() readonly searchEcheancierDialog!: SearchEcheancierVue;
+  @Ref() readonly caseTvaDialog!: SearchCaseTvaVue;
   @Ref() readonly dossierComponent!: AutoCompleteDossierVue;
+  @Ref() readonly refTypesComptes!: HTMLElement;
+  @Ref() readonly btnValidate!: HTMLElement;
+  @Ref() readonly compteGeneralSuggestion!: CompteGeneralSuggestion;
 
   @PropSync('isReadOnly') public readonly!: boolean;
   @PropSync('Ventilations') public ventilations!: Ventilation[];
@@ -388,6 +368,7 @@ export default class VentilationVue extends Vue {
   private numeroCompte = '';
   private nomCompte = '';
   private nomCompteRules: any = [(v: string) => !!v || 'Nom obligatoire'];
+  private numeroCompteRules: any = [(v: string) => !!v || 'Numéro obligatoire'];
   private natureCompte = '';
 
   private devises: Devise[] = [];
@@ -395,22 +376,22 @@ export default class VentilationVue extends Vue {
   private devisesRules: any = [(v: string) => !!v || 'Devise obligatoire'];
   private taux = '';
   private libelle = '';
-  private libelleRules: any = [(v: string) => !!v || 'Libelle obligatoire'];
+  private libelleRules: any = [(v: string) => !!v || 'Libellé obligatoire'];
   private typesMouvements: TypeMouvement[] = getTypesMouvements();
   private typesMouvementsSelected: TypeMouvement = new TypeMouvement();
   private typesMouvementsRules: any = [(v: string) => !!v || 'Type obligatoire'];
   private montant = '';
   private montantRules: any = [
     (v: string) => !!v || 'Montant obligatoire',
-    (v: string) => v.isDecimal() || 'Montant invalide'
+    (v: string) => v.isDecimal() || 'Montant invalide',
   ];
+  private montantInit = 0;
 
   private caseTva: CaseTva = new CaseTva();
+  private caseBases: number[] = [];
   private numeroCaseTva = '';
   private numeroCaseTvaError = '';
-  private numeroCaseTvaRules: any = [
-    (v: string) => !v || (v.isInt() && v.toNumber() != 0) || 'Numéro invalide'
-  ];
+  private numeroCaseTvaRules: any = [(v: string) => !v || (v.isInt() && v.toNumber() != 0) || 'Numéro invalide'];
 
   private tauxCase = 0;
   private tvaLoading = false;
@@ -419,7 +400,7 @@ export default class VentilationVue extends Vue {
   private referenceJournal = '';
   private referencePiece = '';
   private referenceRules: any = [
-    (v: string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || 'Référence invalide'
+    (v: string) => !v || (v.isInt() && v.length == 8) || v.length == 9 || 'Référence invalide',
   ];
   private referenceWarning = '';
 
@@ -430,9 +411,14 @@ export default class VentilationVue extends Vue {
   private tvaCalcule = 0;
   private tvaImpute = 0;
 
+  private paramsFinanciers: ParametreFinancier[] = [];
+
   mounted() {
     FinancierApi.getTypesComptes().then((resp) => {
       this.typesComptes = resp;
+    });
+    ParametreApi.getParamsFinanciers().then((resp) => {
+      this.paramsFinanciers = resp;
     });
   }
 
@@ -444,7 +430,7 @@ export default class VentilationVue extends Vue {
     this.$nextTick(() => {
       (this.$refs.form as any)?.resetValidation();
       this.init(ventilation, journal);
-      this.compteComponent?.focus();
+      // this.compteComponent?.focus();
     });
 
     return new Promise((resolve, reject) => {
@@ -460,7 +446,13 @@ export default class VentilationVue extends Vue {
     this.$nextTick(() => {
       (this.$refs.form as any)?.resetValidation();
       this.init(ventilation, journal);
-      this.compteComponent?.focus();
+      // this.compteComponent?.focus();
+      this.$nextTick(() => {
+        const element = document.getElementById('validateVentilation');
+        if (element != null) {
+          element.scrollIntoView();
+        }
+      });
     });
 
     return new Promise((resolve, reject) => {
@@ -481,16 +473,25 @@ export default class VentilationVue extends Vue {
     this.nomCompte = ventilation?.nomCompte ? ventilation.nomCompte : '';
 
     if (ventilation) {
-      this.$nextTick(() => {
+      this.montantInit = ventilation.montantDevise;
+      if (ventilation.numeroCompte) {
         this.compteComponent?.init(ventilation.numeroCompte.toString(), ventilation.nomCompte);
-      });
+
+        if (ventilation.typeCompte == 'G') {
+          const compteG = await CompteApi.getCompteGeneral('G', ventilation.numeroCompte);
+          const caseTva = await CaseTvaApi.getCaseTVA(compteG.numeroCase, this.numeroJournal);
+          ventilation.caseTva.numeroCase = caseTva.numeroCase;
+          ventilation.caseTva = caseTva;
+        }
+      }
+
       if (ventilation.dossier) {
         this.dossierComponent.setDossier(
           new DossierSearch({
             idDossier: ventilation.dossier,
             nom: ventilation.dossierNom,
             dateEntree: '',
-            dateSortie: ''
+            dateSortie: '',
           })
         );
         this.idDossier = ventilation.dossier;
@@ -518,10 +519,19 @@ export default class VentilationVue extends Vue {
     }
   }
   //#endregion
+  private async resetCompte() {
+    this.compteComponent?.resetCompte();
+    if (this.typesComptesSelected.id != 'G') {
+      this.caseTva.refresh();
+      this.numeroCaseTva = '';
+      this.montant = this.montantInit.toString();
+    }
+  }
 
-  private compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
-    this.compteComponent.blur();
-    if (
+  private async compteChange(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
+    if (!compte) {
+      this.nomCompte = '';
+    } else if (
       typeof compte === 'string' &&
       (this.typesComptesSelected.id == 'C' || this.typesComptesSelected.id == 'F') &&
       compte.length == 8
@@ -530,19 +540,26 @@ export default class VentilationVue extends Vue {
       this.dossierIsDisabled = true;
       this.natureCompte = '';
       this.dossierComponent?.resetDossier();
-      this.$nextTick(() => (this.$refs.montant as any)?.focus());
+      //this.compteComponent.blur();
+      this.$nextTick(() => this.selectTextMontant());
     } else if (compte instanceof CompteGeneralSearch) {
       this.nomCompte = compte.nom;
       this.numeroCompte = compte.numero.toString();
       this.natureCompte = compte.nature;
+      // await this.getCaseTvaVentilations(compte);
       this.setCompteGeneralCaseTvaAsync(compte);
-      if (this.typesComptesSelected?.id == 'G' && (compte.nature == 'R' || compte.nature == 'C') && this.dossierIsEnabled) {
+      if (
+        this.typesComptesSelected?.id == 'G' &&
+        (compte.nature == 'R' || compte.nature == 'C') &&
+        this.dossierIsEnabled
+      ) {
         this.dossierIsDisabled = false;
         this.dossierComponent?.focus();
       } else {
         this.dossierIsDisabled = true;
         this.dossierComponent?.resetDossier();
-        this.$nextTick(() => (this.$refs.montant as any)?.focus());
+        //this.compteComponent.blur();
+        this.$nextTick(() => (this.$refs.numeroCaseTva as any).focus());
       }
     } else if (compte instanceof CompteSearch || compte instanceof CompteDeTier) {
       this.nomCompte = compte.nom;
@@ -550,6 +567,9 @@ export default class VentilationVue extends Vue {
       this.dossierIsDisabled = true;
       this.natureCompte = '';
       this.dossierComponent?.resetDossier();
+      this.caseTva = new CaseTva();
+      this.numeroCaseTva = '';
+      //this.compteComponent.blur();
       this.$nextTick(() => (this.$refs.reference as any)?.focus());
     }
   }
@@ -563,21 +583,26 @@ export default class VentilationVue extends Vue {
       } n'est pas actif à la date du ${this.datePiece.toString()}`;
     else this.warningMessage = '';
 
-    this.$nextTick(() => (this.$refs.montant as any)?.focus());
+    this.$nextTick(() => this.selectTextMontant());
   }
 
   private async setCompteGeneralCaseTvaAsync(compte: CompteGeneralSearch) {
-    if (compte.numeroCase) {
-      const caseTva = await CaseTvaApi.getCaseTVA(compte.numeroCase, this.numeroJournal);
-      if (caseTva) {
-        this.caseTva = caseTva;
-        this.numeroCaseTva = compte.numeroCase.toString();
-      } else {
-        this.caseTva = new CaseTva();
-        this.numeroCaseTva = '';
-      }
-      //this.calculMontant();
+    let caseTva: CaseTva | null;
+    caseTva = await this.getCaseTvaVentilations(compte); // On vérifie d'abord dans les ventilations
+
+    if (!caseTva && compte.numeroCase) {
+      // Si pas trouvé dans les ventilations, on prend le numéro défini par le compte
+      caseTva = await CaseTvaApi.getCaseTVA(compte.numeroCase, this.numeroJournal);
     }
+
+    if (caseTva) {
+      this.caseTva = caseTva;
+      this.numeroCaseTva = caseTva.numeroCase.toString();
+    } else {
+      this.caseTva = new CaseTva();
+      this.numeroCaseTva = '';
+    }
+    this.calculMontant();
   }
 
   //* Init de la ventiliation depuis une piece comptable *//
@@ -594,7 +619,7 @@ export default class VentilationVue extends Vue {
         .then((piece) => {
           if (piece) {
             this.initFromPieceComptable(piece);
-            this.$nextTick(() => (this.$refs.montant as any)?.focus());
+            this.$nextTick(() => this.selectTextMontant());
           }
         })
         .catch();
@@ -634,7 +659,7 @@ export default class VentilationVue extends Vue {
           new Devise({
             id: ventilation.codeDevise,
             libelle: ventilation.libelleDevise,
-            typeDevise: this.devisesSelected.typeDevise
+            typeDevise: this.devisesSelected.typeDevise,
           })
         );
         this.devisesSelected = this.devises.find((d) => d.id == ventilation.codeDevise) || this.devises[0];
@@ -665,7 +690,13 @@ export default class VentilationVue extends Vue {
         .open(this.typesComptesSelected.id, this.numeroCompte, `${this.numeroCompte} - ${this.nomCompte}`)
         .then((elements) => {
           this.initFromEcheancier(elements);
-          this.$nextTick(() => (this.$refs.montant as any)?.focus());
+          this.$nextTick(() => {
+            if (this.montant.toNumber() == this.ventileDevise) {
+              this.sendVentilation();
+            } else {
+              this.selectTextMontant();
+            }
+          });
         })
         .catch(() => {
           this.$nextTick(() => (this.$refs.reference as any)?.focus());
@@ -674,14 +705,17 @@ export default class VentilationVue extends Vue {
   }
 
   private initFromEcheancier(elements: EcheancierElement[]) {
+    // Init ventilation for the first element
     const element = elements[0];
     this.devisesSelected = this.devises.find((e) => e.id == element.codeDevise) || this.devises[0];
     this.reference = `${element.numeroJournal}.${element.numeroPiece}`;
     this.referenceJournal = element.numeroJournal.toString();
     this.referencePiece = element.numeroPiece.toString();
-    this.typesMouvementsSelected =
-      this.typesComptesSelected.id == 'F' ? this.typesMouvements[0] : this.typesMouvements[1];
-    this.montant = Math.abs(element.montantDevise).toComptaString(2);
+    this.caseBases.push(element.caseBase1, element.caseBase2, element.caseBase3);
+    // Take the opposite codeMouvement from element
+    this.typesMouvementsSelected = element.soldeDevise > 0 ? this.typesMouvements[1] : this.typesMouvements[0]; // [0] == DB, [1] == CR
+    this.montant = Math.abs(element.soldeDevise).toComptaString(2);
+    // Init other ventilations if there were more than one element
     for (let index = 1; index < elements.length; index++) {
       this.createVentilationFromEcheancier(elements[index]);
     }
@@ -697,6 +731,7 @@ export default class VentilationVue extends Vue {
     ventilation.referenceJournal = element.numeroJournal;
     ventilation.referencePiece = element.numeroPiece;
     ventilation.libelle = this.reglement.libelle;
+    ventilation.caseBases.push(element.caseBase1, element.caseBase2, element.caseBase3);
     ventilation.codeMouvement = element.montantDevise < 0 ? 'DB' : 'CR';
     ventilation.montantDevise = Math.abs(element.montantDevise);
     ventilation.montantBase = Math.abs(element.montantBase);
@@ -705,34 +740,6 @@ export default class VentilationVue extends Vue {
     this.ventilations.push(ventilation);
   }
   //#endregion
-
-  // private calculMontant(){
-  //   if(this.caseTva.typeCase == 50)
-  //     this.montant = this.calculMontantTva().toComptaString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
-  //   else if(this.caseTva.typeCase == 1)
-  //     this.montant = this.calculMontantTaxable().toComptaString(this.devisesSelected.typeDevise == "E" ? 0 : 2);
-  // }
-
-  // private calculMontantTva() : number{
-  //   let montantTva = this.tvaCalcule - this.tvaImpute;
-  //   if(this.typesMouvementsSelected.id == "DB") montantTva = this.tvaImpute -  this.tvaCalcule;
-  //   if(montantTva < 0)montantTva = 0;
-  //   return montantTva;
-  // }
-
-  // private calculMontantTaxable() : number {
-  //   let montantTaxable = this.tvaCalcule - this.tvaImpute;
-  //   if(this.typesMouvementsSelected.id == "CR")
-  //     montantTaxable = this.ventileDevise - montantTaxable;
-  //   else montantTaxable = montantTaxable - this.ventileDevise;
-
-  //   if(montantTaxable < 0)
-  //     montantTaxable = 0;
-  //   else if(this.caseTva.tauxTvaCase)
-  //     montantTaxable = (montantTaxable / (1+ (this.caseTva.tauxTvaCase / 100)));
-
-  //   return montantTaxable;
-  // }
 
   private async loadCaseTvaAsync() {
     try {
@@ -746,7 +753,7 @@ export default class VentilationVue extends Vue {
           this.numeroCaseTva = caseTva.numeroCase.toString();
           this.caseTva = caseTva;
           this.numeroCaseTvaError = '';
-          //this.calculMontant();
+          this.calculMontant();
         }
       } else {
         this.caseTva.refresh();
@@ -754,7 +761,7 @@ export default class VentilationVue extends Vue {
       }
     } catch (err) {
       this.caseTva = new CaseTva();
-      this.numeroCaseTvaError = "Numéro invalide";
+      this.numeroCaseTvaError = 'Numéro invalide';
       if (err.request.status != 505) this.errorMessage = err.request.response;
     } finally {
       this.tvaLoading = false;
@@ -768,6 +775,7 @@ export default class VentilationVue extends Vue {
         this.numeroCaseTva = caseTva.numeroCase.toString();
         this.caseTva = caseTva;
         this.numeroCaseTvaError = '';
+        this.calculMontant();
         this.$nextTick(() => (this.$refs.btnValidate as any)?.$el?.focus());
       })
       .catch(() => {
@@ -794,6 +802,7 @@ export default class VentilationVue extends Vue {
     ventilation.dossier = this.idDossier;
     ventilation.dossierNom = this.nomDossier;
     ventilation.caseTva = new CaseTva(this.caseTva);
+    ventilation.caseBases = this.caseBases;
     return ventilation;
   }
 
@@ -826,7 +835,12 @@ export default class VentilationVue extends Vue {
   }
 
   private focusFirstElement() {
-    this.compteComponent.focus();
+    this.refTypesComptes.focus();
+  }
+
+  private cycleFocus() {
+    if (!this.isValid) this.focusFirstElement();
+    else (this.$refs.btnValidate as any)?.$el?.focus();
   }
 
   public close() {
@@ -835,6 +849,73 @@ export default class VentilationVue extends Vue {
       this.ventilationIsSelected = false;
       if (this.reject) this.reject();
     }
+  }
+
+  private changeType(event: KeyboardEvent) {
+    if (['c', 'f', 'g', 'z'].includes(event.key)) {
+      if ('z' == event.key) this.typesComptesSelected = new TypeCompte({ id: 'Z', libelle: 'Extra-comptable' });
+      this.$nextTick(() => this.refTypesComptes.blur());
+      this.$nextTick(() => this.compteComponent.focus());
+    }
+  }
+
+  public async getCaseTvaVentilations(compte: CompteGeneralSearch): Promise<CaseTva | null> {
+    let caseTva = new CaseTva();
+    let caseBase = 0;
+    const caseBases: number[] = [];
+    // Retrouver les cases bases dans les ventilations hors TVA
+    this.ventilations
+      .filter((v) => v.caseTva.typeCase != 50)
+      .forEach((v) => {
+        v.caseBases.forEach((cb) => caseBases.push(cb));
+      });
+    // Filter duplicates or zeros
+    caseBases.filter((item, index) => caseBases.indexOf(item) != index || item != 0);
+
+    // On cherche les cases déjà utilisées pour ce compte
+    const usedCaseBases = this.ventilations
+      .filter(
+        (v) =>
+          v.typeCompte == 'G' && v.numeroCompte == compte.numero && v.caseTva.typeCase != 0 && v.caseTva.typeCase != 50
+      )
+      .map((v) => v.codeCaseTVA);
+    //Filter duplicates and zeros
+    usedCaseBases.filter((item, index) => usedCaseBases.indexOf(item) != index || item != 0);
+
+    // On renvoie la première case qui n'est pas reprise dans les cases déjà utilisées
+    caseBase = caseBases.find((c) => !usedCaseBases.some((uc) => c == uc)) ?? 0;
+
+    if (caseBase != 0) {
+      // Si caseTVA, on récupère les infos et on les renvoie
+      caseTva = await CaseTvaApi.getCaseTVA(caseBase, this.numeroJournal);
+      return caseTva;
+    } else {
+      // Sinon on renvoie null pour que setGeneralCompteTva prenne le relais
+      return null;
+    }
+  }
+
+  public selectTextMontant() {
+    this.$nextTick(() => (this.$refs.montant as Vue).$el.querySelector('input')?.select());
+  }
+
+  public calculMontant() {
+    if (this.caseTva.typeCase == 1)
+      this.montant = (Math.abs(this.montantInit) / (1 + this.caseTva.tauxTvaCase / 100)).toString();
+    this.montant = this.montant.toNumber().toComptaString();
+  }
+
+  public openSuggestion() {
+    this.compteGeneralSuggestion
+      .open()
+      .then(async (compte) => {
+        this.compteComponent.init(compte.numeroCompte.toString(), compte.libelle);
+        const compteG = await CompteApi.getCompteGeneral('G', compte.numeroCompte);
+        this.compteChange(compteG);
+      })
+      .catch((_) => {
+        this.compteComponent.focus();
+      });
   }
 }
 </script>

@@ -22,7 +22,7 @@
         </v-tooltip>
       </v-card-title>
       <v-spacer></v-spacer>
-      <v-btn color="info" @click="displayVentilation = !displayVentilation">
+      <v-btn color="info" @click="toggleVentilation">
         {{ displayVentilation ? 'Cacher la ventilation' : 'Afficher la ventilation' }}
       </v-btn>
     </v-toolbar>
@@ -135,6 +135,11 @@ export default class extends Vue {
 
   public focus() {
     this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
+  }
+
+  private toggleVentilation() {
+    this.displayVentilation = !this.displayVentilation;
+    this.focus();
   }
 }
 </script>

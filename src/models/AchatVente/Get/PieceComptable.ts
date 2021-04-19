@@ -24,7 +24,7 @@ export interface IPieceComptable {
   delaiPaiementLibelle: string;
   compteTiersEscomptePourcentage: string;
   compteTiersEscompteNombreJours: string;
-  compteAssocieNumero: string;
+  compteAssocieNumero: number;
   compteAssocieNom: string;
   compteVenteAchatNumero: number;
   compteVenteAchatNom: string;
@@ -58,7 +58,7 @@ export class PieceComptableDTO implements IPieceComptable {
   public delaiPaiementLibelle = '';
   public compteTiersEscomptePourcentage = '';
   public compteTiersEscompteNombreJours = '';
-  public compteAssocieNumero = '';
+  public compteAssocieNumero = 0;
   public compteAssocieNom = '';
   public compteVenteAchatNumero = 0;
   public compteVenteAchatNom = '';

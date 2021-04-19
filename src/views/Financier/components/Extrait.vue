@@ -1,19 +1,18 @@
 <template>
   <v-dialog
     v-model="dialog"
-    @keydown.alt.enter.stop="sendExtrait()"
+    @keydown.alt.enter.stop="sendExtrait"
     @click:outside="close()"
     @keydown.esc.stop="close()"
     @keydown.f2.stop="modifierPiece()"
     @keydown.107.prevent.stop="createVentilation"
-    @keydown.46.prevent.stop="deleteExtrait"
   >
     <v-form ref="form" v-model="isValid" lazy-validation>
       <v-card min-height="710px">
         <v-toolbar color="primary" dark flat>
           <v-card-title class="pa-2">
             <span v-if="numeroExtrait">Extrait {{ journal.numero }}.{{ numeroPiece }} - Ligne {{ numeroExtrait }}</span>
-            <span v-else>Nouvelle ligne</span>
+            <span v-else>Nouvelle ligne - Pièce {{ journal.numero }}.{{ journal.numeroDernierePiece + 1 }}</span>
           </v-card-title>
           <v-spacer></v-spacer>
           <v-tooltip v-if="readonly" top open-delay="500">
@@ -39,18 +38,50 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="7">
+            <v-col lg="7" sm="12">
+              <v-row>
+                <v-col cols="4">
+                  <v-text-field
+                    label="Date pièce"
+                    v-model="datePiece"
+                    outlined
+                    readonly
+                    tabindex="-1"
+                    prepend-inner-icon="mdi-calendar"
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    label="Solde initial"
+                    v-model="soldeInitial"
+                    outlined
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field
+                    label="Solde actuel"
+                    v-model="soldeActuel"
+                    outlined
+                    readonly
+                    tabindex="-1"
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
               <v-row dense>
-                <v-col cols="5">
-                  <v-text-field v-model="libelleCompte" label="Compte" :filled="readonly" readonly tabindex="-1">
-                  </v-text-field>
+                <v-col cols="6">
+                  <v-text-field v-model="libelleCompte" label="Compte" outlined readonly tabindex="-1" hide-details />
                 </v-col>
                 <v-col cols="3">
                   <v-text-field
                     ref="montant"
                     label="Montant"
                     v-model="montant"
-                    :filled="readonly"
+                    outlined
                     :readonly="readonly"
                     :suffix="journal.devise.libelle"
                     @blur="montant = montant.toNumber().toComptaString()"
@@ -58,7 +89,7 @@
                     autofocus
                   ></v-text-field>
                 </v-col>
-                <v-col cols="4">
+                <v-col cols="3">
                   <v-select
                     :items="reglements"
                     v-model="reglementSelected"
@@ -66,7 +97,7 @@
                     item-text="libelle"
                     item-value="numero"
                     return-object
-                    :filled="readonly"
+                    outlined
                     :readonly="readonly"
                     :hide-details="readonly"
                     :rules="reglementsRules"
@@ -101,7 +132,7 @@
                         <span v-if="!journal.devise || journal.devise.id == 1"
                           >Montant à ventiler :
                           <b
-                            >{{ ventileDevise | numberToStringEvenZero }}
+                            >{{ getVentileDevise() | numberToStringEvenZero }}
                             {{ journal.devise ? journal.devise.libelle : 'EUR' }}</b
                           ></span
                         >
@@ -125,14 +156,14 @@
                       @click:row="editVentilation"
                       disable-sort
                       dense
-                      height="400"
+                      :height="dataTableHeight"
                     >
                     </v-data-table>
                   </v-card>
                 </v-col>
               </v-row>
             </v-col>
-            <v-col cols="5">
+            <v-col lg="5" md="12">
               <VentilationVue
                 ref="refVentilationVue"
                 :Ventilations.sync="ventilations"
@@ -146,21 +177,13 @@
           </v-row>
         </v-card-text>
         <v-card-actions class="text-center" v-if="!readonly">
-          <v-tooltip top open-delay="500">
+          <v-tooltip top open-delay="500" v-if="numeroExtrait && !readonly">
             <template v-slot:activator="{ on }">
-              <v-btn
-                color="error"
-                class="ma-2 pr-4"
-                text
-                tabindex="-1"
-                v-if="!isNew && !readonly"
-                @click="deleteExtrait()"
-                v-on="on"
-              >
+              <v-btn color="error" class="ma-2 pr-4" text tabindex="-1" @click="deleteExtrait()" v-on="on">
                 Supprimer
               </v-btn>
             </template>
-            <span>Supprimer l'extrait'<span class="shortcutTooltip">del</span></span>
+            <span>Supprimer l'extrait<span class="shortcutTooltip">del</span></span>
           </v-tooltip>
           <v-spacer></v-spacer>
           <v-tooltip top open-delay="500">
@@ -183,6 +206,7 @@
         </v-card-actions>
       </v-card>
     </v-form>
+    <Confirm ref="confirmDialog"></Confirm>
   </v-dialog>
 </template>
 
@@ -193,14 +217,20 @@ import { FinancierApi } from '@/api/FinancierApi';
 import VentilationVue from './Ventilation.vue';
 import { Reglement } from '@/models/Financier/Get/Reglement';
 import { DateTime } from '@/models/DateTime';
+import { PromiseResponse } from '@/models/PromiseResponse';
 import DeviseApi from '@/api/DeviseApi';
+import DatePicker from '@/components/DatePicker.vue';
+import { ApplicationModule } from '@/store/modules/application';
+import { CaseTva } from '@/models/CaseTva';
+import Confirm from '@/components/Confirm.vue';
 
 @Component({
   name: 'Extrait',
-  components: { VentilationVue }
+  components: { VentilationVue, DatePicker, Confirm },
 })
 export default class extends Vue {
   @Ref() readonly refVentilationVue!: VentilationVue;
+  @Ref() confirmDialog!: Confirm;
 
   private dialog = false;
   @PropSync('isReadOnly')
@@ -215,25 +245,35 @@ export default class extends Vue {
   private journal: Journal = new Journal();
   private numeroPiece = '';
 
+  public get isOpened(): boolean {
+    return this.dialog;
+  }
+
+  public get dataTableHeight(): number {
+    return this.$vuetify.breakpoint.name == 'sm' || this.$vuetify.breakpoint.name == 'md' ? 200 : 400;
+  }
+
   private numeroExtrait = 0;
   private typeCompte = '';
   private compteLoading = false;
   private numeroCompte = '';
   private nomCompte = '';
   private libelleCompte = '';
+  private soldeInitial = '';
+  private soldeActuel = '';
 
   private reglementsLoading = false;
   private reglements: Reglement[] = [];
   private reglementSelected: Reglement = new Reglement();
   private reglementsRules = [
     (v: Reglement) => !!v || 'Règlement obligatoire',
-    (v: Reglement) => v.numero != 0 || 'Règlement obligatoire'
+    (v: Reglement) => v.numero != 0 || 'Règlement obligatoire',
   ];
 
   private montant = '';
   private montantRules: any = [
     (v: string) => !!v || 'Montant obligatoire',
-    (v: string) => v.isDecimal() || 'Montant invalide'
+    (v: string) => v.isDecimal() || 'Montant invalide',
   ];
 
   private ventilations: Ventilation[] = [];
@@ -246,21 +286,34 @@ export default class extends Vue {
     { text: 'Débit', value: 'montantDebit', width: 100, align: 'end' },
     { text: 'Crédit', value: 'montantCredit', width: 100, align: 'end' },
     { text: 'Devise', value: 'libelleDevise', width: 70 },
-    { text: 'TVA', value: 'libelleTva', width: 100 }
+    { text: 'TVA', value: 'libelleTva', width: 100 },
   ];
 
   private ventileBase = 0;
   private ventileDevise = 0;
 
+  private dernierType = '';
+  private derniereBase = '';
+  private derniereDevise!: number;
+
   mounted() {
     this.loadReglements();
+    ApplicationModule.initParametresFinanciers();
   }
 
-  public open(journal: Journal, numeroPiece: string, extrait: Extrait): Promise<Extrait> {
+  public open(
+    journal: Journal,
+    numeroPiece: string,
+    extrait: Extrait,
+    soldeInitial: string,
+    soldeActuel: string
+  ): Promise<PromiseResponse<Extrait>> {
     this.reset();
     this.dialog = true;
     this.isNew = false;
     this.numeroPiece = numeroPiece;
+    this.soldeInitial = soldeInitial;
+    this.soldeActuel = soldeActuel;
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
       this.initJournal(journal);
@@ -273,15 +326,21 @@ export default class extends Vue {
     });
   }
 
-  public openNew(journal: Journal): Promise<Extrait> {
+  public openNew(journal: Journal, soldeInitial: string, soldeActuel: string): Promise<PromiseResponse<Extrait>> {
     this.reset();
     this.dialog = true;
     this.isNew = true;
+
+    this.soldeInitial = soldeInitial;
+    this.soldeActuel = soldeActuel;
 
     this.$nextTick(() => {
       (this.$refs.form as any).resetValidation();
       this.setReglement(5);
       this.initJournal(journal);
+      this.$nextTick(() => {
+        (this.$refs.montant as HTMLElement).focus();
+      });
     });
 
     return new Promise((resolve, reject) => {
@@ -297,18 +356,39 @@ export default class extends Vue {
   get createVentilationEnabled() {
     return !this.readonly && this.montant;
   }
+
   private createVentilation() {
+    if (this.readonly) return false;
     (this.$refs.form as any).validate();
     this.$nextTick(() => {
       if (this.montant && this.isValid) {
         this.refVentilationVue
           .openNew(this.getVentilationToAdd(), this.journal)
           .then((ventil) => {
+            // On garde le type de compte/ nature case tva de la ventilation en mÃ©moire pour la ventilation TVA
+            if (['C', 'F'].some((type) => type == ventil.typeCompte) && this.dernierType != ventil.typeCompte) {
+              this.dernierType = ventil.typeCompte;
+            }
+            if (
+              ['V', 'A'].some((base) => base == ventil.caseTva.natureCase) &&
+              this.derniereBase != ventil.caseTva.natureCase
+            ) {
+              this.derniereBase = ventil.caseTva.natureCase;
+            }
+
             const maxLigne = this.ventilations?.length
               ? Math.max(...this.ventilations.map((i) => i.numeroVentilation))
               : 0;
             ventil.numeroVentilation = maxLigne + 1;
             this.ventilations.push(ventil);
+            this.$nextTick(() => {
+              if (this.ventileDevise != 0) {
+                // S'il reste un montant à ventiler
+                this.createVentilation(); // On réouvre la création d'une ventilation
+              } else {
+                this.sendExtrait(); // Sinon on crée l'extrait
+              }
+            });
           })
           .catch()
           .finally(() => {
@@ -368,11 +448,52 @@ export default class extends Vue {
   public getVentilationToAdd(): Ventilation {
     const ventilation = new Ventilation();
     ventilation.libelle = this.reglementSelected.libelle;
-    ventilation.codeDevise = this.journal.devise.id;
+    ventilation.codeDevise = this.derniereDevise ?? this.journal.devise.id;
     ventilation.libelleDevise = this.journal.devise.libelle;
     ventilation.montantDevise = Math.abs(this.ventileDevise);
     ventilation.montantBase = Math.abs(this.ventileDevise * (this.taux | 1));
-    if (this.montant.toNumber() > 0) {
+
+    if (this.ventilations.length > 0) {
+      // S'il existe déjà des ventilations
+      const lastVentilation = this.ventilations[this.ventilations.length - 1];
+      if (
+        this.ventilations.some((vent) => vent.caseTva.typeCase === 1) && // S'il y a une ventilation avec une case TVA de type 1
+        Math.abs(this.ventileBase) <= Math.abs(this.getTvaCalcule() - this.getTvaImpute()) // Et si le solde à ventiler est inférieur à (TVA calculée - TVA imputée)
+      ) {
+        ventilation.typeCompte = 'G';
+        ventilation.codeMouvement = this.getVentileDevise() < 0 ? 'DB' : 'CR'; // Code mouvement selon le reste à ventiler
+
+        if (this.dernierType == 'C' || this.derniereBase == 'V') {
+          const param = ApplicationModule.compteTvaClient;
+          ventilation.numeroCompte = param.numeroCompte;
+          ventilation.nomCompte = param.libelle;
+        } else if (this.dernierType == 'F' || this.derniereBase == 'A') {
+          const param = ApplicationModule.compteTvaFournisseur;
+          ventilation.numeroCompte = param.numeroCompte;
+          ventilation.nomCompte = param.libelle;
+        } else {
+          if (this.ventileDevise < 0) {
+            const param = ApplicationModule.compteTvaClient;
+            ventilation.numeroCompte = param.numeroCompte;
+            ventilation.nomCompte = param.libelle;
+          } else {
+            const param = ApplicationModule.compteTvaFournisseur;
+            ventilation.numeroCompte = param.numeroCompte;
+            ventilation.nomCompte = param.libelle;
+          }
+        }
+      } else {
+        // Sinon on propose le type compte de la dernière ventilation
+        ventilation.typeCompte = lastVentilation.typeCompte;
+        ventilation.codeMouvement = this.getVentileDevise() < 0 ? 'DB' : 'CR'; // Code mouvement selon le reste à ventiler
+        // if (ventilation.typeCompte == 'G') ventilation.caseTva = this.getCaseTvaVentilations() ?? new CaseTva();
+        if (this.ventilations.some((vent) => vent.caseTva.typeCase === 1)) {
+          // S'il y a déjà des ventilations avec des bases taxables
+          ventilation.montantDevise = this.ventileDevise - Math.abs(this.getTvaCalcule()); // On soustrait cette partie taxable du montant restant à ventiler
+        }
+      }
+    } // Si c'est la première ligne
+    else if (this.montant.toNumber() > 0) {
       ventilation.codeMouvement = 'CR';
       ventilation.typeCompte = 'C';
     } else {
@@ -468,19 +589,79 @@ export default class extends Vue {
   }
 
   private sendExtrait() {
-    (this.$refs.form as any).validate();
-    this.$nextTick(() => {
-      if (this.isValid) {
-        this.dialog = false;
-        this.resolve(this.getModel());
-      }
-    });
+    if (!(this.ventilations.length > 0)) {
+      // If there's no ventilation
+      this.confirmDialog
+        .open('Confirmer', 'Aucune ventilation définie, êtes-vous sûr de vouloir créer la ligne ?')
+        .then((resp) => {
+          if (resp) {
+            (this.$refs.form as any).validate();
+            this.$nextTick(() => {
+              if (this.isValid) {
+                this.dialog = false;
+                this.resolve(new PromiseResponse<Extrait>(this.getModel(), this.ventileDevise != 0)); // Send true to trigger openNew again if ventileBase = 0
+              }
+            });
+          }
+        });
+    } else {
+      (this.$refs.form as any).validate();
+      this.$nextTick(() => {
+        if (this.isValid) {
+          this.dialog = false;
+          this.resolve(new PromiseResponse<Extrait>(this.getModel(), this.ventileDevise != 0)); // Send true to trigger openNew again if ventileBase = 0
+        }
+      });
+    }
+  }
+
+  public getTvaCalcule(ventilationToIgnore?: Ventilation): number {
+    if (!this.ventilations) return 0;
+
+    const montantsCaseTva: { case: number; caseTaux: number; montant: number }[] = [];
+    this.ventilations
+      .filter((c) => c !== ventilationToIgnore)
+      .forEach((element) => {
+        const montantCase = montantsCaseTva.find((c) => c.case == element.caseTva.numeroCase);
+        if (montantCase) montantCase.montant += element.montantCredit.toNumber() - element.montantDebit.toNumber();
+        else if (element.caseTva.typeCase > 0 && element.caseTva.typeCase < 4) {
+          montantsCaseTva.push({
+            case: element.caseTva.numeroCase,
+            caseTaux: element.caseTva.tauxTvaCase,
+            montant: element.montantCredit.toNumber() - element.montantDebit.toNumber(),
+          });
+        }
+      });
+
+    return montantsCaseTva
+      .map((c) => ((c.montant * c.caseTaux) / 100).toDecimalString(2).toNumber())
+      .reduce((a, b) => a + b, 0)
+      .toDecimalString(this.journal.devise.typeDevise == 'E' ? 0 : 2)
+      .toNumber();
+  }
+
+  public getTvaImpute(ventilationToIgnore?: Ventilation): number {
+    if (!this.ventilations) return 0;
+
+    return this.ventilations
+      .filter(
+        (c) =>
+          (c.caseTva.typeCase == 50 || c.caseTva.typeCase == 51) &&
+          c.codeDevise == this.journal.devise.id &&
+          c !== ventilationToIgnore
+      )
+      .map((c) => c.montantCredit.toNumber() - c.montantDebit.toNumber())
+      .reduce((a, b) => a + b, 0);
+  }
+
+  public getCaseTvaVentilations(): CaseTva | undefined {
+    return this.ventilations.find((vent) => vent.codeCaseTVA)?.caseTva;
   }
 
   private deleteExtrait() {
     if (!this.isNew && !this.readonly) {
       this.dialog = false;
-      this.resolve();
+      this.resolve(new PromiseResponse(null, false));
     }
   }
 

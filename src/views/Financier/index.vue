@@ -3,7 +3,7 @@
     <v-card>
       <v-form ref="form" v-model="searchIsValid">
         <v-row align="start" justify="start" class="pl-5 pr-5">
-          <v-col cols="12" xs="12" md="4" lg="2">
+          <v-col cols="12" xs="12" sm="6" lg="2">
             <v-select
               autofocus
               label="Sélection de la période"
@@ -20,7 +20,7 @@
               @change="loadPiecesComptables"
             ></v-select>
           </v-col>
-          <v-col cols="12" xs="12" md="6" lg="3">
+          <v-col cols="12" xs="12" sm="6" lg="3">
             <v-select
               v-model="journalSelected"
               :items="journaux"
@@ -43,20 +43,31 @@
     </v-card>
     <v-card class="mt-5">
       <v-card-title>
-        Pièces comptables
-        <v-btn
-          ref="btnAdd"
-          color="warning"
-          small
-          fab
-          class="ml-5"
-          :disabled="!searchIsValid"
-          @click.stop="createNewPieceComptable"
-        >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-text-field v-model="search" append-icon="mdi-magnify" label="Rechercher" single-line hide-details></v-text-field>
+        <v-col cols="8">
+          Pièces comptables
+          <v-btn
+            ref="btnAdd"
+            color="warning"
+            small
+            fab
+            class="ml-5"
+            :disabled="!searchIsValid"
+            @click.stop="createNewPieceComptable"
+          >
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col cols="4">
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Rechercher"
+            single-line
+            hide-details
+            id="indexSearch"
+            outlined
+          ></v-text-field>
+        </v-col>
       </v-card-title>
       <v-data-table
         id="dataTable"
@@ -97,7 +108,7 @@
       </v-data-table>
     </v-card>
     <PieceComptableVue ref="refDialogPiece"></PieceComptableVue>
-    <PieceAddResultVue ref="PieceAddResultVue"></PieceAddResultVue>
+    <PieceAddResultVue ref="PieceAddResultVue" :SkipDialog.sync="skipAddResult"></PieceAddResultVue>
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
       <span v-html="snackbarMessage"></span>
@@ -123,6 +134,7 @@ export default class extends Vue {
   @Ref() readonly refDialogPiece!: PieceComptableVue;
   @Ref() readonly PieceAddResultVue!: PieceAddResultVue;
   private searchIsValid = true;
+  private skipAddResult = false;
 
   private isErrorPeriode = false;
   private periodeIsLoading = false;
@@ -150,7 +162,6 @@ export default class extends Vue {
     { text: '', value: 'pieceEquilibree', width: 50 },
     { text: 'Numéro pièce', value: 'numeroPiece' },
     { text: 'Date pièce', value: 'datePieceDate' },
-    { text: 'Libellé', value: 'libelle' },
     { text: 'Solde initial', value: 'soldeInitiale', align: 'end' },
     { text: 'Débit', value: 'totalDebit', align: 'end' },
     { text: 'Crédit', value: 'totalCredit', align: 'end' },
@@ -163,7 +174,26 @@ export default class extends Vue {
   private totalItems = 0;
   private isLoadingPieces = false;
 
+  private unsubscribe!: Function;
+
   mounted() {
+    this.loadPeriodes();
+    this.loadJournaux();
+    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      if(mutation.type === 'selectSociete') {
+        this.reset();
+      }
+    });
+  }
+
+  beforeDestroy() {
+    this.unsubscribe();
+  }
+
+  private reset() {
+    this.piecesComptables = [];
+    this.journalSelected = new Journal();
+    this.periodeSelected = new PeriodeComptable();
     this.loadPeriodes();
     this.loadJournaux();
   }
@@ -201,16 +231,12 @@ export default class extends Vue {
     this.refDialogPiece
       .open(this.periodeSelected, this.journalSelected, entete.numeroPiece)
       .then((resp) => {
-        if (resp) {
-          Vue.set(
-            this.piecesComptables,
-            this.piecesComptables.findIndex((e) => e == entete),
-            resp
-          );
-          this.notifier(`Pièce numéro <b>${resp.codePieceDisplay}</b> mise à jour.`, 'success');
+        if (!resp.delete) {
+          this.notifier(`Pièce numéro <b>${resp}</b> mise à jour.`, 'success');
         } else {
           this.piecesComptables.splice(this.piecesComptables.indexOf(entete), 1);
-          this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimer.`, 'error');
+          this.notifier(`Pièce numéro <b>${entete.codePieceDisplay}</b> supprimée.`, 'error');
+          this.journalSelected.numeroDernierePiece = resp.numeroDernierePiece;
         }
       })
       .catch()
@@ -220,12 +246,21 @@ export default class extends Vue {
   }
 
   private createNewPieceComptable() {
+    if (!this.searchIsValid) return false;
     this.refDialogPiece
       .openNew(this.periodeSelected, this.journalSelected)
       .then((resp) => {
-        this.displayAddResult(resp);
-        this.journalSelected.numeroDernierePiece = parseInt(resp);
+        if (!this.skipAddResult && !resp.delete) this.displayAddResult(resp.numeroDernierePiece.toString());
+        if(resp.delete) {
+          this.notifier(`Pièce supprimée.`, 'error');
+        }
+        this.journalSelected.numeroDernierePiece = resp.numeroDernierePiece;
         this.loadPiecesComptables();
+      })
+      .catch((resp) => {
+        if (resp.newRecord) {
+          this.loadPiecesComptables();
+        }
       })
       .finally(() => {
         this.$nextTick(() => (this.$refs.btnAdd as any)?.$el?.focus());
@@ -234,7 +269,12 @@ export default class extends Vue {
 
   private displayAddResult(numeroPiece: string) {
     (this.$refs.PieceAddResultVue as PieceAddResultVue)
-      .open(this.journalSelected.numero, parseInt(numeroPiece), this.periodeSelected.typePeriodeComptable)
+      .open(
+        this.journalSelected.numero,
+        parseInt(numeroPiece),
+        this.periodeSelected.typePeriodeComptable,
+        this.journalSelected.numeroCompteBanque
+      )
       .then((numero) => {
         if (parseInt(numeroPiece) != numero) {
           this.loadPiecesComptables();

@@ -1,47 +1,42 @@
 <template>
   <v-app id="inspire">
     <!-- Click display only child -->
-    <v-navigation-drawer v-model="drawer" :mini-variant="mini" app>
+    <v-navigation-drawer v-model="drawer" disable-resize-watcher permanent app width="86">
       <v-list dense>
         <v-list-item v-if="parentRoute" :key="previousName" @click="previous()">
-          <v-list-item-action>
-            <v-icon>mdi-menu-left</v-icon>
-          </v-list-item-action>
           <v-list-item-content>
+            <v-icon>mdi-keyboard-backspace</v-icon>
             <v-list-item-title>{{ previousName }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <template v-for="route in routesDisplay">
-          <v-list-item link v-if="!route.children || route.children.length == 1" :key="route.title" :to="route">
-            <v-list-item-action>
-              <v-icon>{{ getOnlyChildren(route).meta.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>{{ getOnlyChildren(route).name }}</v-list-item-title>
+          <v-list-item
+            link
+            v-if="!route.children || route.children.length == 1"
+            :key="route.title"
+            :to="route"
+            class="pr-1 pl-1"
+          >
+            <v-list-item-content class="text-center">
+              <v-icon class="align-self-center">{{ route.meta.icon }}</v-icon>
+              <v-list-item-title class="align-self-center text-wrap">{{ route.meta.title }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item v-else :key="route.meta.title" @click="displayChildRoute(route)">
-            <v-list-item-action>
-              <v-icon>{{ route.meta.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>{{ route.meta.title }}</v-list-item-title>
+          <v-list-item v-else :key="route.meta.title" @click="displayChildRoute(route)" class="pr-1 pl-1">
+            <v-list-item-content class="text-center">
+              <v-icon class="align-self-center">{{ route.meta.icon }}</v-icon>
+              <v-list-item-title class="align-self-center text-wrap">{{ route.meta.title }}</v-list-item-title>
             </v-list-item-content>
-            <v-list-item-action>
-              <v-btn icon>
-                <v-icon color="grey lighten-1">mdi-menu-right</v-icon>
-              </v-btn>
-            </v-list-item-action>
           </v-list-item>
         </template>
       </v-list>
     </v-navigation-drawer>
 
     <v-app-bar app color="blue" dark>
-      <v-app-bar-nav-icon @click.stop="mini = !mini">
+      <!-- <v-app-bar-nav-icon @click.stop="mini = !mini">
         <v-icon v-if="mini">mdi-forwardburger</v-icon>
         <v-icon v-if="!mini">mdi-backburger</v-icon>
-      </v-app-bar-nav-icon>
+      </v-app-bar-nav-icon> -->
       <v-toolbar-title class="d-flex justify-start">AcQua / {{ currentRoute }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <span style="width: 400px">
@@ -73,8 +68,21 @@
           </template>
         </v-autocomplete>
       </span>
+      <span style="width: 300px; padding-top: 25px">
+        <v-select
+          class="mr-10"
+          outlined
+          dense
+          :v-if="societes.length > 1"
+          label="Société"
+          :items="societes"
+          item-text="name"
+          v-model="societeSelected"
+          return-object
+        ></v-select>
+      </span>
       {{ username }}
-      <v-btn icon class="ml-5" @click="logout">
+      <v-btn v-if="!singleUserMode" icon class="ml-5" @click="logout">
         <v-icon>mdi-logout</v-icon>
       </v-btn>
     </v-app-bar>
@@ -92,14 +100,17 @@ import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { AppMain } from './components';
 import { UserModule } from '@/store/modules/user';
+import { SocieteModule } from '@/store/modules/companies';
 import { RouteConfig } from 'vue-router';
 import { PermissionModule } from '@/store/modules/permissions';
+import { Societe } from '@/models/Societe/societe';
+import { ApplicationModule } from '@/store/modules/application';
 
 @Component({
   name: 'Layout',
   components: {
-    AppMain
-  }
+    AppMain,
+  },
 })
 export default class extends Vue {
   private drawer = true;
@@ -107,6 +118,10 @@ export default class extends Vue {
   private source = '';
   private currentRoute: any = '';
   private previousName = 'Accueil';
+
+  private get singleUserMode() {
+    return ApplicationModule.singleUserMode;
+  }
 
   mounted() {
     this.currentRoute = this.$route.name;
@@ -175,6 +190,18 @@ export default class extends Vue {
 
   get username() {
     return UserModule.username;
+  }
+
+  get societes() {
+    return SocieteModule.societes;
+  }
+
+  get societeSelected() {
+    return SocieteModule.societeSelected;
+  }
+
+  set societeSelected(societe: Societe) {
+    SocieteModule.selectSociete(societe);
   }
 
   private logout() {

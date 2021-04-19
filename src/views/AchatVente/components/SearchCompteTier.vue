@@ -4,8 +4,8 @@
     v-model="dialog"
     @click:outside="close()"
     @keydown.esc="close()"
-    @keydown.page-up="nextPage()"
-    @keydown.page-down="previousPage()"
+    @keydown.page-down="nextPage()"
+    @keydown.page-up="previousPage()"
   >
     <v-card class="mt-5" :loading="isLoading">
       <v-card-title>
@@ -80,7 +80,8 @@ export default class extends Vue {
     onCellKeyDown: this.keypress,
     overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
     pagination: true,
-    paginationAutoPageSize: true,
+    // paginationAutoPageSize: true,
+    paginationPageSize: 15,
     onRowDoubleClicked: this.rowDoubleClick,
     getRowStyle(params: any) {
       if (params.node.data.compteBloque) return { 'background-color': '#ffd6cc' };

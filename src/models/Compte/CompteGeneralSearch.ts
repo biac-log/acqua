@@ -7,6 +7,7 @@ export interface ICompteGeneralSearch {
   libelleNature: string;
   numeroCase: number;
   libelleCase: string;
+  bloque: boolean;
 }
 
 export class CompteGeneralSearchDTO implements ICompteGeneralSearch {
@@ -18,6 +19,7 @@ export class CompteGeneralSearchDTO implements ICompteGeneralSearch {
   libelleNature = '';
   numeroCase = 0;
   libelleCase = '';
+  bloque = false;
 }
 
 export class CompteGeneralSearch extends CompteGeneralSearchDTO {
@@ -31,7 +33,7 @@ export class CompteGeneralSearch extends CompteGeneralSearchDTO {
   }
 
   get numeroNom() {
-    return `${this.numero} ${this.nom}`;
+    return `${this.numero ? this.numero : ''} ${this.nom}`;
   }
 
   get caseTvaDisplay() {

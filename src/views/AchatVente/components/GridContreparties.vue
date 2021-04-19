@@ -38,7 +38,7 @@
         :items="contreparties"
         id="dataTable"
         class="elevation-1"
-        :dense="contreparties.length > 8"
+        :dense="contreparties && contreparties.length > 8"
         disable-pagination
         hide-default-footer
         @click:row="editContrepartie"
@@ -74,7 +74,7 @@ export default class extends Vue {
   @PropSync('Contreparties') private contreparties!: PieceComptableContrepartie[];
   @PropSync('Journal') public journal!: Journal;
   @PropSync('DeviseEntete') public devise!: Devise;
-  @PropSync('CompteAchatVente') private numeroCompteAchatVente!: string;
+  @PropSync('CompteAchatVente') private numeroCompteAchatVente!: number;
   @PropSync('MontantDevise') private montantDevise!: string;
   @PropSync('MontantBase') private montantBase!: string;
   @PropSync('NomCompteDeTier') private nomCompteDeTier!: string;
@@ -90,7 +90,7 @@ export default class extends Vue {
   private headersContreparties = [
     { text: 'N° Compte', value: 'libelleNumero' },
     { text: 'Nom compte', value: 'compteLibelle' },
-    { text: 'Libelle', value: 'libelle' },
+    { text: 'Libellé', value: 'libelle' },
     { text: 'Débit', value: 'montantDebit', align: 'end' },
     { text: 'Crédit', value: 'montantCredit', align: 'end' },
     { text: 'Devise', value: 'libelleDevise' },
@@ -153,33 +153,39 @@ export default class extends Vue {
   }
 
   public async createContrepartie() {
-    if ((!this.numeroCompteAchatVente || this.numeroCompteAchatVente == '0') && this.contreparties.length == 0) {
+    if (!this.numeroCompteAchatVente && this.contreparties.length == 0) {
       this.propositionLibelle = this.nomCompteDeTier;
       this.addContrepartie();
     } else if (this.contreparties.length == 0) {
+      // Première contrepartie
       const compteAchatVente = await CompteApi.getCompteGeneral('G', this.numeroCompteAchatVente);
       const contrepartie = new PieceComptableContrepartie();
       contrepartie.numeroCompte = compteAchatVente.numero;
       contrepartie.compteLibelle = compteAchatVente.nom;
       contrepartie.libelle = this.nomCompteDeTier;
-      contrepartie.codeMouvement = this.journal.codeMouvement == 'DB' ? 'CR' : 'DB';
+      if (this.montantBase.toNumber() >= 0) {
+        contrepartie.codeMouvement = this.journal.codeMouvement == 'DB' ? 'CR' : 'DB';
+      } else {
+        contrepartie.codeMouvement = this.journal.codeMouvement == 'CR' ? 'CR' : 'DB';
+      }
       if (compteAchatVente.numeroCase) {
         const tva = await CaseTvaApi.getCaseTVA(compteAchatVente.numeroCase, this.journal.numero);
         if (tva) {
-          contrepartie.montantDevise = this.montantDevise.toNumber() / (1 + tva.tauxTvaCase / 100);
-          contrepartie.montantBase = this.montantBase.toNumber() / (1 + tva.tauxTvaCase / 100);
+          contrepartie.montantDevise = Math.abs(this.montantDevise.toNumber()) / (1 + tva.tauxTvaCase / 100);
+          contrepartie.montantBase = Math.abs(this.montantBase.toNumber()) / (1 + tva.tauxTvaCase / 100);
           contrepartie.caseTva = tva;
         }
       }
       this.addContrepartie(contrepartie);
     } else if (this.ventilleDevise == 0 && this.ventilleBase != 0) {
+      // Si le ventileBase n'est pas à 0, généralement à cause du taux de conversion
       const contrepartie = new PieceComptableContrepartie();
       contrepartie.libelle = this.nomCompteDeTier;
       contrepartie.codeMouvement = this.journal.codeMouvement == 'DB' ? 'DB' : 'CR';
       contrepartie.montantDevise = 0;
       contrepartie.montantBase = this.ventilleBase;
       contrepartie.codeDevise = 1;
-      if (+this.numeroCompteAchatVente) {
+      if (this.numeroCompteAchatVente) {
         const compteAchatVente = await CompteApi.getCompteGeneral('G', this.numeroCompteAchatVente);
         if (compteAchatVente.numeroCase) {
           const tva = await CaseTvaApi.getCaseTVA(compteAchatVente?.numeroCase, this.journal.numero);
@@ -211,7 +217,11 @@ export default class extends Vue {
     contrepartie.numeroCompte = compteTva.numero;
     contrepartie.compteLibelle = compteTva.nom;
     contrepartie.libelle = this.nomCompteDeTier;
-    contrepartie.codeMouvement = this.journal.codeMouvement == 'DB' ? 'CR' : 'DB';
+    if (this.montantBase.toNumber() >= 0) {
+      contrepartie.codeMouvement = this.journal.codeMouvement == 'DB' ? 'CR' : 'DB';
+    } else {
+      contrepartie.codeMouvement = this.journal.codeMouvement == 'CR' ? 'CR' : 'DB';
+    }
     contrepartie.montantDevise = Math.abs(tvaCalcule - tvaImpute);
     contrepartie.montantBase = Math.abs((tvaCalcule - tvaImpute) * +this.tauxDevise);
     contrepartie.caseTva = tva;

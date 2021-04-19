@@ -6,6 +6,7 @@
     offset-y
     max-width="290px"
     min-width="290px"
+    :disabled="isDisabled"
     :close-on-content-click="false"
   >
     <template v-slot:activator="{}">
@@ -13,13 +14,18 @@
         v-model="dateFormatted"
         ref="refDate"
         :label="label"
-        :filled="isFilled"
         :readonly="isReadonly"
         :rules="dateRules"
-        @blur.prevent="dateSelected = parseDate(dateFormatted)"
+        @blur.prevent="parseDate(dateFormatted)"
         @focus="$event.target.select()"
         :hide-details="isReadonly"
+        :disabled="isDisabled"
+        :tabindex="tabindex"
+        :outlined="outlined"
         validate-on-blur
+        @update:error="validateField"
+        :error-messages="errorMessages"
+        @keydown.enter.prevent="blur"
       >
         <template v-slot:prepend-inner>
           <v-btn
@@ -51,38 +57,47 @@ export default class extends Vue {
   public dateSelected = '';
   public dateFormatted = '';
 
-  @Prop()
-  readonly label: string | undefined;
-  @PropSync('readonly')
-  private isReadonly!: boolean;
-  @PropSync('date')
-  public syncedDate!: DateTime;
-  @PropSync('rules')
-  public dateRules!: any;
-  @PropSync('filled')
-  public isFilled?: boolean;
+  @Prop() readonly label: string | undefined;
+  @Prop() readonly tabindex: number | undefined;
+  @Prop() readonly outlined!: boolean;
+  @PropSync('readonly') private isReadonly!: boolean;
+  @PropSync('date') public syncedDate!: DateTime | null;
+  @PropSync('rules') public dateRules!: any;
+  @PropSync('filled') public isFilled?: boolean;
+  @PropSync('disabled', { default: false }) public isDisabled!: boolean;
 
-  private parseDate(date: string): string {
-    if (!date) return '';
+  private errorMessages: string[] = [];
+
+  private parseDate(date: string) {
+    if (!date) this.dateSelected = '';
     else {
       let dateString = date;
-      if (date.length === 2) dateString = `${date}/${this.syncedDate.date.format('MM/YYYY')}`;
-      else if (date.length === 4) dateString = `${date}${this.syncedDate.date.format('YYYY')}`;
-      else if (date.length === 5) dateString = `${date}/${this.syncedDate.date.format('YYYY')}`;
-      else if (date.length === 6) {
+      if (date.length < 6) {
+        const dateBase = this.syncedDate ? this.syncedDate : new DateTime();
+        if (date.length === 2) dateString = `${date}/${dateBase.date.format('MM/YYYY')}`;
+        else if (date.length === 4) dateString = `${date}${dateBase.date.format('YYYY')}`;
+        else if (date.length === 5) dateString = `${date}/${dateBase.date.format('YYYY')}`;
+      } else if (date.length === 6) {
         let annee = date.slice(-2).toNumber();
         if (annee >= 80) annee += 1900;
         else annee += 2000;
         dateString = `${date.substring(0, 4)}${annee}`;
       }
       const dateToSelect = new DateTime(dateString);
-      if (dateToSelect.toString('YYYY-MM-DD') == this.dateSelected)
+      if (dateToSelect.toString('YYYY-MM-DD') == this.dateSelected) {
         this.$nextTick(() => (this.dateFormatted = dateToSelect.toString()));
-      return dateToSelect.toString('YYYY-MM-DD');
+      }
+      this.dateSelected = dateToSelect.toString('YYYY-MM-DD');
     }
   }
 
-  @Watch('dateSelected')
+  private validateField() {
+    //Utilisé lors de l'erreur quand on retape la même date mais partiellement
+    //Ex : 01-01-2020 par défaut on écrit 01 => erreur alors qu'il ne faut pas
+    this.$nextTick(() => (this.$refs.refDate as any).validate(true));
+  }
+
+  @Watch('dateSelected', { deep: true })
   private dateSelectedChanged(val: string) {
     if (val) {
       const date = new DateTime(val);
@@ -91,19 +106,44 @@ export default class extends Vue {
       this.$nextTick(() => (this.$refs.refDate as any).validate(true));
     } else {
       this.dateFormatted = '';
-      this.syncedDate = new DateTime();
+      this.syncedDate = null;
     }
+    this.$emit('change', val ?? '');
   }
 
-  @Watch('syncedDate')
-  private syncedDateChanged(val: DateTime) {
+  @Watch('syncedDate', { deep: true })
+  private syncedDateChanged(val: DateTime | null) {
     const currentDate = new DateTime(this.dateFormatted);
-    if (!val.isValid()) this.dateSelected = '';
+    if (!val?.isValid()) this.dateSelected = '';
     else if (!val.isSame(currentDate)) this.dateSelected = val.toUtc();
   }
 
   public focus() {
     this.$nextTick(() => (this.$refs.refDate as any).focus());
+  }
+
+  public blur() {
+    this.$nextTick(() => (this.$refs.refDate as any).blur());
+  }
+
+  public selectText() {
+    this.$nextTick(() => (this.$refs.refDate as Vue).$el.querySelector('input')?.select());
+  }
+
+  public isDateValid() {
+    this.parseDate(this.dateFormatted);
+    if (new DateTime(this.dateSelected).isValid()) {
+      this.errorMessages = [];
+      return true;
+    } else {
+      this.errorMessages.push('Date invalide');
+      this.focus();
+      return false;
+    }
+  }
+
+  public initFromString(date: string) {
+    this.syncedDate = new DateTime(date);
   }
 }
 </script>

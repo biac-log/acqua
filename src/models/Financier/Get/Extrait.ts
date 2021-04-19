@@ -1,5 +1,5 @@
 import { Ventilation } from './Ventilation';
-import _ from 'lodash';
+import { sum, round } from 'lodash';
 export class ExtraitDTO {
   numeroExtrait = 0;
   typeCompte = '';
@@ -47,13 +47,13 @@ export class Extrait extends ExtraitDTO {
   }
 
   get isEquilibre(): boolean {
-    const debitVent = _.round(_.sum(this.ventilations.map((m) => m.montantDebit.toNumber())), 2);
-    const creditVent = _.round(_.sum(this.ventilations.map((m) => m.montantCredit.toNumber())), 2);
+    const debitVent = round(sum(this.ventilations.map((m) => m.montantDebit.toNumber())), 2);
+    const creditVent = round(sum(this.ventilations.map((m) => m.montantCredit.toNumber())), 2);
     if (this.montantCredit) {
-      const aVentille = _.round(this.montantCredit.toNumber() - debitVent + creditVent, 2);
+      const aVentille = round(this.montantCredit.toNumber() - debitVent + creditVent, 2);
       return aVentille == 0;
     } else {
-      const aVentille = _.round(this.montantDebit.toNumber() - creditVent + debitVent, 2);
+      const aVentille = round(this.montantDebit.toNumber() - creditVent + debitVent, 2);
       return aVentille == 0;
     }
   }

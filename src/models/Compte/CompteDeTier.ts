@@ -14,6 +14,7 @@ export interface ICompteDeTier {
   compteVenteAchatNumero: number;
   compteVenteAchatNom: string;
   codeTaxe: number;
+  bloque: boolean;
 }
 
 export class CompteDeTierDTO implements ICompteDeTier {
@@ -32,16 +33,17 @@ export class CompteDeTierDTO implements ICompteDeTier {
   compteVenteAchatNumero = 0;
   compteVenteAchatNom = '';
   codeTaxe = 0;
+  bloque = false;
 }
 
 export class CompteDeTier extends CompteDeTierDTO {
-  constructor(dto: CompteDeTierDTO) {
+  constructor(dto?: CompteDeTierDTO) {
     super();
-    Object.assign(this, dto);
+    Object.assign(this, dto || new CompteDeTierDTO());
   }
 
   get libelleCompteAssocie(): string {
-    return `${this.compteAssocieNumero} ${this.compteAssocieNom}`;
+    return this.compteAssocieNumero ? `${this.compteAssocieNumero} ${this.compteAssocieNom}` : '';
   }
 
   get libelleCompteVenteAchat(): string {
@@ -49,7 +51,7 @@ export class CompteDeTier extends CompteDeTierDTO {
   }
 
   get libelleSoldeCompteTiers(): string {
-    return `${this.soldeComptable.toDecimalString(2)} ${this.libelleDevise}`;
+    return `${this.soldeComptable.toDecimalString(2)}`;
   }
 
   get numeroNom(): string {

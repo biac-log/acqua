@@ -4,8 +4,8 @@
     v-model="dialog"
     @click:outside="close()"
     @keydown.esc="close()"
-    @keydown.page-up="nextPage()"
-    @keydown.page-down="previousPage()"
+    @keydown.page-down="nextPage()"
+    @keydown.page-up="previousPage()"
     @keydown.ctrl.f.prevent="focusSearch()"
   >
     <v-card :loading="isLoading">
@@ -25,63 +25,60 @@
           autofocus
           @keydown.down.prevent="giveFocusToRow(0)"
           autocomplete="off"
+          outlined
         ></v-text-field>
+        <v-btn color="error" fab small class="ml-5" @click="close"><v-icon>mdi-close</v-icon></v-btn>
       </v-card-title>
       <v-card-text>
-        <v-row>
+        <v-row dense>
           <v-col cols="2">
             <v-text-field
               label="Solde"
               v-model="allEcheanciers.soldeDisplay"
-              filled
               hide-details
               tabindex="-1"
               readonly
-              dense
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="2">
             <v-text-field
               label="Numéro tél."
               v-model="allEcheanciers.numeroTelephone"
-              filled
               hide-details
               tabindex="-1"
               readonly
-              dense
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="2">
             <v-text-field
               label="Montant échu"
               v-model="allEcheanciers.montantEchuDisplay"
-              filled
               hide-details
               tabindex="-1"
               readonly
-              dense
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="2">
             <v-text-field
               label="Montant non échu"
               v-model="allEcheanciers.montantNonEchuDisplay"
-              filled
               hide-details
               tabindex="-1"
               readonly
-              dense
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="2">
             <v-text-field
               label="Condition paiement"
               v-model="allEcheanciers.conditionPaiement"
-              filled
               hide-details
               tabindex="-1"
               readonly
-              dense
+              outlined
             ></v-text-field>
           </v-col>
         </v-row>
@@ -104,19 +101,23 @@
             <v-radio label="Montant compta" value="base"></v-radio>
           </v-radio-group>
           <v-spacer></v-spacer>
+          <div class="text-h6 mr-4">
+            Montant à ventiler :
+            <b class="blue--text">
+              {{ montantAVentileDevise | numberToStringEvenZero }}
+            </b>
+          </div>
           <div class="text-h6">
             Reste à ventiler :
             <b :class="resteAVentile > 0 ? 'amountPositive' : 'amountNull'">
-              {{
-              resteAVentile | numberToStringEvenZero
-              }}
+              {{ resteAVentile | numberToStringEvenZero }}
             </b>
           </div>
         </v-row>
         <v-row>
           <v-col cols="12">
             <AgGridVue
-              style="height: 561px;"
+              style="height: 519px"
               id="dataTable"
               class="ag-theme-alpine"
               :columnDefs="headersEcheanciers"
@@ -124,6 +125,7 @@
               :gridOptions="gridOptions"
               @selection-changed="calculAVentile"
               @grid-ready="onGridReady"
+              :rowSelection="multipleSelection ? 'multiple' : 'single'"
             ></AgGridVue>
           </v-col>
         </v-row>
@@ -132,14 +134,7 @@
         <v-spacer></v-spacer>
         <v-tooltip top open-delay="500">
           <template v-slot:activator="{ on }">
-            <v-btn
-              ref="btnValidate"
-              class="ma-2 pr-4"
-              tile
-              color="success"
-              @click="sendEcheancier"
-              v-on="on"
-            >
+            <v-btn ref="btnValidate" class="ma-2 pr-4" tile color="success" @click="sendEcheancier" v-on="on">
               <v-icon left>mdi-check</v-icon>Valider
             </v-btn>
           </template>
@@ -155,22 +150,23 @@
 
 <script lang="ts">
 import { AgGridVue } from 'ag-grid-vue';
-import { Component, Vue, PropSync, Watch } from 'vue-property-decorator';
+import { Component, Vue, PropSync, Watch, Prop } from 'vue-property-decorator';
 import { GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
 import EcheancierApi from '@/api/EcheancierApi';
-import { Echeancier, EcheancierElement } from '../../../models/Echeancier';
+import { Echeancier, EcheancierElement } from '@/models/Echeancier';
 import { DateTime } from '@/models/DateTime';
 import _ from 'lodash';
 
 @Component({
   name: 'SearchEcheancier',
-  components: { AgGridVue }
+  components: { AgGridVue },
 })
 export default class extends Vue {
   private dialog = false;
 
-  @PropSync('MontantAVentileDevise') private montantAVentileDevise!: number;
-  @PropSync('MontantAVentileBase') private montantAVentileBase!: number;
+  @PropSync('MontantAVentileDevise', { default: 0 }) private montantAVentileDevise!: number;
+  @PropSync('MontantAVentileBase', { default: 0 }) private montantAVentileBase!: number;
+  @Prop({ default: true }) private multipleSelection!: boolean;
 
   private typeLoad!: string;
   private numeroEcheancierToLoad!: string;
@@ -189,7 +185,7 @@ export default class extends Vue {
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: true,
-      type: 'rightAligned'
+      type: 'rightAligned',
     },
     { headerName: 'PiecePrincipale', field: 'isPiecePrincipale', filter: true, width: 150, hide: true },
     { headerName: 'Type', field: 'typePiece', filter: true, width: 150 },
@@ -199,7 +195,7 @@ export default class extends Vue {
       filter: true,
       width: 120,
       type: 'dateColumn',
-      valueFormatter: this.dateToString
+      valueFormatter: this.dateToString,
     },
     {
       headerName: 'Montant',
@@ -207,7 +203,7 @@ export default class extends Vue {
       filter: true,
       width: 140,
       type: 'numericColumn',
-      valueFormatter: this.montantDeviseToString
+      valueFormatter: this.montantDeviseToString,
     },
     {
       headerName: 'Montant',
@@ -216,15 +212,15 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
-      hide: true
+      hide: true,
     },
-    { headerName: 'Libelle', field: 'libelle', filter: true, width: 150, type: 'dateColumn' },
+    { headerName: 'Libellé', field: 'libelle', filter: true, width: 150, type: 'dateColumn' },
     {
       headerName: 'Date échéance',
       field: 'dateEcheanceDate',
       filter: true,
       width: 120,
-      valueFormatter: this.dateToString
+      valueFormatter: this.dateToString,
     },
     {
       headerName: 'Solde',
@@ -232,7 +228,7 @@ export default class extends Vue {
       filter: true,
       width: 140,
       type: 'numericColumn',
-      valueFormatter: this.montantDeviseToString
+      valueFormatter: this.montantDeviseToString,
     },
     {
       headerName: 'Solde',
@@ -241,10 +237,10 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
-      hide: true
+      hide: true,
     },
     { headerName: 'Rappel', field: 'rappel', filter: true, width: 100, type: 'numericColumn' },
-    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150 }
+    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150 },
   ];
 
   private resolve!: any;
@@ -259,14 +255,15 @@ export default class extends Vue {
     onCellKeyDown: this.keypress,
     navigateToNextCell: this.navigateToNextCell,
     pagination: true,
-    paginationAutoPageSize: true,
+    // paginationAutoPageSize: true,
+    paginationPageSize: 10,
     suppressRowClickSelection: true,
     enableSorting: true,
     columnTypes: {
       dateColumn: {
         filter: 'agDateColumnFilter',
-        suppressMenu: true
-      }
+        suppressMenu: true,
+      },
     },
     getRowStyle(params: any) {
       if (params.node.data.isLastRow) return { 'border-bottom': '1px solid black' };
@@ -298,7 +295,7 @@ export default class extends Vue {
           }
         }
       }
-    }
+    },
   };
 
   public open(typeToLoad: string, numeroEcheancierToLoad: string, nomCompte: string): Promise<EcheancierElement[]> {
@@ -306,7 +303,7 @@ export default class extends Vue {
     this.nomCompte = nomCompte;
     this.calculAVentile();
     this.loadEcheancier(typeToLoad, numeroEcheancierToLoad);
-    
+
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
       this.reject = reject;
@@ -396,7 +393,7 @@ export default class extends Vue {
         this.montantAVentileBase -
         Math.abs(
           _(rowSelected)
-            .map((r) => r.data.montantDevise)
+            .map((r) => r.data.soldeDevise)
             .sum()
         );
     } else {
@@ -404,7 +401,7 @@ export default class extends Vue {
         this.montantAVentileBase -
         Math.abs(
           _(rowSelected)
-            .map((r) => r.data.montantBase)
+            .map((r) => r.data.soldeBase)
             .sum()
         );
     }

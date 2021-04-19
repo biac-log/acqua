@@ -4,11 +4,10 @@
     v-model="dialog"
     @click:outside="close()"
     @keydown.esc="close()"
-    @keydown.page-up="nextPage()"
-    @keydown.page-down="previousPage()"
-    @keydown.ctrl.f.prevent="focusSearch()"
+    @keydown.page-down="nextPage()"
+    @keydown.page-up="previousPage()"
   >
-    <v-card :loading="isLoading">
+    <v-card class="mt-5" :loading="isLoading">
       <v-card-title>
         Comptes
         <v-btn color="primary" fab small class="ml-5" @click="refreshComptes">
@@ -16,14 +15,13 @@
         </v-btn>
         <v-spacer></v-spacer>
         <v-text-field
-          ref="filterField"
           v-model="filtreCompte"
           append-icon="mdi-magnify"
           label="Filtrer"
           single-line
           hide-details
           autofocus
-          @keydown.down.prevent="giveFocusToFirstDisplayRow()"
+          @keydown.down.prevent="giveFocusToRow(0)"
           autocomplete="off"
         ></v-text-field>
       </v-card-title>
@@ -45,11 +43,11 @@
 import { AgGridVue } from 'ag-grid-vue';
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { CompteSearch } from '@/models/Compte/CompteSearch';
-import { GridOptions, GridApi } from 'ag-grid-community';
 import CompteApi from '@/api/CompteApi';
+import { GridOptions, ICellRenderer, GridApi } from 'ag-grid-community';
 
 @Component({
-  name: 'SearchCompteTier',
+  name: 'SearchComptes',
   components: { AgGridVue }
 })
 export default class extends Vue {
@@ -64,12 +62,15 @@ export default class extends Vue {
     { headerName: 'Nom', field: 'nom', filter: true, width: 300 },
     { headerName: 'Raison sociale', field: 'raisonSocial', filter: true, width: 140 },
     { headerName: 'Adresse', field: 'adresse', filter: true, flex: 1 },
+    { headerName: 'Code TVA', field: 'codeTVAIntracommunautaire', filter: true, width: 180 },
     { headerName: 'Bloqué', field: 'compteBloqueDisplay', filter: true, width: 100 }
   ];
 
   private resolve!: any;
   private reject!: any;
 
+  private loadingCellRenderer: string | undefined | (new () => ICellRenderer) = undefined;
+  private loadingCellRendererParams = null;
   private gridOptions: GridOptions = {
     columnDefs: this.headersComptes,
     rowSelection: 'single',
@@ -79,16 +80,18 @@ export default class extends Vue {
     onCellKeyDown: this.keypress,
     overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Chargement des comptes</span>',
     pagination: true,
-    paginationAutoPageSize: true,
+    // paginationAutoPageSize: true,
+    paginationPageSize: 15,
     onRowDoubleClicked: this.rowDoubleClick,
     getRowStyle(params: any) {
       if (params.node.data.compteBloque) return { 'background-color': '#ffd6cc' };
     }
   };
 
-  public open(typeToLoad: string): Promise<CompteSearch> {
+  public open(typeToLoad: string, items: CompteSearch[]): Promise<CompteSearch> {
     this.dialog = true;
-    this.loadComptes(typeToLoad);
+
+    this.comptes = items;
 
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
@@ -106,14 +109,35 @@ export default class extends Vue {
   private refreshComptes() {
     if (this.typeLoad) {
       this.isLoading = true;
-      CompteApi.getComptesTiers(this.typeLoad)
-        .then((resp) => {
-          this.comptes = resp;
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      if (this.typeLoad == 'G') {
+        CompteApi.searchComptesGeneraux(this.typeLoad)
+          .then((resp) => {
+            this.comptes = resp;
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      } else {
+        CompteApi.getComptesTiers(this.typeLoad)
+          .then((resp) => {
+            this.comptes = resp;
+          })
+          .finally(() => {
+            this.isLoading = false;
+          });
+      }
     }
+  }
+
+  private giveFocusToRow(id: number) {
+    let ds = 0;
+    this.gridOptions?.api?.forEachNode(function(node) {
+      if (node.rowIndex === id) {
+        node.setSelected(true);
+        ds = node.rowIndex;
+      }
+    });
+    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, 'numero'));
   }
 
   @Watch('filtreCompte')
@@ -141,19 +165,14 @@ export default class extends Vue {
         });
         return suggestedNextCell;
       case KEY_UP:
-        if (previousCell.rowIndex == 0) {
-          this.focusSearch();
-          break;
-        } else {
-          previousCell = params.previousCellPosition;
-          // set selected cell on current cell - 1
-          this.gridOptions?.api?.forEachNode(function(node) {
-            if (previousCell.rowIndex - 1 === node.rowIndex) {
-              node.setSelected(true);
-            }
-          });
-          return suggestedNextCell;
-        }
+        previousCell = params.previousCellPosition;
+        // set selected cell on current cell - 1
+        this.gridOptions?.api?.forEachNode(function(node) {
+          if (previousCell.rowIndex - 1 === node.rowIndex) {
+            node.setSelected(true);
+          }
+        });
+        return suggestedNextCell;
       case KEY_LEFT:
       case KEY_RIGHT:
         return suggestedNextCell;
@@ -174,45 +193,12 @@ export default class extends Vue {
     this.sendCompte(selectedRow);
   }
 
-  private focusSearch() {
-    (this.gridOptions.api as GridApi).deselectAll();
-    this.$nextTick(() => (this.$refs.filterField as any).focus());
-  }
-
-  private giveFocusToFirstDisplayRow() {
-    const rowToFocus = this?.gridOptions?.api?.getFirstDisplayedRow() || 0;
-    this.giveFocusToRow(rowToFocus);
-  }
-
-  private giveFocusToRow(id: number) {
-    if (id < (this?.gridOptions?.api?.getFirstDisplayedRow() || 0)) id = 0;
-    else if (id > (this?.gridOptions?.api?.getLastDisplayedRow() || 0))
-      id = this?.gridOptions?.api?.getLastDisplayedRow() || 0;
-
-    let ds = 0;
-    this.gridOptions?.api?.forEachNode(function(node) {
-      if (node.rowIndex === id) {
-        node.setSelected(true);
-        ds = node.rowIndex;
-      }
-    });
-
-    this.$nextTick(() => this.gridOptions?.api?.setFocusedCell(ds, 'numero'));
-  }
-
   private nextPage() {
     this?.gridOptions?.api?.paginationGoToNextPage();
-    const selectedCell = this?.gridOptions?.api?.getSelectedNodes()[0];
-    const pageSize = this?.gridOptions?.api?.paginationGetPageSize();
-    this?.gridOptions?.api?.getFirstDisplayedRow();
-    if (selectedCell && pageSize) this.giveFocusToRow(selectedCell.rowIndex + pageSize);
   }
 
   private previousPage() {
     this?.gridOptions?.api?.paginationGoToPreviousPage();
-    const selectedCell = this?.gridOptions?.api?.getSelectedNodes()[0];
-    const pageSize = this?.gridOptions?.api?.paginationGetPageSize();
-    if (selectedCell && pageSize) this.giveFocusToRow(selectedCell.rowIndex - pageSize);
   }
 
   private reinitGrid() {

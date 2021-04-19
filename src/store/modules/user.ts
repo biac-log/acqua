@@ -6,6 +6,8 @@ import { UserLogin } from '@/models/Login/UserLogin';
 import { JsonConvert } from 'json2typescript';
 import jwtDecode from 'jwt-decode';
 import api from '@/api/AxiosApi';
+import {SocieteModule} from './companies'
+import { Societe } from '@/models/Societe/societe';
 
 export interface IUserState {
   token: string;
@@ -58,12 +60,12 @@ class User extends VuexModule implements IUserState {
     userInfo.application = 'ACQUA';
     return new Promise((resolve, reject) => {
       api.Authentication.post<Token>('/Authentication/LoginApp', userInfo)
-        .then((resp) => {
+        .then(async (resp) => {
           this.setToken(resp.data);
           const tokenDecode = jwtDecode(resp.data.value);
           const jsonConvert: JsonConvert = new JsonConvert();
           const user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
-          this.setUser(user);
+          await this.setUser(user);
           resolve(resp);
         })
         .catch((err) => {
@@ -77,25 +79,49 @@ class User extends VuexModule implements IUserState {
     });
   }
 
-  @Action
-  public loadUser() {
+  @Action({ rawError: true })
+  public loginSingleUser(): Promise<any> {
     return new Promise((resolve, reject) => {
+      api.AcQuaCore.get<Token>('/SingleUserToken')
+        .then(async (resp) => {
+          this.setToken(resp.data);
+          const tokenDecode = jwtDecode(resp.data.value);
+          const jsonConvert: JsonConvert = new JsonConvert();
+          const user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
+          await this.setUser(user);
+          resolve(resp);
+        })
+        .catch((err) => {
+          this.loginFail();
+          let errorMessage = "Impossible de récupérer le token";
+          if (err.response && err.response.status === 400) {
+            errorMessage = err.response.data.Message;
+          }
+          reject(errorMessage);
+        });
+    });
+  }
+
+  @Action
+  public async loadUser() {
+    // return new Promise((resolve, reject) => {
       try {
         const tokenDecode = jwtDecode(this.token);
         const jsonConvert: JsonConvert = new JsonConvert();
         const user = jsonConvert.deserializeObject(tokenDecode, Utilisateur);
-        this.setUser(user);
-        resolve();
+        await this.setUser(user);
+        // resolve();
       } catch (err) {
         this.resetToken();
-        reject();
+        // reject();
       }
-    });
+    // });
   }
 
   @Action
   public logout() {
     this.resetToken();
+    SocieteModule.reset();
     api.reset();
   }
 }
