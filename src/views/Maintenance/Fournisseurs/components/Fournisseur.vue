@@ -322,8 +322,8 @@
                       :readonly="readonly"
                       typeCompte="C"
                       label="N° de compte maître"
-                      @change="setCompteMaitre"
                       ref="autocompleteCompteMaitre"
+                      @change="setCompteMaitre"
                       :hide-details="readonly"
                       outlined
                       :rules="[]"
@@ -1336,7 +1336,6 @@ export default class FournisseurVue extends Vue {
     this.fournisseur.emissionDocumentCar4 = this.emissionDocuments.substring(3, 4);
     this.fournisseur.emissionDocumentCar5 = this.emissionDocuments.substring(4, 5);
   }
-
   private closeDialog() {
     this.display = false;
     this.readonly = true;
@@ -1344,6 +1343,7 @@ export default class FournisseurVue extends Vue {
     this.alertMessage.clear();
     this.successMessage.clear();
     this.setFournisseur(new Fournisseur());
+    this.resetCompteValue();
     this.reject();
   }
 
@@ -1426,11 +1426,22 @@ export default class FournisseurVue extends Vue {
 
   private cancelEdit() {
     this.fournisseur = this.fournisseurBase;
+    this.setFournisseur(this.fournisseur);
+    this.resetCompteValue();
     if (this.newRecord) {
       this.closeDialog();
     } else {
       this.readonly = true;
     }
+  }
+
+  private resetCompteValue(){
+    if(this.autocompleteCompteAssocie)
+      this.autocompleteCompteAssocie.resetCompte();
+    if(this.autocompleteCompteMaitre)
+      this.autocompleteCompteMaitre.resetCompte();
+    if(this.autocompleteCompteVenteAchat)
+      this.autocompleteCompteVenteAchat.resetCompte();
   }
 
   private setCompteAssocie(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {

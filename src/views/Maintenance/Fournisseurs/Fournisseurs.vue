@@ -75,6 +75,7 @@ export default class extends Vue {
         this.reset();
       }
     });
+    
   }
 
   beforeDestroy() {
