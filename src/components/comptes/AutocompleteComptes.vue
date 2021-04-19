@@ -25,6 +25,7 @@
       :error.sync="error"
       :suffix="nomCompte"
       :outlined="outlined"
+      auto-select-first
     >
       <template v-slot:append>
         <v-tooltip top open-delay="500">
@@ -61,7 +62,7 @@ import { CompteGeneralSearch } from '@/models/Compte/CompteGeneralSearch';
 
 @Component({
   name: 'AutocompleteComptes',
-  components: { SearchCompteTierVue, SearchCompteGeneralVue }
+  components: { SearchCompteTierVue, SearchCompteGeneralVue },
 })
 export default class AutocompleteComptes extends Vue {
   @Ref() readonly comboboxCompte!: HTMLInputElement;
@@ -97,7 +98,7 @@ export default class AutocompleteComptes extends Vue {
         numero: numero ? numero : '',
         nom,
         numeroNom: numero ? `${numero} ${nom}` : '',
-        bloque: false
+        bloque: false,
       };
       this.setCompte(compteToSelect);
     } else this.resetCompte();
@@ -144,7 +145,13 @@ export default class AutocompleteComptes extends Vue {
       if (value) {
         this.compteLoading = true;
         if (this._typeCompte == 'F' || this._typeCompte == 'C') {
-          const compte = await CompteApi.getCompteDeTier(this._typeCompte, value);
+          let compte;
+          if (value.isInt()) {
+            compte = await CompteApi.getCompteDeTier(this._typeCompte, value);
+          } else {
+            const comptes = await CompteApi.searchCompteDeTier(this._typeCompte, value.toUpperCase(), 1);
+            compte = comptes[0];
+          }
           this.setCompte(compte);
           this.emitChange(compte);
         } else {
@@ -167,7 +174,7 @@ export default class AutocompleteComptes extends Vue {
     try {
       this.autocompleteLoading = true;
       if (matchCode && matchCode.isInt() && this._typeCompte == 'G') {
-        this.comptesSearch = await CompteApi.autocompleteCompteByNumero(this._typeCompte, matchCode, 5);
+        this.comptesSearch = await CompteApi.autocompleteCompteByNumero(this._typeCompte, matchCode, 10);
       } else if (matchCode) {
         if (this._typeCompte == 'F' || this._typeCompte == 'C') {
           this.comptesSearch = await CompteApi.searchCompteDeTier(this._typeCompte, matchCode.toUpperCase(), 5);

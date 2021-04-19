@@ -206,6 +206,7 @@
         </v-card-actions>
       </v-card>
     </v-form>
+    <Confirm ref="confirmDialog"></Confirm>
   </v-dialog>
 </template>
 
@@ -221,13 +222,15 @@ import DeviseApi from '@/api/DeviseApi';
 import DatePicker from '@/components/DatePicker.vue';
 import { ApplicationModule } from '@/store/modules/application';
 import { CaseTva } from '@/models/CaseTva';
+import Confirm from '@/components/Confirm.vue';
 
 @Component({
   name: 'Extrait',
-  components: { VentilationVue, DatePicker },
+  components: { VentilationVue, DatePicker, Confirm },
 })
 export default class extends Vue {
   @Ref() readonly refVentilationVue!: VentilationVue;
+  @Ref() confirmDialog!: Confirm;
 
   private dialog = false;
   @PropSync('isReadOnly')
@@ -484,7 +487,8 @@ export default class extends Vue {
         ventilation.typeCompte = lastVentilation.typeCompte;
         ventilation.codeMouvement = this.getVentileDevise() < 0 ? 'DB' : 'CR'; // Code mouvement selon le reste à ventiler
         // if (ventilation.typeCompte == 'G') ventilation.caseTva = this.getCaseTvaVentilations() ?? new CaseTva();
-        if(this.ventilations.some((vent) => vent.caseTva.typeCase === 1)) { // S'il y a déjà des ventilations avec des bases taxables
+        if (this.ventilations.some((vent) => vent.caseTva.typeCase === 1)) {
+          // S'il y a déjà des ventilations avec des bases taxables
           ventilation.montantDevise = this.ventileDevise - Math.abs(this.getTvaCalcule()); // On soustrait cette partie taxable du montant restant à ventiler
         }
       }
@@ -587,8 +591,19 @@ export default class extends Vue {
   private sendExtrait() {
     if (!(this.ventilations.length > 0)) {
       // If there's no ventilation
-      this.dialog = false;
-      this.reject();
+      this.confirmDialog
+        .open('Confirmer', 'Aucune ventilation définie, êtes-vous sûr de vouloir créer la ligne ?')
+        .then((resp) => {
+          if (resp) {
+            (this.$refs.form as any).validate();
+            this.$nextTick(() => {
+              if (this.isValid) {
+                this.dialog = false;
+                this.resolve(new PromiseResponse<Extrait>(this.getModel(), this.ventileDevise != 0)); // Send true to trigger openNew again if ventileBase = 0
+              }
+            });
+          }
+        });
     } else {
       (this.$refs.form as any).validate();
       this.$nextTick(() => {
