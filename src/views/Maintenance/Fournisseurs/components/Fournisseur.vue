@@ -75,6 +75,7 @@
                     <v-text-field
                       label="Match code"
                       v-model="matchCode"
+                      :rules="rules.matchCode"
                       outlined
                       :readonly="readonly"
                       :counter="!readonly"
@@ -92,11 +93,12 @@
                       :tabindex="numeroReadonly ? -1 : null"
                       dense
                       :hide-details="numeroReadonly"
-                      :append-icon="readonly ? '' : 'mdi-pencil'"
+                      :append-icon="readonly||updateMode ? '' : 'mdi-pencil'"
                       @click:append="numeroReadonly = !numeroReadonly"
                       @blur="checkNumeroExists"
                       ref="numeroInput"
                       :error-messages="numeroErrors"
+                      :rules="rules.numero"
                     />
                   </v-col>
                   <v-col cols="6">
@@ -990,6 +992,8 @@ export default class FournisseurVue extends Vue {
   private deleteLoading = false;
   private getLoading = false;
 
+  private updateMode = false;
+
   get isLoading() {
     return this.saveLoading || this.deleteLoading || this.getLoading;
   }
@@ -1118,6 +1122,7 @@ export default class FournisseurVue extends Vue {
   }
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
+    this.updateMode = true;
     this.numero = searchFournisseur.numero.toString();
     this.nom = searchFournisseur.nom;
 
@@ -1138,6 +1143,7 @@ export default class FournisseurVue extends Vue {
   }
 
   public async openNew(): Promise<number> {
+    this.updateMode = false;
     this.readonly = false;
     this.setFournisseur(new Fournisseur());
     this.fournisseurBase = new Fournisseur();
