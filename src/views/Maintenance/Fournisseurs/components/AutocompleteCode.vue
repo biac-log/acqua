@@ -13,7 +13,8 @@
       item-value="code"
       hide-no-data
       @keyup.enter="$event.target.select()"
-      @focus="$event.target.select()"
+      @focus="$event.target.select(),clearContentOnFocus()"
+      @blur="restoreContentOnBlur()"
       @keydown.ctrl.f.prevent="openSearch()"
       @keydown.f5.prevent="openSearch()"
       v-model="codeSelected"
@@ -74,15 +75,36 @@ export default class AutocompleteCodeVue extends Vue {
   private codeSelected: CodeItem = new CodeItem(0, '');
   private items: CodeItem[] = [];
   private searchCode = '';
+  private previousCode: CodeItem = new CodeItem(0,'');
 
   public init(value: string) {
     this.codeSelected = new CodeItem(value, '');
   }
 
+
   private async codeChange(value: CodeItem) {
     this.codeSelected = value;
-    this.$emit('select', value);
-    this.comboboxCode.blur();
+    this.$emit('select', this.codeSelected);
+  }
+
+  /*w.o. this method, the default behavior visually append the freshly inputed value to the already existing value.
+  So, this method clean the existing value and store it in a temp attribute to use with restoreContentOnBlur() method*/
+  private clearContentOnFocus(){
+    this.previousCode = this.codeSelected;
+    this.codeSelected = new CodeItem(0, '');
+  }
+  private restoreContentOnBlur(){
+    //If codeSelected changed, we don't want to restore the previous code valuenpm 
+    if(this.codeSelected.code && this.codeSelected.nom)
+      return;
+    if(this.previousCode.code && this.previousCode.nom){
+      this.codeSelected = this.previousCode;
+    }
+  }
+  public resetValue(){
+    this.codeSelected = new CodeItem(0,'');
+    this.previousCode = new CodeItem(0,'');
+    this.searchCode='';
   }
 
   @Watch('searchCode')

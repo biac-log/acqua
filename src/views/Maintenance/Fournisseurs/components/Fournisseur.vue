@@ -1255,6 +1255,11 @@ export default class FournisseurVue extends Vue {
     if (fournisseur.tournee3 != 0) this.tournees.push(fournisseur.tournee3.toIntString());
   }
 
+/*
+  Added some validation logic in this method.
+  Not. default value for codeFamille, codeRepresentant and codeSecteur.
+  Refactoring may be needed at some point to get that validation outside or at least, to get it right
+*/
   private mapFournisseur() {
     this.fournisseur.numero = this.numero.toNumber();
     this.fournisseur.nom = this.nom;
@@ -1343,6 +1348,7 @@ export default class FournisseurVue extends Vue {
     this.alertMessage.clear();
     this.successMessage.clear();
     this.setFournisseur(new Fournisseur());
+    this.resetCodeValue();
     this.resetCompteValue();
     this.reject();
   }
@@ -1427,6 +1433,7 @@ export default class FournisseurVue extends Vue {
   private cancelEdit() {
     this.fournisseur = this.fournisseurBase;
     this.setFournisseur(this.fournisseur);
+    this.resetCodeValue();
     this.resetCompteValue();
     if (this.newRecord) {
       this.closeDialog();
@@ -1442,6 +1449,12 @@ export default class FournisseurVue extends Vue {
       this.autocompleteCompteMaitre.resetCompte();
     if(this.autocompleteCompteVenteAchat)
       this.autocompleteCompteVenteAchat.resetCompte();
+  }
+  private resetCodeValue()
+  {
+    this.autocompleteCodeRepresentant.resetValue();
+    this.autocompleteCodeFamille.resetValue();
+    this.autocompleteCodeSecteur.resetValue();
   }
 
   private setCompteAssocie(compte: CompteSearch | CompteGeneralSearch | CompteDeTier | string) {
@@ -1535,8 +1548,10 @@ export default class FournisseurVue extends Vue {
   }
 
   private selectSecteur(secteur: { code: string; nom: string }) {
-    this.codeSecteur = secteur.code;
-    this.nomSecteur = secteur.nom;
+    if(secteur.code && secteur.nom){
+      this.codeSecteur = secteur.code;
+      this.nomSecteur = secteur.nom;
+    }
     if (secteur != null) {
       this.$nextTick(() => (this.paiementField as any)?.focus());
     }
@@ -1549,7 +1564,7 @@ export default class FournisseurVue extends Vue {
   private clickOutside() {
     if (this.readonly) this.closeDialog();
   }
-
+  
   private async checkNumeroExists() {
     const exists = await FournisseurApi.checkNumero(this.numero.toNumber());
 
