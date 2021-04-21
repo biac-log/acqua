@@ -89,11 +89,11 @@
                       label="Numéro"
                       v-model="numero"
                       outlined
-                      :readonly="numeroReadonly"
+                      :readonly="!newRecord || numeroReadonly"
                       :tabindex="numeroReadonly ? -1 : null"
                       dense
                       :hide-details="numeroReadonly"
-                      :append-icon="readonly||updateMode ? '' : 'mdi-pencil'"
+                      :append-icon="newRecord && !readonly ? 'mdi-pencil' : ''"
                       @click:append="numeroReadonly = !numeroReadonly"
                       @blur="checkNumeroExists"
                       ref="numeroInput"
@@ -992,7 +992,6 @@ export default class FournisseurVue extends Vue {
   private deleteLoading = false;
   private getLoading = false;
 
-  private updateMode = false;
 
   get isLoading() {
     return this.saveLoading || this.deleteLoading || this.getLoading;
@@ -1122,7 +1121,7 @@ export default class FournisseurVue extends Vue {
   }
 
   public open(searchFournisseur: SearchFournisseur): Promise<boolean> {
-    this.updateMode = true;
+    console.log("Open");
     this.numero = searchFournisseur.numero.toString();
     this.nom = searchFournisseur.nom;
 
@@ -1143,7 +1142,7 @@ export default class FournisseurVue extends Vue {
   }
 
   public async openNew(): Promise<number> {
-    this.updateMode = false;
+    console.log("OpenNew");
     this.readonly = false;
     this.setFournisseur(new Fournisseur());
     this.fournisseurBase = new Fournisseur();
@@ -1574,7 +1573,7 @@ export default class FournisseurVue extends Vue {
   private async checkNumeroExists() {
     const exists = await FournisseurApi.checkNumero(this.numero.toNumber());
 
-    if (exists) {
+    if (exists && !this.numeroReadonly) {
       this.numeroErrors.push('Ce numéro existe déjà');
       (this.$refs.numeroInput as HTMLElement).focus();
     } else {
