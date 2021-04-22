@@ -117,6 +117,7 @@
         <v-row>
           <v-col cols="12">
             <AgGridVue
+              ref="agGrid"
               style="height: 519px"
               id="dataTable"
               class="ag-theme-alpine"
@@ -150,7 +151,7 @@
 
 <script lang="ts">
 import { AgGridVue } from 'ag-grid-vue';
-import { Component, Vue, PropSync, Watch, Prop } from 'vue-property-decorator';
+import { Component, Vue, PropSync, Watch, Prop, Ref } from 'vue-property-decorator';
 import { GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
 import EcheancierApi from '@/api/EcheancierApi';
 import { Echeancier, EcheancierElement } from '@/models/Echeancier';
@@ -162,7 +163,13 @@ import _ from 'lodash';
   components: { AgGridVue },
 })
 export default class extends Vue {
+  @Ref() readonly agGrid!:AgGridVue;
+
   private dialog = false;
+
+  //which col to display and when
+  private columnVisibilityLevel = 0;
+  private widthThreshol = [960];
 
   @PropSync('MontantAVentileDevise', { default: 0 }) private montantAVentileDevise!: number;
   @PropSync('MontantAVentileBase', { default: 0 }) private montantAVentileBase!: number;
@@ -186,9 +193,10 @@ export default class extends Vue {
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: true,
       type: 'rightAligned',
+      priority:0
     },
     { headerName: 'PiecePrincipale', field: 'isPiecePrincipale', filter: true, width: 150, hide: true },
-    { headerName: 'Type', field: 'typePiece', filter: true, width: 150 },
+    { headerName: 'Type', field: 'typePiece', filter: true, width: 150, priority:1 },
     {
       headerName: 'Date',
       field: 'datePieceDate',
@@ -196,6 +204,7 @@ export default class extends Vue {
       width: 120,
       type: 'dateColumn',
       valueFormatter: this.dateToString,
+      priority:0
     },
     {
       headerName: 'Montant',
@@ -204,6 +213,7 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantDeviseToString,
+      priority:0
     },
     {
       headerName: 'Montant',
@@ -213,14 +223,16 @@ export default class extends Vue {
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
       hide: true,
+      priority:0
     },
-    { headerName: 'Libellé', field: 'libelle', filter: true, width: 150, type: 'dateColumn' },
+    { headerName: 'Libellé', field: 'libelle', filter: true, width: 150, type: 'dateColumn',priority: 1 },
     {
-      headerName: 'Date échéance',
+      headerName: 'Échéance',
       field: 'dateEcheanceDate',
       filter: true,
       width: 120,
       valueFormatter: this.dateToString,
+      priority:0
     },
     {
       headerName: 'Solde',
@@ -229,6 +241,7 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantDeviseToString,
+      priority:0
     },
     {
       headerName: 'Solde',
@@ -238,9 +251,10 @@ export default class extends Vue {
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
       hide: true,
+      priority:0
     },
-    { headerName: 'Rappel', field: 'rappel', filter: true, width: 100, type: 'numericColumn' },
-    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150 },
+    { headerName: 'Rappel', field: 'rappel', filter: true, width: 100, type: 'numericColumn', priority:1 },
+    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150, priority:1},
   ];
 
   private resolve!: any;
@@ -297,6 +311,10 @@ export default class extends Vue {
       }
     },
   };
+
+  mounted(){
+    window.addEventListener("resize", this.onResize);
+  }
 
   public open(typeToLoad: string, numeroEcheancierToLoad: string, nomCompte: string): Promise<EcheancierElement[]> {
     this.dialog = true;
@@ -497,6 +515,27 @@ export default class extends Vue {
     this.dialog = false;
     this.reinitGrid();
     this.reject();
+  }
+
+  private onResize(){
+    this.setColumnVisibility();
+    this.updateDisplayedColumns();
+    this.gridOptions.columnApi?.sizeColumnsToFit(this.agGrid.$el.clientWidth);
+    }
+
+  private setColumnVisibility(){
+    const winWidth = window.innerWidth;
+    this.columnVisibilityLevel = 0;
+    for(let i = 0; i < this.widthThreshol.length; i++)
+    {
+      if(winWidth > this.widthThreshol[i])
+        this.columnVisibilityLevel = i+1;
+    }
+  }
+
+  private updateDisplayedColumns(){
+    const colToDisplay = this.headersEcheanciers.filter(h => h.priority !== undefined && h.priority != null && h.priority <= this.columnVisibilityLevel);
+    this.gridOptions.api?.setColumnDefs(colToDisplay);
   }
 }
 </script>
