@@ -543,8 +543,12 @@ export default class ImputationVue extends Vue {
     this.libelle = previousLibelle;
       this.$nextTick(() => {
         const element = document.getElementById('validateButton');
-        console.log('element', element);
-        element?.scrollIntoView();
+        let smallScreen = true;
+        switch(this.$vuetify.breakpoint.name){
+          case 'xs' :  case 'sm' :  break;
+          case 'md' :  case 'lg' : case 'xl' : smallScreen = false; break;
+        }
+        element?.scrollIntoView(smallScreen);
         this.firstElement?.focus();
       });
     });
