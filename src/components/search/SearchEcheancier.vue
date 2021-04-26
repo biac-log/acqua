@@ -167,9 +167,7 @@ export default class extends Vue {
 
   private dialog = false;
 
-  //which col to display and when
-  private columnVisibilityLevel = 0;
-  private widthThreshol = [960];
+  private minColDisplayWidth = 1300;
 
   @PropSync('MontantAVentileDevise', { default: 0 }) private montantAVentileDevise!: number;
   @PropSync('MontantAVentileBase', { default: 0 }) private montantAVentileBase!: number;
@@ -192,19 +190,17 @@ export default class extends Vue {
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: true,
-      type: 'rightAligned',
-      priority:0
+      type: 'rightAligned'
     },
     { headerName: 'PiecePrincipale', field: 'isPiecePrincipale', filter: true, width: 150, hide: true },
-    { headerName: 'Type', field: 'typePiece', filter: true, width: 150, priority:1 },
+    { headerName: 'Type', field: 'typePiece', filter: true, width: 150 },
     {
       headerName: 'Date',
       field: 'datePieceDate',
       filter: true,
       width: 120,
       type: 'dateColumn',
-      valueFormatter: this.dateToString,
-      priority:0
+      valueFormatter: this.dateToString
     },
     {
       headerName: 'Montant',
@@ -212,8 +208,7 @@ export default class extends Vue {
       filter: true,
       width: 140,
       type: 'numericColumn',
-      valueFormatter: this.montantDeviseToString,
-      priority:0
+      valueFormatter: this.montantDeviseToString
     },
     {
       headerName: 'Montant',
@@ -222,17 +217,15 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
-      hide: true,
-      priority:0
+      hide: true
     },
-    { headerName: 'Libellé', field: 'libelle', filter: true, width: 150, type: 'dateColumn',priority: 1 },
+    { headerName: 'Libellé', field: 'libelle', filter: true, width: 150, type: 'dateColumn'},
     {
       headerName: 'Échéance',
       field: 'dateEcheanceDate',
       filter: true,
       width: 120,
-      valueFormatter: this.dateToString,
-      priority:0
+      valueFormatter: this.dateToString
     },
     {
       headerName: 'Solde',
@@ -240,8 +233,7 @@ export default class extends Vue {
       filter: true,
       width: 140,
       type: 'numericColumn',
-      valueFormatter: this.montantDeviseToString,
-      priority:0
+      valueFormatter: this.montantDeviseToString
     },
     {
       headerName: 'Solde',
@@ -250,11 +242,10 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
-      hide: true,
-      priority:0
+      hide: true
     },
-    { headerName: 'Rappel', field: 'rappel', filter: true, width: 100, type: 'numericColumn', priority:1 },
-    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150, priority:1},
+    { headerName: 'Rappel', field: 'rappel', filter: true, width: 100, type: 'numericColumn' },
+    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150},
   ];
 
   private resolve!: any;
@@ -265,7 +256,7 @@ export default class extends Vue {
     rowSelection: 'multiple',
     rowDeselection: true,
     rowData: this.echeanciers,
-    suppressHorizontalScroll: true,
+    suppressHorizontalScroll: false,
     onCellKeyDown: this.keypress,
     navigateToNextCell: this.navigateToNextCell,
     pagination: true,
@@ -314,6 +305,12 @@ export default class extends Vue {
 
   mounted(){
     window.addEventListener("resize", this.onResize);
+  }
+  updated(){
+    if(this.$vuetify.breakpoint.xlOnly)
+      {
+        this.gridOptions.api?.sizeColumnsToFit();
+      }
   }
 
   public open(typeToLoad: string, numeroEcheancierToLoad: string, nomCompte: string): Promise<EcheancierElement[]> {
@@ -507,7 +504,7 @@ export default class extends Vue {
   }
 
   private onGridReady() {
-    (this.gridOptions.api as GridApi).sizeColumnsToFit();
+    // (this.gridOptions.api as GridApi).sizeColumnsToFit();
   }
 
   private close() {
@@ -518,24 +515,9 @@ export default class extends Vue {
   }
 
   private onResize(){
-    this.setColumnVisibility();
-    this.updateDisplayedColumns();
-    this.gridOptions.columnApi?.sizeColumnsToFit(this.agGrid.$el.clientWidth);
+    if(window.innerWidth >= this.minColDisplayWidth){
+      this.gridOptions.api?.sizeColumnsToFit();
     }
-
-  private setColumnVisibility(){
-    const winWidth = window.innerWidth;
-    this.columnVisibilityLevel = 0;
-    for(let i = 0; i < this.widthThreshol.length; i++)
-    {
-      if(winWidth > this.widthThreshol[i])
-        this.columnVisibilityLevel = i+1;
-    }
-  }
-
-  private updateDisplayedColumns(){
-    const colToDisplay = this.headersEcheanciers.filter(h => h.priority !== undefined && h.priority != null && h.priority <= this.columnVisibilityLevel);
-    this.gridOptions.api?.setColumnDefs(colToDisplay);
   }
 }
 </script>
