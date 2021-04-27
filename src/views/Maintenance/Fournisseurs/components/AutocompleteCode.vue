@@ -90,16 +90,27 @@ export default class AutocompleteCodeVue extends Vue {
   /*w.o. this method, the default behavior visually append the freshly inputed value to the already existing value.
   So, this method clean the existing value and store it in a temp attribute to use with restoreContentOnBlur() method*/
   private clearContentOnFocus(){
-    this.previousCode = this.codeSelected;
-    this.codeSelected = new CodeItem(0, '');
+    if(!this.isReadonly){
+      this.previousCode = this.codeSelected;
+      this.codeSelected = new CodeItem(0, '');
+    }
   }
   private restoreContentOnBlur(){
-    //If codeSelected changed, we don't want to restore the previous code valuenpm 
+    //If codeSelected changed, we don't want to restore the previous code value
+    /* This code should is a quick fix but should be looked at more in depth.
+      It doesn't work when considering the previousCode.nom as it seem to be stored
+      in a different manner (AKA not at all) than the previousCode.code. 
+      Thus, we can't check both value and restore them both
     if(this.codeSelected.code && this.codeSelected.nom)
       return;
     if(this.previousCode.code && this.previousCode.nom){
       this.codeSelected = this.previousCode;
     }
+    */
+    if(this.codeSelected.code)
+      return;
+    if(this.previousCode.code)
+      this.codeSelected = this.previousCode;
   }
   public resetValue(){
     this.codeSelected = new CodeItem(0,'');
