@@ -1,5 +1,11 @@
 <template>
   <div class="autocompleteCode">
+      <!-- rules -->
+      <!-- loading -->
+      <!-- error-message -->
+      <!-- validate-on-blur -->
+      <!-- no-filter -->
+      
     <v-combobox
       ref="comboboxCode"
       :label="label"
@@ -40,12 +46,7 @@
           <span>Recherche<span class="shortcutTooltip">ctrl + f</span></span>
         </v-tooltip>
       </template>
-      <template v-slot:selection="{ item }">
-        {{ item.code }}
-      </template>
-      <template v-slot:item="{ item }">
-        {{ item.numeroNom }}
-      </template>
+      <template v-slot:item="{ item }"> {{ item.numeroNom }}</template>
     </v-combobox>
     <search-code ref="searchModal" />
   </div>
@@ -60,10 +61,10 @@ import SearchCode from '@/views/Maintenance/Fournisseurs/components/SearchCode.v
 import { CodeItem } from '@/models/CodeItem';
 
 @Component({
-  name: 'AutocompleteCodeVue',
+  name: 'AutocompleteCodeSingleInputVue',
   components: { SearchCode }
 })
-export default class AutocompleteCodeVue extends Vue {
+export default class AutocompleteCodeSingleInputVue extends Vue {
   @Prop() readonly label!: string;
   @PropSync('readonly') readonly isReadonly!: boolean;
   @Prop() private typeCode!: string;
@@ -72,6 +73,7 @@ export default class AutocompleteCodeVue extends Vue {
   @Ref() private searchModal!: SearchCode;
   @Ref() private comboboxCode!: any;
 
+//this is rendered (only the numeric part)
   private codeSelected: CodeItem = new CodeItem(0, '');
   private items: CodeItem[] = [];
   private searchCode = '';
@@ -90,27 +92,19 @@ export default class AutocompleteCodeVue extends Vue {
   /*w.o. this method, the default behavior visually append the freshly inputed value to the already existing value.
   So, this method clean the existing value and store it in a temp attribute to use with restoreContentOnBlur() method*/
   private clearContentOnFocus(){
-    if(!this.isReadonly){
+    if(!this.isReadonly)
+    {
       this.previousCode = this.codeSelected;
       this.codeSelected = new CodeItem(0, '');
     }
   }
   private restoreContentOnBlur(){
-    //If codeSelected changed, we don't want to restore the previous code value
-    /* This code is a quick fix but should be looked at more in depth.
-      It doesn't work when considering the previousCode.nom as it seem to be stored
-      in a different manner (AKA not at all) than the previousCode.code. 
-      Thus, we can't check both value and restore them both
+    //If codeSelected changed, we don't want to restore the previous code valuenpm 
     if(this.codeSelected.code && this.codeSelected.nom)
       return;
     if(this.previousCode.code && this.previousCode.nom){
       this.codeSelected = this.previousCode;
     }
-    */
-    if(this.codeSelected.code)
-      return;
-    if(this.previousCode.code)
-      this.codeSelected = this.previousCode;
   }
   public resetValue(){
     this.codeSelected = new CodeItem(0,'');
