@@ -1467,6 +1467,7 @@ export default class FournisseurVue extends Vue {
           .then((numeroFournisseur) => {
             this.fournisseurParams.nextNumero = numeroFournisseur + 1;
             this.fournisseur = this.fournisseurBase;
+            this.resolve(true);
             this.closeDialog();
           })
           .catch((err) => {
