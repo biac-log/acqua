@@ -80,243 +80,238 @@
               mdi-alert-circle
             </v-icon>
           </v-tab>
-        <v-tab-item  >
+          <v-tab-item  >
             <v-card-text flat>
-          <v-form ref="formSignaletique"
-            v-model="isSignaletiqueValid"
-          >
-
-          <v-row>
-          <v-col sm="12" lg="7" 
-            :class="this.$vuetify.breakpoint.sm ? 'pr-3' : 'pr-10'"
-          >
-            <v-row dense class="mb-16">
-              <v-col sm="12" lg="2" class="">
-                <v-text-field label="Numéro" 
-                  v-model="numero"
-                  outlined
-                  :readonly="!newRecord || numeroReadonly"
-                  :tabindex="numeroReadonly ? -1 : null"
-                  
-                  :hide-details="numeroReadonly"
-                  :append-icon="newRecord && !readonly ? 'mdi-pencil' : ''"
-                  @click:append="numeroReadonly = !numeroReadonly"
-                  @blur="checkNumeroExists"
-                  ref="numeroInput"
-                  :error-messages="numeroErrors"
-                  :rules="rules.numero"/>
-              </v-col>
-              <v-col sm="12" lg="4" class="">
-                <v-text-field label="Nom" 
-                  autofocus
-                  ref="inputNom"
-                  v-model="nom"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="23"
-                  :hide-details="readonly"
-                  :rules="rules.nom"
-                  validate-on-blur/>
-              </v-col>
-              <v-col sm="12" lg="2" class="">
-                <v-text-field label="Raison soc." 
-                  v-model="raisonSociale"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="11"
-                  :hide-details="readonly"
-                  ref="raisonInput"/>
-              </v-col>
-              <v-col sm="12" lg="4" class="pr-3">
-                <v-text-field label="Matchcode" 
-                  v-model="matchCode"
-                  :rules="rules.matchCode"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="23"
-                  :hide-details="readonly"/>
-              </v-col>
-            </v-row>
-
-            <v-row dense  class="mb-n3 pt-0">
-            </v-row>
-            <v-row dense  class="mb-n3 pt-0">
-              <v-col sm="12" lg="6">
-                <v-text-field label="E-mail" 
-                  v-model="email"
-                  outlined
-                  :readonly="readonly"
-                  :hide-details="readonly"
-                  type="email"
-                  :rules="rules.email"
-                  validate-on-blur/>
-              </v-col>
-              <v-col sm="12" lg="2">
-                <v-text-field label="Téléphone" 
-                  v-model="numeroTelephone"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="14"
-                  :hide-details="readonly"/>
-              </v-col>
-              <v-col sm="12" lg="2">
-                <v-text-field label="GSM" 
-                  v-model="gsm"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="14"
-                  :hide-details="readonly"/>
-              </v-col>
-              <v-col sm="12" lg="2">
-                <v-text-field label="Fax" 
-                  v-model="téléfax"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="14"
-                  :hide-details="readonly"/>
-              </v-col>
-            </v-row>
-            <v-row dense  class="mb-12 pt-0">
-              <v-col sm="12" lg="4">
-                <v-text-field label="Contact 1" 
-                  v-model="contact1"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="30"
-                  :hide-details="readonly"/>
-              </v-col>
-              <v-col sm="12" lg="4">
-                <v-text-field label="Contact 2" 
-                  v-model="contact2"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="30"
-                  :hide-details="readonly"/>
-              </v-col>
-              <v-col sm="12" lg="4">
-                <v-text-field label="Contact 3" 
-                  v-model="contact3"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="30"
-                  :hide-details="readonly"/>
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col sm="12" lg="5"
-            :class="this.$vuetify.breakpoint.sm ? 'pl-3' : 'pl-10' "
-          >
-            <v-row dense  class="mb-16 pt-0">
-              <v-col sm="12" lg="4">
-                <v-text-field label="Commentaire 1"  
-                  v-model="commentaire1"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="20"
-                  :hide-details="readonly"/>
-              </v-col>
-              <v-col sm="12" lg="4">
-                <v-text-field label="Commentaire 2" 
-                  v-model="commentaire2"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="20"
-                  :hide-details="readonly"/>
-              </v-col>
-              <v-col sm="12" lg="4">
-                <v-text-field label="Commentaire 3" 
-                  v-model="commentaire3"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="20"
-                  :hide-details="readonly"/>
-              </v-col>
-              
-            </v-row>
-            
-            <v-row dense class="mb-n3 pb-0">
-              <v-col sm="6" lg="6" class="">
-                <v-text-field label="Adresse" 
-                  v-model="adresseLigne1"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="35"
-                  :hide-details="readonly"/>
-              </v-col>
-              <v-col sm="6" lg="6" class="">
-                <v-text-field label="Complément d'adresse" 
-                  v-model="adresseLigne2"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="35"
-                  :hide-details="readonly"/>
-              </v-col>
-            </v-row>
-            <v-row dense class="mb-12 pt-0">
-              <v-col sm="6" lg="2" class="">
-                <v-text-field label="Pays" 
-                  v-model="codePays"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="3"
-                  :hide-details="readonly"/>
-              </v-col>
-              <v-col sm="6" lg="4" class="">
-                <v-text-field label="Code Postal" 
-                  v-model="codePostal"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="8"
-                  :hide-details="readonly"/>
-              </v-col>
-              <v-col sm="6" lg="6" class="">
-                <v-text-field label="Localité" 
-                  v-model="localité"
-                  outlined
-                  :readonly="readonly"
-                  :counter="!readonly"
-                  maxlength="30"
-                  :hide-details="readonly"/>
-              </v-col>
-            </v-row>
-            
-
-            
-          </v-col>
-          </v-row>
-          
-         
-          </v-form>
-                </v-card-text>
-
-        </v-tab-item>
-
-            <v-tab-item>
+              <v-form ref="formSignaletique"
+                v-model="isSignaletiqueValid"
+              >
+                <v-row>
+                  <v-col sm="12" lg="7" 
+                    :class="this.$vuetify.breakpoint.sm ? 'pr-3' : 'pr-10'"
+                  >
+                    <v-row dense class="mb-16">
+                      <v-col sm="12" lg="2" class="">
+                        <v-text-field label="Numéro" 
+                          v-model="numero"
+                          outlined
+                          :readonly="!newRecord || numeroReadonly"
+                          :tabindex="numeroReadonly ? -1 : null"
+                          
+                          :hide-details="numeroReadonly"
+                          :append-icon="newRecord && !readonly ? 'mdi-pencil' : ''"
+                          @click:append="numeroReadonly = !numeroReadonly"
+                          @blur="checkNumeroExists"
+                          ref="numeroInput"
+                          :error-messages="numeroErrors"
+                          :rules="rules.numero"/>
+                      </v-col>
+                      <v-col sm="12" lg="4" class="">
+                        <v-text-field label="Nom" 
+                          autofocus
+                          ref="inputNom"
+                          v-model="nom"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="23"
+                          :hide-details="readonly"
+                          :rules="rules.nom"
+                          validate-on-blur/>
+                      </v-col>
+                      <v-col sm="12" lg="2" class="">
+                        <v-text-field label="Raison soc." 
+                          v-model="raisonSociale"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="11"
+                          :hide-details="readonly"
+                          ref="raisonInput"/>
+                      </v-col>
+                      <v-col sm="12" lg="4" class="pr-3">
+                        <v-text-field label="Matchcode" 
+                          v-model="matchCode"
+                          :rules="rules.matchCode"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="23"
+                          :hide-details="readonly"/>
+                      </v-col>
+                    </v-row>
+                    <v-row dense  class="mb-n3 pt-0">
+                    </v-row>
+                    <v-row dense  class="pt-0"
+                      :class="readonly? '' : 'mb-n3'"
+                    >
+                      <v-col sm="12" lg="6">
+                        <v-text-field label="E-mail" 
+                          v-model="email"
+                          outlined
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                          type="email"
+                          :rules="rules.email"
+                          validate-on-blur/>
+                      </v-col>
+                      <v-col sm="12" lg="2">
+                        <v-text-field label="Téléphone" 
+                          v-model="numeroTelephone"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="14"
+                          :hide-details="readonly"/>
+                      </v-col>
+                      <v-col sm="12" lg="2">
+                        <v-text-field label="GSM" 
+                          v-model="gsm"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="14"
+                          :hide-details="readonly"/>
+                      </v-col>
+                      <v-col sm="12" lg="2">
+                        <v-text-field label="Fax" 
+                          v-model="téléfax"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="14"
+                          :hide-details="readonly"/>
+                      </v-col>
+                    </v-row>
+                    <v-row dense  class="mb-12 pt-0">
+                      <v-col sm="12" lg="4">
+                        <v-text-field label="Contact 1" 
+                          v-model="contact1"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="30"
+                          :hide-details="readonly"/>
+                      </v-col>
+                      <v-col sm="12" lg="4">
+                        <v-text-field label="Contact 2" 
+                          v-model="contact2"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="30"
+                          :hide-details="readonly"/>
+                      </v-col>
+                      <v-col sm="12" lg="4">
+                        <v-text-field label="Contact 3" 
+                          v-model="contact3"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="30"
+                          :hide-details="readonly"/>
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col sm="12" lg="5"
+                    :class="this.$vuetify.breakpoint.sm ? 'pl-3' : 'pl-10' "
+                  >
+                    <v-row dense  class="mb-16 pt-0">
+                      <v-col sm="12" lg="4">
+                        <v-text-field label="Commentaire 1"  
+                          v-model="commentaire1"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="20"
+                          :hide-details="readonly"/>
+                      </v-col>
+                      <v-col sm="12" lg="4">
+                        <v-text-field label="Commentaire 2" 
+                          v-model="commentaire2"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="20"
+                          :hide-details="readonly"/>
+                      </v-col>
+                      <v-col sm="12" lg="4">
+                        <v-text-field label="Commentaire 3" 
+                          v-model="commentaire3"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="20"
+                          :hide-details="readonly"/>
+                      </v-col>
+                    </v-row>
+                    <v-row dense class="pb-0"
+                      :class="readonly? '' : 'mb-n3'"
+                    >
+                      <v-col sm="6" lg="6" class="">
+                        <v-text-field label="Adresse" 
+                          v-model="adresseLigne1"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="35"
+                          :hide-details="readonly"/>
+                      </v-col>
+                      <v-col sm="6" lg="6" class="">
+                        <v-text-field label="Complément d'adresse" 
+                          v-model="adresseLigne2"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="35"
+                          :hide-details="readonly"/>
+                      </v-col>
+                    </v-row>
+                    <v-row dense class="mb-12 pt-0">
+                      <v-col sm="6" lg="2" class="">
+                        <v-text-field label="Pays" 
+                          v-model="codePays"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="3"
+                          :hide-details="readonly"/>
+                      </v-col>
+                      <v-col sm="6" lg="4" class="">
+                        <v-text-field label="Code Postal" 
+                          v-model="codePostal"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="8"
+                          :hide-details="readonly"/>
+                      </v-col>
+                      <v-col sm="6" lg="6" class="">
+                        <v-text-field label="Localité" 
+                          v-model="localité"
+                          outlined
+                          :readonly="readonly"
+                          :counter="!readonly"
+                          maxlength="30"
+                          :hide-details="readonly"/>
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-card-text>
+          </v-tab-item>
+          <v-tab-item>
             <v-card-text flat>
-                
-          <v-form ref="formComptabilite"
-            v-model="isComptabiliteValid"
-          >
-                <v-row dense>
+              <v-form ref="formComptabilite"
+                v-model="isComptabiliteValid"
+              >
+                <v-row dense
+                  :class="readonly ? 'mb-5' : ''"
+                >
                   <v-col cols="6" class="mb-n3 pt-0" :class="readonly ? 'input-spacing' : '' ">
                     <autocomplete-comptes-vue
-                      class="mb-n3 pt-0"
+                      class="pt-0"
+                      :class="readonly ? '' : 'mb-n3'"
                       :readonly.sync="readonly"
                       typeCompte.sync="G"
                       label="N° de compte associé"
@@ -328,7 +323,8 @@
                       :rules="[]"
                     />
                     <autocomplete-comptes-vue
-                      class="mb-n3 pt-0"
+                      class="pt-0"
+                      :class="readonly ? '' : 'mb-n3'"
                       :readonly="readonly"
                       typeCompte="C"
                       label="N° de compte maître"
@@ -340,6 +336,7 @@
                     />
                     <autocomplete-comptes-vue
                       class="pt-0"
+                      :class="readonly ? '' : 'mb-n3'"
                       :readonly="readonly"
                       typeCompte="G"
                       label="N° de compte vente/achat"
@@ -352,7 +349,8 @@
                   </v-col>
                   <v-col cols="3" class="pl-3 mb-n3 pt-0" :class="readonly ? 'input-spacing' : ''">
                     <v-text-field
-                      class="mb-n3 pt-0"
+                      class="pt-0"
+                      :class="readonly ? '' : 'mb-n3 '"
                       label="IBAN"
                       v-model="compte"
                       outlined
@@ -361,7 +359,8 @@
                       ref="ibanField"
                     />
                     <v-select
-                      class="mb-n3 pt-0"
+                      class="pt-0"
+                      :class="readonly ? '' : 'mb-n3 '"
                       label="Code suivis"
                       :readonly="readonly"
                       outlined
@@ -374,6 +373,7 @@
                     <v-text-field
                       class="pt-0"
                       label="N° domiciliation"
+                      :class="readonly ? 'mb-5' : ' '"
                       v-model="numeroDomiciliation"
                       outlined
                       :readonly="readonly"
@@ -384,7 +384,8 @@
                   </v-col>
                   <v-col cols="3" class="mb-n3 pt-0" :class="readonly ? 'input-spacing' : ''">
                     <v-text-field
-                      class="mb-n3 pt-0"
+                      class="pt-0"
+                      :class="readonly ? '' : 'mb-n3 '"
                       label="BIC"
                       v-model="bic"
                       outlined
@@ -396,7 +397,8 @@
                       :hide-details="readonly"
                     />
                     <v-text-field
-                      class="mb-n3 pt-0"
+                      class="pt-0"
+                      :class="readonly ? '' : 'mb-n3 '"
                       label="Code ventilation"
                       v-model="codeVentilation"
                       outlined
@@ -476,477 +478,472 @@
                     />
                   </v-col>
                 </v-row>
-          </v-form>
+              </v-form>
             </v-card-text>
-        </v-tab-item>
-        <v-tab-item>
+          </v-tab-item>
+          <v-tab-item>
             <v-card-text flat>
-          <v-form ref="formCommercial"
-            v-model="isCommercialValid"
-          >
+              <v-form ref="formCommercial"
+                v-model="isCommercialValid"
+              >
                 <v-row dense>
                   <v-col sm="12" lg="6">
-                    <v-row class="mb-n8">
+                    <v-row :class="readonly ? 'mb-n3' : 'mb-n8'">
                       <v-col cols="12">
-                      <autocomplete-code-vue
-                      ref="autocompleteCodeRepresentant"
-                      label="Code représentant"
-                      :readonly.sync="readonly"
-                      typeCode="codeRepresentant"
-                      v-model="codeRepresentant"
-                      @select="selectRepresentant"
-                      :hide-details="readonly"
-                    />
-                        </v-col>
+                        <autocomplete-code-vue
+                        ref="autocompleteCodeRepresentant"
+                        label="Code représentant"
+                        :readonly.sync="readonly"
+                        typeCode="codeRepresentant"
+                        v-model="codeRepresentant"
+                        @select="selectRepresentant"
+                        :hide-details="readonly"
+                        />
+                      </v-col>
                     </v-row>
-
-                    <v-row class="mb-n8">
+                    <v-row :class="readonly? 'mb-n3' : 'mb-n8'">
                       <v-col cols="12">
-                    <autocomplete-code-vue
-                      ref="autocompleteCodeFamille"
-                      label="Code famille"
-                      :readonly.sync="readonly"
-                      typeCode="codeFamille"
-                      v-model="codeFamille"
-                      @select="selectFamille"
-                      :hide-details="readonly"
-                      dense
-                    />
-                        </v-col>
+                        <autocomplete-code-vue
+                          ref="autocompleteCodeFamille"
+                          label="Code famille"
+                          :readonly.sync="readonly"
+                          typeCode="codeFamille"
+                          v-model="codeFamille"
+                          @select="selectFamille"
+                          :hide-details="readonly"
+                          dense
+                        />
+                      </v-col>
                     </v-row>
-
-                    <v-row class="mb-n8">
+                    <v-row :class="readonly ? 'mb-n3' : 'mb-n8'">
                       <v-col cols="12">
-                    <autocomplete-code-vue
-                      ref="autocompleteCodeSecteur"
-                      label="Code secteur"
-                      :readonly.sync="readonly"
-                      typeCode="codeSecteur"
-                      v-model="codeSecteur"
-                      @select="selectSecteur"
-                      :hide-details="readonly"
-                      dense
-                    />
-                        </v-col>
+                        <autocomplete-code-vue
+                          ref="autocompleteCodeSecteur"
+                          label="Code secteur"
+                          :readonly.sync="readonly"
+                          typeCode="codeSecteur"
+                          v-model="codeSecteur"
+                          @select="selectSecteur"
+                          :hide-details="readonly"
+                          dense
+                        />
+                      </v-col>
                     </v-row>
-
-                    <v-row class="mb-n8">
+                    <v-row :class="readonly ? 'mb-n3' : 'mb-n8'">
                       <v-col cols="4" :class="readonly ? 'input-spacing' : ''">
-                    
-                    <v-text-field
-                      outlined
-                      label="Nombre de jours"
-                      v-model="nombreDeJoursPaiement"
-                      :hide-details="readonly"
-                      :rules="rules.nombreDeJoursPaiement"
-                      validate-on-blur
-                    />
-                  </v-col>
-                   <v-col cols="8" class="pr-3" :class="readonly ? 'input-spacing' : ''">
-                    
-                    <v-select
-                      outlined
-                      :readonly="readonly"
-                      label="Paiement"
-                      v-model="codePaiement"
-                      :items="codesPaiement"
-                      item-text="code"
-                      item-value="code"
-                      @change="changeCodePaiement"
-                      :hide-details="readonly"
-                      ref="paiementField"
-                    />
-                  </v-col>
+                        <v-text-field
+                          outlined
+                          :readonly.sync="readonly"
+                          label="Nombre de jours"
+                          v-model="nombreDeJoursPaiement"
+                          :hide-details="readonly"
+                          :rules="rules.nombreDeJoursPaiement"
+                          validate-on-blur
+                        />
+                      </v-col>
+                      <v-col cols="8" class="pr-3" :class="readonly ? 'input-spacing' : ''">
+                        <v-select
+                          outlined
+                          :readonly="readonly"
+                          label="Paiement"
+                          v-model="codePaiement"
+                          :items="codesPaiement"
+                          item-text="code"
+                          item-value="code"
+                          @change="changeCodePaiement"
+                          :hide-details="readonly"
+                          ref="paiementField"
+                        />
+                      </v-col>
                     </v-row>
-                    
                   </v-col>
-                  
-                 
                   <v-col sm="12" lg="6" class="pl-3" :class="readonly ? 'input-spacing' : ''">
-                    <v-row class="mb-n8">
+                    <v-row :class="readonly ? 'mb-n3' : 'mb-n8'">
                       <v-col cols="4">
-                    <v-select
-                      label="Langue"
-                      v-model="codeLangue"
-                      item-value="code"
-                      item-text="valeur"
-                      :items="codesLangues"
-                      outlined
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                    />
+                        <v-select
+                          label="Langue"
+                          v-model="codeLangue"
+                          item-value="code"
+                          item-text="valeur"
+                          :items="codesLangues"
+                          outlined
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                        />
                       </v-col>
-
                       <v-col cols="4">
-                      <v-text-field
-                      outlined
-                      label="Numéro prix"
-                      v-model="codePrix"
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                    />
+                        <v-text-field
+                        outlined
+                        label="Numéro prix"
+                        v-model="codePrix"
+                        :readonly="readonly"
+                        :hide-details="readonly"
+                        />
                       </v-col>
-                      
                       <v-col cols="4">
-                    <v-text-field
-                      outlined
-                      label="NACE"
-                      v-model="codeNace"
-                      maxlength="5"
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                    />
+                        <v-text-field
+                          outlined
+                          label="NACE"
+                          v-model="codeNace"
+                          maxlength="5"
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                        />
                       </v-col>
                     </v-row>
-                    <v-row class="mb-n8">
+                    <v-row :class="readonly ? 'mb-n3' : 'mb-n8'">
                       <v-col>
                         <v-text-field
-                      outlined
-                      label="Escompte"
-                      v-model="escompte"
-                      append-icon="mdi-percent-outline"
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                      :rules="rules.escompte"
-                      validate-on-blur
-                    />
+                          outlined
+                          label="Escompte"
+                          v-model="escompte"
+                          append-icon="mdi-percent-outline"
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                          :rules="rules.escompte"
+                          validate-on-blur
+                        />
                       </v-col>
                       <v-col>
                         <v-text-field
-                      outlined
-                      label="Jours"
-                      v-model="joursEscomptes"
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                      :rules="rules.codeVentilation"
-                      validate-on-blur
-                    />
+                          outlined
+                          label="Jours"
+                          v-model="joursEscomptes"
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                          :rules="rules.codeVentilation"
+                          validate-on-blur
+                        />
                       </v-col>
                       <v-col>
                         <v-text-field
-                      outlined
-                      label="Tarif"
-                      v-model="tarif"
-                      maxlength="6"
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                    />
+                          outlined
+                          label="Tarif"
+                          v-model="tarif"
+                          maxlength="6"
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                        />
                       </v-col>
                     </v-row>
-                    <v-row class="mb-n8">
+                    <v-row :class="readonly ? 'mb-n3' : 'mb-n8'">
                       <v-col>
                         <v-text-field
-                      outlined
-                      label="Remise"
-                      v-model="codeRemise"
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                    />
+                          outlined
+                          label="Remise"
+                          v-model="codeRemise"
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                        />
                       </v-col>
                       <v-col>
                         <v-text-field
-                      outlined
-                      label="Remise Globale"
-                      v-model="remiseGlobaleDefaut"
-                      append-icon="mdi-percent-outline"
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                      :rules="rules.remiseGlobaleDefaut"
-                      validate-on-blur
-                    />
+                          outlined
+                          label="Remise Globale"
+                          v-model="remiseGlobaleDefaut"
+                          append-icon="mdi-percent-outline"
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                          :rules="rules.remiseGlobaleDefaut"
+                          validate-on-blur
+                        />
                       </v-col>
                       <v-col>
-                         <v-text-field
-                      outlined
-                      label="Port Franco"
-                      v-model="francoMontant"
-                      append-icon="mdi-currency-eur"
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                      :rules="rules.francoMontant"
-                      validate-on-blur
-                    />
+                        <v-text-field
+                          outlined
+                          label="Port Franco"
+                          v-model="francoMontant"
+                          append-icon="mdi-currency-eur"
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                          :rules="rules.francoMontant"
+                          validate-on-blur
+                        />
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col> 
                         <div>
-                      <date-picker
-                        label="Fermeture du"
-                        :date.sync="fermetureDu"
-                        :readonly.sync="readonly"
-                        outlined
-                        :rules.sync="fermetureDuRules"
-                        :hide-details="readonly"
-                        validate-on-blur
-                      />
-                    </div>
+                          <date-picker
+                            label="Fermeture du"
+                            :date.sync="fermetureDu"
+                            :readonly.sync="readonly"
+                            outlined
+                            :rules.sync="fermetureDuRules"
+                            :hide-details="readonly"
+                            validate-on-blur
+                          />
+                        </div>
                       </v-col>
                       <v-col>
                         <div>
-                      <date-picker
-                        id="fermetureAu"
-                        label="au"
-                        :date.sync="fermetureAu"
-                        :readonly.sync="readonly"
-                        outlined
-                        :rules.sync="fermetureAuRules"
-                        :hide-details="readonly"
-                        class="pt-8"
-                      />
-                    </div>
+                          <date-picker
+                            id="fermetureAu"
+                            label="au"
+                            :date.sync="fermetureAu"
+                            :readonly.sync="readonly"
+                            outlined
+                            :rules.sync="fermetureAuRules"
+                            :hide-details="readonly"
+                            class="pt-8"
+                          />
+                        </div>
                       </v-col>
                       <v-col>
                         <v-text-field
-                      outlined
-                      label="Limite de crédit"
-                      v-model="limiteCredit"
-                      append-icon="mdi-currency-eur"
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                      :rules="rules.limiteCredit"
-                      validate-on-blur
-                    />
+                          outlined
+                          label="Limite de crédit"
+                          v-model="limiteCredit"
+                          append-icon="mdi-currency-eur"
+                          :readonly="readonly"
+                          :hide-details="readonly"
+                          :rules="rules.limiteCredit"
+                          validate-on-blur
+                        />
                       </v-col>
                     </v-row>
                   </v-col>
                 </v-row>
-          </v-form>
+              </v-form>
             </v-card-text>
-        </v-tab-item>
-        <v-tab-item>
-
+          </v-tab-item>
+          <v-tab-item>
             <v-card-text flat>
-          <v-form ref="formLogistique"
-            v-model="isLogistiqueValid"
-          >
-            <v-row >
-              <v-col sm="6" lg="3" >
+              <v-form ref="formLogistique"
+                v-model="isLogistiqueValid"
+              >
                 <v-row >
-                  <v-col cols="6">
-                    <v-tooltip top open-delay="500">
-                      <template v-slot:activator="{ on }">
-                        <v-checkbox
-                          label="Livraison globale"
-                          v-model="livraisonGlobale"
-                          :readonly="readonly"
-                          v-on="on"
-                          :hide-details="true"
-                        ></v-checkbox>
-                      </template>
-                      <span>Une livraison est effectuée si tous les articles d'une commande sont de stock</span>
-                    </v-tooltip>
-                    <v-tooltip top open-delay="500">
-                      <template v-slot:activator="{ on }">
-                        <v-checkbox
-                          label="Facture certifiée"
-                          v-model="documentCertifie"
-                          v-on="on"
-                          :hide-details="true"
-                        ></v-checkbox>
-                      </template>
-                      <span>Les factures émises reprendront une mention de CERTIFICATION</span>
-                    </v-tooltip>
+                  <v-col sm="6" lg="3" >
+                    <v-row >
+                      <v-col cols="6">
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-checkbox
+                              label="Livraison globale"
+                              v-model="livraisonGlobale"
+                              :readonly="readonly"
+                              v-on="on"
+                              :hide-details="true"
+                            ></v-checkbox>
+                          </template>
+                          <span>Une livraison est effectuée si tous les articles d'une commande sont de stock</span>
+                        </v-tooltip>
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-checkbox
+                              label="Facture certifiée"
+                              v-model="documentCertifie"
+                              v-on="on"
+                              :hide-details="true"
+                            ></v-checkbox>
+                          </template>
+                          <span>Les factures émises reprendront une mention de CERTIFICATION</span>
+                        </v-tooltip>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-checkbox
+                              label="Tenue back-orders"
+                              v-model="tenueBackOrders"
+                              :readonly="readonly"
+                              v-on="on"
+                              :hide-details="true"
+                            ></v-checkbox>
+                          </template>
+                          <span>Gestion des back-orders</span>
+                        </v-tooltip>
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-checkbox
+                              label="Confirmation commande"
+                              v-model="confirmationCommande"
+                              :readonly="readonly"
+                              v-on="on"
+                              :hide-details="true"
+                            ></v-checkbox>
+                          </template>
+                          <span>Les back-orders sont gérés dans des documents externes</span>
+                        </v-tooltip>
+                      </v-col>
+                    </v-row>
                   </v-col>
-                  <v-col cols="6">
-                    <v-tooltip top open-delay="500">
-                      <template v-slot:activator="{ on }">
-                        <v-checkbox
-                          label="Tenue back-orders"
-                          v-model="tenueBackOrders"
-                          :readonly="readonly"
-                          v-on="on"
-                          :hide-details="true"
-                        ></v-checkbox>
-                      </template>
-                      <span>Gestion des back-orders</span>
-                    </v-tooltip>
-                    <v-tooltip top open-delay="500">
-                      <template v-slot:activator="{ on }">
-                        <v-checkbox
-                          label="Confirmation commande"
-                          v-model="confirmationCommande"
-                          :readonly="readonly"
-                          v-on="on"
-                          :hide-details="true"
-                        ></v-checkbox>
-                      </template>
-                      <span>Les back-orders sont gérés dans des documents externes</span>
-                    </v-tooltip>
-                  </v-col>
-                </v-row>
-              </v-col>
-              <v-col sm="6" lg="3" >
-                <v-row >
-                  <v-col cols="6" class="pl-3" :class="readonly ? 'input-spacing' : ''">
-                    <v-select
-                      class="mb-n3 pt-0"
-                      label="Factures groupées"
-                      v-model="facturesGroupees"
-                      outlined
-                      :readonly="readonly"
-                      :items="facturesGroupeesItems"
-                      item-value="code"
-                      item-text="valeur"
-                      :hide-details="readonly"
-                    ></v-select>
-                    <v-tooltip top open-delay="500">
-                      <template v-slot:activator="{ on }">
-                        <v-text-field
-                          label="Catégorie facturation"
-                          v-model="categorieFacturation"
+                  <v-col sm="6" lg="3" >
+                    <v-row>
+                      <v-col cols="6" class="pl-3" :class="readonly ? 'input-spacing' : ''">
+                        <v-select
+                          class="pt-0"
+                          :class="readonly ? '' : 'mb-n3'"
+                          label="Factures groupées"
+                          v-model="facturesGroupees"
                           outlined
                           :readonly="readonly"
-                          v-on="on"
+                          :items="facturesGroupeesItems"
+                          item-value="code"
+                          item-text="valeur"
                           :hide-details="readonly"
-                          maxlength="1"
-                        ></v-text-field>
-                      </template>
-                      <span
-                        >Ce code permet de regrouper les clients au niveau des lots de facturation
-                        (hebdomadaires/mensuels/...)</span
-                      >
-                    </v-tooltip>
-                  </v-col>
-                  <v-col cols="6" class="pr-3" :class="readonly ? 'input-spacing' : ''">
-                    <v-tooltip top open-delay="500" 
-                      class="mb-n3 pt-0"
-                    >
-                      <template v-slot:activator="{ on }">
-                        <v-text-field
+                        ></v-select>
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-text-field
+                              label="Catégorie facturation"
+                              v-model="categorieFacturation"
+                              outlined
+                              :readonly="readonly"
+                              v-on="on"
+                              :hide-details="readonly"
+                              maxlength="1"
+                            ></v-text-field>
+                          </template>
+                          <span
+                            >Ce code permet de regrouper les clients au niveau des lots de facturation
+                            (hebdomadaires/mensuels/...)</span
+                          >
+                        </v-tooltip>
+                      </v-col>
+                      <v-col cols="6" class="pr-3" :class="readonly ? 'input-spacing' : ''">
+                        <v-tooltip top open-delay="500" 
                           class="mb-n3 pt-0"
-                          label="# Copies factures"
-                          v-model="nombreExemplaireFacture"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-text-field
+                              class="pt-0"
+                              :class="readonly ? '' : 'mb-n3'"
+                              label="# Copies factures"
+                              v-model="nombreExemplaireFacture"
+                              outlined
+                              :readonly="readonly"
+                              v-on="on"
+                              :hide-details="readonly"
+                              :rules="rules.nombreExemplaireFacture"
+                              validate-on-blur
+                            ></v-text-field>
+                          </template>
+                          <span>Nombre de copies de factures à éditer en plus de l'original</span>
+                        </v-tooltip>
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-text-field
+                              label="Code formulaire"
+                              v-model="formulaire"
+                              outlined
+                              :readonly="readonly"
+                              v-on="on"
+                              :hide-details="readonly"
+                            ></v-text-field>
+                          </template>
+                          <span
+                            >Ce code permet de dissocier la présentation des documents externes (Notes de
+                            livraison/Factures/...)</span
+                          >
+                        </v-tooltip>
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col sm="6" lg="3"  class="pl-3 pr-3">
+                    <v-row >
+                      <v-col cols="12" :class="readonly ? 'input-spacing' : ''">
+                        <v-select
+                          class="pt-0"
+                          :class="readonly ? '' : 'mb-n3'"
+                          label="Transporteur"
+                          v-model="transporteur"
                           outlined
                           :readonly="readonly"
-                          v-on="on"
+                          :items="transporteurs"
+                          item-text="transportFR"
+                          item-value="id"
                           :hide-details="readonly"
-                          :rules="rules.nombreExemplaireFacture"
-                          validate-on-blur
-                        ></v-text-field>
-                      </template>
-                      <span>Nombre de copies de factures à éditer en plus de l'original</span>
-                    </v-tooltip>
-                    <v-tooltip top open-delay="500">
-                      <template v-slot:activator="{ on }">
+                        ></v-select>
+                        <v-combobox
+                          class=""
+                          height="56"
+                          label="Tournées"
+                          outlined
+                          :readonly="readonly"
+                          chips
+                          multiple
+                          :hide-details="readonly"
+                          v-model="tournees"
+                          append-icon=""
+                          :rules="rules.tournees"
+                        ></v-combobox>
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col sm="6" lg="3" class="pl-3">
+                    <v-row >
+                      <v-col cols="6" :class="readonly ? 'input-spacing' : ''">
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-text-field
+                              class="pt-0"
+                              :class="readonly ? '' : 'mb-n3'"
+                              label="Période commandes"
+                              v-model="periodiciteCommande"
+                              outlined
+                              :readonly="readonly"
+                              :suffix="periodiciteCommande != '0' ? '' : 'semaines'"
+                              v-on="on"
+                              :hide-details="readonly"
+                              :rules="rules.periodiciteCommande"
+                              validate-on-blur
+                            ></v-text-field>
+                          </template>
+                          <span>Nombre moyen de semaines entre deux commande</span>
+                        </v-tooltip>
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-text-field
+                              label="Délai livraison"
+                              v-model="delaiLivraison"
+                              outlined
+                              :readonly="readonly"
+                              :suffix="delaiLivraison != '0' ? '' : 'jours'"
+                              v-on="on"
+                              :hide-details="readonly"
+                              :rules="rules.delaiLivraison"
+                              validate-on-blur
+                            ></v-text-field>
+                          </template>
+                          <span>Nombre moyen de jours de délai de livraison</span>
+                        </v-tooltip>
+                      </v-col>
+                      <v-col cols="6" :class="readonly ? 'input-spacing' : ''">
                         <v-text-field
-                          label="Code formulaire"
-                          v-model="formulaire"
+                          class="pt-0"
+                          :class="readonly ? '' : 'mb-n3'"
+                          label="Conditions transp."
+                          v-model="conditionsTransport"
                           outlined
                           :readonly="readonly"
-                          v-on="on"
                           :hide-details="readonly"
                         ></v-text-field>
-                      </template>
-                      <span
-                        >Ce code permet de dissocier la présentation des documents externes (Notes de
-                        livraison/Factures/...)</span
-                      >
-                    </v-tooltip>
+                        <v-tooltip top open-delay="500">
+                          <template v-slot:activator="{ on }">
+                            <v-text-field
+                              label="Emission documents"
+                              outlined
+                              :readonly="readonly"
+                              v-on="on"
+                              :hide-details="readonly"
+                              v-model="emissionDocuments"
+                              maxlength="5"
+                            ></v-text-field>
+                          </template>
+                          <span
+                            >Le contenu de cette zone permet de piloter l'envoi de documents par courrier, fax et
+                            e-mail</span
+                          >
+                        </v-tooltip>
+                      </v-col>
+                    </v-row>
                   </v-col>
                 </v-row>
-              </v-col>
-              <v-col sm="6" lg="3"  class="pl-3 pr-3">
-                <v-row >
-                  <v-col cols="12" :class="readonly ? 'input-spacing' : ''">
-                    <v-select
-                      class="mb-n3 pt-0"
-                      label="Transporteur"
-                      v-model="transporteur"
-                      outlined
-                      :readonly="readonly"
-                      :items="transporteurs"
-                      item-text="transportFR"
-                      item-value="id"
-                      :hide-details="readonly"
-                    ></v-select>
-                    <v-combobox
-                      class=""
-                      height="56"
-                      label="Tournées"
-                      outlined
-                      :readonly="readonly"
-                      chips
-                      multiple
-                      :hide-details="readonly"
-                      v-model="tournees"
-                      append-icon=""
-                      :rules="rules.tournees"
-                    ></v-combobox>
-                  </v-col>
-                </v-row>
-              </v-col>
-              <v-col sm="6" lg="3" class="pl-3">
-                <v-row >
-                  <v-col cols="6" :class="readonly ? 'input-spacing' : ''">
-                    <v-tooltip top open-delay="500">
-                      <template v-slot:activator="{ on }">
-                        <v-text-field
-                          class="mb-n3 pt-0"
-                          label="Période commandes"
-                          v-model="periodiciteCommande"
-                          outlined
-                          :readonly="readonly"
-                          :suffix="periodiciteCommande != '0' ? '' : 'semaines'"
-                          v-on="on"
-                          :hide-details="readonly"
-                          :rules="rules.periodiciteCommande"
-                          validate-on-blur
-                        ></v-text-field>
-                      </template>
-                      <span>Nombre moyen de semaines entre deux commande</span>
-                    </v-tooltip>
-                    <v-tooltip top open-delay="500">
-                      <template v-slot:activator="{ on }">
-                        <v-text-field
-                          label="Délai livraison"
-                          v-model="delaiLivraison"
-                          outlined
-                          :readonly="readonly"
-                          :suffix="delaiLivraison != '0' ? '' : 'jours'"
-                          v-on="on"
-                          :hide-details="readonly"
-                          :rules="rules.delaiLivraison"
-                          validate-on-blur
-                        ></v-text-field>
-                      </template>
-                      <span>Nombre moyen de jours de délai de livraison</span>
-                    </v-tooltip>
-                  </v-col>
-                  <v-col cols="6" :class="readonly ? 'input-spacing' : ''">
-                    <v-text-field
-                      class="mb-n3 pt-0"
-                      label="Conditions transp."
-                      v-model="conditionsTransport"
-                      outlined
-                      :readonly="readonly"
-                      :hide-details="readonly"
-                    ></v-text-field>
-                    <v-tooltip top open-delay="500">
-                      <template v-slot:activator="{ on }">
-                        <v-text-field
-                          label="Emission documents"
-                          outlined
-                          :readonly="readonly"
-                          v-on="on"
-                          :hide-details="readonly"
-                          v-model="emissionDocuments"
-                          maxlength="5"
-                        ></v-text-field>
-                      </template>
-                      <span
-                        >Le contenu de cette zone permet de piloter l'envoi de documents par courrier, fax et
-                        e-mail</span
-                      >
-                    </v-tooltip>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
-          </v-form>
+              </v-form>
             </v-card-text>
-        </v-tab-item>
-    </v-tabs>
+          </v-tab-item>
+        </v-tabs>
       <v-card-actions v-if="!readonly">
         <v-spacer />
         <v-tooltip top open-delay="500">
@@ -1015,10 +1012,10 @@ import DatePicker from '@/components/DatePicker.vue';
 import { DateTime } from '@/models/DateTime';
 
 @Component({
-  name: 'TestTabForm',
+  name: 'FournisseurVue',
   components: { AlertMessageVue, SearchComptes, AutocompleteComptesVue, AutocompleteCodeVue, DatePicker }
 })
-export default class TestTabForm extends Vue {
+export default class FournisseurVue extends Vue {
   @Ref() readonly inputNom: any;
   @Ref() alertMessage!: AlertMessageVue;
   @Ref() successMessage!: AlertMessageVue;
@@ -1034,8 +1031,6 @@ export default class TestTabForm extends Vue {
   @Ref() paiementField!: any;
   @Ref() fournisseurDialog!: any;
 
-  private tabHeaders: string[] = ["Signalétique", "Comptabilité", "Commercial", "Logistique"];
-  
   private isSignaletiqueValid = true;
   private isComptabiliteValid = true;
   private isCommercialValid = true;
