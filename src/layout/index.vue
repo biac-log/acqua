@@ -168,7 +168,7 @@ export default class extends Vue {
       }
     }
     // If there is no children, return itself with path removed,
-    // because this.basePath already conatins item's path information
+    // because this.basePath already contains item's path information
     return { ...route, path: '' };
   }
 
