@@ -33,6 +33,7 @@
       </v-card-text>
       <v-progress-linear :active="isLoading" indeterminate top color="primary accent-4"></v-progress-linear>
         <v-tabs
+        v-model="currentTab"
         >
           <v-tabs-slider color="#1976d2"></v-tabs-slider>
           <v-tab>
@@ -300,7 +301,7 @@
               </v-form>
             </v-card-text>
           </v-tab-item>
-          <v-tab-item>
+          <v-tab-item eager>
             <v-card-text flat>
               <v-form ref="formComptabilite"
                 v-model="isComptabiliteValid"
@@ -321,6 +322,7 @@
                       :hide-details.sync="readonly"
                       outlined
                       :rules="[]"
+                      id="autocompleteAssocie"
                     />
                     <autocomplete-comptes-vue
                       class="pt-0"
@@ -481,7 +483,7 @@
               </v-form>
             </v-card-text>
           </v-tab-item>
-          <v-tab-item>
+          <v-tab-item eager>
             <v-card-text flat>
               <v-form ref="formCommercial"
                 v-model="isCommercialValid"
@@ -1035,6 +1037,7 @@ export default class FournisseurVue extends Vue {
   private isComptabiliteValid = true;
   private isCommercialValid = true;
   private isLogistiqueValid = true;
+  private currentTab = 0;
 
   private display = false;
   private isValid = true;
@@ -1409,6 +1412,7 @@ export default class FournisseurVue extends Vue {
     (this.$refs.formCommercial as any).resetValidation();
     (this.$refs.formComptabilite as any).resetValidation();
     (this.$refs.formLogistique as any).resetValidation();
+    this.currentTab = 0;
     this.setFournisseur(new Fournisseur());
     this.resetCodeValue();
     this.resetCompteValue();
