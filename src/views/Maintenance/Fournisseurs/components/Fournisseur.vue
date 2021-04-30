@@ -1591,7 +1591,6 @@ export default class FournisseurVue extends Vue {
 
   private async getParams() {
     const params = await FournisseurApi.getParams();
-    console.log(params);
     this.fournisseurParams = new FournisseurParams(params);
 
     this.libellesAssujettis = this.fournisseurParams.libellesAssujettis;

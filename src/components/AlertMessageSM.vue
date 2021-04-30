@@ -47,10 +47,6 @@ export default class AlertMessageSM extends Vue {
     this.message = '';
     this.messageDetails = '';
   }
-  public log()
-  {
-    console.log("hello");
-  }
 }
 </script>
 

@@ -125,7 +125,6 @@
               :rowData="echeanciers"
               :gridOptions="gridOptions"
               @selection-changed="calculAVentile"
-              @grid-ready="onGridReady"
               :rowSelection="multipleSelection ? 'multiple' : 'single'"
             ></AgGridVue>
           </v-col>
@@ -501,10 +500,6 @@ export default class extends Vue {
       this.reinitGrid();
       this.resolve(comptes);
     }
-  }
-
-  private onGridReady() {
-    // (this.gridOptions.api as GridApi).sizeColumnsToFit();
   }
 
   private close() {
