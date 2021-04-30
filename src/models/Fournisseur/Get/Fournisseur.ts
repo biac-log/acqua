@@ -125,8 +125,6 @@ export class Fournisseur extends FournisseurDTO {
 
   public static rules = {
     nom: [(v: string) => !!v || 'Nom requis.'],
-    matchCode:[(v:string) => !!v || 'Match code requis'],
-    numero:[(v:string) => !!v || 'Numéro requis'],
     email: [(v: string) => !v || /\S+@\S+\.\S+/.test(v) || 'Adresse email invalide'],
     codeVentilation: [(v: string) => !v || !!v.isInt() || 'Nombre invalide'],
     nombreDeJoursPaiement: [(v: string) => !v || !!v.isInt() || 'Nombre invalide'],

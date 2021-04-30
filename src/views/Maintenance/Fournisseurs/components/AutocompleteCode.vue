@@ -13,8 +13,7 @@
       item-value="code"
       hide-no-data
       @keyup.enter="$event.target.select()"
-      @focus="$event.target.select(),clearContentOnFocus()"
-      @blur="restoreContentOnBlur()"
+      @focus="$event.target.select()"
       @keydown.ctrl.f.prevent="openSearch()"
       @keydown.f5.prevent="openSearch()"
       v-model="codeSelected"
@@ -75,47 +74,15 @@ export default class AutocompleteCodeVue extends Vue {
   private codeSelected: CodeItem = new CodeItem(0, '');
   private items: CodeItem[] = [];
   private searchCode = '';
-  private previousCode: CodeItem = new CodeItem(0,'');
 
   public init(value: string) {
     this.codeSelected = new CodeItem(value, '');
   }
 
-
   private async codeChange(value: CodeItem) {
     this.codeSelected = value;
-    this.$emit('select', this.codeSelected);
-  }
-
-  /*w.o. this method, the default behavior visually append the freshly inputed value to the already existing value.
-  So, this method clean the existing value and store it in a temp attribute to use with restoreContentOnBlur() method*/
-  private clearContentOnFocus(){
-    if(!this.isReadonly){
-      this.previousCode = this.codeSelected;
-      this.codeSelected = new CodeItem(0, '');
-    }
-  }
-  private restoreContentOnBlur(){
-    //If codeSelected changed, we don't want to restore the previous code value
-    /* This code is a quick fix but should be looked at more in depth.
-      It doesn't work when considering the previousCode.nom as it seem to be stored
-      in a different manner (AKA not at all) than the previousCode.code. 
-      Thus, we can't check both value and restore them both
-    if(this.codeSelected.code && this.codeSelected.nom)
-      return;
-    if(this.previousCode.code && this.previousCode.nom){
-      this.codeSelected = this.previousCode;
-    }
-    */
-    if(this.codeSelected.code)
-      return;
-    if(this.previousCode.code)
-      this.codeSelected = this.previousCode;
-  }
-  public resetValue(){
-    this.codeSelected = new CodeItem(0,'');
-    this.previousCode = new CodeItem(0,'');
-    this.searchCode='';
+    this.$emit('select', value);
+    this.comboboxCode.blur();
   }
 
   @Watch('searchCode')

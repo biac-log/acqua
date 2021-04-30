@@ -117,7 +117,6 @@
         <v-row>
           <v-col cols="12">
             <AgGridVue
-              ref="agGrid"
               style="height: 519px"
               id="dataTable"
               class="ag-theme-alpine"
@@ -125,6 +124,7 @@
               :rowData="echeanciers"
               :gridOptions="gridOptions"
               @selection-changed="calculAVentile"
+              @grid-ready="onGridReady"
               :rowSelection="multipleSelection ? 'multiple' : 'single'"
             ></AgGridVue>
           </v-col>
@@ -150,7 +150,7 @@
 
 <script lang="ts">
 import { AgGridVue } from 'ag-grid-vue';
-import { Component, Vue, PropSync, Watch, Prop, Ref } from 'vue-property-decorator';
+import { Component, Vue, PropSync, Watch, Prop } from 'vue-property-decorator';
 import { GridOptions, GridApi, ValueFormatterParams } from 'ag-grid-community';
 import EcheancierApi from '@/api/EcheancierApi';
 import { Echeancier, EcheancierElement } from '@/models/Echeancier';
@@ -162,11 +162,7 @@ import _ from 'lodash';
   components: { AgGridVue },
 })
 export default class extends Vue {
-  @Ref() readonly agGrid!:AgGridVue;
-
   private dialog = false;
-
-  private minColDisplayWidth = 1300;
 
   @PropSync('MontantAVentileDevise', { default: 0 }) private montantAVentileDevise!: number;
   @PropSync('MontantAVentileBase', { default: 0 }) private montantAVentileBase!: number;
@@ -189,7 +185,7 @@ export default class extends Vue {
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: true,
-      type: 'rightAligned'
+      type: 'rightAligned',
     },
     { headerName: 'PiecePrincipale', field: 'isPiecePrincipale', filter: true, width: 150, hide: true },
     { headerName: 'Type', field: 'typePiece', filter: true, width: 150 },
@@ -199,7 +195,7 @@ export default class extends Vue {
       filter: true,
       width: 120,
       type: 'dateColumn',
-      valueFormatter: this.dateToString
+      valueFormatter: this.dateToString,
     },
     {
       headerName: 'Montant',
@@ -207,7 +203,7 @@ export default class extends Vue {
       filter: true,
       width: 140,
       type: 'numericColumn',
-      valueFormatter: this.montantDeviseToString
+      valueFormatter: this.montantDeviseToString,
     },
     {
       headerName: 'Montant',
@@ -216,15 +212,15 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
-      hide: true
+      hide: true,
     },
-    { headerName: 'Libellé', field: 'libelle', filter: true, width: 150, type: 'dateColumn'},
+    { headerName: 'Libellé', field: 'libelle', filter: true, width: 150, type: 'dateColumn' },
     {
-      headerName: 'Échéance',
+      headerName: 'Date échéance',
       field: 'dateEcheanceDate',
       filter: true,
       width: 120,
-      valueFormatter: this.dateToString
+      valueFormatter: this.dateToString,
     },
     {
       headerName: 'Solde',
@@ -232,7 +228,7 @@ export default class extends Vue {
       filter: true,
       width: 140,
       type: 'numericColumn',
-      valueFormatter: this.montantDeviseToString
+      valueFormatter: this.montantDeviseToString,
     },
     {
       headerName: 'Solde',
@@ -241,10 +237,10 @@ export default class extends Vue {
       width: 140,
       type: 'numericColumn',
       valueFormatter: this.montantBaseToString,
-      hide: true
+      hide: true,
     },
     { headerName: 'Rappel', field: 'rappel', filter: true, width: 100, type: 'numericColumn' },
-    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150},
+    { headerName: 'Code bloc.', field: 'codeBlocageDisplay', filter: true, width: 150 },
   ];
 
   private resolve!: any;
@@ -255,7 +251,7 @@ export default class extends Vue {
     rowSelection: 'multiple',
     rowDeselection: true,
     rowData: this.echeanciers,
-    suppressHorizontalScroll: false,
+    suppressHorizontalScroll: true,
     onCellKeyDown: this.keypress,
     navigateToNextCell: this.navigateToNextCell,
     pagination: true,
@@ -301,16 +297,6 @@ export default class extends Vue {
       }
     },
   };
-
-  mounted(){
-    window.addEventListener("resize", this.onResize);
-  }
-  updated(){
-    if(this.$vuetify.breakpoint.xlOnly)
-      {
-        this.gridOptions.api?.sizeColumnsToFit();
-      }
-  }
 
   public open(typeToLoad: string, numeroEcheancierToLoad: string, nomCompte: string): Promise<EcheancierElement[]> {
     this.dialog = true;
@@ -502,17 +488,15 @@ export default class extends Vue {
     }
   }
 
+  private onGridReady() {
+    (this.gridOptions.api as GridApi).sizeColumnsToFit();
+  }
+
   private close() {
     this.filtreEcheancier = '';
     this.dialog = false;
     this.reinitGrid();
     this.reject();
-  }
-
-  private onResize(){
-    if(window.innerWidth >= this.minColDisplayWidth){
-      this.gridOptions.api?.sizeColumnsToFit();
-    }
   }
 }
 </script>

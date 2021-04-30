@@ -487,8 +487,6 @@ export default class extends Vue {
     (v: string) => this.validateDateEcheance(v),
   ];
 
-  private isFocusAllowedOnDateEcheance = true;
-
   mounted() {
     this.loadDevises();
     this.loadStatuts();
@@ -828,8 +826,7 @@ export default class extends Vue {
   @Watch('datePiece')
   private async datePieceChanged(val: DateTime) {
     if (!this.piecereadonly) {
-      await this.initDateEcheance(this.numeroCompteTier, this.typeCompte, val, this.isFocusAllowedOnDateEcheance);
-      this.isFocusAllowedOnDateEcheance = true;
+      await this.initDateEcheance(this.numeroCompteTier, this.typeCompte, val, true);
       if (this.deviseSelected) this.initTauxDevise(this.deviseSelected.id, val);
     }
   }
@@ -894,7 +891,6 @@ export default class extends Vue {
   }
 
   private createContrepartie() {
-    this.isFocusAllowedOnDateEcheance = false;
     if (this.compteTiersNom) this.gridContreparties.createContrepartie();
   }
 
