@@ -114,7 +114,7 @@ export default class AutocompleteCodeSingleInputVue extends Vue {
 
   @Watch('searchCode')
   private async watchSearchCode() {
-    if (this.searchCode == '' || this.searchCode == null) {
+    if (this.searchCode == '' || this.searchCode == ' - ' || this.searchCode == null) {
       this.items = [];
     } else {
       if (this.typeCode == 'codeRepresentant') {
