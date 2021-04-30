@@ -709,7 +709,7 @@
               </v-form>
             </v-card-text>
           </v-tab-item>
-          <v-tab-item>
+          <v-tab-item eager>
             <v-card-text flat>
               <v-form ref="formLogistique"
                 v-model="isLogistiqueValid"
