@@ -84,6 +84,7 @@
             <v-card-text flat>
               <v-form ref="formSignaletique"
                 v-model="isSignaletiqueValid"
+                lazy-validation
               >
                 <v-row>
                   <v-col sm="12" lg="7" 
