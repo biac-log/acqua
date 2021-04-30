@@ -243,7 +243,29 @@ export const asyncRoutes: RouteConfig[] = [
         }
       }
     ]
-  }
+  }//,
+  // {
+  //   path: '/resultatscomptables',
+  //   component: Layout,
+  //   redirect: 'resultatscomptables/index',
+  //   meta: {
+  //     roles: ['admin', 'ACQUAACHATVENTE'],
+  //     title: 'Résultats comptables',
+  //     icon: 'mdi-currency-eur'
+  //   },
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import(/* webpackChunkName: "achatvente" */ '@/views/ResultatsComptables/index.vue'),
+  //       name: 'Résultats comptables',
+  //       meta: {
+  //         title: 'Résultats comptables',
+  //         icon: 'mdi-currency-eur',
+  //         affix: true
+  //       }
+  //     }
+  //   ]
+  // }
 ];
 
 const createRouter = () =>
