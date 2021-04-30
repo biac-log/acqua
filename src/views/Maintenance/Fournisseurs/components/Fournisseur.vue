@@ -33,7 +33,6 @@
       </v-card-text>
       <v-progress-linear :active="isLoading" indeterminate top color="primary accent-4"></v-progress-linear>
         <v-tabs
-          v-model="tab"
         >
           <v-tabs-slider color="#1976d2"></v-tabs-slider>
           <v-tab>
