@@ -148,7 +148,8 @@ export default class Ecriture extends Vue {
 
 <style>
 .highlighted {
-  background-color: lightgrey;
+  background-color: #fb8a00da;
+  color: #FFFF;
 }
 .height-90 {
   height: 90%;
