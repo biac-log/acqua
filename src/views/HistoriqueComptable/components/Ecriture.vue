@@ -108,9 +108,13 @@ export default class Ecriture extends Vue {
 
   // Ajout d'une surbrillance pour mettre en avant l'imputation sélectionnée à l'écran précédent
   private highlightRow(item: ImputationDetail) {
-    return item.codeLigneExtrait == this.highlightExtrait && item.codeLigneVentilation == this.highlightVentilation
-      ? 'highlighted'
-      : '';
+    if(item.codeLigneExtrait == this.highlightExtrait && item.codeLigneVentilation == this.highlightVentilation) {
+      return 'highlighted';
+    }else if(item.codeLigneVentilation != 0) {
+      return 'ventilation';
+    }else {
+      return '';
+    }
   }
 
   private pgDown() {
@@ -148,7 +152,11 @@ export default class Ecriture extends Vue {
 
 <style>
 .highlighted {
-  background-color: lightgrey;
+  background-color: #fb8a00da;
+  color: #FFFF;
+}
+.ventilation {
+  background-color: #f4f4fd;
 }
 .height-90 {
   height: 90%;
