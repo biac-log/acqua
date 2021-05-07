@@ -87,10 +87,85 @@
             v-on:click="onClickDataFetcher"
             :disabled="!enabledDataFetcherBtn()"
           >
-            Chargerment
+            Chargement
           </v-btn>
         </v-row>
       </v-form>
+    </v-card>
+    <v-card
+      class="p-5 mt-5"  
+      v-show="displayTable"
+    >
+      Englobing V-card
+      <v-row
+        class="pr-5"
+        align="center"
+        align-content="end"
+        justify="end"
+        dense
+      >
+        <div class="pr-2">
+          Compte résultat
+        </div>
+        <v-switch v-model="displayBilan" :disabled="!canSwitchData"></v-switch>
+        <div>
+          Bilan
+        </div>
+      </v-row>
+      <v-card
+        class="pl-3"
+        flat
+        v-show="!displayBilan"
+      >
+        Compte Résultat V-card
+        <v-data-table 
+          dense
+          :headers="headers"
+          :items="compteResultatData"
+        >
+          <template v-slot:item.levelName="{item}">
+            <div
+            :class="{'pcol-1' : item.level == 1,
+            'pcol-2' : item.level == 2,
+            'pcol-3' : item.level == 3}"
+            >
+            {{item.levelName}}</div>
+            <!-- <v-chip
+            :class="{ 'pl-2' : item.level == 0,
+            'pl-6' : item.level == 1,
+            'pl-10' : item.level == 2,
+            'pl-15' : item.level == 3}"
+            >
+            {{item.levelName}}</v-chip> -->
+          </template>
+        </v-data-table>
+      </v-card>
+      <v-card
+        class="pl-3"
+        flat
+        v-show="displayBilan"
+      >
+        Actif V-card
+        <v-data-table 
+          dense
+          :headers="headers"
+          :items="bilanActifData"
+        >
+        </v-data-table>
+      </v-card>
+      <v-card
+        class="pl-3"
+        flat
+        v-show="displayBilan"
+      >
+        Passif V-card        
+        <v-data-table 
+          hide-default-header
+          dense
+          :items="bilanPassifData"
+        >
+        </v-data-table>
+      </v-card>
     </v-card>
     <v-snackbar v-model="snackbar" :timeout="snackbarTimeout" :color="snackbarColor">
       <v-icon dark class="mr-3">{{ snackbarColor == 'error' ? 'mdi-delete' : 'mdi-check' }}</v-icon>
@@ -110,6 +185,7 @@ import { PeriodeComptable } from '@/models/OperationDiverse/PeriodeComptable'
 import OperationDiverseApi from '@/api/OperationDiverseApi';
 import { ResultatsComptablesApi } from '@/api/ResultatsComptablesApi'
 import { ResultatsComptables, ResultatsComptablesDTO } from '@/models/ResultatComptable/ResultatComptable'
+import { LigneResultatsComptablesDTO, LigneResultatsComptables } from '@/models/ResultatComptable/LigneResultatsComptables'
 import { PeriodeComptableDTO } from '@/models/Financier';
 
 @Component({
@@ -140,8 +216,31 @@ export default class extends Vue {
   private bilan = false;
   private canSwitchData = false;
   private compteResultat = false;
+  private displayTable = false;
   private displayBilan = false;
   private periodeIsLoading = false;
+
+  //Processed ResultatsComptables Data
+  private bilanActifData : LigneResultatsComptablesDTO[] = [];
+  private bilanPassifData : LigneResultatsComptablesDTO[] = [];
+  private compteResultatData : LigneResultatsComptablesDTO[] = [];
+  private headers = [
+    {
+      text:"Catégorie",
+      value:"levelName"
+    },
+    {
+      text:"Libellé",
+      value:"libelle"
+    },
+    {
+      text:this.fromDateP1 + " - " + this.toDateP1,
+      value:"montantP1"
+    },
+    {
+      text:this.fromDateP2 + " - " + this.toDateP2,
+      value:"montantP2"
+    }];
 
   //Snackbar for error handlings
   private snackbar = false;
@@ -202,7 +301,14 @@ export default class extends Vue {
 
   private async loadResultatsComptablesData(resultatComptableDTO : ResultatsComptablesDTO){
     try{
-      await ResultatsComptablesApi.getResultatsComptablesData(resultatComptableDTO).then( x => console.log(x));
+      await ResultatsComptablesApi.getResultatsComptablesData(resultatComptableDTO).then( x => {
+       console.log(x[0]); 
+       this.bilanActifData=x[0];
+       console.log(x[1]); 
+       this.bilanPassifData=x[1];
+       console.log(x[2]); 
+       this.compteResultatData=x[2];
+      });
     }catch(err){
       this.notifier('Erreur lors du chargement des données comptables','red');
     }
@@ -239,12 +345,19 @@ export default class extends Vue {
   private onClickDataFetcher(){
     this.canSwitchData = this.bilan && this.compteResultat;
     this.displayBilan = this.bilan;
+    this.displayTable = true;
     const resultatsComptablesDTO : ResultatsComptablesDTO = new ResultatsComptablesDTO();
     resultatsComptablesDTO.structureName = this.structure;
     resultatsComptablesDTO.periode1 = new PeriodeComptableDTO();
+    resultatsComptablesDTO.DebutPeriode1= this.fromDateP1.toUtc();
+    resultatsComptablesDTO.FinPeriode1= this.toDateP1.toUtc();
+    if(this.secondPeriod){
+      resultatsComptablesDTO.DebutPeriode2= this.fromDateP2.toUtc();
+      resultatsComptablesDTO.FinPeriode2= this.toDateP2.toUtc();
+    }
     resultatsComptablesDTO.periode1.debut = this.fromDateP1.toUtc(); 
     resultatsComptablesDTO.periode1.fin = this.toDateP1.toUtc(); 
-    resultatsComptablesDTO.compteBilan = this.bilan;
+    resultatsComptablesDTO.Bilan = this.bilan;
     resultatsComptablesDTO.compteResultat = this.compteResultat;
 
     if(this.secondPeriod){
@@ -275,5 +388,16 @@ export default class extends Vue {
 </script>
 
 <style scopped type="scss">
+.pcol-1{
+  padding-left: 50px;
+}
+.pcol-2{
+  padding-left: 100px;
+}
+.pcol-3{
+  padding-left: 150px;
+}
+
+
 
 </style>

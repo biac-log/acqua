@@ -3,8 +3,12 @@ import { PeriodeComptableDTO } from "../AchatVente";
 
 export class ResultatsComptablesDTO {
     public structureName = '';
-    public compteBilan = false;
+    public Bilan = false;
     public compteResultat = false;
+    public DebutPeriode1 = '';
+    public FinPeriode1 = '';
+    public DebutPeriode2 = '';
+    public FinPeriode2 = '';
     public periode1 : PeriodeComptableDTO = new PeriodeComptableDTO();
     public periode2 : PeriodeComptableDTO = new PeriodeComptableDTO();
   }
